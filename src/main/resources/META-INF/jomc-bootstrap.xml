@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemas xmlns="http://jomc.org/model/bootstrap"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://jomc.org/model/bootstrap http://www.jomc.org/jomc-model/jomc-bootstrap-1.0.xsd">
+
+  <schema public-id="http://jomc.org/model"
+          system-id="http://www.jomc.org/jomc-model/jomc-1.0.xsd"
+          context-id="org.jomc.model"
+          classpath-id="org/jomc/model/jomc-1.0.xsd"/>
+
+</schemas>

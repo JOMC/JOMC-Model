@@ -1,0 +1,274 @@
+/*
+ *  JOMC Model
+ *  Copyright (c) 2005 Christian Schulte <cs@schulte.it>
+ *
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or any later version.
+ *
+ *  This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ *  $Id$
+ *
+ */
+
+options {
+  STATIC = false;
+  IGNORE_CASE = true;
+  FORCE_LA_CHECK = true;
+}
+
+PARSER_BEGIN(VersionParser)
+/*
+ *  JOMC Model
+ *  Copyright (c) 2005 Christian Schulte <cs@schulte.it>
+ *
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or any later version.
+ *
+ *  This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ *  $Id$
+ *
+ */
+package org.jomc.model.util;
+
+import java.io.StringReader;
+import java.util.List;
+import java.util.LinkedList;
+import java.util.Locale;
+import java.text.NumberFormat;
+
+/**
+ * Parses and compares version identifiers.
+ * <p><blockquote><pre>
+ * Version    ::= Token ( ( &lt;SEPARATOR&gt; )* Token )* &lt;EOF&gt;
+ * Token      ::= &lt;INTEGER&gt;
+ *              | &lt;IDENTIFIER&gt;
+ * </pre></blockquote></p>
+ * <p>
+ * A separator character is defined as<blockquote><pre>
+ * [".","_","-","@","/","\\"," ","\t","\n","\r","\f","\b","\"","\'"]</pre></blockquote>
+ * An integer is a sequence of digits. An identifier is everything else, not
+ * a separator character or an integer.
+ * </p>
+ *
+ * @author <a href="mailto:cs@schulte.it">Christian Schulte</a>
+ * @version $Id$
+ * @see #compare(String, String)
+ */
+public final class VersionParser
+{
+
+  /**
+   * Parses the input to produce an array of tokens.
+   *
+   * @return the parsed tokens.
+   *
+   * @throws ParseException if the parse fails.
+   * @throws TokenMgrError for any invalid tokens.
+   */
+  public Token[] parse() throws ParseException, TokenMgrError
+  {
+    return this.Version();
+  }
+
+  /**
+   * Compares two versions for order.
+   * <p>This method parses the given strings to produce a sequence of tokens
+   * and then compares these tokens for order.</p>
+   *
+   * @param v1 the version to compare with.
+   * @param v2 the version to compare to.
+   *
+   * @return a negative integer, zero, or a positive integer as the first
+   * version is less than, equal to, or greater than the second.
+   *
+   * @throws NullPointerException if {@code v1} or {@code v2} is {@code null}.
+   * @throws ParseException if parsing fails.
+   * @throws TokenMgrError for any invalid tokens.
+   */
+  public static int compare( final String v1, final String v2 )
+    throws ParseException, TokenMgrError
+  {
+    if ( v1 == null )
+    {
+      throw new NullPointerException( "v1" );
+    }
+    if ( v2 == null )
+    {
+      throw new NullPointerException( "v2" );
+    }
+
+    try
+    {
+      final NumberFormat format =
+        NumberFormat.getNumberInstance( Locale.ENGLISH );
+
+      final VersionParser versionParser =
+        new VersionParser( new StringReader( v1 ) );
+
+      final Token[] c = versionParser.parse();
+
+      versionParser.ReInit( new StringReader( v2 ) );
+      final Token[] r = versionParser.parse();
+
+      final int len = Math.max( c.length, r.length );
+
+      int result = 0;
+
+      for ( int i = 0; i < len; i++ )
+      {
+        final Token current;
+        final Token spec;
+
+        if ( i < c.length )
+        {
+          current = c[i];
+        }
+        else
+        {
+          current = new Token();
+          current.kind = r[i].kind;
+
+          if ( r[i].kind == VersionParserConstants.IDENTIFIER )
+          {
+            // If a version has less tokens than another, comparison is stopped
+            // at the first identifier. Remaining tokens are considered suffices
+            // less than the shorter version.
+            result = 1;
+            break;
+          }
+          else if ( r[i].kind == VersionParserConstants.INTEGER )
+          {
+            current.image = "0";
+          }
+        }
+
+        if ( i < r.length )
+        {
+          spec = r[i];
+        }
+        else
+        {
+          spec = new Token();
+          spec.kind = c[i].kind;
+
+          if ( c[i].kind == VersionParserConstants.IDENTIFIER )
+          {
+            // If a version has less tokens than another, comparison is stopped
+            // at the first identifier. Remaining tokens are considered suffices
+            // less than the shorter version.
+            result = -1;
+            break;
+          }
+          else if ( c[i].kind == VersionParserConstants.INTEGER )
+          {
+            spec.image = "0";
+          }
+        }
+
+        if ( current.kind != spec.kind )
+        {
+          final java.text.MessageFormat f =
+            new java.text.MessageFormat( getMessage( "cannotCompare" ) );
+
+          throw new ParseException(
+            f.format( new Object[] { current.image, spec.image, v1, v2 } ) );
+
+        }
+
+        if ( current.kind == VersionParserConstants.IDENTIFIER )
+        {
+          result = current.image.compareTo( spec.image );
+          if ( result != 0 )
+          {
+            break;
+          }
+        }
+        else if ( current.kind == VersionParserConstants.INTEGER )
+        {
+          final Long m = (Long) format.parse( current.image );
+          final Long n = (Long) format.parse( spec.image );
+
+          result = m.compareTo( n );
+
+          if ( result != 0 )
+          {
+            break;
+          }
+        }
+        else
+        {
+          // Unsupported tokens are compared lexicographically by default.
+          result = current.image.compareTo( spec.image );
+          if ( result != 0 )
+          {
+            break;
+          }
+        }
+      }
+
+      return result;
+    }
+    catch ( java.text.ParseException e )
+    {
+      throw new ParseException( e.getMessage() );
+    }
+  }
+
+  private static String getMessage( final String key )
+  {
+    return java.util.ResourceBundle.getBundle(
+        VersionParser.class.getName().replace( '.', '/' ),
+        java.util.Locale.getDefault() ).getString( key );
+
+  }
+
+}
+
+PARSER_END(VersionParser)
+
+TOKEN :
+{
+  < INTEGER: ( ["0" - "9"] )+ >
+| < SEPARATOR: ( [".","_","-","@","/","\\"," ","\t","\n","\r","\f","\b","\"","\'"] ) >
+| < IDENTIFIER: ( ~[".","_","-","@","/","\\"," ","\t","\n","\r","\f","\b","\"","\'","0" - "9"] )+ >
+}
+
+private Token[] Version():
+{
+    final List tokens = new LinkedList();
+}
+{
+  Token(tokens) ( ( <SEPARATOR> )* Token(tokens) )* <EOF>
+  {
+    return (Token[]) tokens.toArray(new Token[tokens.size()]);
+  }
+}
+
+private void Token(final List tokens):
+{
+    Token part;
+}
+{
+  part = <INTEGER> { tokens.add ( part ); }
+| part = <IDENTIFIER> { tokens.add( part ); }
+}

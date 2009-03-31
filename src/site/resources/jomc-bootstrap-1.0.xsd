@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+  JOMC Bootstrap Model
+  Copyright (c) 2005 Christian Schulte
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+  $Id jdtaus-container-1.0.xsd 141 2009-02-08 13:47:51Z schulte $
+
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://jomc.org/model/bootstrap"
+            xmlns:bootstrap="http://jomc.org/model/bootstrap"
+            xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+            jaxb:version="2.0"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en"><![CDATA[
+
+  JOMC Bootstrap Model
+  Copyright (c) 2005 Christian Schulte
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+  $Id jdtaus-container-1.0.xsd 141 2009-02-08 13:47:51Z schulte $]]>
+    </xsd:documentation>
+  </xsd:annotation>
+  <!--                                                                       -->
+  <!-- Schemas                                                               -->
+  <!--                                                                       -->
+  <xsd:element name="schemas" type="bootstrap:Schemas">
+    <xsd:key name="schema-key">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en"><![CDATA[Key of a schema.]]></xsd:documentation>
+      </xsd:annotation>
+      <xsd:selector xpath=".//bootstrap:schema"/>
+      <xsd:field xpath="@public-id"/>
+    </xsd:key>
+  </xsd:element>
+  <xsd:complexType name="Schemas">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <jaxb:class>
+          <jaxb:javadoc><![CDATA[List of schemas.]]></jaxb:javadoc>
+        </jaxb:class>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element ref="bootstrap:schema" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- Schema                                                                -->
+  <!--                                                                       -->
+  <xsd:element name="schema" type="bootstrap:Schema"/>
+  <xsd:complexType name="Schema">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <jaxb:class>
+          <jaxb:javadoc><![CDATA[Schema.]]></jaxb:javadoc>
+        </jaxb:class>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:attribute name="public-id" type="xsd:string" use="required">
+      <xsd:annotation>
+        <xsd:appinfo>
+          <jaxb:property>
+            <jaxb:javadoc><![CDATA[The public id of the schema.]]></jaxb:javadoc>
+          </jaxb:property>
+        </xsd:appinfo>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="system-id" type="xsd:string" use="required">
+      <xsd:annotation>
+        <xsd:appinfo>
+          <jaxb:property>
+            <jaxb:javadoc><![CDATA[The system id of the schema.]]></jaxb:javadoc>
+          </jaxb:property>
+        </xsd:appinfo>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="context-id" type="xsd:string" use="optional">
+      <xsd:annotation>
+        <xsd:appinfo>
+          <jaxb:property>
+            <jaxb:javadoc><![CDATA[The context id of the schema.]]></jaxb:javadoc>
+          </jaxb:property>
+        </xsd:appinfo>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="classpath-id" type="xsd:string" use="optional">
+      <xsd:annotation>
+        <xsd:appinfo>
+          <jaxb:property>
+            <jaxb:javadoc><![CDATA[The classpath id of the schema.]]></jaxb:javadoc>
+          </jaxb:property>
+        </xsd:appinfo>
+      </xsd:annotation>
+    </xsd:attribute>
+  </xsd:complexType>
+</xsd:schema>

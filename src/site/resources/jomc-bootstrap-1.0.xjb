@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jaxb:bindings xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+               xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+               xmlns:xs="http://www.w3.org/2001/XMLSchema"
+               xmlns:bootstrap="http://jomc.org/model/bootstrap"
+               xmlns:ci="http://jaxb.dev.java.net/plugin/code-injector"
+               jaxb:version="2.0">
+
+  <jaxb:bindings schemaLocation="jomc-bootstrap-1.0.xsd">
+    <jaxb:bindings node="xs:complexType[@name='Schemas']">
+      <ci:code><![CDATA[
+    /**
+     * Gets a schema for a given public id.
+     *
+     * @param publicId The publid id of the schema to return.
+     *
+     * @return The schema with public id {@code publicId} or {@code null} if no
+     * schema matching {@code publicId} is found.
+     *
+     * @throws NullPointerException if {@code publicId} is {@code null}.
+     */
+    public Schema getSchema( final String publicId )
+    {
+        if ( publicId == null )
+        {
+            throw new NullPointerException( "publicId" );
+        }
+
+        for ( Schema s : this.getSchema() )
+        {
+            if ( s.getPublicId().equals( publicId ) )
+            {
+                return s;
+            }
+        }
+
+        return null;
+    }
+]]></ci:code>
+    </jaxb:bindings>
+  </jaxb:bindings>
+</jaxb:bindings>

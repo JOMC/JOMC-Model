@@ -1,0 +1,543 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jaxb:bindings xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+               xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+               xmlns:xs="http://www.w3.org/2001/XMLSchema"
+               xmlns:jomc="http://jomc.org/model"
+               xmlns:ci="http://jaxb.dev.java.net/plugin/code-injector"
+               jaxb:version="2.0">
+
+  <jaxb:bindings schemaLocation="jomc-1.0.xsd">
+    <jaxb:bindings node="xs:complexType[@name='Texts']">
+      <ci:code><![CDATA[
+    /**
+     * Gets a text for a given language.
+     *
+     * @param language The language of the text to return.
+     *
+     * @return The text with language {@code language} or the default text, if
+     * no text matching {@code language} is found.
+     *
+     * @throws NullPointerException if {@code language} is {@code null}.
+     */
+    public Text getText( final String language )
+    {
+        if ( language == null )
+        {
+            throw new NullPointerException( "language" );
+        }
+
+        Text defaultText = null;
+
+        for ( Text t : this.getText() )
+        {
+            if ( t.getLanguage().equals( this.getDefaultLanguage() ) )
+            {
+                defaultText = t;
+            }
+            if ( t.getLanguage().equals( language ) )
+            {
+                return t;
+            }
+        }
+
+        return defaultText;
+    }
+]]></ci:code>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Specifications']">
+      <ci:code><![CDATA[
+    /**
+     * Gets a specification for a given identifier from the list of
+     * specifications.
+     *
+     * @param specification The identifier of the specification to return.
+     *
+     * @return The specification identified by {@code specification} from the
+     * list or {@code null}, if no specification matching {@code specification}
+     * is found.
+     *
+     * @throws NullPointerException if {@code specification} is {@code null}.
+     */
+    public Specification getSpecification( final String specification )
+    {
+        if ( specification == null )
+        {
+            throw new NullPointerException( "specification" );
+        }
+
+        for ( Specification s : this.getSpecification() )
+        {
+            if ( specification.equals( s.getIdentifier() ) )
+            {
+                return s;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Gets a specification reference for a given identifier from the list of
+     * references.
+     *
+     * @param specification The identifier of the reference to return.
+     *
+     * @return The specification reference identified by {@code specification}
+     * from the list or {@code null}, if no specification reference matching
+     * {@code specification} is found.
+     *
+     * @throws NullPointerException if {@code specification} is {@code null}.
+     */
+    public SpecificationReference getReference( final String specification )
+    {
+        if ( specification == null )
+        {
+            throw new NullPointerException( "specification" );
+        }
+
+        for ( SpecificationReference r : this.getReference() )
+        {
+            if ( specification.equals( r.getIdentifier() ) )
+            {
+                return r;
+            }
+        }
+
+        return null;
+    }
+]]></ci:code>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Implementations']">
+      <ci:code><![CDATA[
+    /**
+     * Gets an implementation for a given identifier from the list.
+     *
+     * @param implementation The identifier of the implementation to return.
+     *
+     * @return The implementation identified by {@code implementation} from the
+     * list or {@code null}, if no implementation matching
+     * {@code implementation} is found.
+     *
+     * @throws NullPointerException if {@code implementation} is {@code null}.
+     */
+    public Implementation getImplementation( final String implementation )
+    {
+        if ( implementation == null )
+        {
+            throw new NullPointerException( "implementation" );
+        }
+
+        for ( Implementation i : this.getImplementation() )
+        {
+            if ( implementation.equals( i.getIdentifier() ) )
+            {
+                return i;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Gets an implementation for a given clazz from the list.
+     *
+     * @param implementation The class of the implementation to return.
+     *
+     * @return The implementation identified by {@code implementation} from the
+     * list or {@code null}, if no implementation matching
+     * {@code implementation} is found.
+     *
+     * @throws NullPointerException if {@code implementation} is {@code null}.
+     */
+    public Implementation getImplementation( final Class implementation )
+    {
+        if ( implementation == null )
+        {
+            throw new NullPointerException( "implementation" );
+        }
+
+        for ( Implementation i : this.getImplementation() )
+        {
+            if ( implementation.getName().equals( i.getIdentifier() ) &&
+                 i.getIdentifier().equals( i.getClazz() ) )
+            {
+                return i;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Gets an implementation for a given name from the list.
+     *
+     * @param name The name of the implementation to return.
+     *
+     * @return The implementation named {@code name} from the list or
+     * {@code null}, if no implementation matching {@code name} is found.
+     *
+     * @throws NullPointerException if {@code name} is {@code null}.
+     */
+    public Implementation getImplementationByName( final String name )
+    {
+        if ( name == null )
+        {
+            throw new NullPointerException( "name" );
+        }
+
+        for ( Implementation i : this.getImplementation() )
+        {
+            if ( name.equals( i.getName() ) )
+            {
+                return i;
+            }
+        }
+
+        return null;
+    }
+]]></ci:code>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Dependencies']">
+      <ci:code><![CDATA[
+    /**
+     * Gets a dependency for a given name from the list.
+     *
+     * @param name The name of the dependency to return.
+     *
+     * @return The dependency with name {@code name} from the list or
+     * {@code null}, if no dependency matching {@code name} is found.
+     *
+     * @throws NullPointerException if {@code name} is {@code null}.
+     */
+    public Dependency getDependency( final String name )
+    {
+        if ( name == null )
+        {
+            throw new NullPointerException( "identifier" );
+        }
+
+        for ( Dependency d : this.getDependency() )
+        {
+            if ( name.equals( d.getName() ) )
+            {
+                return d;
+            }
+        }
+
+        return null;
+    }
+]]></ci:code>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Properties']">
+      <ci:code><![CDATA[
+    /**
+     * Gets a property for a given name from the list.
+     *
+     * @param name The name of the property to return.
+     *
+     * @return The property with name {@code name} from the list or
+     * {@code null}, if no property matching {@code name} is found.
+     *
+     * @throws NullPointerException if {@code name} is {@code null}.
+     */
+    public Property getProperty( final String name )
+    {
+        if ( name == null )
+        {
+            throw new NullPointerException( "name" );
+        }
+
+        for ( Property p : this.getProperty() )
+        {
+            if ( name.equals( p.getName() ) )
+            {
+                return p;
+            }
+        }
+
+        return null;
+    }
+]]></ci:code>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Property']">
+      <ci:code><![CDATA[
+    /**
+     * Gets the java value of the property.
+     *
+     * @return The java value of the property.
+     */
+    public Object getPropertyValue()
+    {
+        final Class objectType;
+        Object propertyValue = null;
+
+        if ( this.getType() == PropertyType.BOOLEAN ||
+             this.getType() == PropertyType.JAVA_LANG_BOOLEAN )
+        {
+            objectType = Boolean.class;
+        }
+        else if ( this.getType() == PropertyType.BYTE ||
+                  this.getType() == PropertyType.JAVA_LANG_BYTE )
+        {
+            objectType = Byte.class;
+        }
+        else if ( this.getType() == PropertyType.CHAR ||
+                  this.getType() == PropertyType.JAVA_LANG_CHARACTER )
+        {
+            objectType = Character.class;
+        }
+        else if ( this.getType() == PropertyType.DOUBLE ||
+                  this.getType() == PropertyType.JAVA_LANG_DOUBLE )
+        {
+            objectType = Double.class;
+        }
+        else if ( this.getType() == PropertyType.FLOAT ||
+                  this.getType() == PropertyType.JAVA_LANG_FLOAT )
+        {
+            objectType = Float.class;
+        }
+        else if ( this.getType() == PropertyType.INT ||
+                  this.getType() == PropertyType.JAVA_LANG_INTEGER )
+        {
+            objectType = Integer.class;
+        }
+        else if ( this.getType() == PropertyType.LONG ||
+                  this.getType() == PropertyType.JAVA_LANG_LONG )
+        {
+            objectType = Long.class;
+        }
+        else if ( this.getType() == PropertyType.SHORT ||
+                  this.getType() == PropertyType.JAVA_LANG_SHORT )
+        {
+            objectType = Short.class;
+        }
+        else if ( this.getType() == PropertyType.JAVA_LANG_STRING )
+        {
+            objectType = String.class;
+        }
+        else if ( this.getType() == PropertyType.JAVA_LANG_OBJECT )
+        {
+            objectType = Object.class;
+            propertyValue = this.getAny();
+            if ( propertyValue != null &&
+                 propertyValue instanceof javax.xml.bind.JAXBElement )
+            {
+                propertyValue =
+                    ( (javax.xml.bind.JAXBElement) propertyValue ).getValue();
+
+            }
+        }
+        else
+        {
+            throw new ModelError( this.getType().value() );
+        }
+
+        if ( objectType != Object.class && this.getValue() != null )
+        {
+            try
+            {
+                final java.lang.reflect.Constructor ctor;
+                final Object arg;
+
+                if ( objectType == Character.class )
+                {
+                    ctor = objectType.getConstructor( new Class[]
+                        {
+                            char.class
+                        } );
+
+                    arg = new Character( this.getValue().charAt( 0 ) );
+                }
+                else
+                {
+                    ctor = objectType.getConstructor( new Class[]
+                        {
+                            String.class
+                        } );
+
+                    arg = this.getValue();
+                }
+
+                propertyValue = ctor.newInstance( new Object[]
+                    {
+                        arg
+                    } );
+
+            }
+            catch ( InstantiationException e )
+            {
+                throw new ModelError( e );
+            }
+            catch ( IllegalAccessException e )
+            {
+                throw new ModelError( e );
+            }
+            catch ( java.lang.reflect.InvocationTargetException e )
+            {
+                throw new ModelError( e );
+            }
+            catch ( NoSuchMethodException e )
+            {
+                throw new ModelError( e );
+            }
+        }
+
+        return propertyValue;
+    }
+]]></ci:code>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Messages']">
+      <ci:code><![CDATA[
+    /**
+     * Gets a message for a given name from the list.
+     *
+     * @param name The name of the message to return.
+     *
+     * @return The message with name {@code name} from the list or {@code null},
+     * if no message matching {@code name} is found.
+     *
+     * @throws NullPointerException if {@code name} is {@code null}.
+     */
+    public Message getMessage( final String name )
+    {
+        if ( name == null )
+        {
+            throw new NullPointerException( "name" );
+        }
+
+        for ( Message m : this.getMessage() )
+        {
+            if ( name.equals( m.getName() ) )
+            {
+                return m;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Gets a message reference for a given name from the list of references.
+     *
+     * @param name The name of the message reference to return.
+     *
+     * @return The message reference with name {@code name} from the list of
+     * references or {@code null}, if no message reference matching {@code name}
+     * is found.
+     *
+     * @throws NullPointerException if {@code name} is {@code null}.
+     */
+    public MessageReference getReference( final String name )
+    {
+        if ( name == null )
+        {
+            throw new NullPointerException( "name" );
+        }
+
+        for ( MessageReference r : this.getReference() )
+        {
+            if ( name.equals( r.getName() ) )
+            {
+                return r;
+            }
+        }
+
+        return null;
+    }
+]]></ci:code>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Arguments']">
+      <ci:code><![CDATA[
+    /**
+     * Gets an argument for a given name from the list.
+     *
+     * @param name The name of the argument to return.
+     *
+     * @return The argument with name {@code name} from the list or
+     * {@code null}, if no argument matching {@code name} is found.
+     *
+     * @throws NullPointerException if {@code name} is {@code null}.
+     */
+    public Argument getArgument( final String name )
+    {
+        if ( name == null )
+        {
+            throw new NullPointerException( "name" );
+        }
+
+        for ( Argument a : this.getArgument() )
+        {
+            if ( name.equals( a.getName() ) )
+            {
+                return a;
+            }
+        }
+
+        return null;
+    }
+]]></ci:code>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Instances']">
+      <ci:code><![CDATA[
+    /**
+     * Gets an instance for a given identifier from the list.
+     *
+     * @param identifier The identifier of the instance to return.
+     *
+     * @return The instance identified by {@code identifier} from the list or
+     * {@code null}, if no instance matching {@code identifier} is found.
+     *
+     * @throws NullPointerException if {@code identifier} is {@code null}.
+     */
+    public Instance getInstance( final String identifier )
+    {
+        if ( identifier == null )
+        {
+            throw new NullPointerException( "identifier" );
+        }
+
+        for ( Instance i : this.getInstance() )
+        {
+            if ( i.getIdentifier().equals( identifier ) )
+            {
+                return i;
+            }
+        }
+
+        return null;
+    }
+]]></ci:code>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Modules']">
+      <ci:code><![CDATA[
+    /**
+     * Gets a module for a given name from the list.
+     *
+     * @param name The name of the module to return.
+     *
+     * @return The module with name {@code name} from the list or {@code null},
+     * if no module matching {@code name} is found.
+     *
+     * @throws NullPointerException if {@code name} is {@code null}.
+     */
+    public Module getModule( final String name )
+    {
+        if ( name == null )
+        {
+            throw new NullPointerException( "name" );
+        }
+
+        for ( Module m : this.getModule() )
+        {
+            if ( m.getName().equals( name ) )
+            {
+                return m;
+            }
+        }
+
+        return null;
+    }
+]]></ci:code>
+    </jaxb:bindings>
+  </jaxb:bindings>
+</jaxb:bindings>
