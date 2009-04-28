@@ -20,39 +20,69 @@
 package org.jomc.model;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.MessageFormat;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.xml.XMLConstants;
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.util.JAXBSource;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
+import org.jomc.model.bootstrap.Schema;
+import org.jomc.model.bootstrap.Schemas;
 import org.jomc.model.util.ParseException;
 import org.jomc.model.util.TokenMgrError;
 import org.jomc.model.util.VersionParser;
+import org.w3c.dom.ls.LSInput;
+import org.w3c.dom.ls.LSResourceResolver;
+import org.xml.sax.EntityResolver;
 import org.xml.sax.ErrorHandler;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 /**
  * Default {@code ModelManager} implementation.
- * <p>If not stated otherwise, all methods of this class throw an instance of {@code ModelError} for any model related
- * unrecoverable errors.</p>
+ *
+ * <p><b>Classpath support</b><ul>
+ * <li>{@link #getClassLoader() }</li>
+ * <li>{@link #setClassLoader(java.lang.ClassLoader) }</li>
+ * <li>{@link #getClasspathModule() }</li>
+ * <li>{@link #getClasspathModules(java.lang.String) }</li>
+ * </ul></p>
+ *
+ * <p><b>Logging</b><ul>
+ * <li>{@link #getListeners() }</li>
+ * <li>{@link #log(java.util.logging.Level, java.lang.String, java.lang.Throwable) }</li>
+ * </ul></p>
  *
  * @author <a href="mailto:cs@schulte.it">Christian Schulte</a>
  * @version $Id$
@@ -61,813 +91,414 @@ public class DefaultModelManager implements ModelManager
 {
     // SECTION-START[ModelManager]
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see #isClasspathAware()
-     * @see #isValidating()
-     */
-    public Modules getModules()
+    public ObjectFactory getObjectFactory()
     {
-        try
+        if ( this.objectFactory == null )
         {
-            if ( this.modules == null )
-            {
-                if ( this.isClasspathAware() )
-                {
-                    this.modules = this.getClasspathModules( MODEL_LOCATION );
-
-                    final Module classpath = this.getClasspathModule();
-
-                    if ( classpath != null )
-                    {
-                        this.modules.getModule().add( classpath );
-                    }
-                }
-                else
-                {
-                    this.modules = new Modules();
-                    final Texts texts = new Texts();
-                    final Text text = new Text();
-
-                    this.modules.setModelVersion( MODEL_VERSION );
-                    this.modules.setDocumentation( texts );
-                    texts.setDefaultLanguage( "en" );
-                    texts.getText().add( text );
-                    text.setLanguage( "en" );
-                    text.setValue( new MessageFormat( this.getMessage( "defaultModulesInfo" ) ).format( null ) );
-                }
-
-                if ( this.isValidating() )
-                {
-                    this.assertValidModules( this.modules );
-                }
-            }
-
-            return this.modules;
+            this.objectFactory = new ObjectFactory();
         }
-        catch ( Throwable t )
-        {
-            throw new ModelError( t.getMessage(), t );
-        }
+
+        return this.objectFactory;
     }
 
-    public Module getModuleOfSpecification( final String specification )
+    public EntityResolver getEntityResolver()
     {
-        if ( specification == null )
+        if ( this.entityResolver == null )
         {
-            throw new NullPointerException( "specification" );
-        }
-
-        for ( Module m : this.getModules().getModule() )
-        {
-            if ( m.getSpecifications() != null )
+            this.entityResolver = new EntityResolver()
             {
-                for ( Specification s : m.getSpecifications().getSpecification() )
+
+                public InputSource resolveEntity( final String publicId, final String systemId )
+                    throws SAXException, IOException
                 {
-                    if ( specification.equals( s.getIdentifier() ) )
+                    if ( systemId == null )
                     {
-                        return m;
+                        throw new NullPointerException( "systemId" );
                     }
-                }
-            }
-        }
 
-        return null;
-    }
+                    InputSource schemaSource = null;
 
-    public Module getModuleOfImplementation( final String implementation )
-    {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-
-        for ( Module m : this.getModules().getModule() )
-        {
-            if ( m.getImplementations() != null )
-            {
-                for ( Implementation i : m.getImplementations().getImplementation() )
-                {
-                    if ( implementation.equals( i.getIdentifier() ) )
+                    try
                     {
-                        return m;
-                    }
-                }
-            }
-        }
-
-        return null;
-    }
-
-    public Module getImplementationModule( final String implementation )
-    {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-
-        Module module = null;
-        final Implementation i = this.getImplementation( implementation );
-
-        if ( i != null )
-        {
-            final Modules m = new Modules();
-            module = new Module();
-            module.setSpecifications( new Specifications() );
-            module.setImplementations( new Implementations() );
-            module.setName( i.getIdentifier() );
-            module.setVersion( i.getVersion() );
-            module.setModelVersion( MODEL_VERSION );
-            m.getModule().add( module );
-
-            this.collectImplementationModule( module, implementation );
-
-            final Dependencies dependencies = this.getDependencies( implementation );
-            final List<SpecificationReference> references = this.getSpecifications( implementation );
-
-            if ( dependencies != null )
-            {
-                for ( Dependency d : dependencies.getDependency() )
-                {
-                    if ( module.getSpecifications().getSpecification( d.getIdentifier() ) == null )
-                    {
-                        final Specification s = this.getSpecification( d.getIdentifier() );
-
+                        final Schema s = getSchemas().getSchema( publicId );
                         if ( s != null )
                         {
-                            module.getSpecifications().getSpecification().add( s );
-                        }
-                    }
-                }
-            }
+                            schemaSource = new InputSource();
+                            schemaSource.setPublicId( publicId );
 
-            if ( references != null )
-            {
-                for ( SpecificationReference ref : references )
-                {
-                    if ( module.getSpecifications().getSpecification( ref.getIdentifier() ) == null )
-                    {
-                        final Specification s = this.getSpecification( ref.getIdentifier() );
-                        if ( s != null )
-                        {
-                            module.getSpecifications().getSpecification().add( s );
-                        }
-                    }
-                }
-            }
-        }
-
-        return module;
-    }
-
-    private void collectImplementationModule( final Module module, final String parent )
-    {
-        final Implementation i = getImplementation( parent );
-        if ( i != null )
-        {
-            if ( i.getParent() != null )
-            {
-                this.collectImplementationModule( module, i.getParent() );
-            }
-
-            if ( module.getImplementations().getImplementation( i.getIdentifier() ) == null )
-            {
-                final Module m = getModuleOfImplementation( i.getIdentifier() );
-                module.getImplementations().getImplementation().add( i );
-
-                if ( i.getMessages() != null )
-                {
-                    for ( Iterator<MessageReference> ref = i.getMessages().getReference().iterator();
-                          ref.hasNext(); )
-                    {
-                        i.getMessages().getMessage().add( m.getMessages().getMessage( ref.next().getName() ) );
-                        ref.remove();
-                    }
-                }
-            }
-        }
-    }
-
-    public Specification getSpecification( final String specification )
-    {
-        if ( specification == null )
-        {
-            throw new NullPointerException( "specification" );
-        }
-
-        for ( Module m : this.getModules().getModule() )
-        {
-            if ( m.getSpecifications() != null )
-            {
-                final Specification s = m.getSpecifications().getSpecification( specification );
-                if ( s != null )
-                {
-                    return s;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    public List<SpecificationReference> getSpecifications( final String implementation )
-    {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-
-        Specifications specs = new Specifications();
-        this.collectSpecifications( implementation, specs );
-        return specs.getReference().isEmpty() ? null : specs.getReference();
-    }
-
-    private void collectSpecifications( final String implementation, final Specifications specifications )
-    {
-        final Implementation i = getImplementation( implementation );
-
-        if ( i != null )
-        {
-            if ( i.getParent() != null )
-            {
-                this.collectSpecifications( i.getParent(), specifications );
-            }
-
-            if ( i.getSpecifications() != null )
-            {
-                for ( SpecificationReference ref : i.getSpecifications().getReference() )
-                {
-                    if ( specifications.getReference( ref.getIdentifier() ) == null )
-                    {
-                        specifications.getReference().add( ref );
-                    }
-                }
-            }
-        }
-    }
-
-    public Implementation getImplementation( final String implementation )
-    {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-
-        for ( Module m : this.getModules().getModule() )
-        {
-            if ( m.getImplementations() != null )
-            {
-                final Implementation i = m.getImplementations().getImplementation( implementation );
-                if ( i != null )
-                {
-                    return i;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    public Implementation getImplementation( final Class implementation )
-    {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-
-        for ( Module m : this.getModules().getModule() )
-        {
-            if ( m.getImplementations() != null )
-            {
-                final Implementation i = m.getImplementations().getImplementation( implementation );
-                if ( i != null )
-                {
-                    return i;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    public Implementation getImplementation( final String specification, final String name )
-    {
-        if ( specification == null )
-        {
-            throw new NullPointerException( "specification" );
-        }
-        if ( name == null )
-        {
-            throw new NullPointerException( "name" );
-        }
-
-        final Implementations implementations = this.getImplementations( specification );
-        if ( implementations != null )
-        {
-            return implementations.getImplementationByName( name );
-        }
-
-        return null;
-    }
-
-    public Dependencies getDependencies( final String implementation )
-    {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-
-        final Dependencies dependencies = new Dependencies();
-        this.collectDependencies( implementation, dependencies );
-        Collections.sort( dependencies.getDependency(), new Comparator<Dependency>()
-        {
-
-            public int compare( final Dependency o1, final Dependency o2 )
-            {
-                return o1.getName().compareTo( o2.getName() );
-            }
-
-        } );
-
-        return dependencies.getDependency().size() > 0 ? dependencies : null;
-    }
-
-    private void collectDependencies( final String implementation, final Dependencies dependencies )
-    {
-        final Implementation i = getImplementation( implementation );
-
-        if ( i != null )
-        {
-            if ( i.getDependencies() != null )
-            {
-                for ( Dependency d : i.getDependencies().getDependency() )
-                {
-                    if ( dependencies.getDependency( d.getName() ) == null )
-                    {
-                        dependencies.getDependency().add( d );
-                    }
-                }
-            }
-
-            if ( i.getParent() != null )
-            {
-                this.collectDependencies( i.getParent(), dependencies );
-            }
-        }
-    }
-
-    public Properties getProperties( final String implementation )
-    {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-
-        final Properties properties = new Properties();
-        this.collectProperties( implementation, properties );
-        final Properties specified = this.getSpecifiedProperties( implementation );
-
-        if ( specified != null )
-        {
-            for ( Property p : specified.getProperty() )
-            {
-                if ( properties.getProperty( p.getName() ) == null )
-                {
-                    properties.getProperty().add( p );
-                }
-            }
-        }
-
-        Collections.sort( properties.getProperty(), new Comparator<Property>()
-        {
-
-            public int compare( final Property o1, final Property o2 )
-            {
-                return o1.getName().compareTo( o2.getName() );
-            }
-
-        } );
-
-        return properties.getProperty().size() > 0 ? properties : null;
-    }
-
-    private void collectProperties( final String implementation, final Properties properties )
-    {
-        final Implementation i = getImplementation( implementation );
-
-        if ( i != null )
-        {
-            if ( i.getProperties() != null )
-            {
-                for ( Property p : i.getProperties().getProperty() )
-                {
-                    if ( properties.getProperty( p.getName() ) == null )
-                    {
-                        properties.getProperty().add( p );
-                    }
-                }
-            }
-
-            if ( i.getParent() != null )
-            {
-                this.collectProperties( i.getParent(), properties );
-            }
-        }
-    }
-
-    public Properties getSpecifiedProperties( final String implementation )
-    {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-
-        final Properties properties = new Properties();
-
-        final List<SpecificationReference> references = this.getSpecifications( implementation );
-
-        if ( references != null )
-        {
-            for ( SpecificationReference r : references )
-            {
-                final Specification s = this.getSpecification( r.getIdentifier() );
-
-                if ( s != null && s.getProperties() != null )
-                {
-                    properties.getProperty().addAll( s.getProperties().getProperty() );
-                }
-            }
-        }
-
-        Collections.sort( properties.getProperty(), new Comparator<Property>()
-        {
-
-            public int compare( final Property o1, final Property o2 )
-            {
-                return o1.getName().compareTo( o2.getName() );
-            }
-
-        } );
-
-        return properties.getProperty().size() > 0 ? properties : null;
-    }
-
-    public Messages getMessages( final String implementation )
-    {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-
-        final Messages msgs = new Messages();
-        this.collectMessages( implementation, msgs );
-        Collections.sort( msgs.getMessage(), new Comparator<Message>()
-        {
-
-            public int compare( final Message o1, final Message o2 )
-            {
-                return o1.getName().compareTo( o2.getName() );
-            }
-
-        } );
-
-        return msgs.getMessage().size() > 0 ? msgs : null;
-    }
-
-    private void collectMessages( final String implementation, final Messages messages )
-    {
-        final Implementation i = getImplementation( implementation );
-
-        if ( i != null )
-        {
-            if ( i.getMessages() != null )
-            {
-                for ( Message msg : i.getMessages().getMessage() )
-                {
-                    if ( messages.getMessage( msg.getName() ) == null )
-                    {
-                        messages.getMessage().add( msg );
-                    }
-                }
-                if ( !i.getMessages().getReference().isEmpty() )
-                {
-                    final Module m = getModuleOfImplementation( i.getIdentifier() );
-
-                    if ( m != null )
-                    {
-                        for ( MessageReference ref : i.getMessages().getReference() )
-                        {
-                            if ( messages.getMessage( ref.getName() ) == null )
+                            if ( s.getClasspathId() != null )
                             {
-                                messages.getMessage().add( m.getMessages().getMessage( ref.getName() ) );
+                                schemaSource.setSystemId( getClassLoader().getResource( s.getClasspathId() ).
+                                    toExternalForm() );
+
+                            }
+                            else
+                            {
+                                schemaSource.setSystemId( s.getSystemId() );
+                            }
+                        }
+
+                        if ( schemaSource == null )
+                        {
+                            final URI systemUri = new URI( systemId );
+                            String schemaName = systemUri.getPath();
+                            if ( schemaName != null )
+                            {
+                                final int lastIndexOfSlash = schemaName.lastIndexOf( '/' );
+                                if ( lastIndexOfSlash != -1 && lastIndexOfSlash < schemaName.length() )
+                                {
+                                    schemaName = schemaName.substring( lastIndexOfSlash + 1 );
+                                }
+
+                                for ( URL url : getSchemaResources() )
+                                {
+                                    if ( url.getPath().endsWith( schemaName ) )
+                                    {
+                                        schemaSource = new InputSource();
+                                        schemaSource.setPublicId( publicId );
+                                        schemaSource.setSystemId( url.toExternalForm() );
+
+                                        log( Level.FINE, getMessage( "resolvedSystemIdUri", new Object[]
+                                            {
+                                                systemUri.toASCIIString(),
+                                                schemaSource.getSystemId()
+                                            } ), null );
+
+                                        break;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                log( Level.WARNING, getMessage( "unsupportedSystemIdUri", new Object[]
+                                    {
+                                        systemId, systemUri.toASCIIString()
+                                    } ), null );
+
+                                schemaSource = null;
                             }
                         }
                     }
-                }
-            }
-
-            if ( i.getParent() != null )
-            {
-                this.collectMessages( i.getParent(), messages );
-            }
-        }
-    }
-
-    public Implementations getImplementations( final String specification )
-    {
-        if ( specification == null )
-        {
-            throw new NullPointerException( "specification" );
-        }
-
-        final Implementations implementations = new Implementations();
-        for ( Module m : this.getModules().getModule() )
-        {
-            if ( m.getImplementations() != null )
-            {
-                for ( Implementation i : m.getImplementations().getImplementation() )
-                {
-                    final List<SpecificationReference> references = this.getSpecifications( i.getIdentifier() );
-
-                    if ( references != null )
+                    catch ( URISyntaxException e )
                     {
-                        for ( SpecificationReference ref : references )
-                        {
-                            if ( specification.equals( ref.getIdentifier() ) )
+                        log( Level.WARNING, getMessage( "unsupportedSystemIdUri", new Object[]
                             {
-                                implementations.getImplementation().add( i );
-                            }
-                        }
+                                systemId, e.getMessage()
+                            } ), null );
+
+                        schemaSource = null;
                     }
+                    catch ( JAXBException e )
+                    {
+                        throw (IOException) new IOException( e.getMessage() ).initCause( e );
+                    }
+
+                    return schemaSource;
                 }
-            }
+
+            };
         }
 
-        return implementations.getImplementation().size() > 0 ? implementations : null;
+        return this.entityResolver;
     }
 
-    public Implementations getImplementations( final String implementation, final String dependency )
+    public LSResourceResolver getLSResourceResolver()
     {
-        if ( implementation == null )
+        if ( this.resourceResolver == null )
         {
-            throw new NullPointerException( "implementation" );
-        }
-        if ( dependency == null )
-        {
-            throw new NullPointerException( "dependency" );
-        }
-
-        final Implementations implementations = new Implementations();
-        final Implementation i = this.getImplementation( implementation );
-
-        if ( i != null )
-        {
-            final Dependencies dependencies = this.getDependencies( implementation );
-
-            if ( dependencies != null )
+            this.resourceResolver = new LSResourceResolver()
             {
-                final Dependency d = dependencies.getDependency( dependency );
 
-                if ( d != null )
+                public LSInput resolveResource( final String type, final String namespaceURI, final String publicId,
+                                                final String systemId, final String baseURI )
                 {
-                    if ( d.getImplementationName() != null )
+                    LSInput input = null;
+                    try
                     {
-                        final Implementation di =
-                            this.getImplementation( d.getIdentifier(), d.getImplementationName() );
+                        final InputSource schemaSource = getEntityResolver().resolveEntity( publicId, systemId );
 
-                        if ( di != null )
+                        if ( schemaSource != null )
                         {
-                            implementations.getImplementation().add( di );
+                            input = new LSInput()
+                            {
+
+                                public Reader getCharacterStream()
+                                {
+                                    return schemaSource.getCharacterStream();
+                                }
+
+                                public void setCharacterStream( final Reader characterStream )
+                                {
+                                    throw new UnsupportedOperationException();
+                                }
+
+                                public InputStream getByteStream()
+                                {
+                                    return schemaSource.getByteStream();
+                                }
+
+                                public void setByteStream( final InputStream byteStream )
+                                {
+                                    throw new UnsupportedOperationException();
+                                }
+
+                                public String getStringData()
+                                {
+                                    return null;
+                                }
+
+                                public void setStringData( final String stringData )
+                                {
+                                    throw new UnsupportedOperationException();
+                                }
+
+                                public String getSystemId()
+                                {
+                                    return schemaSource.getSystemId();
+                                }
+
+                                public void setSystemId( final String systemId )
+                                {
+                                    throw new UnsupportedOperationException();
+                                }
+
+                                public String getPublicId()
+                                {
+                                    return schemaSource.getPublicId();
+                                }
+
+                                public void setPublicId( final String publicId )
+                                {
+                                    throw new UnsupportedOperationException();
+                                }
+
+                                public String getBaseURI()
+                                {
+                                    return null;
+                                }
+
+                                public void setBaseURI( final String baseURI )
+                                {
+                                    throw new UnsupportedOperationException();
+                                }
+
+                                public String getEncoding()
+                                {
+                                    return schemaSource.getEncoding();
+                                }
+
+                                public void setEncoding( final String encoding )
+                                {
+                                    throw new UnsupportedOperationException();
+                                }
+
+                                public boolean getCertifiedText()
+                                {
+                                    return false;
+                                }
+
+                                public void setCertifiedText( final boolean certifiedText )
+                                {
+                                    throw new UnsupportedOperationException();
+                                }
+
+                            };
                         }
+
                     }
-                    else
+                    catch ( SAXException e )
                     {
-                        final Implementations available = this.getImplementations( d.getIdentifier() );
+                        log( Level.WARNING, getMessage( "unsupportedSystemIdUri", new Object[]
+                            {
+                                systemId, e.getMessage()
+                            } ), null );
 
-                        if ( available != null )
-                        {
-                            implementations.getImplementation().addAll( available.getImplementation() );
-                        }
+                        input = null;
                     }
-                }
-            }
-        }
-
-        return implementations.getImplementation().size() > 0 ? implementations : null;
-    }
-
-    public Instance getInstance( final String implementation )
-    {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-
-        final Implementation i = this.getImplementation( implementation );
-
-        Instance instance = null;
-
-        if ( i != null )
-        {
-            instance = new Instance();
-            instance.setIdentifier( i.getIdentifier() );
-            instance.setClazz( i.getClazz() );
-            instance.setModelVersion( MODEL_VERSION );
-            instance.setScope( Scope.MULTITON );
-            instance.setDependencies( this.getDependencies( i.getIdentifier() ) );
-            instance.setProperties( this.getProperties( i.getIdentifier() ) );
-            instance.setMessages( this.getMessages( i.getIdentifier() ) );
-        }
-
-        return instance;
-    }
-
-    public Instance getInstance( final String specification, final String name )
-    {
-        if ( specification == null )
-        {
-            throw new NullPointerException( "specification" );
-        }
-        if ( name == null )
-        {
-            throw new NullPointerException( "name" );
-        }
-
-        final Specification s = this.getSpecification( specification );
-
-        Instance instance = null;
-
-        if ( s != null )
-        {
-            final Implementation i = this.getImplementation( specification, name );
-
-            if ( i != null )
-            {
-                instance = this.getInstance( i.getIdentifier() );
-
-                if ( instance != null )
-                {
-                    instance.setScope( s.getScope() );
-                }
-            }
-        }
-
-        return instance;
-    }
-
-    public Instance getInstance( final String specification, final String name, final Dependency dependency )
-    {
-        if ( specification == null )
-        {
-            throw new NullPointerException( "specification" );
-        }
-        if ( name == null )
-        {
-            throw new NullPointerException( "name" );
-        }
-        if ( dependency == null )
-        {
-            throw new NullPointerException( "dependency" );
-        }
-
-        final Instance instance = this.getInstance( specification, name );
-
-        if ( instance != null )
-        {
-            final Properties properties = new Properties();
-
-            if ( dependency.getProperties() != null )
-            {
-                properties.getProperty().addAll( dependency.getProperties().getProperty() );
-            }
-
-            if ( instance.getProperties() != null )
-            {
-                for ( Property p : instance.getProperties().getProperty() )
-                {
-                    if ( properties.getProperty( p.getName() ) == null )
+                    catch ( IOException e )
                     {
-                        properties.getProperty().add( p );
-                    }
-                }
-            }
+                        log( Level.WARNING, getMessage( "unsupportedSystemIdUri", new Object[]
+                            {
+                                systemId, e.getMessage()
+                            } ), null );
 
-            instance.setProperties( properties.getProperty().isEmpty() ? null : properties );
+                        input = null;
+                    }
+
+                    return input;
+                }
+
+            };
         }
 
-        return instance;
+        return this.resourceResolver;
     }
 
-    public void assertValidModelObject( final JAXBElement<? extends ModelObject> modelObject ) throws ModelException
+    public javax.xml.validation.Schema getSchema() throws IOException, SAXException, JAXBException
     {
-        final StringBuffer validationEvents = new StringBuffer();
-        validationEvents.append( "\n\n" );
+        final SchemaFactory f = SchemaFactory.newInstance( XMLConstants.W3C_XML_SCHEMA_NS_URI );
+        final List<Source> sources = new ArrayList<Source>( this.getSchemas().getSchema().size() );
+
+        for ( Schema s : this.getSchemas().getSchema() )
+        {
+            sources.add( new StreamSource( this.getClassLoader().getResourceAsStream( s.getClasspathId() ),
+                                           s.getSystemId() ) );
+
+        }
+
+        return f.newSchema( sources.toArray( new Source[ sources.size() ] ) );
+    }
+
+    public JAXBContext getContext() throws IOException, SAXException, JAXBException
+    {
+        final StringBuffer context = new StringBuffer();
+
+        for ( Iterator<Schema> s = this.getSchemas().getSchema().iterator(); s.hasNext(); )
+        {
+            final Schema schema = s.next();
+            context.append( schema.getContextId() );
+            if ( s.hasNext() )
+            {
+                context.append( ':' );
+            }
+        }
+
+        return JAXBContext.newInstance( context.toString(), this.getClassLoader() );
+    }
+
+    public Marshaller getMarshaller( final boolean validating, final boolean formattedOutput )
+        throws IOException, SAXException, JAXBException
+    {
+        final Marshaller m = this.getContext().createMarshaller();
+        final StringBuffer schemaLocation = new StringBuffer();
+
+        for ( Iterator<Schema> s = this.getSchemas().getSchema().iterator(); s.hasNext(); )
+        {
+            final Schema schema = s.next();
+            schemaLocation.append( schema.getPublicId() ).append( ' ' ).append( schema.getSystemId() );
+            if ( s.hasNext() )
+            {
+                schemaLocation.append( ' ' );
+            }
+        }
+
+        m.setProperty( Marshaller.JAXB_SCHEMA_LOCATION, schemaLocation.toString() );
+        m.setProperty( Marshaller.JAXB_ENCODING, "UTF-8" );
+        m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.valueOf( formattedOutput ) );
+
+        if ( validating )
+        {
+            m.setSchema( this.getSchema() );
+        }
+
+        return m;
+    }
+
+    public Unmarshaller getUnmarshaller( final boolean validating ) throws IOException, SAXException, JAXBException
+    {
+        final Unmarshaller u = this.getContext().createUnmarshaller();
+
+        if ( validating )
+        {
+            u.setSchema( this.getSchema() );
+        }
+
+        return u;
+    }
+
+    public void validateModelObject( final JAXBElement<? extends ModelObject> modelObject ) throws ModelException
+    {
+        if ( modelObject == null )
+        {
+            throw new NullPointerException( "modelObject" );
+        }
+
+        Validator validator = null;
+        final StringWriter stringWriter = new StringWriter();
+        final List<ModelException.Detail> details = new LinkedList<ModelException.Detail>();
 
         try
         {
-            final Validator validator = this.getModelResolver().getSchema().newValidator();
-
+            validator = this.getSchema().newValidator();
             validator.setErrorHandler( new ErrorHandler()
             {
 
                 public void warning( final SAXParseException exception ) throws SAXException
                 {
-                    validationEvents.append( "[WARNING]" );
-                    validationEvents.append( " [" ).append( exception.getLineNumber() ).append( "," ).
-                        append( exception.getColumnNumber() ).append( "]" );
-
                     if ( exception.getMessage() != null )
                     {
-                        validationEvents.append( " " ).append( exception.getMessage() );
+                        details.add( new ModelException.Detail( Level.WARNING, exception.getMessage() ) );
                     }
-
-                    if ( exception.getPublicId() != null )
-                    {
-                        validationEvents.append( " [" ).append( exception.getPublicId() ).append( ']' );
-                    }
-
-                    if ( exception.getSystemId() != null )
-                    {
-                        validationEvents.append( " [" ).append( exception.getSystemId() ).append( ']' );
-                    }
-
-                    getLogger().log( Level.WARNING, validationEvents.toString() );
-                    validationEvents.append( "\n" );
                 }
 
                 public void error( final SAXParseException exception ) throws SAXException
                 {
-                    validationEvents.append( "[ERROR]" );
-                    validationEvents.append( " [" ).append( exception.getLineNumber() ).append( "," ).
-                        append( exception.getColumnNumber() ).append( "]" );
-
                     if ( exception.getMessage() != null )
                     {
-                        validationEvents.append( " " ).append( exception.getMessage() );
+                        details.add( new ModelException.Detail( Level.SEVERE, exception.getMessage() ) );
                     }
 
-                    if ( exception.getPublicId() != null )
-                    {
-                        validationEvents.append( " [" ).append( exception.getPublicId() ).append( ']' );
-                    }
-
-                    if ( exception.getSystemId() != null )
-                    {
-                        validationEvents.append( " [" ).append( exception.getSystemId() ).append( ']' );
-                    }
-
-                    validationEvents.append( "\n" );
                     throw exception;
                 }
 
                 public void fatalError( final SAXParseException exception ) throws SAXException
                 {
-                    validationEvents.append( "[FATAL]" );
-                    validationEvents.append( " [" ).append( exception.getLineNumber() ).append( "," ).
-                        append( exception.getColumnNumber() ).append( "]" );
-
                     if ( exception.getMessage() != null )
                     {
-                        validationEvents.append( " " ).append( exception.getMessage() );
+                        details.add( new ModelException.Detail( Level.SEVERE, exception.getMessage() ) );
                     }
 
-                    if ( exception.getPublicId() != null )
-                    {
-                        validationEvents.append( " [" ).append( exception.getPublicId() ).append( ']' );
-                    }
-
-                    if ( exception.getSystemId() != null )
-                    {
-                        validationEvents.append( " [" ).append( exception.getSystemId() ).append( ']' );
-                    }
-
-                    validationEvents.append( "\n" );
                     throw exception;
                 }
 
             } );
 
-            validator.validate( new JAXBSource( this.getModelResolver().getMarshaller( false, false ), modelObject ) );
+            this.getMarshaller( false, false ).marshal( modelObject, stringWriter );
+        }
+        catch ( IOException e )
+        {
+            this.log( Level.SEVERE, e.getMessage(), e );
+            validator = null;
         }
         catch ( SAXException e )
         {
-            throw new ModelException( validationEvents.toString(), e, modelObject );
+            this.log( Level.SEVERE, e.getMessage(), e );
+            validator = null;
         }
-        catch ( Throwable t )
+        catch ( JAXBException e )
         {
-            throw new ModelError( t.getMessage(), t );
+            this.log( Level.SEVERE, e.getMessage(), e );
+            validator = null;
+        }
+
+        if ( validator != null )
+        {
+            try
+            {
+                validator.validate( new StreamSource( new StringReader( stringWriter.toString() ) ) );
+            }
+            catch ( SAXException e )
+            {
+                final ModelException modelException = new ModelException( e.getMessage(), e );
+                modelException.getDetails().addAll( details );
+                throw modelException;
+            }
+            catch ( IOException e )
+            {
+                this.log( Level.SEVERE, e.getMessage(), e );
+            }
         }
     }
 
-    public void assertValidModules( final Modules modules ) throws ModelException
+    public void validateModules( final Modules modules ) throws ModelException
     {
         if ( modules == null )
         {
             throw new NullPointerException( "modules" );
         }
 
-        this.assertValidModelObject( this.getModelResolver().getObjectFactory().createModules( modules ) );
+        this.validateModelObject( this.getObjectFactory().createModules( modules ) );
+        final List<ModelException.Detail> details = new LinkedList<ModelException.Detail>();
 
         try
         {
@@ -877,21 +508,23 @@ public class DefaultModelManager implements ModelManager
                 {
                     for ( Implementation i : m.getImplementations().getImplementation() )
                     {
-                        final List<SpecificationReference> specs = this.getSpecifications( i.getIdentifier() );
-                        final Dependencies deps = this.getDependencies( i.getIdentifier() );
+                        final List<SpecificationReference> specs =
+                            modules.getSpecifications( i.getIdentifier() );
+
+                        final Dependencies deps = modules.getDependencies( i.getIdentifier() );
 
                         if ( specs != null )
                         {
                             for ( SpecificationReference r : specs )
                             {
-                                final Specification s = this.getSpecification( r.getIdentifier() );
+                                final Specification s = modules.getSpecification( r.getIdentifier() );
 
                                 if ( s != null && r.getVersion() != null && s.getVersion() != null &&
                                      VersionParser.compare( r.getVersion(), s.getVersion() ) != 0 )
                                 {
-                                    this.throwIncompatibleImplementationException(
-                                        this.getModelResolver().getObjectFactory().createImplementation( i ),
-                                        i.getIdentifier(), r.getIdentifier(), r.getVersion(), s.getVersion() );
+                                    details.add( this.newIncompatibleImplementationDetail(
+                                        this.getObjectFactory().createImplementation( i ), i.getIdentifier(),
+                                        r.getIdentifier(), r.getVersion(), s.getVersion() ) );
 
                                 }
                             }
@@ -901,23 +534,35 @@ public class DefaultModelManager implements ModelManager
                         {
                             for ( Dependency d : deps.getDependency() )
                             {
-                                final Specification s = this.getSpecification( d.getIdentifier() );
+                                final Specification s = modules.getSpecification( d.getIdentifier() );
 
                                 if ( s != null && s.getVersion() != null && d.getVersion() != null &&
                                      VersionParser.compare( d.getVersion(), s.getVersion() ) > 0 )
                                 {
-                                    this.throwIncompatibleDependencyException(
-                                        this.getModelResolver().getObjectFactory().createDependency( d ),
-                                        i.getIdentifier(), d.getIdentifier(), d.getVersion(), s.getVersion() );
+                                    details.add( this.newIncompatibleDependencyDetail(
+                                        this.getObjectFactory().createDependency( d ), i.getIdentifier(),
+                                        d.getIdentifier(), d.getVersion(), s.getVersion() ) );
 
                                 }
 
                                 if ( s.getScope() != Scope.MULTITON && d.getProperties() != null &&
                                      !d.getProperties().getProperty().isEmpty() )
                                 {
-                                    this.throwPropertyOverwriteConstraintException(
-                                        this.getModelResolver().getObjectFactory().createDependency( d ),
-                                        i.getIdentifier(), d.getName(), s.getIdentifier() );
+                                    details.add( this.newPropertyOverwriteConstraintDetail(
+                                        this.getObjectFactory().createDependency( d ), i.getIdentifier(), d.getName(),
+                                        s.getIdentifier() ) );
+
+                                }
+
+                                final Implementations available =
+                                    modules.getImplementations( i.getIdentifier(), d.getName() );
+
+                                if ( !d.isOptional() &&
+                                     ( available == null || available.getImplementation().isEmpty() ) )
+                                {
+                                    details.add( this.newMandatoryDependencyConstraintDetail(
+                                        this.getObjectFactory().createDependency( d ), i.getIdentifier(),
+                                        d.getName() ) );
 
                                 }
                             }
@@ -929,7 +574,7 @@ public class DefaultModelManager implements ModelManager
                 {
                     for ( Specification s : m.getSpecifications().getSpecification() )
                     {
-                        final Implementations impls = this.getImplementations( s.getIdentifier() );
+                        final Implementations impls = modules.getImplementations( s.getIdentifier() );
 
                         if ( impls != null )
                         {
@@ -939,39 +584,49 @@ public class DefaultModelManager implements ModelManager
                             {
                                 if ( map.containsKey( i.getName() ) )
                                 {
-                                    this.throwImplementationNameConstraintException(
-                                        this.getModelResolver().getObjectFactory().createSpecification( s ),
-                                        s.getIdentifier(), i.getIdentifier() + ", " +
-                                                           map.get( i.getName() ).getIdentifier() );
+                                    details.add( this.newImplementationNameConstraintDetail(
+                                        this.getObjectFactory().createSpecification( s ), s.getIdentifier(),
+                                        i.getIdentifier() + ", " + map.get( i.getName() ).getIdentifier() ) );
 
                                 }
+                            }
+
+                            if ( s.getMultiplicity() == Multiplicity.ONE && impls.getImplementation().size() > 1 )
+                            {
+                                details.add( this.newMultiplicityConstraintDetail(
+                                    this.getObjectFactory().createSpecification( s ), impls.getImplementation().size(),
+                                    s.getIdentifier(), 1, s.getMultiplicity() ) );
+
                             }
                         }
                     }
                 }
             }
+
+            if ( !details.isEmpty() )
+            {
+                final ModelException modelException = new ModelException();
+                modelException.getDetails().addAll( details );
+                throw modelException;
+            }
         }
         catch ( TokenMgrError e )
         {
-            throw new ModelException( e, this.getModelResolver().getObjectFactory().createModules( modules ) );
+            throw new ModelException( e.getMessage(), e );
         }
         catch ( ParseException e )
         {
-            throw new ModelException( e, this.getModelResolver().getObjectFactory().createModules( modules ) );
-        }
-        catch ( ModelException e )
-        {
-            throw e;
-        }
-        catch ( Throwable t )
-        {
-            throw new ModelError( t.getMessage(), t );
+            throw new ModelException( e.getMessage(), e );
         }
     }
 
-    public Object createObject( final String specification, final String name, final ClassLoader classLoader )
-        throws InstantiationException
+    public Object createObject( final Modules modules, final String specification, final String name,
+                                final ClassLoader classLoader ) throws InstantiationException
     {
+        if ( modules == null )
+        {
+            throw new NullPointerException( "modules" );
+        }
         if ( specification == null )
         {
             throw new NullPointerException( "specification" );
@@ -989,10 +644,10 @@ public class DefaultModelManager implements ModelManager
 
         try
         {
-            final Specification s = this.getSpecification( specification );
-            final Implementation i = this.getImplementation( specification, name );
+            final Specification s = modules.getSpecification( specification );
+            final Implementation i = modules.getImplementation( specification, name );
 
-            if ( s != null && i != null )
+            if ( s != null && i != null && i.getClazz() != null )
             {
                 final Class specClass = Class.forName( s.getIdentifier(), true, classLoader );
                 final Class implClass = Class.forName( i.getClazz(), true, classLoader );
@@ -1006,10 +661,10 @@ public class DefaultModelManager implements ModelManager
                     }
                     catch ( NoSuchMethodException e )
                     {
-                        if ( this.getLogger().isLoggable( Level.FINE ) )
-                        {
-                            this.getLogger().log( Level.FINE, e.getMessage(), e );
-                        }
+                        this.log( Level.FINE, this.getMessage( "noSuchMethod", new Object[]
+                            {
+                                e.getMessage()
+                            } ), null );
 
                         ctor = null;
                     }
@@ -1027,8 +682,25 @@ public class DefaultModelManager implements ModelManager
                         char[] c = i.getName().toCharArray();
                         c[0] = Character.toUpperCase( c[0] );
                         methodName = "get" + String.valueOf( c );
-                        methodNames.append( methodName );
-                        factoryMethod = this.getFactoryMethod( implClass, specClass, methodName );
+
+                        boolean javaIdentifier = Character.isJavaIdentifierStart( c[0] );
+                        if ( javaIdentifier )
+                        {
+                            for ( int idx = c.length - 1; idx > 0; idx-- )
+                            {
+                                if ( !Character.isJavaIdentifierPart( c[idx] ) )
+                                {
+                                    javaIdentifier = false;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if ( javaIdentifier )
+                        {
+                            methodNames.append( methodName );
+                            factoryMethod = this.getFactoryMethod( implClass, specClass, methodName );
+                        }
 
                         if ( factoryMethod == null )
                         {
@@ -1048,8 +720,7 @@ public class DefaultModelManager implements ModelManager
 
                         if ( factoryMethod == null )
                         {
-                            throw new ModelError( new MessageFormat( this.getMessage( "missingFactoryMethod" ) ).format(
-                                new Object[]
+                            throw new InstantiationException( this.getMessage( "missingFactoryMethod", new Object[]
                                 {
                                     implClass.getName(), specClass.getName(), methodNames.append( ']' ).toString()
                                 } ) );
@@ -1066,8 +737,7 @@ public class DefaultModelManager implements ModelManager
                         }
                         else
                         {
-                            throw new ModelError( new MessageFormat( this.getMessage( "missingFactoryMethod" ) ).format(
-                                new Object[]
+                            throw new InstantiationException( this.getMessage( "missingFactoryMethod", new Object[]
                                 {
                                     implClass.getName(), specClass.getName(), methodNames.append( ']' ).toString()
                                 } ) );
@@ -1079,130 +749,210 @@ public class DefaultModelManager implements ModelManager
 
             return instance;
         }
-        catch ( InstantiationException e )
-        {
-            throw e;
-        }
         catch ( InvocationTargetException e )
         {
-            throw new ModelError( e.getTargetException() != null
-                                  ? e.getTargetException().getMessage() : e.getMessage(), e );
+            throw (InstantiationException) new InstantiationException().initCause( e.getTargetException() != null
+                                                                                   ? e.getTargetException() : e );
 
         }
-        catch ( Throwable e )
+        catch ( IllegalAccessException e )
         {
-            throw new ModelError( e.getMessage(), e );
+            throw (InstantiationException) new InstantiationException().initCause( e );
+        }
+        catch ( ClassNotFoundException e )
+        {
+            throw (InstantiationException) new InstantiationException().initCause( e );
         }
     }
 
     // SECTION-END
     // SECTION-START[DefaultModelManager]
 
+    /** Listener interface. */
+    public static abstract class Listener
+    {
+
+        /**
+         * Get called on logging.
+         *
+         * @param level The level of the event.
+         * @param message The message of the event or {@code null}.
+         * @param throwable The throwable of the event or {@code null}.
+         */
+        public abstract void onLog( Level level, String message, Throwable t );
+
+    }
+
     /** Constant for the classpath module name. */
     public static final String CLASSPATH_MODULE_NAME = "Java Classpath";
 
-    /** Classpath location searched for container documents by default. */
-    public static final String MODEL_LOCATION = "META-INF/jomc.xml";
+    /** Classpath location searched for documents by default. */
+    public static final String DEFAULT_DOCUMENT_LOCATION = "META-INF/jomc.xml";
 
-    /** Constant for the version of classpath module. */
-    private static final String CLASSPATH_MODULE_VERSION = "1.0";
+    /** Classpath location of the bootstrap schema. */
+    private static final String BOOTSTRAP_SCHEMA_LOCATION = "org/jomc/model/bootstrap/jomc-bootstrap-1.0.xsd";
 
-    /** Model version used by this manager. */
-    private static final String MODEL_VERSION = "1.0";
+    /** Classpath location searched for bootstrap resources. */
+    private static final String BOOTSTRAP_RESOURCE_LOCATION = "META-INF/jomc-bootstrap.xml";
+
+    /** JAXB context of the bootstrap schema. */
+    private static final String BOOTSTRAP_CONTEXT = "org.jomc.model.bootstrap";
+
+    /** Supported schema name extensions. */
+    private static final String[] SCHEMA_EXTENSIONS = new String[]
+    {
+        "xsd"
+    };
 
     /** Classloader of the instance. */
     private ClassLoader classLoader;
 
-    /** Model resolver of the instance. */
-    private ModelResolver modelResolver;
+    /** The entity resolver of the instance. */
+    private EntityResolver entityResolver;
 
-    /** Modules of the instance. */
-    private Modules modules;
+    /** The L/S resolver of the instance. */
+    private LSResourceResolver resourceResolver;
 
-    /** Flag indicating that classpath resolution is performed. */
-    private boolean classpathAware;
+    /** The bootstrap schema. */
+    private javax.xml.validation.Schema bootstrapSchema;
 
-    /** Flag indicating validation support. */
-    private boolean validating = true;
+    /** URLs of all available classpath schema resources. */
+    private Set<URL> schemaResources;
 
-    /** The logger of the instance. */
-    private Logger logger;
+    /** Schemas of the instance. */
+    private Schemas schemas;
+
+    /** Object factory of the instance. */
+    private ObjectFactory objectFactory;
+
+    /** The listeners of the instance. */
+    private List<Listener> listeners;
 
     /** Creates a new {@code DefaultModelManager} instance. */
     public DefaultModelManager()
     {
-        this( null );
-    }
-
-    /**
-     * Creates a new {@code DefaultModelManager} instance taking a classloader to resolve entities with.
-     *
-     * @param classLoader The classloader to resolve entities with.
-     */
-    public DefaultModelManager( final ClassLoader classLoader )
-    {
         super();
-        this.classLoader = classLoader;
     }
 
     /**
-     * Gets the flag indicating that classpath resolution is performed.
+     * Sets the object factory of the instance.
      *
-     * @return {@code true} if the classloader of the instance is searched for container documents; {@code false} if no
-     * classpath resolution is performed.
+     * @param value The new object factory of the instance.
      */
-    public boolean isClasspathAware()
+    public void setObjectFactory( final ObjectFactory value )
     {
-        return this.classpathAware;
+        this.objectFactory = value;
     }
 
     /**
-     * Sets the flag indicating that classpath resolution is performed.
+     * Sets the entity resolver of the instance.
      *
-     * @param value {@code true} if the classloader of the instance should be searched for container documents;
-     * {@code false} if no classpath resolution should be performed.
+     * @param value The new entity resolver of the instance.
      */
-    public void setClasspathAware( final boolean value )
+    public void setEntityResolver( final EntityResolver value )
     {
-        if ( this.classpathAware != value )
+        this.entityResolver = value;
+    }
+
+    /**
+     * Sets the L/S resolver of the instance.
+     *
+     * @param value The new L/S resolver of the instance.
+     */
+    public void setLSResourceResolver( final LSResourceResolver value )
+    {
+        this.resourceResolver = value;
+    }
+
+    /**
+     * Gets the list of registered listeners.
+     *
+     * @return The list of registered listeners.
+     */
+    public List<Listener> getListeners()
+    {
+        if ( this.listeners == null )
         {
-            this.modules = null;
+            this.listeners = new LinkedList<Listener>();
         }
 
-        this.classpathAware = value;
+        return this.listeners;
     }
 
     /**
-     * Gets the flag indicating validation support.
+     * Gets the schemas backing the instance.
      *
-     * @return {@code true} if validation is performed; {@code false} if no validation is performed.
-     */
-    public boolean isValidating()
-    {
-        return this.validating;
-    }
-
-    /**
-     * Sets the flag indicating validation support.
+     * @return The schemas backing the instance.
      *
-     * @param value {@code true} to perform validation; {@code false} to not perform any validation.
+     * @throws IOException if reading schema resources fails.
+     * @throws SAXException if parsing schema resources fails.
+     * @throws JAXBException if unmarshalling schema resources fails.
      */
-    public void setValidating( final boolean value )
+    public Schemas getSchemas() throws IOException, JAXBException, SAXException
     {
-        this.validating = value;
+        if ( this.schemas == null )
+        {
+            this.schemas = new Schemas();
+
+            final JAXBContext ctx = JAXBContext.newInstance( BOOTSTRAP_CONTEXT, this.getClassLoader() );
+            final Unmarshaller u = ctx.createUnmarshaller();
+            final Enumeration<URL> e = this.getClassLoader().getResources( BOOTSTRAP_RESOURCE_LOCATION );
+            u.setSchema( this.getBootstrapSchema() );
+
+            while ( e.hasMoreElements() )
+            {
+                final URL url = e.nextElement();
+                this.log( Level.FINE, this.getMessage( "processing", new Object[]
+                    {
+                        url.toExternalForm()
+                    } ), null );
+
+                final Object content = u.unmarshal( url );
+                if ( content instanceof JAXBElement )
+                {
+                    final JAXBElement element = (JAXBElement) content;
+                    if ( element.getValue() instanceof Schema )
+                    {
+                        final Schema schema = (Schema) element.getValue();
+                        this.log( Level.FINE, this.getMessage( "addingSchema", new Object[]
+                            {
+                                schema.getPublicId(), schema.getSystemId(), schema.getContextId(),
+                                schema.getClasspathId()
+                            } ), null );
+
+                        this.schemas.getSchema().add( (Schema) element.getValue() );
+                    }
+                    else if ( element.getValue() instanceof Schemas )
+                    {
+                        for ( Schema schema : ( (Schemas) element.getValue() ).getSchema() )
+                        {
+                            this.log( Level.FINE, this.getMessage( "addingSchema", new Object[]
+                                {
+                                    schema.getPublicId(), schema.getSystemId(), schema.getContextId(),
+                                    schema.getClasspathId()
+                                } ), null );
+
+                            this.schemas.getSchema().add( schema );
+                        }
+                    }
+                }
+            }
+        }
+
+        return this.schemas;
     }
 
     /**
-     * Gets modules by searching the classloader of the instance for container document resources.
+     * Gets modules by searching the classloader of the instance for resources.
      *
      * @param location The location to search at.
      *
-     * @return All classpath documents from the classloader of the instance.
+     * @return All resources from the classloader of the instance matching {@code location}.
      *
      * @throws NullPointerException if {@code location} is {@code null}.
      * @throws IOException if reading resources fails.
      *
-     * @see #MODEL_LOCATION
+     * @see #DEFAULT_DOCUMENT_LOCATION
      */
     public Modules getClasspathModules( final String location ) throws IOException
     {
@@ -1211,28 +961,33 @@ public class DefaultModelManager implements ModelManager
             throw new NullPointerException( "location" );
         }
 
+        final Text text = new Text();
+        text.setLanguage( "en" );
+        text.setValue( this.getMessage( "classpathModulesInfo", new Object[]
+            {
+                location
+            } ) );
+
+        Modules mods = new Modules();
+        mods.setDocumentation( new Texts() );
+        mods.getDocumentation().setDefaultLanguage( "en" );
+        mods.getDocumentation().getText().add( text );
+
         try
         {
-            Modules mods = new Modules();
-            final Texts texts = new Texts();
-            final Text text = new Text();
-
-            mods.setModelVersion( MODEL_VERSION );
-            mods.setDocumentation( texts );
-            texts.setDefaultLanguage( "en" );
-            texts.getText().add( text );
-            text.setLanguage( "en" );
-            text.setValue( new MessageFormat( this.getMessage( "classpathModulesInfo" ) ).format( new Object[]
-                {
-                    location
-                } ) );
-
-            final Unmarshaller u = this.getModelResolver().getUnmarshaller( false );
+            final Unmarshaller u = this.getUnmarshaller( false );
             final Enumeration<URL> resources = this.getClassLoader().getResources( location );
 
             while ( resources.hasMoreElements() )
             {
-                final Object content = ( (JAXBElement) u.unmarshal( resources.nextElement() ) ).getValue();
+                final URL url = resources.nextElement();
+
+                this.log( Level.FINE, this.getMessage( "processing", new Object[]
+                    {
+                        url.toExternalForm()
+                    } ), null );
+
+                final Object content = ( (JAXBElement) u.unmarshal( url ) ).getValue();
 
                 if ( content instanceof Module )
                 {
@@ -1240,6 +995,14 @@ public class DefaultModelManager implements ModelManager
                 }
                 else if ( content instanceof Modules )
                 {
+                    this.log( Level.FINE, this.getMessage( "usingModules", new Object[]
+                        {
+                            ( mods.getDocumentation() != null
+                              ? mods.getDocumentation().getText( Locale.getDefault().getLanguage() ).getValue()
+                              : "<>" ),
+                            url.toExternalForm()
+                        } ), null );
+
                     mods = (Modules) content;
                     break;
                 }
@@ -1247,74 +1010,42 @@ public class DefaultModelManager implements ModelManager
 
             return mods;
         }
-        catch ( IOException e )
-        {
-            throw e;
-        }
         catch ( SAXException e )
         {
-            throw new ModelError( e.getException() != null ? e.getException().getMessage() : e.getMessage(), e );
+            throw (IOException) new IOException( e.getMessage() ).initCause( e );
         }
         catch ( JAXBException e )
         {
-            throw new ModelError( e.getLinkedException() != null
-                                  ? e.getLinkedException().getMessage() : e.getMessage(), e );
-
-        }
-        catch ( Throwable t )
-        {
-            throw new ModelError( t.getMessage(), t );
+            throw (IOException) new IOException( e.getMessage() ).initCause( e );
         }
     }
 
     /**
      * Gets a module holding model objects resolved by inspecting the classloader of the instance.
-     * <p>This method searches the modules of the instance for unresolved references and tries to resolve each
-     * unresolved reference by inspecting the classloader of the instance.</p>
+     * <p>This method searches the given modules for unresolved references and tries to resolve each unresolved
+     * reference by inspecting the classloader of the instance.</p>
+     *
+     * @param modules The modules to resolve by inspecting the classloader of the instance.
      *
      * @return A module holding model objects resolved by inspecting the classloader of the instance or {@code null} if
      * nothing could be resolved.
      *
      * @see #CLASSPATH_MODULE_NAME
      */
-    public Module getClasspathModule()
+    public Module getClasspathModule( final Modules modules )
     {
-        try
-        {
-            final Module module = new Module();
-            module.setModelVersion( MODEL_VERSION );
-            module.setVersion( CLASSPATH_MODULE_VERSION );
-            module.setName( CLASSPATH_MODULE_NAME );
-            module.setVendor( System.getProperty( "java.vendor" ) );
+        final Module module = new Module();
+        module.setVersion( System.getProperty( "java.specification.version" ) );
+        module.setName( CLASSPATH_MODULE_NAME );
 
-            this.resolveClasspath( module );
+        this.resolveClasspath( modules, module );
 
-            final boolean resolved = ( module.getSpecifications() != null &&
-                                       !module.getSpecifications().getSpecification().isEmpty() ) ||
-                                     ( module.getImplementations() != null &&
-                                       !module.getImplementations().getImplementation().isEmpty() );
+        final boolean resolved = ( module.getSpecifications() != null &&
+                                   !module.getSpecifications().getSpecification().isEmpty() ) ||
+                                 ( module.getImplementations() != null &&
+                                   !module.getImplementations().getImplementation().isEmpty() );
 
-            return resolved ? module : null;
-        }
-        catch ( Throwable t )
-        {
-            throw new ModelError( t.getMessage(), t );
-        }
-    }
-
-    /**
-     * Gets the {@code ModelResolver} of the instance.
-     *
-     * @return The {@code ModelResolver} of the instance.
-     */
-    protected ModelResolver getModelResolver()
-    {
-        if ( this.modelResolver == null )
-        {
-            this.modelResolver = new ModelResolver( this.getClassLoader() );
-        }
-
-        return this.modelResolver;
+        return resolved ? module : null;
     }
 
     /**
@@ -1322,7 +1053,7 @@ public class DefaultModelManager implements ModelManager
      *
      * @return The classloader of the instance.
      */
-    protected ClassLoader getClassLoader()
+    public ClassLoader getClassLoader()
     {
         if ( this.classLoader == null )
         {
@@ -1331,327 +1062,291 @@ public class DefaultModelManager implements ModelManager
             {
                 this.classLoader = ClassLoader.getSystemClassLoader();
             }
+
         }
 
         return this.classLoader;
     }
 
     /**
-     * Gets the logger of the instance.
+     * Sets the classloader of the instance.
      *
-     * @return The logger of the instance.
+     * @param value The new classloader of the instance.
      */
-    protected Logger getLogger()
+    public void setClassLoader( final ClassLoader value )
     {
-        if ( this.logger == null )
-        {
-            this.logger = Logger.getLogger( this.getClass().getName() );
-        }
+        this.classLoader = value;
+        this.bootstrapSchema = null;
+        this.schemaResources = null;
+        this.schemas = null;
+        this.entityResolver = null;
+        this.resourceResolver = null;
+    }
 
-        return this.logger;
+    /**
+     * Notifies registered listeners.
+     *
+     * @param level The level of the event.
+     * @param message The message of the event.
+     * @param throwable The throwable of the event.
+     */
+    protected void log( final Level level, final String message, final Throwable throwable )
+    {
+        for ( Listener l : this.getListeners() )
+        {
+            l.onLog( level, message, throwable );
+        }
     }
 
     /**
      * Resolves references by inspecting the classloader of the instance.
      *
+     * @param modules The modules to resolve.
      * @param cpModule The module for resolved references.
      *
      * @throws NullPointerException if {@code cpModule} is {@code null}.
      */
-    private void resolveClasspath( final Module cpModule )
+    private void resolveClasspath( final Modules modules, final Module cpModule )
     {
-        for ( Module m : this.getModules().getModule() )
+        for ( Module m : modules.getModule() )
         {
             if ( m.getSpecifications() != null )
             {
-                this.resolveClasspath( m.getSpecifications(), cpModule );
+                this.resolveClasspath( modules, m.getSpecifications(), cpModule );
             }
+
             if ( m.getImplementations() != null )
             {
-                this.resolveClasspath( m.getImplementations(), cpModule );
+                this.resolveClasspath( modules, m.getImplementations(), cpModule );
             }
+
         }
     }
 
-    /**
-     * Resolves references by inspecting a given classloader.
-     *
-     * @param ref The specification reference to resolve.
-     * @param cpModule The module for resolved references.
-     */
-    private void resolveClasspath( final SpecificationReference ref, final Module cpModule )
+    private void resolveClasspath( final Modules modules, final SpecificationReference ref, final Module cpModule )
     {
-        Specification spec = this.getSpecification( ref.getIdentifier() );
-
-        if ( spec == null )
+        if ( modules.getSpecification( ref.getIdentifier() ) == null )
         {
-            if ( cpModule.getSpecifications() != null )
-            {
-                spec = cpModule.getSpecifications().getSpecification( ref.getIdentifier() );
-            }
-
-            if ( spec == null )
-            {
-                spec = this.resolveClasspath( ref.getIdentifier() );
-
-                if ( spec != null )
-                {
-                    if ( cpModule.getSpecifications() == null )
-                    {
-                        cpModule.setSpecifications( new Specifications() );
-                        cpModule.getSpecifications().setModelVersion( MODEL_VERSION );
-                    }
-
-                    cpModule.getSpecifications().getSpecification().add( spec );
-                }
-            }
+            this.resolveClasspath( ref.getIdentifier(), cpModule );
         }
     }
 
-    /**
-     * Resolves references by inspecting a given classloader.
-     *
-     * @param references The specification references to resolve.
-     * @param cpModule The module for resolved references.
-     */
-    private void resolveClasspath( final Specifications references, final Module cpModule )
+    private void resolveClasspath( final Modules modules, final Specifications references, final Module cpModule )
     {
         for ( SpecificationReference ref : references.getReference() )
         {
-            this.resolveClasspath( ref, cpModule );
+            this.resolveClasspath( modules, ref, cpModule );
         }
+
     }
 
-    /**
-     * Resolves references by inspecting a given classloader.
-     *
-     * @param implementations The implementations to resolve references with.
-     * @param cpModule The module for resolved references.
-     */
-    private void resolveClasspath( final Implementations implementations, final Module cpModule )
+    private void resolveClasspath( final Modules modules, final Implementations implementations, final Module cpModule )
     {
         for ( Implementation implementation : implementations.getImplementation() )
         {
             if ( implementation.getSpecifications() != null )
             {
-                this.resolveClasspath( implementation.getSpecifications(), cpModule );
+                this.resolveClasspath( modules, implementation.getSpecifications(), cpModule );
             }
+
             if ( implementation.getDependencies() != null )
             {
-                this.resolveClasspath( implementation, implementation.getDependencies(), cpModule );
+                this.resolveClasspath( modules, implementation.getDependencies(), cpModule );
             }
         }
     }
 
-    /**
-     * Resolves references by inspecting a given classloader.
-     *
-     * @param implementation The implementation declaring {@code dependencies}.
-     * @param dependencies The dependencies to resolve.
-     * @param cpModule The classpath module for resolved references.
-     */
-    private void resolveClasspath( final Implementation implementation, final Dependencies dependencies,
-                                   final Module cpModule )
+    private void resolveClasspath( final Modules modules, final Dependencies dependencies, final Module cpModule )
     {
         for ( Dependency dependency : dependencies.getDependency() )
         {
-            this.resolveClasspath( dependency, cpModule );
-
-            Specification s = this.getSpecification( dependency.getIdentifier() );
-
-            if ( s == null && cpModule.getSpecifications() != null )
-            {
-                s = cpModule.getSpecifications().getSpecification( dependency.getIdentifier() );
-            }
-
-            if ( s != null &&
-                 ( s.getMultiplicity() == Multiplicity.ONE || dependency.getImplementationName() != null ) )
-            {
-                final Implementations a =
-                    this.getImplementations( implementation.getIdentifier(), dependency.getName() );
-
-                if ( a == null || a.getImplementation().isEmpty() ||
-                     ( dependency.getImplementationName() != null &&
-                       a.getImplementationByName( dependency.getImplementationName() ) == null ) )
-                {
-                    final Implementation resolved = this.resolveClasspath( s );
-
-                    if ( resolved != null )
-                    {
-                        if ( cpModule.getImplementations() == null )
-                        {
-                            cpModule.setImplementations( new Implementations() );
-                            cpModule.getImplementations().setModelVersion( MODEL_VERSION );
-                        }
-
-                        if ( cpModule.getImplementations().getImplementationByName( resolved.getName() ) == null )
-                        {
-                            cpModule.getImplementations().getImplementation().add( resolved );
-                        }
-                    }
-                }
-            }
+            this.resolveClasspath( modules, dependency, cpModule );
         }
     }
 
-    /**
-     * Resolves references by inspecting the classloader of the instance.
-     *
-     * @param identifier The identifier to resolve.
-     *
-     * @return The specification resolved for {@code identifier} or {@code null}, if no manifest meta-data is available
-     * for {@code identifier}.
-     *
-     * @throws NullPointerException if {@code identifier} is {@code null}.
-     */
-    private Specification resolveClasspath( final String identifier )
+    private void resolveClasspath( final String identifier, final Module cpModule )
     {
-        if ( identifier == null )
-        {
-            throw new NullPointerException( "identifier" );
-        }
+        Specification specification =
+            cpModule.getSpecifications() == null ? null
+            : cpModule.getSpecifications().getSpecification( identifier );
 
-        Specification specification = null;
-
-        try
+        if ( specification == null )
         {
-            final Class classpathSpec = Class.forName( identifier, true, this.getClassLoader() );
-            if ( Modifier.isPublic( classpathSpec.getModifiers() ) )
+            try
             {
-                String vendor = null;
-                String version = null;
-
-                if ( classpathSpec.getPackage() != null )
+                final Class classpathSpec = Class.forName( identifier, true, this.getClassLoader() );
+                if ( Modifier.isPublic( classpathSpec.getModifiers() ) )
                 {
-                    vendor = classpathSpec.getPackage().getSpecificationVendor();
-                    version = classpathSpec.getPackage().getSpecificationVersion();
+                    String vendor = null;
+                    String version = null;
+
+                    if ( classpathSpec.getPackage() != null )
+                    {
+                        vendor = classpathSpec.getPackage().getSpecificationVendor();
+                        version = classpathSpec.getPackage().getSpecificationVersion();
+                    }
+
+                    specification = new Specification();
+                    specification.setIdentifier( identifier );
+                    specification.setMultiplicity( Multiplicity.MANY );
+                    specification.setScope( Scope.MULTITON );
+                    specification.setVendor( vendor );
+                    specification.setVersion( version );
+
+                    this.log( Level.FINE, this.getMessage( "classpathSpecification", new Object[]
+                        {
+                            specification.getIdentifier(),
+                            specification.getScope().value(),
+                            specification.getMultiplicity().value()
+                        } ), null );
+
+
+                    if ( cpModule.getSpecifications() == null )
+                    {
+                        cpModule.setSpecifications( new Specifications() );
+                    }
+
+                    cpModule.getSpecifications().getSpecification().add( specification );
+
+                    this.resolveClasspath( specification, cpModule );
                 }
 
-                specification = new Specification();
-                specification.setIdentifier( identifier );
-                specification.setModelVersion( MODEL_VERSION );
-                specification.setMultiplicity( Multiplicity.MANY );
-                specification.setScope( Scope.MULTITON );
-                specification.setVendor( vendor );
-                specification.setVersion( version );
             }
-        }
-        catch ( ClassNotFoundException e )
-        {
-            if ( this.getLogger().isLoggable( Level.FINE ) )
+            catch ( ClassNotFoundException e )
             {
-                this.getLogger().log( Level.FINE, e.toString() );
+                this.log( Level.FINE, this.getMessage( "noSuchClass", new Object[]
+                    {
+                        e.getMessage()
+                    } ), null );
+
             }
         }
-
-        return specification;
     }
 
-    /**
-     * Resolves references by inspecting the classloader of the instance.
-     *
-     * @param specification The specification specifying the implementation to
-     *
-     * @return The resolved implementation as specified by {@code specification} or {@code null}, if no manifest
-     * meta-data is available for {@code specification}.
-     *
-     * @throws NullPointerException if {@code specification} or is {@code null}.
-     */
-    private Implementation resolveClasspath( final Specification specification )
+    private void resolveClasspath( final Specification specification, final Module cpModule )
     {
         if ( specification == null )
         {
             throw new NullPointerException( "specification" );
         }
 
-        Implementation implementation = null;
-        String name = null;
+        Implementation implementation =
+            cpModule.getImplementations() == null ? null
+            : cpModule.getImplementations().getImplementation( specification.getIdentifier() );
 
-        try
+        if ( implementation == null )
         {
-            final Class classpathImpl = Class.forName( specification.getIdentifier(), true, this.getClassLoader() );
-            boolean classpathImplementation = false;
+            String name = null;
 
-            if ( Modifier.isPublic( classpathImpl.getModifiers() ) )
+            try
             {
-                if ( !Modifier.isAbstract( classpathImpl.getModifiers() ) )
+                final Class classpathImpl = Class.forName( specification.getIdentifier(), true, this.getClassLoader() );
+                boolean classpathImplementation = false;
+
+                if ( Modifier.isPublic( classpathImpl.getModifiers() ) )
                 {
-                    try
+                    if ( !Modifier.isAbstract( classpathImpl.getModifiers() ) )
                     {
-                        classpathImpl.getConstructor( new Class[ 0 ] );
-                        name = "init";
-                        classpathImplementation = true;
-                    }
-                    catch ( NoSuchMethodException e )
-                    {
-                        if ( this.getLogger().isLoggable( Level.FINE ) )
+                        try
                         {
-                            this.getLogger().log( Level.FINE, e.getMessage(), e );
+                            classpathImpl.getConstructor( new Class[ 0 ] );
+                            name = "init";
+                            classpathImplementation = true;
                         }
+                        catch ( NoSuchMethodException e )
+                        {
+                            this.log( Level.FINE, this.getMessage( "noSuchMethod", new Object[]
+                                {
+                                    e.getMessage()
+                                } ), null );
+
+                        }
+
                     }
-                }
 
-                if ( !classpathImplementation )
-                {
-                    final char[] c = specification.getIdentifier().substring(
-                        specification.getIdentifier().lastIndexOf( '.' ) ).toCharArray();
-
-                    name = String.valueOf( c );
-                    c[0] = Character.toUpperCase( c[0] );
-
-                    if ( this.checkFactoryMethod( classpathImpl, classpathImpl, "getDefault" ) )
+                    if ( !classpathImplementation )
                     {
-                        name = "default";
-                        classpathImplementation = true;
-                    }
-                    else if ( this.checkFactoryMethod( classpathImpl, classpathImpl, "getInstance" ) )
-                    {
-                        name = "instance";
-                        classpathImplementation = true;
-                    }
-                    else if ( this.checkFactoryMethod( classpathImpl, classpathImpl, "get" + String.valueOf( c ) ) )
-                    {
-                        classpathImplementation = true;
-                    }
-                }
+                        final char[] c = specification.getIdentifier().substring(
+                            specification.getIdentifier().lastIndexOf( '.' ) + 1 ).toCharArray();
 
-                if ( classpathImplementation )
-                {
-                    String vendor = null;
-                    String version = null;
-                    if ( classpathImpl.getPackage() != null )
-                    {
-                        vendor = classpathImpl.getPackage().getImplementationVendor();
-                        version = classpathImpl.getPackage().getImplementationVersion();
+                        name = String.valueOf( c );
+                        c[0] = Character.toUpperCase( c[0] );
+
+                        if ( this.checkFactoryMethod( classpathImpl, classpathImpl, "getDefault" ) )
+                        {
+                            name = "default";
+                            classpathImplementation = true;
+                        }
+                        else if ( this.checkFactoryMethod( classpathImpl, classpathImpl, "getInstance" ) )
+                        {
+                            name = "instance";
+                            classpathImplementation = true;
+                        }
+                        else if ( this.checkFactoryMethod( classpathImpl, classpathImpl, "get" + String.valueOf( c ) ) )
+                        {
+                            classpathImplementation = true;
+                        }
+
                     }
 
-                    implementation = new Implementation();
-                    implementation.setModelVersion( MODEL_VERSION );
-                    implementation.setVendor( vendor );
-                    implementation.setFinal( true );
-                    implementation.setName( name );
-                    implementation.setIdentifier( specification.getIdentifier() );
-                    implementation.setClazz( specification.getIdentifier() );
-                    implementation.setVersion( version );
+                    if ( classpathImplementation )
+                    {
+                        String vendor = null;
+                        String version = null;
+                        if ( classpathImpl.getPackage() != null )
+                        {
+                            vendor = classpathImpl.getPackage().getImplementationVendor();
+                            version = classpathImpl.getPackage().getImplementationVersion();
+                        }
 
-                    final Specifications implemented = new Specifications();
-                    final SpecificationReference ref = new SpecificationReference();
-                    ref.setIdentifier( specification.getIdentifier() );
-                    ref.setVersion( specification.getVersion() );
-                    implemented.getReference().add( ref );
-                    implementation.setSpecifications( implemented );
+                        implementation = new Implementation();
+                        implementation.setVendor( vendor );
+                        implementation.setFinal( true );
+                        implementation.setName( name );
+                        implementation.setIdentifier( specification.getIdentifier() );
+                        implementation.setClazz( specification.getIdentifier() );
+                        implementation.setVersion( version );
+
+                        final Specifications implemented = new Specifications();
+                        final SpecificationReference ref = new SpecificationReference();
+                        ref.setIdentifier( specification.getIdentifier() );
+                        ref.setVersion( specification.getVersion() );
+                        implemented.getReference().add( ref );
+                        implementation.setSpecifications( implemented );
+
+                        this.log( Level.FINE, this.getMessage( "classpathImplementation", new Object[]
+                            {
+                                implementation.getIdentifier(),
+                                specification.getIdentifier(),
+                                implementation.getName()
+                            } ), null );
+
+                        if ( cpModule.getImplementations() == null )
+                        {
+                            cpModule.setImplementations( new Implementations() );
+                        }
+
+                        cpModule.getImplementations().getImplementation().add( implementation );
+                    }
+                    else
+                    {
+                        this.log( Level.FINE, this.getMessage( "noClasspathImplementation", new Object[]
+                            {
+                                specification.getIdentifier()
+                            } ), null );
+
+                    }
                 }
             }
-        }
-        catch ( ClassNotFoundException e )
-        {
-            if ( this.getLogger().isLoggable( Level.FINE ) )
+            catch ( ClassNotFoundException e )
             {
-                this.getLogger().log( Level.FINE, e.getMessage(), e );
+                this.log( Level.FINE, this.getMessage( "noSuchClass", new Object[]
+                    {
+                        e.getMessage()
+                    } ), null );
+
             }
         }
-
-        return implementation;
     }
 
     private boolean checkFactoryMethod( final Class clazz, final Class type, final String methodName )
@@ -1665,10 +1360,10 @@ public class DefaultModelManager implements ModelManager
         }
         catch ( NoSuchMethodException e )
         {
-            if ( this.getLogger().isLoggable( Level.FINE ) )
-            {
-                this.getLogger().log( Level.FINE, e.getMessage(), e );
-            }
+            this.log( Level.FINE, this.getMessage( "noSuchMethod", new Object[]
+                {
+                    e.getMessage()
+                } ), null );
 
             factoryMethod = false;
         }
@@ -1687,13 +1382,14 @@ public class DefaultModelManager implements ModelManager
             {
                 m = null;
             }
+
         }
         catch ( NoSuchMethodException e )
         {
-            if ( this.getLogger().isLoggable( Level.FINE ) )
-            {
-                this.getLogger().log( Level.FINE, e.getMessage(), e );
-            }
+            this.log( Level.FINE, this.getMessage( "noSuchMethod", new Object[]
+                {
+                    e.getMessage()
+                } ), null );
 
             m = null;
         }
@@ -1701,56 +1397,171 @@ public class DefaultModelManager implements ModelManager
         return m;
     }
 
-    private String getMessage( final String key )
+    /**
+     * Searches all available {@code META-INF/MANIFEST.MF} resources and gets a set containing URLs of entries whose
+     * name end with a known schema extension.
+     *
+     * @return URLs of any matching entries.
+     *
+     * @throws IOException if reading or parsing fails.
+     */
+    private Set<URL> getSchemaResources() throws IOException
     {
-        return ResourceBundle.getBundle( "org/jomc/model/DefaultModelManager", Locale.getDefault() ).getString( key );
+        if ( this.schemaResources == null )
+        {
+            this.schemaResources = new HashSet<URL>();
+
+            for ( Enumeration<URL> e = this.getClassLoader().getResources( "META-INF/MANIFEST.MF" );
+                  e.hasMoreElements(); )
+            {
+                final URL manifestUrl = e.nextElement();
+                final String externalForm = manifestUrl.toExternalForm();
+                final String baseUrl = externalForm.substring( 0, externalForm.indexOf( "META-INF" ) );
+                final InputStream manifestStream = manifestUrl.openStream();
+                final Manifest mf = new Manifest( manifestStream );
+                manifestStream.close();
+
+                for ( Map.Entry<String, Attributes> entry : mf.getEntries().entrySet() )
+                {
+                    for ( int i = SCHEMA_EXTENSIONS.length - 1; i >= 0; i-- )
+                    {
+                        if ( entry.getKey().toLowerCase().endsWith( '.' + SCHEMA_EXTENSIONS[i].toLowerCase() ) )
+                        {
+                            final URL schemaUrl = new URL( baseUrl + entry.getKey() );
+                            this.schemaResources.add( schemaUrl );
+                            this.log( Level.FINE, this.getMessage( "processing", new Object[]
+                                {
+                                    schemaUrl.toExternalForm()
+                                } ), null );
+
+                        }
+                    }
+                }
+            }
+        }
+
+        return this.schemaResources;
     }
 
-    private void throwIncompatibleImplementationException( final JAXBElement element, final String implementation,
-                                                           final String specification, final String implementedVersion,
-                                                           final String specifiedVersion ) throws ModelException
+    /**
+     * Gets the bootstrap schema.
+     *
+     * @return The bootstrap schema.
+     *
+     * @throws SAXException if parsing the bootstrap schema fails.
+     */
+    private javax.xml.validation.Schema getBootstrapSchema() throws SAXException
     {
-        final MessageFormat f = new MessageFormat( this.getMessage( "incompatibleImplementation" ) );
-        throw new ModelException( f.format( new Object[]
+        if ( this.bootstrapSchema == null )
+        {
+            final URL url = this.getClassLoader().getResource( BOOTSTRAP_SCHEMA_LOCATION );
+            this.log( Level.FINE, this.getMessage( "processing", new Object[]
+                {
+                    url.toExternalForm()
+                } ), null );
+
+            this.bootstrapSchema = SchemaFactory.newInstance( XMLConstants.W3C_XML_SCHEMA_NS_URI ).newSchema( url );
+        }
+
+        return this.bootstrapSchema;
+    }
+
+    private String getMessage( final String key, final Object args )
+    {
+        return new MessageFormat( ResourceBundle.getBundle( "org/jomc/model/DefaultModelManager", Locale.getDefault() ).
+            getString( key ) ).format( args );
+
+    }
+
+    private ModelException.Detail newIncompatibleImplementationDetail( final JAXBElement element,
+                                                                       final String implementation,
+                                                                       final String specification,
+                                                                       final String implementedVersion,
+                                                                       final String specifiedVersion )
+    {
+        final ModelException.Detail detail =
+            new ModelException.Detail( Level.SEVERE, this.getMessage( "incompatibleImplementation", new Object[]
             {
                 implementation, specification, implementedVersion, specifiedVersion
-            } ), element );
+            } ) );
 
+        detail.setElement( element );
+        return detail;
     }
 
-    private void throwIncompatibleDependencyException( final JAXBElement element, final String implementation,
-                                                       final String specification, final String requiredVersion,
-                                                       final String availableVersion ) throws ModelException
+    private ModelException.Detail newIncompatibleDependencyDetail( final JAXBElement element,
+                                                                   final String implementation,
+                                                                   final String specification,
+                                                                   final String requiredVersion,
+                                                                   final String availableVersion )
     {
-        final MessageFormat f = new MessageFormat( this.getMessage( "incompatibleDependency" ) );
-        throw new ModelException( f.format( new Object[]
+        final ModelException.Detail detail =
+            new ModelException.Detail( Level.SEVERE, this.getMessage( "incompatibleDependency", new Object[]
             {
                 implementation, specification, requiredVersion, availableVersion
-            } ), element );
+            } ) );
 
+        detail.setElement( element );
+        return detail;
     }
 
-    private void throwPropertyOverwriteConstraintException( final JAXBElement element, final String implementation,
-                                                            final String dependency, final String specification )
-        throws ModelException
+    private ModelException.Detail newPropertyOverwriteConstraintDetail( final JAXBElement element,
+                                                                        final String implementation,
+                                                                        final String dependency,
+                                                                        final String specification )
     {
-        final MessageFormat f = new MessageFormat( this.getMessage( "propertyOverwriteConstraint" ) );
-        throw new ModelException( f.format( new Object[]
+        final ModelException.Detail detail =
+            new ModelException.Detail( Level.SEVERE, this.getMessage( "propertyOverwriteConstraint", new Object[]
             {
                 implementation, dependency, specification
-            } ), element );
+            } ) );
 
+        detail.setElement( element );
+        return detail;
     }
 
-    private void throwImplementationNameConstraintException( final JAXBElement element, final String specification,
-                                                             final String implementations ) throws ModelException
+    private ModelException.Detail newImplementationNameConstraintDetail( final JAXBElement element,
+                                                                         final String specification,
+                                                                         final String implementations )
     {
-        final MessageFormat f = new MessageFormat( this.getMessage( "implementationNameConstraint" ) );
-        throw new ModelException( f.format( new Object[]
+        final ModelException.Detail detail =
+            new ModelException.Detail( Level.SEVERE, this.getMessage( "implementationNameConstraint", new Object[]
             {
                 specification, implementations
-            } ), element );
+            } ) );
 
+        detail.setElement( element );
+        return detail;
+    }
+
+    private ModelException.Detail newMandatoryDependencyConstraintDetail( final JAXBElement element,
+                                                                          final String implementation,
+                                                                          final String dependencyName )
+    {
+        final ModelException.Detail detail =
+            new ModelException.Detail( Level.SEVERE, this.getMessage( "mandatoryDependencyConstraint", new Object[]
+            {
+                implementation, dependencyName
+            } ) );
+
+        detail.setElement( element );
+        return detail;
+    }
+
+    private ModelException.Detail newMultiplicityConstraintDetail( final JAXBElement element,
+                                                                   final Number implementations,
+                                                                   final String specification,
+                                                                   final Number expected,
+                                                                   final Multiplicity multiplicity )
+    {
+        final ModelException.Detail detail =
+            new ModelException.Detail( Level.SEVERE, this.getMessage( "multiplicityConstraint", new Object[]
+            {
+                implementations, specification, expected, multiplicity.value()
+            } ) );
+
+        detail.setElement( element );
+        return detail;
     }
 
     // SECTION-END

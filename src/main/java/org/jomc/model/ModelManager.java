@@ -19,11 +19,37 @@
  */
 package org.jomc.model;
 
-import java.util.List;
+import java.io.IOException;
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.validation.Schema;
+import org.w3c.dom.ls.LSResourceResolver;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.SAXException;
 
 /**
  * Manages the object management and configuration model.
+ *
+ * <p><b>Entity resolution</b><ul>
+ * <li>{@link #getEntityResolver() }</li>
+ * <li>{@link #getLSResourceResolver() }</li>
+ * </ul></p>
+ *
+ * <p><b>JAXB</b><ul>
+ * <li>{@link #getContext() }</li>
+ * <li>{@link #getMarshaller(boolean, boolean) }</li>
+ * <li>{@link #getObjectFactory() }</li>
+ * <li>{@link #getUnmarshaller(boolean) }</li>
+ * </ul></p>
+ *
+ * <p><b>Validation</b><ul>
+ * <li>{@link #getSchema() }</li>
+ * <li>{@link #validateModelObject(javax.xml.bind.JAXBElement) }</li>
+ * <li>{@link #validateModules(org.jomc.model.Modules) }</li>
+ * </ul></p>
  *
  * @author <a href="mailto:cs@schulte.it">Christian Schulte</a>
  * @version $Id$
@@ -32,238 +58,78 @@ public interface ModelManager
 {
 
     /**
-     * Gets all modules provided by an implementation.
+     * Gets the object management and configuration entity resolver.
      *
-     * @return All modules provided by an implementation.
+     * @return The object management and configuration entity resolver.
      */
-    Modules getModules();
+    EntityResolver getEntityResolver();
 
     /**
-     * Gets the module declaring a given specification.
+     * Gets the object management and configuration L/S resolver.
      *
-     * @param specification The identifier of the specification whose module to return.
-     *
-     * @return The module declaring {@code specification} or {@code null}, if no module could be resolved.
-     *
-     * @throws NullPointerException if {@code specification} is {@code null}.
-     * @throws ModelError if getting the module fails due to unrecoverable model errors.
+     * @return The object management and configuration L/S resolver.
      */
-    Module getModuleOfSpecification( String specification ) throws NullPointerException, ModelError;
+    LSResourceResolver getLSResourceResolver();
 
     /**
-     * Gets the module declaring a given implementation.
+     * Gets the object management and configuration {@code ObjectFactory}.
      *
-     * @param implementation The identifier of the implementation whose module to return.
-     *
-     * @return The module declaring {@code implementation} or {@code null}, if no module could be resolved.
-     *
-     * @throws NullPointerException if {@code implementation} is {@code null}.
-     * @throws ModelError if getting the module fails due to unrecoverable model errors.
+     * @return The object management and configuration {@code ObjectFactory}.
      */
-    Module getModuleOfImplementation( String implementation ) throws NullPointerException, ModelError;
+    ObjectFactory getObjectFactory();
 
     /**
-     * Gets an implementation including referenced model objects as a module.
+     * Gets the object management and configuration schema.
      *
-     * @param implementation The identifier of the implementation to resolve.
+     * @return The object management and configuration schema.
      *
-     * @return A module declaring {@code implementation} in addition to all referenced model objects or {@code null} if
-     * no implementation matching {@code implementation} is available.
-     *
-     * @throws NullPointerException if {@code implementation} is {@code null}.
-     * @throws ModelError if getting the module fails due to unrecoverable model errors.
+     * @throws IOException if reading schema resources fails.
+     * @throws SAXException if parsing schema resources fails.
+     * @throws JAXBException if unmarshalling schema resources fails.
      */
-    Module getImplementationModule( String implementation ) throws NullPointerException, ModelError;
+    Schema getSchema() throws IOException, SAXException, JAXBException;
 
     /**
-     * Gets a specification for a given identifier.
+     * Gets the object management and configuration {@code JAXBContext}.
      *
-     * @param specification The identifier of the specification to return.
+     * @return The object management and configuration {@code JAXBContext}.
      *
-     * @return The specification identified by {@code specification} from the modules provided by an implementation or
-     * {@code null}, if no specification matching {@code specification} is available.
-     *
-     * @throws NullPointerException if {@code specification} is {@code null}.
-     * @throws ModelError if getting the specification fails due to unrecoverable model errors.
+     * @throws IOException if reading schema resources fails.
+     * @throws SAXException if parsing schema resources fails.
+     * @throws JAXBException if unmarshalling schema resources fails.
      */
-    Specification getSpecification( String specification ) throws NullPointerException, ModelError;
+    JAXBContext getContext() throws IOException, SAXException, JAXBException;
 
     /**
-     * Gets references to all specifications an implementation implements.
+     * Gets an object management and configuration {@code Marshaller}.
      *
-     * @param implementation The identifier of the implementation to get all implemented specifications of.
+     * @param validating {@code true} for a marshaller with additional schema validation support enabled; {@code false}
+     * for a marshaller without additional schema validation support enabled.
+     * @param formattedOutput {@code true} for the marshaller to produce formatted output; {@code false} for the
+     * marshaller to not apply any formatting when marshalling.
      *
-     * @return List of references to all specifications implemented by {@code implementation} or {@code null}, if no
-     * implementation matching {@code implementation} is available.
+     * @return An object management and configuration {@code Marshaller}.
      *
-     * @throws NullPointerException if {@code implementation} is {@code null}.
-     * @throws ModelError if getting the specifications fails due to unrecoverable model errors.
+     * @throws IOException if reading schema resources fails.
+     * @throws SAXException if parsing schema resources fails.
+     * @throws JAXBException if unmarshalling schema resources fails.
      */
-    List<SpecificationReference> getSpecifications( String implementation ) throws NullPointerException, ModelError;
+    Marshaller getMarshaller( boolean validating, boolean formattedOutput )
+        throws IOException, SAXException, JAXBException;
 
     /**
-     * Gets an implementation for a given identifier.
+     * Gets an object management and configuration {@code Unmarshaller}.
      *
-     * @param implementation The identifier of the implementation to return.
+     * @param validating {@code true} for an unmarshaller with additional schema validation support enabled;
+     * {@code false} for an unmarshaller without additional schema validation support enabled.
      *
-     * @return The implementation identified by {@code implementation} from the modules provided by an implementation or
-     * {@code null}, if no implementation matching {@code implementation} is available.
+     * @return An object management and configuration {@code Unmarshaller}.
      *
-     * @throws NullPointerException if {@code implementation} is {@code null}.
-     * @throws ModelError if getting the implementation fails due to unrecoverable model errors.
+     * @throws IOException if reading schema resources fails.
+     * @throws SAXException if parsing schema resources fails.
+     * @throws JAXBException if unmarshalling schema resources fails.
      */
-    Implementation getImplementation( String implementation ) throws NullPointerException, ModelError;
-
-    /**
-     * Gets an implementation for a given class.
-     *
-     * @param implementation The class of the implementation to return.
-     *
-     * @return The implementation identified by {@code implementation} from the modules provided by an implementation or
-     * {@code null}, if no implementation matching {@code implementation} is available.
-     *
-     * @throws NullPointerException if {@code implementation} is {@code null}.
-     * @throws ModelError if getting the implementation fails due to unrecoverable model errors.
-     */
-    Implementation getImplementation( Class implementation ) throws NullPointerException, ModelError;
-
-    /**
-     * Gets an implementation for a given name implementing a given specification.
-     *
-     * @param specification The identifier of the specification to return an implementation of.
-     * @param name The name of the implementation to return.
-     *
-     * @return The implementation with name {@code name} implementing the specification identified by
-     * {@code specification} from the modules provided by an implementation or {@code null}, if no such implementation
-     * is found.
-     *
-     * @throws NullPointerException if {@code specification} or {@code name} is {@code null}.
-     * @throws ModelError if getting the implementation fails due to unrecoverable model errors.
-     */
-    Implementation getImplementation( String specification, String name ) throws NullPointerException, ModelError;
-
-    /**
-     * Gets all dependencies of an implementation.
-     *
-     * @param implementation The identifier of the implementation to get all dependencies of.
-     *
-     * @return List of all dependencies of {@code implementation} or {@code null}, if nothing could be resolved.
-     *
-     * @throws NullPointerException if {@code implementation} is {@code null}.
-     * @throws ModelError if getting the dependencies fails due to unrecoverable model errors.
-     */
-    Dependencies getDependencies( String implementation ) throws NullPointerException, ModelError;
-
-    /**
-     * Gets all properties of an implementation.
-     *
-     * @param implementation The identifier of the implementation to get all properties of.
-     *
-     * @return List of all properties of {@code implementation} or {@code null}, if nothing could be resolved.
-     *
-     * @throws NullPointerException if {@code implementation} is {@code null}.
-     * @throws ModelError if getting the properties fails due to unrecoverable model errors.
-     */
-    Properties getProperties( String implementation ) throws NullPointerException, ModelError;
-
-    /**
-     * Gets all properties specified for an implementation.
-     *
-     * @param implementation The identifier of the implementation to return specified properties of.
-     *
-     * @return List of all properties specified for {@code implementation} or {@code null}, if nothing could be
-     * resolved.
-     *
-     * @throws NullPointerException if {@code implementation} is {@code null}.
-     * @throws ModelError if getting the properties fails due to unrecoverable model errors.
-     */
-    Properties getSpecifiedProperties( String implementation ) throws NullPointerException, ModelError;
-
-    /**
-     * Gets all messages of an implementation.
-     *
-     * @param implementation The identifier of the implementation to get all messages of.
-     *
-     * @return List of messages of {@code implementation} or {@code null}, if nothing could be resolved.
-     *
-     * @throws NullPointerException if {@code implementation} is {@code null}.
-     * @throws ModelError if getting the messages fails due to unrecoverable model errors.
-     */
-    Messages getMessages( String implementation ) throws NullPointerException, ModelError;
-
-    /**
-     * Gets all implementations implementing a given specification.
-     *
-     * @param specification The identifier of the specification to return implementations of.
-     *
-     * @return All implementations implementing the specification identified by {@code specification} from the modules
-     * provided by an implementation or {@code null}, if no implementation implementing {@code specification} is
-     * available.
-     *
-     * @throws NullPointerException if {@code specification} is {@code null}.
-     * @throws ModelError if getting the implementations fails due to unrecoverable model errors.
-     */
-    Implementations getImplementations( String specification ) throws NullPointerException, ModelError;
-
-    /**
-     * Gets all implementations implementing a given dependency from a list of modules.
-     *
-     * @param implementation The identifier of the implementation declaring {@code dependency}.
-     * @param dependency The name of the dependency to return implementations of.
-     *
-     * @return All implementations of {@code dependency} from the modules provided by an implementation or {@code null}
-     * if no implementation is available.
-     *
-     * @throws NullPointerException if {@code implementation} or {@code dependency} is {@code null}.
-     * @throws ModelError if getting the implementations fails due to unrecoverable model errors.
-     */
-    Implementations getImplementations( String implementation, String dependency )
-        throws NullPointerException, ModelError;
-
-    /**
-     * Gets an instance of an implementation.
-     *
-     * @param implementation The identifier of the implementation to return an instance of.
-     *
-     * @return An instance of the implementation identified by {@code implementation} from the modules provided by an
-     * implementation or {@code null}, if no such instance is available.
-     *
-     * @throws NullPointerException if {@code implementation} is {@code null}.
-     * @throws ModelError if getting the instance fails due to unrecoverable model errors.
-     */
-    Instance getInstance( String implementation ) throws NullPointerException, ModelError;
-
-    /**
-     * Gets an instance of an implementation of a given specification.
-     *
-     * @param specification The identifier of the specification to return an instance of.
-     * @param name The name of the implementation implementing {@code specification} to return an instance of.
-     *
-     * @return An instance of the implementation with name {@code name} implementing the specification identified by
-     * {@code specification} from the modules provided by an implementation or {@code null}, if no such instance is
-     * available.
-     *
-     * @throws NullPointerException if {@code specification} or {@code name} is {@code null}.
-     * @throws ModelError if getting the instance fails due to unrecoverable model errors.
-     */
-    Instance getInstance( String specification, String name ) throws NullPointerException, ModelError;
-
-    /**
-     * Gets an instance of an implementation of a given specification as required by a given dependency.
-     *
-     * @param specification The identifier of the specification to return an implementation instance of.
-     * @param name The name of the implementation to return an instance of.
-     * @param dependency The dependency requiring the instance.
-     *
-     * @return An instance of the implementation with name {@code name} implementing the specification identified by
-     * {@code specification} as required by {@code dependency} from the modules provided by an implementation or
-     * {@code null}, if no such instance is available.
-     *
-     * @throws NullPointerException if {@code specification}, {@code name} or {@code dependency} is {@code null}.
-     * @throws ModelError if getting the instance fails due to unrecoverable model errors.
-     */
-    Instance getInstance( String specification, String name, Dependency dependency )
-        throws NullPointerException, ModelError;
+    Unmarshaller getUnmarshaller( boolean validating ) throws IOException, SAXException, JAXBException;
 
     /**
      * Validates a given model object.
@@ -272,10 +138,9 @@ public interface ModelManager
      *
      * @throws NullPointerException if {@code modelObject} is {@code null}.
      * @throws ModelException if {@code modelObject} is invalid.
-     * @throws ModelError if validating the model object fails due to unrecoverable model errors.
      */
-    void assertValidModelObject( JAXBElement<? extends ModelObject> modelObject )
-        throws NullPointerException, ModelException, ModelError;
+    void validateModelObject( JAXBElement<? extends ModelObject> modelObject )
+        throws NullPointerException, ModelException;
 
     /**
      * Validates modules.
@@ -284,13 +149,13 @@ public interface ModelManager
      *
      * @throws NullPointerException if {@code modules} is {@code null}.
      * @throws ModelException if {@code modules} is invalid.
-     * @throws ModelError if validating the modules fails due to unrecoverable model errors.
      */
-    void assertValidModules( Modules modules ) throws NullPointerException, ModelException, ModelError;
+    void validateModules( Modules modules ) throws NullPointerException, ModelException;
 
     /**
      * Creates an object.
      *
+     * @param modules The modules declaring the object to create.
      * @param specification The identifier of the specification specifying the object to create.
      * @param name The name of the implementation implementing the object to create.
      * @param classLoader The classloader to use for loading classes.
@@ -299,9 +164,8 @@ public interface ModelManager
      *
      * @throws NullPointerException if {@code specification}, {@code name} or {@code classLoader} is {@code null}.
      * @throws InstantiationException if instantiation fails.
-     * @throws ModelError if creating the object fails due to unrecoverable model errors.
      */
-    Object createObject( String specification, String name, ClassLoader classLoader )
-        throws NullPointerException, InstantiationException, ModelError;
+    Object createObject( Modules modules, String specification, String name, ClassLoader classLoader )
+        throws NullPointerException, InstantiationException;
 
 }

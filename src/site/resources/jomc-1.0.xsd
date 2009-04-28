@@ -177,7 +177,8 @@
         </xsd:annotation>
       </xsd:element>
     </xsd:sequence>
-    <xsd:attribute name="modelVersion" type="jomc:Version" use="optional">
+    <xsd:attribute name="modelVersion" type="jomc:Version" use="optional"
+                   default="1.0">
       <xsd:annotation>
         <xsd:appinfo>
           <jaxb:property>
@@ -328,7 +329,7 @@ module. A module defines specifications, implementations and properties.</p>]]><
             </xsd:appinfo>
           </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="version" type="jomc:Version" use="required">
+        <xsd:attribute name="version" type="jomc:Version" use="optional">
           <xsd:annotation>
             <xsd:appinfo>
               <jaxb:property>
@@ -337,7 +338,7 @@ module. A module defines specifications, implementations and properties.</p>]]><
             </xsd:appinfo>
           </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="vendor" type="jomc:String" use="required">
+        <xsd:attribute name="vendor" type="jomc:String" use="optional">
           <xsd:annotation>
             <xsd:appinfo>
               <jaxb:property>
@@ -408,15 +409,17 @@ module. A module defines specifications, implementations and properties.</p>]]><
 a set of specifications. Property {@code vendor} holds vendor information for
 the vendor providing the specification. Property {@code description} holds a
 textual description and property {@code version} holds a textual version of the
-specification. The {@code stateless} flag indicates that state does not need to
-be retained across operations for implementing objects to operate as specified.</p>
+specification.
+
+<p>The {@code stateless} flag indicates that state does not need to be retained
+across operations for implementing objects to operate as specified.</p>
 
 <p>Property {@code multiplicity} specifies the number of implementations allowed
 to exist among a set of modules. A specification with {@link Multiplicity#ONE}
-specifies that exactly one implementation of the specification must exist among
-a set of modules. A specification with {@link Multiplicity#MANY} specifies that
-multiple implementations of the specification are allowed to exist among a set
-of modules (including none).</p>
+specifies that no more than one implementation of the specification is allowed
+to exist among a set of modules (including none). A specification with
+{@link Multiplicity#MANY} specifies that multiple implementations of the
+specification are allowed to exist among a set of modules (including none).</p>
 
 <p>Property {@code scope} specifies the scope the specification applies to. In
 multiton scope, a new object is created whenever requested. In context scope,
@@ -663,7 +666,7 @@ in an inheritance hierarchy.</p>]]></jaxb:javadoc>
             </xsd:appinfo>
           </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="class" type="jomc:Identifier" use="required">
+        <xsd:attribute name="class" type="jomc:Identifier" use="optional">
           <xsd:annotation>
             <xsd:appinfo>
               <jaxb:property>
@@ -787,7 +790,7 @@ Dependency meta-data.
 <p>A dependency consists of a name uniquely identifying the dependency in a set
 of dependencies and pairs a specification with corresponding implementations
 from a set of available implementations. Properties set with a dependency
-overwrite properties of the dependency's specification. The {@code bound} flag
+overwrite properties of the dependencies specification. The {@code bound} flag
 indicates if the instance of the dependency is bound to the declaring
 implementation. The {@code optional} flag indicates an optional dependency.</p>]]></jaxb:javadoc>
         </jaxb:class>
@@ -910,7 +913,8 @@ the property. Property {@code value} holds the properties value which is of type
             </xsd:appinfo>
           </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="type" type="jomc:PropertyType" use="required">
+        <xsd:attribute name="type" type="jomc:PropertyType" use="optional"
+                       default="java.lang.String">
           <xsd:annotation>
             <xsd:appinfo>
               <jaxb:property>
@@ -1235,7 +1239,8 @@ argument.</p>]]></jaxb:javadoc>
             </xsd:appinfo>
           </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="scope" type="jomc:Scope" use="required">
+        <xsd:attribute name="scope" type="jomc:Scope" use="optional"
+                       default="Multiton">
           <xsd:annotation>
             <xsd:appinfo>
               <jaxb:property>
@@ -1291,7 +1296,7 @@ argument.</p>]]></jaxb:javadoc>
             </xsd:appinfo>
           </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="version" type="jomc:Version" use="required">
+        <xsd:attribute name="version" type="jomc:Version" use="optional">
           <xsd:annotation>
             <xsd:appinfo>
               <jaxb:property>
@@ -1397,8 +1402,9 @@ argument.</p>]]></jaxb:javadoc>
           <xsd:appinfo>
             <jaxb:typesafeEnumMember name="ONE">
               <jaxb:javadoc><![CDATA[
-A multiplicity equal to {@code ONE} specifies that exactly one implementation of
-the specification must exist among a set of modules.]]></jaxb:javadoc>
+A multiplicity equal to {@code ONE} specifies that no more than one
+implementation of the specification is allowed to exist among a set of modules
+(including none).]]></jaxb:javadoc>
             </jaxb:typesafeEnumMember>
           </xsd:appinfo>
         </xsd:annotation>

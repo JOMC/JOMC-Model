@@ -19,10 +19,14 @@
  */
 package org.jomc.model;
 
+import java.io.Serializable;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.logging.Level;
 import javax.xml.bind.JAXBElement;
 
 /**
- * Gets thrown for model related recoverable exceptions.
+ * Gets thrown for invalid model objects.
  *
  * @author <a href="mailto:cs@schulte.it">Christian Schulte</a>
  * @version $Id$
@@ -30,34 +34,109 @@ import javax.xml.bind.JAXBElement;
 public class ModelException extends Exception
 {
 
-    /**
-     * The element causing the exception.
-     * @serial
-     */
-    private JAXBElement<? extends ModelObject> element;
+    /** {@code ModelException} detail. */
+    public static class Detail implements Serializable
+    {
+
+        /**
+         * The detail level.
+         * @serial
+         */
+        private Level level;
+
+        /**
+         * The detail message.
+         * @serial
+         */
+        private String message;
+
+        /**
+         * The element this detail is associated with.
+         * @serial
+         */
+        private JAXBElement<? extends ModelObject> element;
+
+        /**
+         * Creates a new {@code Detail} taking a detail level and message.
+         *
+         * @param level The detail level.
+         * @param message The detail message.
+         */
+        public Detail( final Level level, final String message )
+        {
+            this.level = level;
+            this.message = message;
+        }
+
+        /**
+         * Gets the level of this detail.
+         *
+         * @return The level of this detail.
+         */
+        public Level getLevel()
+        {
+            return this.level;
+        }
+
+        /**
+         * Gets the message of this detail.
+         *
+         * @return The message of this detail.
+         */
+        public String getMessage()
+        {
+            return this.message;
+        }
+
+        /**
+         * Gets the element of this detail.
+         *
+         * @return The element of this detail or {@code null}.
+         */
+        public JAXBElement<? extends ModelObject> getElement()
+        {
+            return this.element;
+        }
+
+        /**
+         * Sets the element of this detail.
+         *
+         * @param value The new element of this detail or {@code null}.
+         */
+        public void setElement( final JAXBElement<? extends ModelObject> value )
+        {
+            this.element = value;
+        }
+
+    }
+
+    /** Details of the instance. */
+    private List<Detail> details;
+
+    /** Creates a new {@code ModelException} instance. */
+    public ModelException()
+    {
+        super();
+    }
 
     /**
      * Creates a new {@code ModelException} instance taking a message.
      *
      * @param message The message of the exception.
-     * @param element The element causing the exception.
      */
-    public ModelException( final String message, final JAXBElement<? extends ModelObject> element )
+    public ModelException( final String message )
     {
         super( message );
-        this.element = element;
     }
 
     /**
      * Creates a new {@code ModelException} instance taking a causing exception.
      *
      * @param t The causing exception.
-     * @param element The element causing the exception.
      */
-    public ModelException( final Throwable t, final JAXBElement<? extends ModelObject> element )
+    public ModelException( final Throwable t )
     {
         super( t );
-        this.element = element;
     }
 
     /**
@@ -65,22 +144,25 @@ public class ModelException extends Exception
      *
      * @param message The message of the exception.
      * @param t The causing exception.
-     * @param element The element causing the exception.
      */
-    public ModelException( final String message, final Throwable t, final JAXBElement<? extends ModelObject> element )
+    public ModelException( final String message, final Throwable t )
     {
         super( message, t );
-        this.element = element;
     }
 
     /**
-     * Gets the element causing the exception.
+     * Gets the details of the instance.
      *
-     * @return The element causing the exception or {@code null}.
+     * @return The details of the instance.
      */
-    public JAXBElement<? extends ModelObject> getElement()
+    public List<Detail> getDetails()
     {
-        return this.element;
+        if ( this.details == null )
+        {
+            this.details = new LinkedList<Detail>();
+        }
+
+        return this.details;
     }
 
 }
