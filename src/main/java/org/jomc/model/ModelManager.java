@@ -151,9 +151,12 @@ public interface ModelManager
      *
      * @throws NullPointerException if {@code modelObject} is {@code null}.
      * @throws ModelException if {@code modelObject} is invalid.
+     * @throws IOException if reading schema resources fails.
+     * @throws SAXException if parsing schema resources fails.
+     * @throws JAXBException if unmarshalling schema resources fails.
      */
     void validateModelObject( JAXBElement<? extends ModelObject> modelObject )
-        throws NullPointerException, ModelException;
+        throws NullPointerException, ModelException, IOException, SAXException, JAXBException;
 
     /**
      * Validates modules.
@@ -162,8 +165,12 @@ public interface ModelManager
      *
      * @throws NullPointerException if {@code modules} is {@code null}.
      * @throws ModelException if {@code modules} is invalid.
+     * @throws IOException if reading schema resources fails.
+     * @throws SAXException if parsing schema resources fails.
+     * @throws JAXBException if unmarshalling schema resources fails.
      */
-    void validateModules( Modules modules ) throws NullPointerException, ModelException;
+    void validateModules( Modules modules )
+        throws NullPointerException, ModelException, IOException, SAXException, JAXBException;
 
     /**
      * Creates an object.

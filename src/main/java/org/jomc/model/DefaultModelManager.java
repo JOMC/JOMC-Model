@@ -419,91 +419,66 @@ public class DefaultModelManager implements ModelManager
         return u;
     }
 
-    public void validateModelObject( final JAXBElement<? extends ModelObject> modelObject ) throws ModelException
+    public void validateModelObject( final JAXBElement<? extends ModelObject> modelObject )
+        throws ModelException, IOException, SAXException, JAXBException
     {
         if ( modelObject == null )
         {
             throw new NullPointerException( "modelObject" );
         }
 
-        Validator validator = null;
         final StringWriter stringWriter = new StringWriter();
         final List<ModelException.Detail> details = new LinkedList<ModelException.Detail>();
+        final Validator validator = this.getSchema().newValidator();
+        validator.setErrorHandler( new ErrorHandler()
+        {
+
+            public void warning( final SAXParseException exception ) throws SAXException
+            {
+                if ( exception.getMessage() != null )
+                {
+                    details.add( new ModelException.Detail( Level.WARNING, exception.getMessage() ) );
+                }
+            }
+
+            public void error( final SAXParseException exception ) throws SAXException
+            {
+                if ( exception.getMessage() != null )
+                {
+                    details.add( new ModelException.Detail( Level.SEVERE, exception.getMessage() ) );
+                }
+
+                throw exception;
+            }
+
+            public void fatalError( final SAXParseException exception ) throws SAXException
+            {
+                if ( exception.getMessage() != null )
+                {
+                    details.add( new ModelException.Detail( Level.SEVERE, exception.getMessage() ) );
+                }
+
+                throw exception;
+            }
+
+        } );
+
+        this.getMarshaller( false, false ).marshal( modelObject, stringWriter );
 
         try
         {
-            validator = this.getSchema().newValidator();
-            validator.setErrorHandler( new ErrorHandler()
-            {
-
-                public void warning( final SAXParseException exception ) throws SAXException
-                {
-                    if ( exception.getMessage() != null )
-                    {
-                        details.add( new ModelException.Detail( Level.WARNING, exception.getMessage() ) );
-                    }
-                }
-
-                public void error( final SAXParseException exception ) throws SAXException
-                {
-                    if ( exception.getMessage() != null )
-                    {
-                        details.add( new ModelException.Detail( Level.SEVERE, exception.getMessage() ) );
-                    }
-
-                    throw exception;
-                }
-
-                public void fatalError( final SAXParseException exception ) throws SAXException
-                {
-                    if ( exception.getMessage() != null )
-                    {
-                        details.add( new ModelException.Detail( Level.SEVERE, exception.getMessage() ) );
-                    }
-
-                    throw exception;
-                }
-
-            } );
-
-            this.getMarshaller( false, false ).marshal( modelObject, stringWriter );
-        }
-        catch ( IOException e )
-        {
-            this.log( Level.SEVERE, e.getMessage(), e );
-            validator = null;
+            validator.validate( new StreamSource( new StringReader( stringWriter.toString() ) ) );
         }
         catch ( SAXException e )
         {
-            this.log( Level.SEVERE, e.getMessage(), e );
-            validator = null;
-        }
-        catch ( JAXBException e )
-        {
-            this.log( Level.SEVERE, e.getMessage(), e );
-            validator = null;
-        }
-
-        if ( validator != null )
-        {
-            try
-            {
-                validator.validate( new StreamSource( new StringReader( stringWriter.toString() ) ) );
-            }
-            catch ( SAXException e )
-            {
-                final ModelException modelException = new ModelException( e.getMessage(), e );
-                modelException.getDetails().addAll( details );
-                throw modelException;
-            }
-            catch ( IOException e )
-            {
-                this.log( Level.SEVERE, e.getMessage(), e );
-            }
+            final ModelException modelException = new ModelException( e.getMessage(), e );
+            modelException.getDetails().addAll( details );
+            throw modelException;
         }
     }
 
-    public void validateModules( final Modules modules ) throws ModelException
+    public void validateModules( final Modules modules )
+        throws ModelException, IOException, SAXException, JAXBException
     {
         if ( modules == null )
         {
@@ -780,6 +755,7 @@ public class DefaultModelManager implements ModelManager
 
     // SECTION-END
     // SECTION-START[DefaultModelManager]
+
     /** Listener interface. */
     public static abstract class Listener
     {
@@ -963,10 +939,12 @@ public class DefaultModelManager implements ModelManager
      *
      * @throws NullPointerException if {@code location} is {@code null}.
      * @throws IOException if reading resources fails.
+     * @throws SAXException if parsing schema resources fails.
+     * @throws JAXBException if unmarshalling schema resources fails.
      *
      * @see #DEFAULT_DOCUMENT_LOCATION
      */
-    public Modules getClasspathModules( final String location ) throws IOException
+    public Modules getClasspathModules( final String location ) throws IOException, SAXException, JAXBException
     {
         if ( location == null )
         {
@@ -985,51 +963,40 @@ public class DefaultModelManager implements ModelManager
         mods.getDocumentation().setDefaultLanguage( "en" );
         mods.getDocumentation().getText().add( text );
 
-        try
+        final Unmarshaller u = this.getUnmarshaller( false );
+        final Enumeration<URL> resources = this.getClassLoader().getResources( location );
+
+        while ( resources.hasMoreElements() )
         {
-            final Unmarshaller u = this.getUnmarshaller( false );
-            final Enumeration<URL> resources = this.getClassLoader().getResources( location );
+            final URL url = resources.nextElement();
 
-            while ( resources.hasMoreElements() )
+            this.log( Level.FINE, this.getMessage( "processing", new Object[]
+                {
+                    url.toExternalForm()
+                } ), null );
+
+            final Object content = ( (JAXBElement) u.unmarshal( url ) ).getValue();
+
+            if ( content instanceof Module )
             {
-                final URL url = resources.nextElement();
-
-                this.log( Level.FINE, this.getMessage( "processing", new Object[]
+                mods.getModule().add( (Module) content );
+            }
+            else if ( content instanceof Modules )
+            {
+                this.log( Level.FINE, this.getMessage( "usingModules", new Object[]
                     {
+                        ( mods.getDocumentation() != null
+                          ? mods.getDocumentation().getText( Locale.getDefault().getLanguage() ).getValue()
+                          : "<>" ),
                         url.toExternalForm()
                     } ), null );
 
-                final Object content = ( (JAXBElement) u.unmarshal( url ) ).getValue();
-
-                if ( content instanceof Module )
-                {
-                    mods.getModule().add( (Module) content );
-                }
-                else if ( content instanceof Modules )
-                {
-                    this.log( Level.FINE, this.getMessage( "usingModules", new Object[]
-                        {
-                            ( mods.getDocumentation() != null
-                              ? mods.getDocumentation().getText( Locale.getDefault().getLanguage() ).getValue()
-                              : "<>" ),
-                            url.toExternalForm()
-                        } ), null );
-
-                    mods = (Modules) content;
-                    break;
-                }
+                mods = (Modules) content;
+                break;
             }
+        }
 
-            return mods;
-        }
-        catch ( SAXException e )
-        {
-            throw (IOException) new IOException( e.getMessage() ).initCause( e );
-        }
-        catch ( JAXBException e )
-        {
-            throw (IOException) new IOException( e.getMessage() ).initCause( e );
-        }
+        return mods;
     }
 
     /**
