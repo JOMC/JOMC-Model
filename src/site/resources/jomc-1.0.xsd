@@ -435,9 +435,6 @@ the vendor providing the specification. Property {@code description} holds a
 textual description and property {@code version} holds a textual version of the
 specification.
 
-<p>The {@code stateless} flag indicates that state does not need to be retained
-across operations for implementing objects to operate as specified.</p>
-
 <p>Property {@code multiplicity} specifies the number of implementations allowed
 to exist among a set of modules. A specification with {@link Multiplicity#ONE}
 specifies that no more than one implementation of the specification is allowed
@@ -505,19 +502,6 @@ specification. A multiplicity equal to {@link Multiplicity#ONE} specifies
 exactly one implementation of the specification must exist among a set of
 modules. A multiplicity equal to {@link Multiplicity#MANY} specifies that many
 implementations are allowed to exist among a set of modules (including none).]]></jaxb:javadoc>
-              </jaxb:property>
-            </xsd:appinfo>
-          </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="stateless" type="xsd:boolean" use="optional"
-                       default="false">
-          <xsd:annotation>
-            <xsd:appinfo>
-              <jaxb:property>
-                <jaxb:javadoc><![CDATA[
-Flag indicating that an implementation's state need not be retained across
-method invocations for an implementation of this specification to operate as
-specified.]]></jaxb:javadoc>
               </jaxb:property>
             </xsd:appinfo>
           </xsd:annotation>
@@ -628,7 +612,10 @@ of the implementation.</p>
 
 <p>Properties, dependencies and specifications may be inherited from a
 {@code parent}. Property {@code final} flags an implementation as the final node
-in an inheritance hierarchy.</p>]]></jaxb:javadoc>
+in an inheritance hierarchy.</p>
+
+<p>The {@code stateless} flag indicates that an implementation does not retain
+state across operations.</p>]]></jaxb:javadoc>
         </jaxb:class>
       </xsd:appinfo>
     </xsd:annotation>
@@ -734,7 +721,18 @@ this implementation will inherit up the hierarchy starting at that parent.]]></j
             <xsd:appinfo>
               <jaxb:property>
                 <jaxb:javadoc><![CDATA[
-Flags this implementation as the final node in an inheritance hierarchy.]]></jaxb:javadoc>
+Flags this implementation the final node in an inheritance hierarchy.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="stateless" type="xsd:boolean" use="optional"
+                       default="false">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                <jaxb:javadoc><![CDATA[
+Flags this implementation stateless.]]></jaxb:javadoc>
               </jaxb:property>
             </xsd:appinfo>
           </xsd:annotation>
@@ -1269,6 +1267,17 @@ argument.</p>]]></jaxb:javadoc>
             <xsd:appinfo>
               <jaxb:property>
                 <jaxb:javadoc><![CDATA[Scope this instance applies to.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="stateless" type="xsd:boolean" use="optional"
+                       default="false">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                <jaxb:javadoc><![CDATA[
+Flags this instance stateless.]]></jaxb:javadoc>
               </jaxb:property>
             </xsd:appinfo>
           </xsd:annotation>

@@ -1301,6 +1301,7 @@
             instance.setIdentifier( i.getIdentifier() );
             instance.setClazz( i.getClazz() );
             instance.setScope( Scope.MULTITON );
+            instance.setStateless( i.isStateless() );
             instance.setDependencies( this.getDependencies( i.getIdentifier() ) );
             instance.setProperties( this.getProperties( i.getIdentifier() ) );
             instance.setMessages( this.getMessages( i.getIdentifier() ) );

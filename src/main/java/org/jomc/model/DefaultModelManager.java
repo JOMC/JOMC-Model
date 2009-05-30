@@ -88,7 +88,7 @@ import org.xml.sax.SAXParseException;
  * <p><b>Classpath support</b><ul>
  * <li>{@link #getClassLoader() }</li>
  * <li>{@link #setClassLoader(java.lang.ClassLoader) }</li>
- * <li>{@link #getClasspathModule() }</li>
+ * <li>{@link #getClasspathModule(org.jomc.model.Modules) }</li>
  * <li>{@link #getClasspathModules(java.lang.String) }</li>
  * </ul></p>
  *
@@ -645,7 +645,7 @@ public class DefaultModelManager implements ModelManager
                     Constructor ctor = null;
                     try
                     {
-                        ctor = implClass.getConstructor( new Class[ 0 ] );
+                        ctor = implClass.getConstructor( NO_CLASSES );
                     }
                     catch ( NoSuchMethodException e )
                     {
@@ -717,11 +717,11 @@ public class DefaultModelManager implements ModelManager
 
                         if ( Modifier.isStatic( factoryMethod.getModifiers() ) )
                         {
-                            instance = factoryMethod.invoke( null, new Object[ 0 ] );
+                            instance = factoryMethod.invoke( null, NO_OBJECTS );
                         }
                         else if ( ctor != null )
                         {
-                            instance = factoryMethod.invoke( ctor.newInstance(), new Object[ 0 ] );
+                            instance = factoryMethod.invoke( ctor.newInstance(), NO_OBJECTS );
                         }
                         else
                         {
@@ -755,7 +755,7 @@ public class DefaultModelManager implements ModelManager
 
     // SECTION-END
     // SECTION-START[DefaultModelManager]
-
+    
     /** Listener interface. */
     public static abstract class Listener
     {
@@ -781,7 +781,7 @@ public class DefaultModelManager implements ModelManager
     private static final String BOOTSTRAP_SCHEMA_LOCATION = "org/jomc/model/bootstrap/jomc-bootstrap-1.0.xsd";
 
     /** Classpath location searched for bootstrap resources. */
-    private static final String BOOTSTRAP_RESOURCE_LOCATION = "META-INF/jomc-bootstrap.xml";
+    private static final String BOOTSTRAP_DOCUMENT_LOCATION = "META-INF/jomc-bootstrap.xml";
 
     /** JAXB context of the bootstrap schema. */
     private static final String BOOTSTRAP_CONTEXT = "org.jomc.model.bootstrap";
@@ -790,6 +790,16 @@ public class DefaultModelManager implements ModelManager
     private static final String[] SCHEMA_EXTENSIONS = new String[]
     {
         "xsd"
+    };
+
+    /** Empty {@code Class} array. */
+    private static final Class[] NO_CLASSES =
+    {
+    };
+
+    /** Empty {@code Object} array. */
+    private static final Object[] NO_OBJECTS =
+    {
     };
 
     /** Classloader of the instance. */
@@ -875,6 +885,8 @@ public class DefaultModelManager implements ModelManager
      * @throws IOException if reading schema resources fails.
      * @throws SAXException if parsing schema resources fails.
      * @throws JAXBException if unmarshalling schema resources fails.
+     *
+     * @see #BOOTSTRAP_DOCUMENT_LOCATION
      */
     public Schemas getSchemas() throws IOException, JAXBException, SAXException
     {
@@ -884,7 +896,7 @@ public class DefaultModelManager implements ModelManager
 
             final JAXBContext ctx = JAXBContext.newInstance( BOOTSTRAP_CONTEXT, this.getClassLoader() );
             final Unmarshaller u = ctx.createUnmarshaller();
-            final Enumeration<URL> e = this.getClassLoader().getResources( BOOTSTRAP_RESOURCE_LOCATION );
+            final Enumeration<URL> e = this.getClassLoader().getResources( BOOTSTRAP_DOCUMENT_LOCATION );
             u.setSchema( this.getBootstrapSchema() );
 
             while ( e.hasMoreElements() )
@@ -963,7 +975,7 @@ public class DefaultModelManager implements ModelManager
         mods.getDocumentation().setDefaultLanguage( "en" );
         mods.getDocumentation().getText().add( text );
 
-        final Unmarshaller u = this.getUnmarshaller( false );
+        final Unmarshaller u = this.getUnmarshaller( true );
         final Enumeration<URL> resources = this.getClassLoader().getResources( location );
 
         while ( resources.hasMoreElements() )
