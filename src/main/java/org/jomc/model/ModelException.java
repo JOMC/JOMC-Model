@@ -123,7 +123,10 @@ public class ModelException extends Exception
 
     }
 
-    /** Details of the instance. */
+    /**
+     * Details of the instance.
+     * @serial
+     */
     private List<Detail> details;
 
     /** Creates a new {@code ModelException} instance. */

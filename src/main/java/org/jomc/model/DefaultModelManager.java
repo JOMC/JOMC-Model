@@ -765,7 +765,7 @@ public class DefaultModelManager implements ModelManager
          *
          * @param level The level of the event.
          * @param message The message of the event or {@code null}.
-         * @param throwable The throwable of the event or {@code null}.
+         * @param t The throwable of the event or {@code null}.
          */
         public abstract void onLog( Level level, String message, Throwable t );
 
