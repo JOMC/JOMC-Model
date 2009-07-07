@@ -508,6 +508,34 @@
 
         return null;
     }
+
+    /**
+     * Gets an argument for a given index from the list of arguments.
+     *
+     * @param index The index of the argument to return.
+     *
+     * @return The argument at {@code index} from the list.
+     *
+     * @throws IndexOutOfBoundsException if {@code index} is negative
+     * or greater or equal to the size of the list.
+     */
+    public Argument getArgument( final int index )
+    {
+        if ( index < 0 || index >= this.getArgument().size() )
+        {
+            throw new IndexOutOfBoundsException( Integer.toString( index ) );
+        }
+
+        for ( Argument a : this.getArgument() )
+        {
+            if ( index == a.getIndex() )
+            {
+                return a;
+            }
+        }
+
+        return null;
+    }
 ]]></ci:code>
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Instances']">
