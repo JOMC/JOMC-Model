@@ -393,8 +393,8 @@ module. A module defines specifications, implementations and properties.</p>]]><
           Checks uniquenes of specification references.]]>
         </xsd:documentation>
       </xsd:annotation>
-      <xsd:selector xpath=".//jomc:specification"/>
-      <xsd:field xpath="@reference"/>
+      <xsd:selector xpath=".//jomc:reference"/>
+      <xsd:field xpath="@identifier"/>
     </xsd:unique>
   </xsd:element>
   <xsd:complexType name="Specifications">
@@ -537,8 +537,7 @@ implementation instances are to be bound to a system's single instance store.]]>
     </xsd:annotation>
     <xsd:complexContent>
       <xsd:extension base="jomc:ModelObject">
-        <xsd:attribute name="identifier" type="jomc:Identifier"
-                       use="required">
+        <xsd:attribute name="identifier" type="jomc:Identifier" use="required">
           <xsd:annotation>
             <xsd:appinfo>
               <jaxb:property>
@@ -976,8 +975,8 @@ the property. Property {@code value} holds the properties value which is of type
           Checks message reference uniquenes.]]>
         </xsd:documentation>
       </xsd:annotation>
-      <xsd:selector xpath=".//jomc:message"/>
-      <xsd:field xpath="@reference"/>
+      <xsd:selector xpath=".//jomc:reference"/>
+      <xsd:field xpath="@name"/>
     </xsd:unique>
   </xsd:element>
   <xsd:complexType name="Messages">
@@ -1136,7 +1135,7 @@ argument.</p>]]></jaxb:javadoc>
     </xsd:annotation>
     <xsd:complexContent>
       <xsd:extension base="jomc:ModelObject">
-        <xsd:attribute name="index" type="xsd:integer" use="required">
+        <xsd:attribute name="index" type="xsd:int" use="required">
           <xsd:annotation>
             <xsd:appinfo>
               <jaxb:property>
