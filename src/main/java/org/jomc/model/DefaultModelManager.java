@@ -755,7 +755,7 @@ public class DefaultModelManager implements ModelManager
 
     // SECTION-END
     // SECTION-START[DefaultModelManager]
-    
+
     /** Listener interface. */
     public static abstract class Listener
     {
