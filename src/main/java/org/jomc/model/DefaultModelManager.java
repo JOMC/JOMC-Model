@@ -1,6 +1,6 @@
 /*
  *   Copyright (c) 2009 The JOMC Project
- *   Copyright (c) 2005 Christian Schulte <cs@schulte.it>
+ *   Copyright (c) 2005 Christian Schulte <schulte2005@users.sourceforge.net>
  *   All rights reserved.
  *
  *   Redistribution and use in source and binary forms, with or without
@@ -97,7 +97,7 @@ import org.xml.sax.SAXParseException;
  * <li>{@link #log(java.util.logging.Level, java.lang.String, java.lang.Throwable) }</li>
  * </ul></p>
  *
- * @author <a href="mailto:cs@schulte.it">Christian Schulte</a>
+ * @author <a href="mailto:schulte2005@users.sourceforge.net">Christian Schulte</a>
  * @version $Id$
  */
 public class DefaultModelManager implements ModelManager
