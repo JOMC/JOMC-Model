@@ -542,16 +542,33 @@ public class DefaultModelManager implements ModelManager
 
                                 }
 
-                                final Implementations available =
-                                    modules.getImplementations( i.getIdentifier(), d.getName() );
+                                final Implementations available = modules.getImplementations( d.getIdentifier() );
 
-                                if ( !d.isOptional() &&
-                                     ( available == null || available.getImplementation().isEmpty() ) )
+                                if ( !d.isOptional() )
                                 {
-                                    details.add( this.newMandatoryDependencyConstraintDetail(
-                                        this.getObjectFactory().createDependency( d ), i.getIdentifier(),
-                                        d.getName() ) );
+                                    boolean missing = false;
 
+                                    if ( available == null )
+                                    {
+                                        missing = true;
+                                    }
+                                    else if ( available.getImplementation().isEmpty() )
+                                    {
+                                        missing = true;
+                                    }
+                                    else if ( d.getImplementationName() != null &&
+                                              available.getImplementationByName( d.getImplementationName() ) == null )
+                                    {
+                                        missing = true;
+                                    }
+
+                                    if ( missing )
+                                    {
+                                        details.add( this.newMandatoryDependencyConstraintDetail(
+                                            this.getObjectFactory().createDependency( d ), i.getIdentifier(),
+                                            d.getName() ) );
+
+                                    }
                                 }
                             }
                         }

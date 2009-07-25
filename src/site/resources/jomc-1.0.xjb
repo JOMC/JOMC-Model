@@ -1257,53 +1257,6 @@
     }
 
     /**
-     * Gets all implementations implementing a given dependency.
-     *
-     * @param implementation The identifier of the implementation declaring {@code dependency}.
-     * @param dependency The name of the dependency to return implementations of.
-     *
-     * @return All implementations of {@code dependency} or {@code null}, if no implementation is available.
-     *
-     * @throws NullPointerException if {@code implementation} or {@code dependency} is {@code null}.
-     */
-    public Implementations getImplementations( final String implementation, final String dependency )
-    {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-        if ( dependency == null )
-        {
-            throw new NullPointerException( "dependency" );
-        }
-
-        final Implementations implementations = new Implementations();
-        final Implementation i = this.getImplementation( implementation );
-
-        if ( i != null )
-        {
-            final Dependencies dependencies = this.getDependencies( implementation );
-
-            if ( dependencies != null )
-            {
-                final Dependency d = dependencies.getDependency( dependency );
-
-                if ( d != null )
-                {
-                    final Implementations available = this.getImplementations( d.getIdentifier() );
-
-                    if ( available != null )
-                    {
-                        implementations.getImplementation().addAll( available.getImplementation() );
-                    }
-                }
-            }
-        }
-
-        return implementations.getImplementation().size() > 0 ? implementations : null;
-    }
-
-    /**
      * Gets an instance of an implementation.
      *
      * @param implementation The identifier of the implementation to return an instance of.
