@@ -1212,6 +1212,15 @@ argument.</p>]]></jaxb:javadoc>
     <xsd:complexContent>
       <xsd:extension base="jomc:ModelObject">
         <xsd:sequence>
+          <xsd:element ref="jomc:specifications" minOccurs="0" maxOccurs="1">
+            <xsd:annotation>
+              <xsd:appinfo>
+                <jaxb:property>
+                  <jaxb:javadoc><![CDATA[Specifications of this instance.]]></jaxb:javadoc>
+                </jaxb:property>
+              </xsd:appinfo>
+            </xsd:annotation>
+          </xsd:element>
           <xsd:element ref="jomc:dependencies" minOccurs="0" maxOccurs="1">
             <xsd:annotation>
               <xsd:appinfo>
@@ -1275,8 +1284,7 @@ argument.</p>]]></jaxb:javadoc>
           <xsd:annotation>
             <xsd:appinfo>
               <jaxb:property>
-                <jaxb:javadoc><![CDATA[
-Flags this instance stateless.]]></jaxb:javadoc>
+                <jaxb:javadoc><![CDATA[Flags this instance stateless.]]></jaxb:javadoc>
               </jaxb:property>
             </xsd:appinfo>
           </xsd:annotation>

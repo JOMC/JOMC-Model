@@ -1330,9 +1330,24 @@
             instance.setClazz( i.getClazz() );
             instance.setScope( Scope.MULTITON );
             instance.setStateless( i.isStateless() );
+            instance.setSpecifications( new Specifications() );
             instance.setDependencies( this.getDependencies( i.getIdentifier() ) );
             instance.setProperties( this.getProperties( i.getIdentifier() ) );
             instance.setMessages( this.getMessages( i.getIdentifier() ) );
+
+
+            final List<SpecificationReference> specifications = this.getSpecifications( i.getIdentifier() );
+            if ( specifications != null )
+            {
+                for ( SpecificationReference ref : specifications )
+                {
+                    final Specification specification = this.getSpecification( ref.getIdentifier() );
+                    if ( specification != null )
+                    {
+                        instance.getSpecifications().getSpecification().add( specification );
+                    }
+                }
+            }
         }
 
         return instance;
