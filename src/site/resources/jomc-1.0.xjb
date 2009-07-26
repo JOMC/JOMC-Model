@@ -569,6 +569,68 @@
     }
 ]]></ci:code>
     </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Instance']">
+      <ci:code><![CDATA[
+    /** Maps dependency names to dependency objects. */
+    @javax.xml.bind.annotation.XmlTransient private java.util.Map<String, Object> dependencyObjects;
+
+    /** Maps property names to property objects. */
+    @javax.xml.bind.annotation.XmlTransient private java.util.Map<String, Object> propertyObjects;
+
+    /** The classloader of the instance. */
+    @javax.xml.bind.annotation.XmlTransient private ClassLoader classLoader;
+
+    /**
+     * Gets the classloader of the instance.
+     *
+     * @return The classloader of the instance.
+     */
+    public ClassLoader getClassLoader()
+    {
+        return this.classLoader;
+    }
+
+    /**
+     * Sets the classloader of the instance.
+     *
+     * @param value The new classloader of the instance.
+     */
+    public void setClassLoader( final ClassLoader value )
+    {
+        this.classLoader = value;
+    }
+
+    /**
+     * Gets a mapping of dependency names to objects bound to the instance.
+     *
+     * @return A mapping of dependency names to objects bound to the instance.
+     */
+    public java.util.Map<String, Object> getDependencyObjects()
+    {
+        if ( this.dependencyObjects == null )
+        {
+            this.dependencyObjects = new java.util.HashMap<String, Object>();
+        }
+
+        return this.dependencyObjects;
+    }
+
+    /**
+     * Gets a mapping of property names to objects bound to the instance.
+     *
+     * @return A mapping of property names to objects bound to the instance.
+     */
+    public java.util.Map<String, Object> getPropertyObjects()
+    {
+        if ( this.propertyObjects == null )
+        {
+            this.propertyObjects = new java.util.HashMap<String, Object>();
+        }
+
+        return this.propertyObjects;
+    }
+]]></ci:code>
+    </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Modules']">
       <ci:code><![CDATA[
     /**
@@ -701,103 +763,6 @@
         }
 
         return null;
-    }
-
-    /**
-     * Gets an implementation including referenced model objects as a module.
-     *
-     * @param implementation The identifier of the implementation to resolve.
-     *
-     * @return A module declaring {@code implementation} in addition to all referenced model objects or {@code null} if
-     * no implementation matching {@code implementation} is available.
-     *
-     * @throws NullPointerException if {@code implementation} is {@code null}.
-     */
-    public Module getImplementationModule( final String implementation )
-    {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-
-        Module m = null;
-        final Implementation i = this.getImplementation( implementation );
-
-        if ( i != null )
-        {
-            m = new Module();
-            m.setSpecifications( new Specifications() );
-            m.setImplementations( new Implementations() );
-            m.setName( i.getIdentifier() );
-            m.setVersion( i.getVersion() );
-            m.setVendor( i.getVendor() );
-
-            this.collectImplementationModule( m, implementation );
-
-            final Dependencies dependencies = this.getDependencies( implementation );
-            final List<SpecificationReference> references = this.getSpecifications( implementation );
-
-            if ( dependencies != null )
-            {
-                for ( Dependency d : dependencies.getDependency() )
-                {
-                    if ( m.getSpecifications().getSpecification( d.getIdentifier() ) == null )
-                    {
-                        final Specification s = this.getSpecification( d.getIdentifier() );
-
-                        if ( s != null )
-                        {
-                            m.getSpecifications().getSpecification().add( s );
-                        }
-                    }
-                }
-            }
-
-            if ( references != null )
-            {
-                for ( SpecificationReference ref : references )
-                {
-                    if ( m.getSpecifications().getSpecification( ref.getIdentifier() ) == null )
-                    {
-                        final Specification s = this.getSpecification( ref.getIdentifier() );
-                        if ( s != null )
-                        {
-                            m.getSpecifications().getSpecification().add( s );
-                        }
-                    }
-                }
-            }
-        }
-
-        return m;
-    }
-
-    private void collectImplementationModule( final Module module, final String parent )
-    {
-        final Implementation i = this.getImplementation( parent );
-        if ( i != null )
-        {
-            if ( i.getParent() != null )
-            {
-                this.collectImplementationModule( module, i.getParent() );
-            }
-
-            if ( module.getImplementations().getImplementation( i.getIdentifier() ) == null )
-            {
-                final Module m = this.getModuleOfImplementation( i.getIdentifier() );
-                module.getImplementations().getImplementation().add( i );
-
-                if ( i.getMessages() != null )
-                {
-                    for ( java.util.Iterator<MessageReference> ref = i.getMessages().getReference().iterator();
-                          ref.hasNext(); )
-                    {
-                        i.getMessages().getMessage().add( m.getMessages().getMessage( ref.next().getName() ) );
-                        ref.remove();
-                    }
-                }
-            }
-        }
     }
 
     /**
@@ -1255,156 +1220,6 @@
 
         return implementations.getImplementation().size() > 0 ? implementations : null;
     }
-
-    /**
-     * Gets an instance of an implementation.
-     *
-     * @param implementation The identifier of the implementation to return an instance of.
-     *
-     * @return An instance of the implementation identified by {@code implementation}  or {@code null}, if no instance
-     * is available.
-     *
-     * @throws NullPointerException if {@code implementation} is {@code null}.
-     */
-    public Instance getInstance( final String implementation )
-    {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-
-        final Implementation i = this.getImplementation( implementation );
-        Instance instance = null;
-
-        if ( i != null && i.getClazz() != null )
-        {
-            instance = new Instance();
-            instance.setIdentifier( i.getIdentifier() );
-            instance.setClazz( i.getClazz() );
-            instance.setScope( Scope.MULTITON );
-            instance.setStateless( i.isStateless() );
-            instance.setSpecifications( new Specifications() );
-            instance.setDependencies( this.getDependencies( i.getIdentifier() ) );
-            instance.setProperties( this.getProperties( i.getIdentifier() ) );
-            instance.setMessages( this.getMessages( i.getIdentifier() ) );
-
-
-            final List<SpecificationReference> specifications = this.getSpecifications( i.getIdentifier() );
-            if ( specifications != null )
-            {
-                for ( SpecificationReference ref : specifications )
-                {
-                    final Specification specification = this.getSpecification( ref.getIdentifier() );
-                    if ( specification != null )
-                    {
-                        instance.getSpecifications().getSpecification().add( specification );
-                    }
-                }
-            }
-        }
-
-        return instance;
-    }
-
-    /**
-     * Gets an instance of an implementation of a given specification.
-     *
-     * @param specification The identifier of the specification to return an instance of.
-     * @param name The name of the implementation implementing {@code specification} to return an instance of.
-     *
-     * @return An instance of the implementation with name {@code name} implementing the specification identified by
-     * {@code specification} or {@code null}, if no instance is available.
-     *
-     * @throws NullPointerException if {@code specification} or {@code name} is {@code null}.
-     */
-    public Instance getInstance( final String specification, final String name )
-    {
-        if ( specification == null )
-        {
-            throw new NullPointerException( "specification" );
-        }
-        if ( name == null )
-        {
-            throw new NullPointerException( "name" );
-        }
-
-        final Specification s = this.getSpecification( specification );
-
-        Instance instance = null;
-
-        if ( s != null )
-        {
-            final Implementation i = this.getImplementation( specification, name );
-
-            if ( i != null )
-            {
-                instance = this.getInstance( i.getIdentifier() );
-
-                if ( instance != null )
-                {
-                    instance.setScope( s.getScope() );
-                }
-            }
-        }
-
-        return instance;
-    }
-
-    /**
-     * Gets an instance of an implementation of a given specification as required by a given dependency.
-     *
-     * @param specification The identifier of the specification to return an implementation instance of.
-     * @param name The name of the implementation to return an instance of.
-     * @param dependency The dependency requiring the instance.
-     *
-     * @return An instance of the implementation with name {@code name} implementing the specification identified by
-     * {@code specification} as required by {@code dependency} or {@code null}, if no such instance is available.
-     *
-     * @throws NullPointerException if {@code specification}, {@code name} or {@code dependency} is {@code null}.
-     */
-    public Instance getInstance( final String specification, final String name, final Dependency dependency )
-    {
-        if ( specification == null )
-        {
-            throw new NullPointerException( "specification" );
-        }
-        if ( name == null )
-        {
-            throw new NullPointerException( "name" );
-        }
-        if ( dependency == null )
-        {
-            throw new NullPointerException( "dependency" );
-        }
-
-        final Instance instance = this.getInstance( specification, name );
-
-        if ( instance != null )
-        {
-            final Properties properties = new Properties();
-
-            if ( dependency.getProperties() != null )
-            {
-                properties.getProperty().addAll( dependency.getProperties().getProperty() );
-            }
-
-            if ( instance.getProperties() != null )
-            {
-                for ( Property p : instance.getProperties().getProperty() )
-                {
-                    if ( properties.getProperty( p.getName() ) == null )
-                    {
-                        properties.getProperty().add( p );
-                    }
-                }
-            }
-
-            instance.setProperties( properties.getProperty().isEmpty() ? null : properties );
-        }
-
-        return instance;
-    }
-
 ]]></ci:code>
     </jaxb:bindings>
   </jaxb:bindings>

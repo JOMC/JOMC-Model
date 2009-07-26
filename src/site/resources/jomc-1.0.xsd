@@ -1259,6 +1259,16 @@ argument.</p>]]></jaxb:javadoc>
             </xsd:appinfo>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="implementationName" type="jomc:Identifier"
+                       use="required">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                <jaxb:javadoc><![CDATA[The name of the implementation of this instance.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="class" type="jomc:Identifier"
                        use="required">
           <xsd:annotation>
@@ -1274,7 +1284,7 @@ argument.</p>]]></jaxb:javadoc>
           <xsd:annotation>
             <xsd:appinfo>
               <jaxb:property>
-                <jaxb:javadoc><![CDATA[Scope this instance applies to.]]></jaxb:javadoc>
+                <jaxb:javadoc><![CDATA[Scope this instance is bound to.]]></jaxb:javadoc>
               </jaxb:property>
             </xsd:appinfo>
           </xsd:annotation>

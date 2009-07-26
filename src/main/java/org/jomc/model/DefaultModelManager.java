@@ -74,6 +74,7 @@ import org.jomc.model.bootstrap.Schemas;
 import org.jomc.model.util.ParseException;
 import org.jomc.model.util.TokenMgrError;
 import org.jomc.model.util.VersionParser;
+import org.jomc.model.util.WeakIdentityHashMap;
 import org.w3c.dom.ls.LSInput;
 import org.w3c.dom.ls.LSResourceResolver;
 import org.xml.sax.EntityResolver;
@@ -625,8 +626,8 @@ public class DefaultModelManager implements ModelManager
         }
     }
 
-    public Object createObject( final Modules modules, final String specification, final String name,
-                                final ClassLoader classLoader ) throws InstantiationException
+    public Instance getInstance( final Modules modules, final Specification specification,
+                                 final Implementation implementation, final ClassLoader classLoader )
     {
         if ( modules == null )
         {
@@ -636,59 +637,243 @@ public class DefaultModelManager implements ModelManager
         {
             throw new NullPointerException( "specification" );
         }
-        if ( name == null )
+        if ( implementation == null )
         {
-            throw new NullPointerException( "name" );
+            throw new NullPointerException( "implementation" );
         }
         if ( classLoader == null )
         {
             throw new NullPointerException( "classLoader" );
         }
 
-        Object instance = null;
+        final Instance instance = this.getDefaultInstance( modules, implementation, classLoader );
+        if ( instance != null )
+        {
+            instance.setScope( specification.getScope() );
+        }
+
+        return instance;
+    }
+
+    public Instance getInstance( final Modules modules, final Specification specification,
+                                 final Implementation implementation, final Dependency dependency,
+                                 final ClassLoader classLoader )
+    {
+        if ( modules == null )
+        {
+            throw new NullPointerException( "modules" );
+        }
+        if ( specification == null )
+        {
+            throw new NullPointerException( "specification" );
+        }
+        if ( implementation == null )
+        {
+            throw new NullPointerException( "implementation" );
+        }
+        if ( dependency == null )
+        {
+            throw new NullPointerException( "dependency" );
+        }
+        if ( classLoader == null )
+        {
+            throw new NullPointerException( "classLoader" );
+        }
+
+        final Instance instance = this.getInstance( modules, specification, implementation, classLoader );
+        if ( instance.getScope() == Scope.MULTITON && dependency.getProperties() != null )
+        {
+            final Properties properties = new Properties();
+            properties.getProperty().addAll( dependency.getProperties().getProperty() );
+
+            if ( instance.getProperties() != null )
+            {
+                for ( Property p : instance.getProperties().getProperty() )
+                {
+                    if ( properties.getProperty( p.getName() ) == null )
+                    {
+                        properties.getProperty().add( p );
+                    }
+                }
+            }
+
+            instance.setProperties( properties );
+        }
+
+        return instance;
+    }
+
+    public Instance getInstance( final Modules modules, final Object object )
+    {
+        if ( modules == null )
+        {
+            throw new NullPointerException( "modules" );
+        }
+        if ( object == null )
+        {
+            throw new NullPointerException( "object" );
+        }
+
+        synchronized ( this.objects )
+        {
+            Instance instance = (Instance) this.objects.get( object );
+
+            if ( instance == null )
+            {
+                final Implementation i = this.getImplementation( modules, object );
+
+                if ( i != null )
+                {
+                    ClassLoader cl = object.getClass().getClassLoader();
+                    if ( cl == null )
+                    {
+                        cl = ClassLoader.getSystemClassLoader();
+                    }
+
+                    instance = this.getDefaultInstance( modules, i, cl );
+                    if ( instance != null )
+                    {
+                        this.objects.put( object, instance );
+                    }
+                }
+            }
+
+            return instance;
+        }
+    }
+
+    private Instance getDefaultInstance( final Modules modules, final Implementation implementation,
+                                         final ClassLoader classLoader )
+    {
+        if ( modules == null )
+        {
+            throw new NullPointerException( "modules" );
+        }
+        if ( implementation == null )
+        {
+            throw new NullPointerException( "implementation" );
+        }
+        if ( classLoader == null )
+        {
+            throw new NullPointerException( "classLoader" );
+        }
+
+        Instance instance = null;
+        instance = new Instance();
+        instance.setIdentifier( implementation.getIdentifier() );
+        instance.setImplementationName( implementation.getName() );
+        instance.setClazz( implementation.getClazz() );
+        instance.setClassLoader( classLoader );
+        instance.setScope( Scope.MULTITON );
+        instance.setStateless( implementation.isStateless() );
+        instance.setDependencies( modules.getDependencies( implementation.getIdentifier() ) );
+        instance.setProperties( modules.getProperties( implementation.getIdentifier() ) );
+        instance.setMessages( modules.getMessages( implementation.getIdentifier() ) );
+
+        final List<SpecificationReference> specifications = modules.getSpecifications( implementation.getIdentifier() );
+        if ( specifications != null && !specifications.isEmpty() )
+        {
+            instance.setSpecifications( new Specifications() );
+            for ( SpecificationReference ref : specifications )
+            {
+                final Specification s = modules.getSpecification( ref.getIdentifier() );
+                if ( s != null )
+                {
+                    instance.getSpecifications().getSpecification().add( s );
+                }
+            }
+        }
+
+        return instance;
+    }
+
+    public Object getObject( final Modules modules, final Specification specification, final Instance instance )
+        throws InstantiationException
+    {
+        if ( modules == null )
+        {
+            throw new NullPointerException( "modules" );
+        }
+        if ( specification == null )
+        {
+            throw new NullPointerException( "specification" );
+        }
+        if ( instance == null )
+        {
+            throw new NullPointerException( "instance" );
+        }
+
+        Object object = null;
 
         try
         {
-            final Specification s = modules.getSpecification( specification );
-            final Implementation i = modules.getImplementation( specification, name );
+            final Class specClass = Class.forName( specification.getIdentifier(), true, instance.getClassLoader() );
+            final Class clazz = Class.forName( instance.getClazz(), true, instance.getClassLoader() );
 
-            if ( s != null && i != null && i.getClazz() != null )
+            if ( Modifier.isPublic( clazz.getModifiers() ) )
             {
-                final Class specClass = Class.forName( s.getIdentifier(), true, classLoader );
-                final Class implClass = Class.forName( i.getClazz(), true, classLoader );
+                Constructor ctor = null;
 
-                if ( Modifier.isPublic( implClass.getModifiers() ) )
+                try
                 {
-                    Constructor ctor = null;
-                    try
+                    ctor = clazz.getConstructor( NO_CLASSES );
+                }
+                catch ( NoSuchMethodException e )
+                {
+                    this.log( Level.FINE, this.getMessage( "noSuchMethod", new Object[]
+                        {
+                            e.getMessage()
+                        } ), null );
+
+                    ctor = null;
+                }
+
+                if ( ctor != null && specClass.isAssignableFrom( clazz ) )
+                {
+                    synchronized ( this.objects )
                     {
-                        ctor = implClass.getConstructor( NO_CLASSES );
+                        object = clazz.newInstance();
+                        this.objects.put( object, instance );
                     }
-                    catch ( NoSuchMethodException e )
+                }
+                else
+                {
+                    final StringBuffer methodNames = new StringBuffer().append( '[' );
+                    Method factoryMethod = null;
+                    String methodName = null;
+
+                    char[] c = instance.getImplementationName().toCharArray();
+                    c[0] = Character.toUpperCase( c[0] );
+                    methodName = "get" + String.valueOf( c );
+
+                    boolean javaIdentifier = Character.isJavaIdentifierStart( c[0] );
+                    if ( javaIdentifier )
                     {
-                        this.log( Level.FINE, this.getMessage( "noSuchMethod", new Object[]
+                        for ( int idx = c.length - 1; idx > 0; idx-- )
+                        {
+                            if ( !Character.isJavaIdentifierPart( c[idx] ) )
                             {
-                                e.getMessage()
-                            } ), null );
-
-                        ctor = null;
+                                javaIdentifier = false;
+                                break;
+                            }
+                        }
                     }
 
-                    if ( ctor != null && specClass.isAssignableFrom( implClass ) )
+                    if ( javaIdentifier )
                     {
-                        instance = implClass.newInstance();
+                        methodNames.append( methodName );
+                        factoryMethod = this.getFactoryMethod( clazz, methodName );
                     }
-                    else
-                    {
-                        final StringBuffer methodNames = new StringBuffer().append( '[' );
-                        Method factoryMethod = null;
-                        String methodName = null;
 
-                        char[] c = i.getName().toCharArray();
+                    if ( factoryMethod == null )
+                    {
+                        methodName = specification.getIdentifier().substring(
+                            specification.getIdentifier().lastIndexOf( '.' ) + 1 );
+
+                        c = methodName.toCharArray();
                         c[0] = Character.toUpperCase( c[0] );
-                        methodName = "get" + String.valueOf( c );
 
-                        boolean javaIdentifier = Character.isJavaIdentifierStart( c[0] );
+                        javaIdentifier = Character.isJavaIdentifierStart( c[0] );
                         if ( javaIdentifier )
                         {
                             for ( int idx = c.length - 1; idx > 0; idx-- )
@@ -703,61 +888,61 @@ public class DefaultModelManager implements ModelManager
 
                         if ( javaIdentifier )
                         {
-                            methodNames.append( methodName );
-                            factoryMethod = this.getFactoryMethod( implClass, specClass, methodName );
-                        }
-
-                        if ( factoryMethod == null )
-                        {
-                            c = s.getIdentifier().substring( s.getIdentifier().lastIndexOf( '.' ) + 1 ).toCharArray();
-                            c[0] = Character.toUpperCase( c[0] );
                             methodName = "get" + String.valueOf( c );
-                            methodNames.append( ", " ).append( methodName );
-                            factoryMethod = this.getFactoryMethod( implClass, specClass, "get" + String.valueOf( c ) );
+                            methodNames.append( " " ).append( methodName );
+                            factoryMethod = this.getFactoryMethod( clazz, methodName );
                         }
+                    }
 
-                        if ( factoryMethod == null )
-                        {
-                            methodName = "getObject";
-                            methodNames.append( ", " ).append( methodName );
-                            factoryMethod = this.getFactoryMethod( implClass, null, methodName );
-                        }
+                    if ( factoryMethod == null )
+                    {
+                        methodName = "getObject";
+                        methodNames.append( " " ).append( methodName );
+                        factoryMethod = this.getFactoryMethod( clazz, methodName );
+                    }
 
-                        if ( factoryMethod == null )
-                        {
-                            throw new InstantiationException( this.getMessage( "missingFactoryMethod", new Object[]
-                                {
-                                    implClass.getName(), specClass.getName(), methodNames.append( ']' ).toString()
-                                } ) );
+                    methodNames.append( ']' );
 
-                        }
+                    if ( factoryMethod == null )
+                    {
+                        throw new InstantiationException( this.getMessage( "missingFactoryMethod", new Object[]
+                            {
+                                clazz.getName(), instance.getIdentifier(), methodNames.toString()
+                            } ) );
 
-                        if ( Modifier.isStatic( factoryMethod.getModifiers() ) )
-                        {
-                            instance = factoryMethod.invoke( null, NO_OBJECTS );
-                        }
-                        else if ( ctor != null )
-                        {
-                            instance = factoryMethod.invoke( ctor.newInstance(), NO_OBJECTS );
-                        }
-                        else
-                        {
-                            throw new InstantiationException( this.getMessage( "missingFactoryMethod", new Object[]
-                                {
-                                    implClass.getName(), specClass.getName(), methodNames.append( ']' ).toString()
-                                } ) );
+                    }
 
+                    if ( Modifier.isStatic( factoryMethod.getModifiers() ) )
+                    {
+                        object = factoryMethod.invoke( null, NO_OBJECTS );
+                    }
+                    else if ( ctor != null )
+                    {
+                        synchronized ( this.objects )
+                        {
+                            object = ctor.newInstance();
+                            this.objects.put( object, instance );
+                            object = factoryMethod.invoke( object, NO_OBJECTS );
+                            this.objects.put( object, instance );
                         }
+                    }
+                    else
+                    {
+                        throw new InstantiationException( this.getMessage( "missingFactoryMethod", new Object[]
+                            {
+                                clazz.getName(), instance.getIdentifier(), methodNames.toString()
+                            } ) );
+
                     }
                 }
             }
 
-            return instance;
+            return object;
         }
         catch ( InvocationTargetException e )
         {
-            throw (InstantiationException) new InstantiationException().initCause( e.getTargetException() != null
-                                                                                   ? e.getTargetException() : e );
+            throw (InstantiationException) new InstantiationException().initCause(
+                e.getTargetException() != null ? e.getTargetException() : e );
 
         }
         catch ( IllegalAccessException e )
@@ -788,10 +973,16 @@ public class DefaultModelManager implements ModelManager
 
     }
 
-    /** Constant for the classpath module name. */
+    /**
+     * Constant for the name of the classpath module.
+     * @see #getClasspathModule(org.jomc.model.Modules)
+     */
     public static final String CLASSPATH_MODULE_NAME = "Java Classpath";
 
-    /** Classpath location searched for documents by default. */
+    /**
+     * Classpath location searched for documents by default.
+     * @see #getClasspathModules(java.lang.String)
+     */
     public static final String DEFAULT_DOCUMENT_LOCATION = "META-INF/jomc.xml";
 
     /** Classpath location of the bootstrap schema. */
@@ -819,7 +1010,7 @@ public class DefaultModelManager implements ModelManager
     {
     };
 
-    /** Classloader of the instance. */
+    /** Class loader of the instance. */
     private ClassLoader classLoader;
 
     /** The entity resolver of the instance. */
@@ -842,6 +1033,9 @@ public class DefaultModelManager implements ModelManager
 
     /** The listeners of the instance. */
     private List<Listener> listeners;
+
+    /** Maps objects to {@code Instance}s. */
+    private final Map objects = new WeakIdentityHashMap( 1024 );
 
     /** Creates a new {@code DefaultModelManager} instance. */
     public DefaultModelManager()
@@ -960,11 +1154,13 @@ public class DefaultModelManager implements ModelManager
     }
 
     /**
-     * Gets modules by searching the classloader of the instance for resources.
+     * Gets modules by searching the class loader of the instance for resources.
+     * <p><b>Note:</b><br/>
+     * This method does not validate the modules.</p>
      *
      * @param location The location to search at.
      *
-     * @return All resources from the classloader of the instance matching {@code location}.
+     * @return All resources from the class loader of the instance matching {@code location}.
      *
      * @throws NullPointerException if {@code location} is {@code null}.
      * @throws IOException if reading resources fails.
@@ -992,7 +1188,7 @@ public class DefaultModelManager implements ModelManager
         mods.getDocumentation().setDefaultLanguage( "en" );
         mods.getDocumentation().getText().add( text );
 
-        final Unmarshaller u = this.getUnmarshaller( true );
+        final Unmarshaller u = this.getUnmarshaller( false );
         final Enumeration<URL> resources = this.getClassLoader().getResources( location );
 
         while ( resources.hasMoreElements() )
@@ -1029,13 +1225,13 @@ public class DefaultModelManager implements ModelManager
     }
 
     /**
-     * Gets a module holding model objects resolved by inspecting the classloader of the instance.
+     * Gets a module holding model objects resolved by inspecting the class loader of the instance.
      * <p>This method searches the given modules for unresolved references and tries to resolve each unresolved
-     * reference by inspecting the classloader of the instance.</p>
+     * reference by inspecting the class loader of the instance.</p>
      *
-     * @param modules The modules to resolve by inspecting the classloader of the instance.
+     * @param modules The modules to resolve by inspecting the class loader of the instance.
      *
-     * @return A module holding model objects resolved by inspecting the classloader of the instance or {@code null} if
+     * @return A module holding model objects resolved by inspecting the class loader of the instance or {@code null} if
      * nothing could be resolved.
      *
      * @see #CLASSPATH_MODULE_NAME
@@ -1057,9 +1253,9 @@ public class DefaultModelManager implements ModelManager
     }
 
     /**
-     * Gets the classloader of the instance.
+     * Gets the class loader of the instance.
      *
-     * @return The classloader of the instance.
+     * @return The class loader of the instance.
      */
     public ClassLoader getClassLoader()
     {
@@ -1077,9 +1273,9 @@ public class DefaultModelManager implements ModelManager
     }
 
     /**
-     * Sets the classloader of the instance.
+     * Sets the class loader of the instance.
      *
-     * @param value The new classloader of the instance.
+     * @param value The new class loader of the instance.
      */
     public void setClassLoader( final ClassLoader value )
     {
@@ -1107,7 +1303,7 @@ public class DefaultModelManager implements ModelManager
     }
 
     /**
-     * Resolves references by inspecting the classloader of the instance.
+     * Resolves references by inspecting the class loader of the instance.
      *
      * @param modules The modules to resolve.
      * @param cpModule The module for resolved references.
@@ -1379,18 +1575,13 @@ public class DefaultModelManager implements ModelManager
         return factoryMethod;
     }
 
-    private Method getFactoryMethod( final Class clazz, final Class type, final String methodName )
+    private Method getFactoryMethod( final Class clazz, final String methodName )
     {
         Method m = null;
 
         try
         {
-            m = clazz.getMethod( methodName, new Class[ 0 ] );
-            if ( type != null && !type.isAssignableFrom( m.getReturnType() ) )
-            {
-                m = null;
-            }
-
+            m = clazz.getMethod( methodName, NO_CLASSES );
         }
         catch ( NoSuchMethodException e )
         {
@@ -1472,6 +1663,29 @@ public class DefaultModelManager implements ModelManager
         }
 
         return this.bootstrapSchema;
+    }
+
+    /**
+     * Gets the implementation of an object.
+     *
+     * @param object The object to get the implementation for.
+     *
+     * @return The implementation for {@code object} or {@code null}, if nothing is known about {@code object}.
+     */
+    private Implementation getImplementation( final Modules modules, final Object object )
+    {
+        return this.collectImplementation( modules, object.getClass() );
+    }
+
+    private Implementation collectImplementation( final Modules modules, final Class clazz )
+    {
+        Implementation i = modules.getImplementation( clazz );
+        if ( i == null && clazz.getSuperclass() != null )
+        {
+            i = this.collectImplementation( modules, clazz.getSuperclass() );
+        }
+
+        return i;
     }
 
     private String getMessage( final String key, final Object args )

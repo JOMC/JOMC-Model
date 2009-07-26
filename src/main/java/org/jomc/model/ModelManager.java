@@ -64,6 +64,13 @@ import org.xml.sax.SAXException;
  * <li>{@link #validateModules(org.jomc.model.Modules) }</li>
  * </ul></p>
  *
+ * <p><b>Object management</b><ul>
+ * <li>{@link #getInstance(org.jomc.model.Modules, org.jomc.model.Specification, org.jomc.model.Implementation, java.lang.ClassLoader) }</li>
+ * <li>{@link #getInstance(org.jomc.model.Modules, org.jomc.model.Specification, org.jomc.model.Implementation, org.jomc.model.Dependency, java.lang.ClassLoader) }</li>
+ * <li>{@link #getInstance(org.jomc.model.Modules, java.lang.Object) }</li>
+ * <li>{@link #getObject(org.jomc.model.Modules, org.jomc.model.Specification, org.jomc.model.Instance) }</li>
+ * </ul></p>
+ *
  * @author <a href="mailto:schulte2005@users.sourceforge.net">Christian Schulte</a>
  * @version $Id$
  */
@@ -173,19 +180,64 @@ public interface ModelManager
         throws NullPointerException, ModelException, IOException, SAXException, JAXBException;
 
     /**
-     * Creates an object.
+     * Gets an instance of an implementation.
      *
-     * @param modules The modules declaring the object to create.
-     * @param specification The identifier of the specification specifying the object to create.
-     * @param name The name of the implementation implementing the object to create.
-     * @param classLoader The classloader to use for loading classes.
+     * @param modules The modules declaring the instance to get.
+     * @param specification The specification specifying the instance to get.
+     * @param implementation The implementation to get an instance of.
+     * @param classLoader The class loader of the instance to get.
      *
-     * @return A new object or {@code null} if nothing could be resolved.
+     * @return An instance of {@code implementation} or {@code null} if no instance is available.
      *
-     * @throws NullPointerException if {@code specification}, {@code name} or {@code classLoader} is {@code null}.
-     * @throws InstantiationException if instantiation fails.
+     * @throws NullPointerException if {@code modules}, {@code specification}, {@code implementation} or
+     * {@code classLoader} is {@code null}.
      */
-    Object createObject( Modules modules, String specification, String name, ClassLoader classLoader )
+    Instance getInstance( Modules modules, Specification specification, Implementation implementation,
+                          ClassLoader classLoader ) throws NullPointerException;
+
+    /**
+     * Gets an instance of an implementation of a dependency.
+     *
+     * @param modules The modules declaring the instance to get.
+     * @param specification The specification specifying the instance to get.
+     * @param implementation The implementation of the dependency to get an instance of.
+     * @param dependency The dependency to get an instance of.
+     * @param classLoader The class loader of the instance to get.
+     *
+     * @return An instance of {@code implementation} or {@code null} if no instance is available.
+     *
+     * @throws NullPointerException if {@code modules}, {@code specification}, {@code implementation},
+     * {@code dependency} or {@code classLoader} is {@code null}.
+     */
+    Instance getInstance( Modules modules, Specification specification, Implementation implementation,
+                          Dependency dependency, ClassLoader classLoader ) throws NullPointerException;
+
+    /**
+     * Gets the instance of an object.
+     *
+     * @param modules The modules declaring the instance to get.
+     * @param object The object to get the instance of.
+     *
+     * @return The instance of {@code object} or {@code null} of nothing is known about {@code object}.
+     *
+     * @throws NullPointerException if {@code modules} or {@code object} is {@code null},
+     */
+    Instance getInstance( Modules modules, Object object )
+        throws NullPointerException;
+
+    /**
+     * Gets the object of an instance.
+     *
+     * @param modules The modules declaring the object to get.
+     * @param specification The specification specifying the object to get.
+     * @param instance The instance of the object to get.
+     *
+     * @return The object of {@code instance} or {@code null} if nothing is known about {@code instance}.
+     *
+     * @throws NullPointerException if {@code modules}, {@code specification} or {@code instance} is {@code null}.
+     * @throws InstantiationException if instantiating the object fails.
+     */
+    Object getObject( Modules modules, Specification specification, Instance instance )
         throws NullPointerException, InstantiationException;
 
 }
