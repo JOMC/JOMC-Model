@@ -535,7 +535,8 @@ public class DefaultModelManager implements ModelManager
                                 }
 
                                 if ( s.getScope() != Scope.MULTITON && d.getProperties() != null &&
-                                     !d.getProperties().getProperty().isEmpty() )
+                                     !( d.getProperties().getProperty().isEmpty() ||
+                                        d.getProperties().getReference().isEmpty() ) )
                                 {
                                     details.add( this.newPropertyOverwriteConstraintDetail(
                                         this.getObjectFactory().createDependency( d ), i.getIdentifier(), d.getName(),
@@ -685,6 +686,18 @@ public class DefaultModelManager implements ModelManager
         {
             final Properties properties = new Properties();
             properties.getProperty().addAll( dependency.getProperties().getProperty() );
+
+            if ( !dependency.getProperties().getReference().isEmpty() )
+            {
+                final Module m = modules.getModuleOfImplementation( implementation.getIdentifier() );
+                if ( m != null )
+                {
+                    for ( PropertyReference r : dependency.getProperties().getReference() )
+                    {
+                        properties.getProperty().add( m.getProperties().getProperty( r.getName() ) );
+                    }
+                }
+            }
 
             if ( instance.getProperties() != null )
             {

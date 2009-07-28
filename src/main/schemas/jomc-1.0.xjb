@@ -995,7 +995,7 @@
 
         } );
 
-        return dependencies.getDependency().size() > 0 ? dependencies : null;
+        return dependencies.getDependency().isEmpty() ? null : dependencies;
     }
 
     private void collectDependencies( final String implementation, final Dependencies dependencies )
@@ -1042,7 +1042,7 @@
         this.collectProperties( implementation, properties );
         final Properties specified = this.getSpecifiedProperties( implementation );
 
-        if ( specified != null )
+        if ( properties != null && specified != null )
         {
             for ( Property p : specified.getProperty() )
             {
@@ -1063,7 +1063,7 @@
 
         } );
 
-        return properties.getProperty().size() > 0 ? properties : null;
+        return properties.getProperty().isEmpty() ? null : properties;
     }
 
     private void collectProperties( final String implementation, final Properties properties )
@@ -1148,7 +1148,7 @@
 
         } );
 
-        return properties.getProperty().size() > 0 ? properties : null;
+        return properties.getProperty().isEmpty() ? null : properties;
     }
 
     /**
@@ -1180,7 +1180,7 @@
 
         } );
 
-        return msgs.getMessage().size() > 0 ? msgs : null;
+        return msgs.getMessage().isEmpty() ? null : msgs;
     }
 
     private void collectMessages( final String implementation, final Messages messages )
