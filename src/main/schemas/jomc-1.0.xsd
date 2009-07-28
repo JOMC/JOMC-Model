@@ -875,6 +875,15 @@ implementation. The {@code optional} flag indicates an optional dependency.</p>]
   <!-- Properties                                                            -->
   <!--                                                                       -->
   <xsd:element name="properties" type="jomc:Properties">
+    <xsd:unique name="properties-uniqueness">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en"><![CDATA[
+          Checks properties uniquenes.]]>
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:selector xpath=".//*"/>
+      <xsd:field xpath="@name"/>
+    </xsd:unique>
     <xsd:unique name="property-name-uniqueness">
       <xsd:annotation>
         <xsd:documentation xml:lang="en"><![CDATA[
@@ -1005,7 +1014,16 @@ the property. Property {@code value} holds the properties value which is of type
   <!-- Messages                                                              -->
   <!--                                                                       -->
   <xsd:element name="messages" type="jomc:Messages">
-    <xsd:unique name="message-uniqueness">
+    <xsd:unique name="messages-uniqueness">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en"><![CDATA[
+          Checks messages uniquenes.]]>
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:selector xpath=".//*"/>
+      <xsd:field xpath="@name"/>
+    </xsd:unique>
+    <xsd:unique name="message-name-uniqueness">
       <xsd:annotation>
         <xsd:documentation xml:lang="en"><![CDATA[
           Checks message identifier uniquenes.]]>
