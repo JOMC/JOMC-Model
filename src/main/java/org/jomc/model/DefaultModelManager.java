@@ -544,6 +544,13 @@ public class DefaultModelManager implements ModelManager
 
                                 }
 
+                                if ( d.getProperties() != null && !d.getProperties().getReference().isEmpty() )
+                                {
+                                    details.add( this.newDependencyPropertyReferenceConstraintDetail(
+                                        this.getObjectFactory().createDependency( d ), i, d ) );
+
+                                }
+
                                 final Implementations available = modules.getImplementations( d.getIdentifier() );
 
                                 if ( !d.isOptional() )
@@ -572,6 +579,17 @@ public class DefaultModelManager implements ModelManager
 
                                     }
                                 }
+                            }
+                        }
+
+                        if ( i.getParent() != null )
+                        {
+                            final Implementation parent = modules.getImplementation( i.getParent() );
+                            if ( parent != null && parent.isFinal() )
+                            {
+                                details.add( this.newInheritanceConstraintDetail(
+                                    this.getObjectFactory().createImplementation( i ), i, parent ) );
+
                             }
                         }
                     }
@@ -612,7 +630,7 @@ public class DefaultModelManager implements ModelManager
 
             if ( !details.isEmpty() )
             {
-                final ModelException modelException = new ModelException();
+                final ModelException modelException = new ModelException( this.getMessage( "validationFailed", null ) );
                 modelException.getDetails().addAll( details );
                 throw modelException;
             }
@@ -686,18 +704,6 @@ public class DefaultModelManager implements ModelManager
         {
             final Properties properties = new Properties();
             properties.getProperty().addAll( dependency.getProperties().getProperty() );
-
-            if ( !dependency.getProperties().getReference().isEmpty() )
-            {
-                final Module m = modules.getModuleOfImplementation( implementation.getIdentifier() );
-                if ( m != null )
-                {
-                    for ( PropertyReference r : dependency.getProperties().getReference() )
-                    {
-                        properties.getProperty().add( m.getProperties().getProperty( r.getName() ) );
-                    }
-                }
-            }
 
             if ( instance.getProperties() != null )
             {
@@ -970,7 +976,6 @@ public class DefaultModelManager implements ModelManager
 
     // SECTION-END
     // SECTION-START[DefaultModelManager]
-
     /** Listener interface. */
     public static abstract class Listener
     {
@@ -999,13 +1004,14 @@ public class DefaultModelManager implements ModelManager
     public static final String DEFAULT_DOCUMENT_LOCATION = "META-INF/jomc.xml";
 
     /** Classpath location of the bootstrap schema. */
-    private static final String BOOTSTRAP_SCHEMA_LOCATION = "org/jomc/model/bootstrap/jomc-bootstrap-1.0.xsd";
+    private static final String BOOTSTRAP_SCHEMA_LOCATION =
+        Schemas.class.getPackage().getName().replace( '.', '/' ) + "/jomc-bootstrap-1.0.xsd";
 
     /** Classpath location searched for bootstrap resources. */
     private static final String BOOTSTRAP_DOCUMENT_LOCATION = "META-INF/jomc-bootstrap.xml";
 
     /** JAXB context of the bootstrap schema. */
-    private static final String BOOTSTRAP_CONTEXT = "org.jomc.model.bootstrap";
+    private static final String BOOTSTRAP_CONTEXT = Schemas.class.getPackage().getName();
 
     /** Supported schema name extensions. */
     private static final String[] SCHEMA_EXTENSIONS = new String[]
@@ -1703,7 +1709,8 @@ public class DefaultModelManager implements ModelManager
 
     private String getMessage( final String key, final Object args )
     {
-        return new MessageFormat( ResourceBundle.getBundle( "org/jomc/model/DefaultModelManager", Locale.getDefault() ).
+        return new MessageFormat(
+            ResourceBundle.getBundle( DefaultModelManager.class.getName().replace( '.', '/' ), Locale.getDefault() ).
             getString( key ) ).format( args );
 
     }
@@ -1793,6 +1800,34 @@ public class DefaultModelManager implements ModelManager
             new ModelException.Detail( Level.SEVERE, this.getMessage( "multiplicityConstraint", new Object[]
             {
                 implementations, specification, expected, multiplicity.value()
+            } ) );
+
+        detail.setElement( element );
+        return detail;
+    }
+
+    private ModelException.Detail newInheritanceConstraintDetail( final JAXBElement element,
+                                                                  final Implementation child,
+                                                                  final Implementation parent )
+    {
+        final ModelException.Detail detail =
+            new ModelException.Detail( Level.SEVERE, this.getMessage( "inheritanceConstraint", new Object[]
+            {
+                child.getIdentifier(), parent.getIdentifier()
+            } ) );
+
+        detail.setElement( element );
+        return detail;
+    }
+
+    private ModelException.Detail newDependencyPropertyReferenceConstraintDetail( final JAXBElement element,
+                                                                                  final Implementation implementation,
+                                                                                  final Dependency dependency )
+    {
+        final ModelException.Detail detail = new ModelException.Detail(
+            Level.SEVERE, this.getMessage( "dependencyPropertyReferenceConstraint", new Object[]
+            {
+                implementation.getIdentifier(), dependency.getName()
             } ) );
 
         detail.setElement( element );

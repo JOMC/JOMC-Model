@@ -123,6 +123,9 @@ public class ModelException extends Exception
 
     }
 
+    /** Serial version UID for compatibility with 1.0.x object streams. */
+    private static final long serialVersionUID = 6078527305669819171L;
+
     /**
      * Details of the instance.
      * @serial
