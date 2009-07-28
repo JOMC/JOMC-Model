@@ -288,6 +288,15 @@
       <xsd:selector xpath=".//jomc:messages/jomc:reference"/>
       <xsd:field xpath="@name"/>
     </xsd:keyref>
+    <xsd:key name="property-key">
+      <xsd:selector xpath="jomc:properties/jomc:property"/>
+      <xsd:field xpath="@name"/>
+    </xsd:key>
+    <xsd:keyref name="property-reference"
+                refer="jomc:property-key">
+      <xsd:selector xpath=".//jomc:properties/jomc:reference"/>
+      <xsd:field xpath="@name"/>
+    </xsd:keyref>
   </xsd:element>
   <xsd:complexType name="Module">
     <xsd:annotation>
@@ -875,6 +884,15 @@ implementation. The {@code optional} flag indicates an optional dependency.</p>]
       <xsd:selector xpath=".//jomc:property"/>
       <xsd:field xpath="@name"/>
     </xsd:unique>
+    <xsd:unique name="property-reference-uniqueness">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en"><![CDATA[
+          Checks property reference uniquenes.]]>
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:selector xpath=".//jomc:reference"/>
+      <xsd:field xpath="@name"/>
+    </xsd:unique>
   </xsd:element>
   <xsd:complexType name="Properties">
     <xsd:annotation>
@@ -889,6 +907,8 @@ implementation. The {@code optional} flag indicates an optional dependency.</p>]
         <xsd:sequence>
           <xsd:element ref="jomc:property" minOccurs="0"
                        maxOccurs="unbounded"/>
+          <xsd:element name="reference" type="jomc:PropertyReference"
+                       minOccurs="0" maxOccurs="unbounded"/>
         </xsd:sequence>
       </xsd:extension>
     </xsd:complexContent>
@@ -957,6 +977,31 @@ the property. Property {@code value} holds the properties value which is of type
     </xsd:complexContent>
   </xsd:complexType>
   <!--                                                                       -->
+  <!-- PropertyReference                                                     -->
+  <!--                                                                       -->
+  <xsd:complexType name="PropertyReference">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <jaxb:class>
+           <jaxb:javadoc><![CDATA[Reference to a property.]]></jaxb:javadoc>
+        </jaxb:class>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="jomc:ModelObject">
+        <xsd:attribute name="name" type="jomc:Identifier" use="required">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                 <jaxb:javadoc><![CDATA[The name of the referenced property.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
   <!-- Messages                                                              -->
   <!--                                                                       -->
   <xsd:element name="messages" type="jomc:Messages">
@@ -989,12 +1034,12 @@ the property. Property {@code value} holds the properties value which is of type
     </xsd:annotation>
     <xsd:complexContent>
       <xsd:extension base="jomc:ModelObject">
-        <xsd:choice>
+        <xsd:sequence>
           <xsd:element ref="jomc:message" minOccurs="0"
                        maxOccurs="unbounded"/>
           <xsd:element name="reference" type="jomc:MessageReference"
                        minOccurs="0" maxOccurs="unbounded"/>
-        </xsd:choice>
+        </xsd:sequence>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>

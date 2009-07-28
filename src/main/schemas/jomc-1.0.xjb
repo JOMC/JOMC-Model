@@ -290,6 +290,35 @@
 
         return null;
     }
+
+    /**
+     * Gets a property reference for a given name from the list of references.
+     *
+     * @param name The name of the property reference to return.
+     *
+     * @return The property reference with name {@code name} from the list of
+     * references or {@code null}, if no property reference matching
+     * {@code name} is found.
+     *
+     * @throws NullPointerException if {@code name} is {@code null}.
+     */
+    public PropertyReference getReference( final String name )
+    {
+        if ( name == null )
+        {
+            throw new NullPointerException( "name" );
+        }
+
+        for ( PropertyReference r : this.getReference() )
+        {
+            if ( name.equals( r.getName() ) )
+            {
+                return r;
+            }
+        }
+
+        return null;
+    }
 ]]></ci:code>
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Property']">
@@ -1050,6 +1079,21 @@
                     if ( properties.getProperty( p.getName() ) == null )
                     {
                         properties.getProperty().add( p );
+                    }
+                }
+                if ( !i.getProperties().getReference().isEmpty() )
+                {
+                    final Module m = this.getModuleOfImplementation( i.getIdentifier() );
+
+                    if ( m != null )
+                    {
+                        for ( PropertyReference ref : i.getProperties().getReference() )
+                        {
+                            if ( properties.getProperty( ref.getName() ) == null )
+                            {
+                                properties.getProperty().add( m.getProperties().getProperty( ref.getName() ) );
+                            }
+                        }
                     }
                 }
             }
