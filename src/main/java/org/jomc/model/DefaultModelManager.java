@@ -377,6 +377,15 @@ public class DefaultModelManager implements ModelManager
             }
         }
 
+        if ( context.length() == 0 )
+        {
+            throw new IOException( this.getMessage( "missingSchemas", new Object[]
+                {
+                    this.getBootstrapDocumentLocation()
+                } ) );
+
+        }
+
         return JAXBContext.newInstance( context.toString(), this.getClassLoader() );
     }
 
@@ -493,10 +502,30 @@ public class DefaultModelManager implements ModelManager
         {
             for ( Module m : modules.getModule() )
             {
+                if ( m.getMessages() != null )
+                {
+                    this.assertMessagesUniqueness( m.getMessages(), details );
+                }
+
+                if ( m.getProperties() != null )
+                {
+                    this.assertPropertiesUniqueness( m.getProperties(), details );
+                }
+
                 if ( m.getImplementations() != null )
                 {
                     for ( Implementation i : m.getImplementations().getImplementation() )
                     {
+                        if ( i.getMessages() != null )
+                        {
+                            this.assertMessagesUniqueness( i.getMessages(), details );
+                        }
+
+                        if ( i.getProperties() != null )
+                        {
+                            this.assertPropertiesUniqueness( i.getProperties(), details );
+                        }
+
                         final List<SpecificationReference> specs =
                             modules.getSpecifications( i.getIdentifier() );
 
@@ -523,6 +552,11 @@ public class DefaultModelManager implements ModelManager
                         {
                             for ( Dependency d : deps.getDependency() )
                             {
+                                if ( d.getProperties() != null )
+                                {
+                                    this.assertPropertiesUniqueness( d.getProperties(), details );
+                                }
+
                                 final Specification s = modules.getSpecification( d.getIdentifier() );
 
                                 if ( s != null && s.getVersion() != null && d.getVersion() != null &&
@@ -599,6 +633,11 @@ public class DefaultModelManager implements ModelManager
                 {
                     for ( Specification s : m.getSpecifications().getSpecification() )
                     {
+                        if ( s.getProperties() != null )
+                        {
+                            this.assertPropertiesUniqueness( s.getProperties(), details );
+                        }
+
                         final Implementations impls = modules.getImplementations( s.getIdentifier() );
 
                         if ( impls != null )
@@ -993,22 +1032,25 @@ public class DefaultModelManager implements ModelManager
 
     /**
      * Constant for the name of the classpath module.
-     * @see #getClasspathModule(org.jomc.model.Modules)
+     * @see #getClasspathModuleName()
      */
-    public static final String CLASSPATH_MODULE_NAME = "Java Classpath";
+    private static final String DEFAULT_CLASSPATH_MODULE_NAME = "Java Classpath";
 
     /**
      * Classpath location searched for documents by default.
-     * @see #getClasspathModules(java.lang.String)
+     * @see #getDefaultDocumentLocation()
      */
-    public static final String DEFAULT_DOCUMENT_LOCATION = "META-INF/jomc.xml";
+    private static final String DEFAULT_DOCUMENT_LOCATION = "META-INF/jomc.xml";
 
     /** Classpath location of the bootstrap schema. */
     private static final String BOOTSTRAP_SCHEMA_LOCATION =
         Schemas.class.getPackage().getName().replace( '.', '/' ) + "/jomc-bootstrap-1.0.xsd";
 
-    /** Classpath location searched for bootstrap resources. */
-    private static final String BOOTSTRAP_DOCUMENT_LOCATION = "META-INF/jomc-bootstrap.xml";
+    /**
+     * Classpath location searched for bootstrap documents by default.
+     * @see #getBootstrapDocumentLocation()
+     */
+    private static final String DEFAULT_BOOTSTRAP_DOCUMENT_LOCATION = "META-INF/jomc-bootstrap.xml";
 
     /** JAXB context of the bootstrap schema. */
     private static final String BOOTSTRAP_CONTEXT = Schemas.class.getPackage().getName();
@@ -1108,6 +1150,23 @@ public class DefaultModelManager implements ModelManager
     }
 
     /**
+     * Gets the location to search for bootstrap documents.
+     * <p>The bootstrap document location is controlled by a system property with name
+     * {@code org.jomc.model.DefaultModelManager.bootstrapDocumentLocation} holding the location to search at. If that
+     * property is not set, the {@code META-INF/jomc-bootstrap.xml} default is returned.</p>
+     *
+     * @return The location to search for bootstrap documents.
+     *
+     * @see #getSchemas()
+     */
+    public String getBootstrapDocumentLocation()
+    {
+        return System.getProperty( "org.jomc.model.DefaultModelManager.bootstrapDocumentLocation",
+                                   DEFAULT_BOOTSTRAP_DOCUMENT_LOCATION );
+
+    }
+
+    /**
      * Gets the schemas backing the instance.
      *
      * @return The schemas backing the instance.
@@ -1116,7 +1175,7 @@ public class DefaultModelManager implements ModelManager
      * @throws SAXException if parsing schema resources fails.
      * @throws JAXBException if unmarshalling schema resources fails.
      *
-     * @see #BOOTSTRAP_DOCUMENT_LOCATION
+     * @see #getBootstrapDocumentLocation()
      */
     public Schemas getSchemas() throws IOException, JAXBException, SAXException
     {
@@ -1126,7 +1185,13 @@ public class DefaultModelManager implements ModelManager
 
             final JAXBContext ctx = JAXBContext.newInstance( BOOTSTRAP_CONTEXT, this.getClassLoader() );
             final Unmarshaller u = ctx.createUnmarshaller();
-            final Enumeration<URL> e = this.getClassLoader().getResources( BOOTSTRAP_DOCUMENT_LOCATION );
+            final String bootstrapLocation = this.getBootstrapDocumentLocation();
+            this.log( Level.FINE, this.getMessage( "bootstrapLocation", new Object[]
+                {
+                    bootstrapLocation
+                } ), null );
+
+            final Enumeration<URL> e = this.getClassLoader().getResources( bootstrapLocation );
             u.setSchema( this.getBootstrapSchema() );
 
             while ( e.hasMoreElements() )
@@ -1173,6 +1238,23 @@ public class DefaultModelManager implements ModelManager
     }
 
     /**
+     * Gets the default location to search for documents.
+     * <p>The default document location is controlled by a system property with name
+     * {@code org.jomc.model.DefaultModelManager.defaultDocumentLocation} holding the location to search at by default.
+     * If that property is not set, the {@code META-INF/jomc.xml} default is returned.</p>
+     *
+     * @return The default location to search for documents.
+     *
+     * @see #getClasspathModules(java.lang.String)
+     */
+    public String getDefaultDocumentLocation()
+    {
+        return System.getProperty( "org.jomc.model.DefaultModelManager.defaultDocumentLocation",
+                                   DEFAULT_DOCUMENT_LOCATION );
+
+    }
+
+    /**
      * Gets modules by searching the class loader of the instance for resources.
      * <p><b>Note:</b><br/>
      * This method does not validate the modules.</p>
@@ -1186,7 +1268,7 @@ public class DefaultModelManager implements ModelManager
      * @throws SAXException if parsing schema resources fails.
      * @throws JAXBException if unmarshalling schema resources fails.
      *
-     * @see #DEFAULT_DOCUMENT_LOCATION
+     * @see #getDefaultDocumentLocation()
      */
     public Modules getClasspathModules( final String location ) throws IOException, SAXException, JAXBException
     {
@@ -1194,6 +1276,11 @@ public class DefaultModelManager implements ModelManager
         {
             throw new NullPointerException( "location" );
         }
+
+        this.log( Level.FINE, this.getMessage( "documentLocation", new Object[]
+            {
+                location
+            } ), null );
 
         final Text text = new Text();
         text.setLanguage( "en" );
@@ -1244,6 +1331,23 @@ public class DefaultModelManager implements ModelManager
     }
 
     /**
+     * Gets the classpath module name.
+     * <p>The classpath module name is controlled by a system property with name
+     * {@code org.jomc.model.DefaultModelManager.classpathModuleName} holding the classpath module name.
+     * If that property is not set, the {@code Java Classpath} default is returned.</p>
+     *
+     * @return The name of the classpath module.
+     *
+     * @see #getClasspathModule(org.jomc.model.Modules)
+     */
+    public String getClasspathModuleName()
+    {
+        return System.getProperty( "org.jomc.model.DefaultModelManager.classpathModuleName",
+                                   DEFAULT_CLASSPATH_MODULE_NAME );
+
+    }
+
+    /**
      * Gets a module holding model objects resolved by inspecting the class loader of the instance.
      * <p>This method searches the given modules for unresolved references and tries to resolve each unresolved
      * reference by inspecting the class loader of the instance.</p>
@@ -1253,13 +1357,13 @@ public class DefaultModelManager implements ModelManager
      * @return A module holding model objects resolved by inspecting the class loader of the instance or {@code null} if
      * nothing could be resolved.
      *
-     * @see #CLASSPATH_MODULE_NAME
+     * @see #getClasspathModuleName()
      */
     public Module getClasspathModule( final Modules modules )
     {
         final Module module = new Module();
         module.setVersion( System.getProperty( "java.specification.version" ) );
-        module.setName( CLASSPATH_MODULE_NAME );
+        module.setName( this.getClasspathModuleName() );
 
         this.resolveClasspath( modules, module );
 
@@ -1713,6 +1817,42 @@ public class DefaultModelManager implements ModelManager
             ResourceBundle.getBundle( DefaultModelManager.class.getName().replace( '.', '/' ), Locale.getDefault() ).
             getString( key ) ).format( args );
 
+    }
+
+    private void assertMessagesUniqueness( final Messages messages, final List<ModelException.Detail> details )
+    {
+        for ( Message m : messages.getMessage() )
+        {
+            if ( messages.getReference( m.getName() ) != null )
+            {
+                final ModelException.Detail detail = new ModelException.Detail( Level.SEVERE, this.getMessage(
+                    "messagesUniquessConstraint", new Object[]
+                    {
+                        m.getName()
+                    } ) );
+
+                detail.setElement( this.getObjectFactory().createMessages( messages ) );
+                details.add( detail );
+            }
+        }
+    }
+
+    private void assertPropertiesUniqueness( final Properties properties, final List<ModelException.Detail> details )
+    {
+        for ( Property p : properties.getProperty() )
+        {
+            if ( properties.getReference( p.getName() ) != null )
+            {
+                final ModelException.Detail detail = new ModelException.Detail( Level.SEVERE, this.getMessage(
+                    "propertiesUniquessConstraint", new Object[]
+                    {
+                        p.getName()
+                    } ) );
+
+                detail.setElement( this.getObjectFactory().createProperties( properties ) );
+                details.add( detail );
+            }
+        }
     }
 
     private ModelException.Detail newIncompatibleImplementationDetail( final JAXBElement element,
