@@ -230,6 +230,35 @@
     }
 ]]></ci:code>
     </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Implementation']">
+      <ci:code><![CDATA[
+    /**
+     * Gets the location URI used for locating instances of this implementation.
+     *
+     * @return The location URI used for locating instances of this
+     * implementation or {@code null}, if instances of this implementation
+     * are not located outside the object manager.
+     */
+    public java.net.URI getLocationUri()
+    {
+        try
+        {
+            java.net.URI locationUri = null;
+
+            if ( this.getLocation() != null )
+            {
+                locationUri = new java.net.URI( this.getLocation() );
+            }
+
+            return locationUri;
+        }
+        catch ( java.net.URISyntaxException e )
+        {
+            throw new AssertionError( e );
+        }
+    }
+]]></ci:code>
+    </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Dependencies']">
       <ci:code><![CDATA[
     /**

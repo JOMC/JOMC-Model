@@ -580,6 +580,15 @@ implementation instances are to be bound to a system's single instance store.]]>
       <xsd:selector xpath=".//jomc:implementation"/>
       <xsd:field xpath="@identifier"/>
     </xsd:unique>
+    <xsd:unique name="implementation-location-uniqueness">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en"><![CDATA[
+          Checks uniquenes of implementation locations.]]>
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:selector xpath=".//jomc:implementation"/>
+      <xsd:field xpath="@location"/>
+    </xsd:unique>
   </xsd:element>
   <xsd:complexType name="Implementations">
     <xsd:annotation>
@@ -608,15 +617,16 @@ implementation instances are to be bound to a system's single instance store.]]>
         <jaxb:class>
           <jaxb:javadoc><![CDATA[Implementation meta-data.
 <p>An implementation consists of the properties {@code identifier}, {@code name},
-{@code class}, {@code description}, {@code vendor} and {@code version}.
-Property {@code identifier} holds an identifier uniquely identifying the
-implementation in a set of implementations. Property {@code name} holds a name
-of the implementation uniquely identifying the implementation for a
-specification. Property {@code class} holds the name of the class providing
-the implementation instance. Property {@code description} holds a textual
-description. Property {@code vendor} holds vendor information for the vendor
-providing the implementation. Property {@code version} holds a textual version
-of the implementation.</p>
+{@code class}, {@code location}, {@code description}, {@code vendor} and
+{@code version}. Property {@code identifier} holds an identifier uniquely
+identifying the implementation in a set of implementations. Property
+{@code name} holds a name of the implementation uniquely identifying the
+implementation for a specification. Property {@code class} holds the name of the
+class providing implementation instances. Property {@code location} holds a
+location URI used for locating implementation instances. Property
+{@code description} holds a textual description. Property {@code vendor} holds
+vendor information for the vendor providing the implementation. Property
+{@code version} holds a textual version of the implementation.</p>
 
 <p>Properties, dependencies and specifications may be inherited from a
 {@code parent}. Property {@code final} flags an implementation as the final node
@@ -690,6 +700,15 @@ state across operations.</p>]]></jaxb:javadoc>
             <xsd:appinfo>
               <jaxb:property>
                 <jaxb:javadoc><![CDATA[The name of the class providing instances of this implementation.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="location" type="xsd:anyURI" use="optional">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                <jaxb:javadoc><![CDATA[The location URI used for locating instances of this implementation.]]></jaxb:javadoc>
               </jaxb:property>
             </xsd:appinfo>
           </xsd:annotation>
