@@ -89,6 +89,7 @@ import org.xml.sax.SAXParseException;
  * <p><b>Classpath support</b><ul>
  * <li>{@link #getClassLoader() }</li>
  * <li>{@link #setClassLoader(java.lang.ClassLoader) }</li>
+ * <li>{@link #getDefaultDocumentLocation() }</li>
  * <li>{@link #getClasspathModule(org.jomc.model.Modules) }</li>
  * <li>{@link #getClasspathModules(java.lang.String) }</li>
  * </ul></p>
@@ -96,6 +97,15 @@ import org.xml.sax.SAXParseException;
  * <p><b>Logging</b><ul>
  * <li>{@link #getListeners() }</li>
  * <li>{@link #log(java.util.logging.Level, java.lang.String, java.lang.Throwable) }</li>
+ * </ul></p>
+ *
+ * <p><b>Model bootstrapping</b><ul>
+ * <li>{@link #getBootstrapContext() }</li>
+ * <li>{@link #getBootstrapDocumentLocation() }</li>
+ * <li>{@link #getBootstrapMarshaller(boolean, boolean) }</li>
+ * <li>{@link #getBootstrapObjectFactory() }</li>
+ * <li>{@link #getBootstrapSchema() }</li>
+ * <li>{@link #getBootstrapUnmarshaller(boolean) }</li>
  * </ul></p>
  *
  * @author <a href="mailto:schulte2005@users.sourceforge.net">Christian Schulte</a>
@@ -1092,6 +1102,9 @@ public class DefaultModelManager implements ModelManager
     /** Object factory of the instance. */
     private ObjectFactory objectFactory;
 
+    /** Bootstrap object factory of the instance. */
+    private org.jomc.model.bootstrap.ObjectFactory bootstrapObjectFactory;
+
     /** The listeners of the instance. */
     private List<Listener> listeners;
 
@@ -1102,6 +1115,109 @@ public class DefaultModelManager implements ModelManager
     public DefaultModelManager()
     {
         super();
+    }
+
+    /**
+     * Gets the bootstrap object factory of the instance.
+     *
+     * @return The bootstrap object factory of the instance.
+     */
+    public org.jomc.model.bootstrap.ObjectFactory getBootstrapObjectFactory()
+    {
+        if ( this.bootstrapObjectFactory == null )
+        {
+            this.bootstrapObjectFactory = new org.jomc.model.bootstrap.ObjectFactory();
+        }
+
+        return this.bootstrapObjectFactory;
+    }
+
+    /**
+     * Gets a new bootstrap context instance.
+     *
+     * @return A new bootstrap context instance.
+     *
+     * @throws JAXBException if creating a new bootstrap context instance fails.
+     */
+    public JAXBContext getBootstrapContext() throws JAXBException
+    {
+        return JAXBContext.newInstance( BOOTSTRAP_CONTEXT, this.getClassLoader() );
+    }
+
+    /**
+     * Gets a new bootstrap {@code Marshaller}.
+     *
+     * @param validating {@code true} for a marshaller with additional schema validation support enabled; {@code false}
+     * for a marshaller without additional schema validation support enabled.
+     * @param formattedOutput {@code true} for the marshaller to produce formatted output; {@code false} for the
+     * marshaller to not apply any formatting when marshalling.
+     *
+     * @return A new bootstrap {@code Marshaller}.
+     *
+     * @throws IOException if reading schema resources fails.
+     * @throws SAXException if parsing schema resources fails.
+     * @throws JAXBException if unmarshalling schema resources fails.
+     */
+    public Marshaller getBootstrapMarshaller( boolean validating, boolean formattedOutput )
+        throws IOException, SAXException, JAXBException
+    {
+        final Marshaller m = this.getBootstrapContext().createMarshaller();
+        m.setProperty( Marshaller.JAXB_ENCODING, "UTF-8" );
+        m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.valueOf( formattedOutput ) );
+
+        if ( validating )
+        {
+            m.setSchema( this.getBootstrapSchema() );
+        }
+
+        return m;
+    }
+
+    /**
+     * Gets a new bootstrap {@code Unmarshaller}.
+     *
+     * @param validating {@code true} for an unmarshaller with additional schema validation support enabled;
+     * {@code false} for an unmarshaller without additional schema validation support enabled.
+     *
+     * @return A new bootstrap {@code Unmarshaller}.
+     *
+     * @throws IOException if reading schema resources fails.
+     * @throws SAXException if parsing schema resources fails.
+     * @throws JAXBException if unmarshalling schema resources fails.
+     */
+    public Unmarshaller getBootstrapUnmarshaller( boolean validating )
+        throws IOException, SAXException, JAXBException
+    {
+        final Unmarshaller u = this.getBootstrapContext().createUnmarshaller();
+        if ( validating )
+        {
+            u.setSchema( this.getBootstrapSchema() );
+        }
+
+        return u;
+    }
+
+    /**
+     * Gets the bootstrap schema.
+     *
+     * @return The bootstrap schema.
+     *
+     * @throws SAXException if parsing the bootstrap schema fails.
+     */
+    public javax.xml.validation.Schema getBootstrapSchema() throws SAXException
+    {
+        if ( this.bootstrapSchema == null )
+        {
+            final URL url = this.getClassLoader().getResource( BOOTSTRAP_SCHEMA_LOCATION );
+            this.log( Level.FINE, this.getMessage( "processing", new Object[]
+                {
+                    url.toExternalForm()
+                } ), null );
+
+            this.bootstrapSchema = SchemaFactory.newInstance( XMLConstants.W3C_XML_SCHEMA_NS_URI ).newSchema( url );
+        }
+
+        return this.bootstrapSchema;
     }
 
     /**
@@ -1763,29 +1879,6 @@ public class DefaultModelManager implements ModelManager
         }
 
         return this.schemaResources;
-    }
-
-    /**
-     * Gets the bootstrap schema.
-     *
-     * @return The bootstrap schema.
-     *
-     * @throws SAXException if parsing the bootstrap schema fails.
-     */
-    private javax.xml.validation.Schema getBootstrapSchema() throws SAXException
-    {
-        if ( this.bootstrapSchema == null )
-        {
-            final URL url = this.getClassLoader().getResource( BOOTSTRAP_SCHEMA_LOCATION );
-            this.log( Level.FINE, this.getMessage( "processing", new Object[]
-                {
-                    url.toExternalForm()
-                } ), null );
-
-            this.bootstrapSchema = SchemaFactory.newInstance( XMLConstants.W3C_XML_SCHEMA_NS_URI ).newSchema( url );
-        }
-
-        return this.bootstrapSchema;
     }
 
     /**
