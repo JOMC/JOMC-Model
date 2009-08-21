@@ -90,6 +90,8 @@
      * is found.
      *
      * @throws NullPointerException if {@code specification} is {@code null}.
+     *
+     * @see #getSpecification()
      */
     public Specification getSpecification( final String specification )
     {
@@ -120,6 +122,8 @@
      * {@code specification} is found.
      *
      * @throws NullPointerException if {@code specification} is {@code null}.
+     *
+     * @see #getReference()
      */
     public SpecificationReference getReference( final String specification )
     {
@@ -137,6 +141,34 @@
         }
 
         return null;
+    }
+]]></ci:code>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Implementation']">
+      <ci:code><![CDATA[
+    /**
+     * Gets the location URI used for locating instances of this implementation.
+     *
+     * @return The location URI used for locating instances of this implementation or {@code null}, if instances of this
+     * implementation do not need to be located.
+     */
+    public java.net.URI getLocationUri()
+    {
+        try
+        {
+            java.net.URI javaLocation = null;
+
+            if ( this.getLocation() != null )
+            {
+                javaLocation = new java.net.URI( this.getLocation() );
+            }
+
+            return javaLocation;
+        }
+        catch ( java.net.URISyntaxException e )
+        {
+            throw new AssertionError( e );
+        }
     }
 ]]></ci:code>
     </jaxb:bindings>
@@ -230,39 +262,10 @@
     }
 ]]></ci:code>
     </jaxb:bindings>
-    <jaxb:bindings node="xs:complexType[@name='Implementation']">
-      <ci:code><![CDATA[
-    /**
-     * Gets the location URI used for locating instances of this implementation.
-     *
-     * @return The location URI used for locating instances of this
-     * implementation or {@code null}, if instances of this implementation
-     * are not located outside the object manager.
-     */
-    public java.net.URI getLocationUri()
-    {
-        try
-        {
-            java.net.URI locationUri = null;
-
-            if ( this.getLocation() != null )
-            {
-                locationUri = new java.net.URI( this.getLocation() );
-            }
-
-            return locationUri;
-        }
-        catch ( java.net.URISyntaxException e )
-        {
-            throw new AssertionError( e );
-        }
-    }
-]]></ci:code>
-    </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Dependencies']">
       <ci:code><![CDATA[
     /**
-     * Gets a dependency for a given name from the list.
+     * Gets a dependency for a given name from the list of dependencies.
      *
      * @param name The name of the dependency to return.
      *
@@ -270,6 +273,8 @@
      * {@code null}, if no dependency matching {@code name} is found.
      *
      * @throws NullPointerException if {@code name} is {@code null}.
+     *
+     * @see #getDependency()
      */
     public Dependency getDependency( final String name )
     {
@@ -293,7 +298,7 @@
     <jaxb:bindings node="xs:complexType[@name='Properties']">
       <ci:code><![CDATA[
     /**
-     * Gets a property for a given name from the list.
+     * Gets a property for a given name from the list of properties.
      *
      * @param name The name of the property to return.
      *
@@ -301,6 +306,8 @@
      * {@code null}, if no property matching {@code name} is found.
      *
      * @throws NullPointerException if {@code name} is {@code null}.
+     *
+     * @see #getProperty()
      */
     public Property getProperty( final String name )
     {
@@ -325,11 +332,12 @@
      *
      * @param name The name of the property reference to return.
      *
-     * @return The property reference with name {@code name} from the list of
-     * references or {@code null}, if no property reference matching
-     * {@code name} is found.
+     * @return The property reference with name {@code name} from the list or
+     * {@code null}, if no property reference matching {@code name} is found.
      *
      * @throws NullPointerException if {@code name} is {@code null}.
+     *
+     * @see #getReference()
      */
     public PropertyReference getReference( final String name )
     {
@@ -353,134 +361,124 @@
     <jaxb:bindings node="xs:complexType[@name='Property']">
       <ci:code><![CDATA[
     /**
-     * Gets the java value of the property.
+     * Gets the Java value of this property.
      *
-     * @return The java value of the property.
+     * @param classLoader The class loader to use for loading the Java class corresponding to the type of this property.
+     *
+     * @return The Java value of this property.
+     *
+     * @throws NullPointerException if {@code classLoader} is {@code null}.
+     * @throws ClassNotFoundException if the Java class corresponding to the type of this property is not found.
+     * @throws InstantiationException if instantiation of the value fails.
      */
-    public Object getPropertyValue()
+    public Object getJavaValue( final ClassLoader classLoader ) throws ClassNotFoundException, InstantiationException
     {
-        final Class objectType;
-        Object propertyValue = null;
+        if ( classLoader == null )
+        {
+            throw new NullPointerException( "classLoader" );
+        }
 
-        if ( this.getType() == PropertyType.BOOLEAN ||
-             this.getType() == PropertyType.JAVA_LANG_BOOLEAN )
+        if ( this.getAny() != null )
         {
-            objectType = Boolean.class;
-        }
-        else if ( this.getType() == PropertyType.BYTE ||
-                  this.getType() == PropertyType.JAVA_LANG_BYTE )
-        {
-            objectType = Byte.class;
-        }
-        else if ( this.getType() == PropertyType.CHAR ||
-                  this.getType() == PropertyType.JAVA_LANG_CHARACTER )
-        {
-            objectType = Character.class;
-        }
-        else if ( this.getType() == PropertyType.DOUBLE ||
-                  this.getType() == PropertyType.JAVA_LANG_DOUBLE )
-        {
-            objectType = Double.class;
-        }
-        else if ( this.getType() == PropertyType.FLOAT ||
-                  this.getType() == PropertyType.JAVA_LANG_FLOAT )
-        {
-            objectType = Float.class;
-        }
-        else if ( this.getType() == PropertyType.INT ||
-                  this.getType() == PropertyType.JAVA_LANG_INTEGER )
-        {
-            objectType = Integer.class;
-        }
-        else if ( this.getType() == PropertyType.LONG ||
-                  this.getType() == PropertyType.JAVA_LANG_LONG )
-        {
-            objectType = Long.class;
-        }
-        else if ( this.getType() == PropertyType.SHORT ||
-                  this.getType() == PropertyType.JAVA_LANG_SHORT )
-        {
-            objectType = Short.class;
-        }
-        else if ( this.getType() == PropertyType.JAVA_LANG_STRING )
-        {
-            objectType = String.class;
-        }
-        else if ( this.getType() == PropertyType.JAVA_LANG_OBJECT )
-        {
-            objectType = Object.class;
-            propertyValue = this.getAny();
-            if ( propertyValue != null &&
-                 propertyValue instanceof javax.xml.bind.JAXBElement )
+            Object javaValue = this.getAny();
+            if ( javaValue instanceof javax.xml.bind.JAXBElement )
             {
-                propertyValue =
-                    ( (javax.xml.bind.JAXBElement) propertyValue ).getValue();
+                javaValue = ( (javax.xml.bind.JAXBElement) javaValue ).getValue();
+            }
 
+            return javaValue;
+        }
+
+        Class javaType = String.class;
+        if ( this.getType() != null )
+        {
+            if ( Boolean.TYPE.getName().equals( this.getType() ) )
+            {
+                javaType = Boolean.class;
+            }
+            else if ( Byte.TYPE.getName().equals( this.getType() ) )
+            {
+                javaType = Byte.class;
+            }
+            else if ( Character.TYPE.getName().equals( this.getType() ) )
+            {
+                javaType = Character.class;
+            }
+            else if ( Double.TYPE.getName().equals( this.getType() ) )
+            {
+                javaType = Double.class;
+            }
+            else if ( Float.TYPE.getName().equals( this.getType() ) )
+            {
+                javaType = Float.class;
+            }
+            else if ( Integer.TYPE.getName().equals( this.getType() ) )
+            {
+                javaType = Integer.class;
+            }
+            else if ( Long.TYPE.getName().equals( this.getType() ) )
+            {
+                javaType = Long.class;
+            }
+            else if ( Short.TYPE.getName().equals( this.getType() ) )
+            {
+                javaType = Short.class;
+            }
+            else
+            {
+                javaType = Class.forName( this.getType(), true, classLoader );
             }
         }
-        else
-        {
-            throw new RuntimeException( this.getType().value() );
-        }
 
-        if ( objectType != Object.class && this.getValue() != null )
+        try
         {
-            try
+            final Object arg;
+            final java.lang.reflect.Constructor ctor;
+
+            if ( javaType == Character.class )
             {
-                final java.lang.reflect.Constructor ctor;
-                final Object arg;
-
-                if ( objectType == Character.class )
-                {
-                    ctor = objectType.getConstructor( new Class[]
-                        {
-                            char.class
-                        } );
-
-                    arg = new Character( this.getValue().charAt( 0 ) );
-                }
-                else
-                {
-                    ctor = objectType.getConstructor( new Class[]
-                        {
-                            String.class
-                        } );
-
-                    arg = this.getValue();
-                }
-
-                propertyValue = ctor.newInstance( new Object[]
+                ctor = javaType.getConstructor( new Class[]
                     {
-                        arg
+                        char.class
                     } );
 
+                arg = new Character( this.getValue().charAt( 0 ) );
             }
-            catch ( InstantiationException e )
+            else
             {
-                throw new RuntimeException( e );
-            }
-            catch ( IllegalAccessException e )
-            {
-                throw new RuntimeException( e );
-            }
-            catch ( java.lang.reflect.InvocationTargetException e )
-            {
-                throw new RuntimeException( e );
-            }
-            catch ( NoSuchMethodException e )
-            {
-                throw new RuntimeException( e );
-            }
-        }
+                ctor = javaType.getConstructor( new Class[]
+                    {
+                        String.class
+                    } );
 
-        return propertyValue;
+                arg = this.getValue();
+            }
+
+            return ctor.newInstance( new Object[]
+                {
+                    arg
+                } );
+
+        }
+        catch ( IllegalAccessException e )
+        {
+            throw (InstantiationException) new InstantiationException( e.getMessage() ).initCause( e );
+        }
+        catch ( java.lang.reflect.InvocationTargetException e )
+        {
+            throw (InstantiationException) new InstantiationException( e.getMessage() ).initCause( e );
+        }
+        catch ( NoSuchMethodException e )
+        {
+            throw (InstantiationException) new InstantiationException( e.getMessage() ).initCause( e );
+        }
     }
 ]]></ci:code>
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Messages']">
       <ci:code><![CDATA[
     /**
-     * Gets a message for a given name from the list.
+     * Gets a message for a given name from the list of messages.
      *
      * @param name The name of the message to return.
      *
@@ -488,6 +486,8 @@
      * if no message matching {@code name} is found.
      *
      * @throws NullPointerException if {@code name} is {@code null}.
+     *
+     * @see #getMessage()
      */
     public Message getMessage( final String name )
     {
@@ -512,11 +512,12 @@
      *
      * @param name The name of the message reference to return.
      *
-     * @return The message reference with name {@code name} from the list of
-     * references or {@code null}, if no message reference matching {@code name}
-     * is found.
+     * @return The message reference with name {@code name} from the list or
+     * {@code null}, if no message reference matching {@code name} is found.
      *
      * @throws NullPointerException if {@code name} is {@code null}.
+     *
+     * @see #getReference()
      */
     public MessageReference getReference( final String name )
     {
@@ -540,7 +541,7 @@
     <jaxb:bindings node="xs:complexType[@name='Arguments']">
       <ci:code><![CDATA[
     /**
-     * Gets an argument for a given name from the list.
+     * Gets an argument for a given name from the list of arguments.
      *
      * @param name The name of the argument to return.
      *
@@ -548,6 +549,8 @@
      * {@code null}, if no argument matching {@code name} is found.
      *
      * @throws NullPointerException if {@code name} is {@code null}.
+     *
+     * @see #getArgument()
      */
     public Argument getArgument( final String name )
     {
@@ -574,8 +577,10 @@
      *
      * @return The argument at {@code index} from the list.
      *
-     * @throws IndexOutOfBoundsException if {@code index} is negative
-     * or greater or equal to the size of the list.
+     * @throws IndexOutOfBoundsException if {@code index} is negative, greater
+     * or equal to the size of the list of arguments.
+     *
+     * @see #getArgument()
      */
     public Argument getArgument( final int index )
     {
@@ -599,7 +604,7 @@
     <jaxb:bindings node="xs:complexType[@name='Instances']">
       <ci:code><![CDATA[
     /**
-     * Gets an instance for a given identifier from the list.
+     * Gets an instance for a given identifier from the list of instances.
      *
      * @param identifier The identifier of the instance to return.
      *
@@ -607,6 +612,8 @@
      * {@code null}, if no instance matching {@code identifier} is found.
      *
      * @throws NullPointerException if {@code identifier} is {@code null}.
+     *
+     * @see #getInstance()
      */
     public Instance getInstance( final String identifier )
     {
@@ -692,7 +699,7 @@
     <jaxb:bindings node="xs:complexType[@name='Modules']">
       <ci:code><![CDATA[
     /**
-     * Gets a module for a given name from the list.
+     * Gets a module for a given name from this list of modules.
      *
      * @param name The name of the module to return.
      *
@@ -700,6 +707,8 @@
      * if no module matching {@code name} is found.
      *
      * @throws NullPointerException if {@code name} is {@code null}.
+     *
+     * @see #getModule()
      */
     public Module getModule( final String name )
     {
@@ -720,9 +729,12 @@
     }
 
     /**
-     * Gets the specifications of an instance.
+     * Gets all specifications declared in this list of modules.
      *
-     * @return The specifications of an instance or {@code null}, if no specifications could be resolved.
+     * @return All specifications declared in the list or {@code null}, if no
+     * specifications are declared.
+     *
+     * @see #getModule()
      */
     public Specifications getSpecifications()
     {
@@ -739,9 +751,12 @@
     }
 
     /**
-     * Gets the implementations of an instance.
+     * Gets all implementations declared in this list of modules.
      *
-     * @return The implementations of an instance or {@code null}, if no implementations could be resolved.
+     * @return All implementations declared in the list or {@code null}, if no
+     * implementations are declared.
+     *
+     * @see #getModule()
      */
     public Implementations getImplementations()
     {
@@ -758,13 +773,16 @@
     }
 
     /**
-     * Gets the module declaring a given specification.
+     * Gets the module declaring a given specification from this list of modules.
      *
-     * @param specification The identifier of the specification whose module to return.
+     * @param specification The identifier of the specification whose declaring module to return.
      *
-     * @return The module declaring {@code specification} or {@code null}, if no module could be resolved.
+     * @return The module declaring {@code specification} from the list or {@code null}, if no module
+     * is found declaring {@code specification}.
      *
      * @throws NullPointerException if {@code specification} is {@code null}.
+     *
+     * @see #getModule()
      */
     public Module getModuleOfSpecification( final String specification )
     {
@@ -791,13 +809,16 @@
     }
 
     /**
-     * Gets the module declaring a given implementation.
+     * Gets the module declaring a given implementation from this list of modules.
      *
-     * @param implementation The identifier of the implementation whose module to return.
+     * @param implementation The identifier of the implementation whose declaring module to return.
      *
-     * @return The module declaring {@code implementation} or {@code null}, if no module could be resolved.
+     * @return The module declaring {@code implementation} from the list or {@code null}, if no module
+     * is found declaring {@code implementation}.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
+     *
+     * @see #getModule()
      */
     public Module getModuleOfImplementation( final String implementation )
     {
@@ -824,14 +845,16 @@
     }
 
     /**
-     * Gets a specification for a given identifier.
+     * Gets a specification for a given identifier from this list of modules.
      *
      * @param specification The identifier of the specification to return.
      *
-     * @return The specification identified by {@code specification} or {@code null}, if no specification matching
-     * {@code specification} is available.
+     * @return The specification identified by {@code specification} from the list or {@code null},
+     * if no specification matching {@code specification} is found.
      *
      * @throws NullPointerException if {@code specification} is {@code null}.
+     *
+     * @see #getModule()
      */
     public Specification getSpecification( final String specification )
     {
@@ -856,14 +879,16 @@
     }
 
     /**
-     * Gets references to all specifications an implementation implements.
+     * Gets references to all specifications an implementation implements from this list of modules.
      *
      * @param implementation The identifier of the implementation to get all implemented specifications of.
      *
-     * @return List of references to all specifications implemented by {@code implementation} or {@code null}, if no
-     * implementation matching {@code implementation} is available.
+     * @return List of references to all specifications implemented by {@code implementation} from the list or
+     * {@code null}, if no implementation matching {@code implementation} is found.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
+     *
+     * @see #getModule()
      */
     public List<SpecificationReference> getSpecifications( final String implementation )
     {
@@ -902,14 +927,16 @@
     }
 
     /**
-     * Gets an implementation for a given identifier.
+     * Gets an implementation for a given identifier from this list of modules.
      *
      * @param implementation The identifier of the implementation to return.
      *
-     * @return The implementation identified by {@code implementation} or {@code null}, if no implementation matching
-     * {@code implementation} is available.
+     * @return The implementation identified by {@code implementation} from the list or {@code null},
+     * if no implementation matching {@code implementation} is found.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
+     *
+     * @see #getModule()
      */
     public Implementation getImplementation( final String implementation )
     {
@@ -934,14 +961,16 @@
     }
 
     /**
-     * Gets an implementation for a given class.
+     * Gets an implementation for a given class from this list of modules.
      *
      * @param implementation The class of the implementation to return.
      *
-     * @return The implementation identified by {@code implementation} or {@code null}, if no implementation matching
-     * {@code implementation} is available.
+     * @return The implementation identified by {@code implementation} from the list or {@code null},
+     * if no implementation matching {@code implementation} is found.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
+     *
+     * @see #getModule()
      */
     public Implementation getImplementation( final Class implementation )
     {
@@ -966,15 +995,18 @@
     }
 
     /**
-     * Gets an implementation for a given name implementing a given specification.
+     * Gets an implementation for a given name implementing a given specification from this list of
+     * modules.
      *
      * @param specification The identifier of the specification to return an implementation of.
      * @param name The name of the implementation to return.
      *
      * @return The implementation with name {@code name} implementing the specification identified by
-     * {@code specification} or {@code null}, if no such implementation is found.
+     * {@code specification} from the list or {@code null}, if no such implementation is found.
      *
      * @throws NullPointerException if {@code specification} or {@code name} is {@code null}.
+     *
+     * @see #getModule()
      */
     public Implementation getImplementation( final String specification, final String name )
     {
@@ -997,13 +1029,16 @@
     }
 
     /**
-     * Gets all dependencies of an implementation.
+     * Gets all dependencies of an implementation from this list of modules.
      *
      * @param implementation The identifier of the implementation to get all dependencies of.
      *
-     * @return List of all dependencies of {@code implementation} or {@code null}, if nothing could be resolved.
+     * @return List of all dependencies of {@code implementation} from the list or {@code null},
+     * if no dependencies are found.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
+     *
+     * @see #getModule()
      */
     public Dependencies getDependencies( final String implementation )
     {
@@ -1052,13 +1087,16 @@
     }
 
     /**
-     * Gets all properties of an implementation.
+     * Gets all properties of an implementation from this list of modules.
      *
      * @param implementation The identifier of the implementation to get all properties of.
      *
-     * @return List of all properties of {@code implementation} or {@code null}, if nothing could be resolved.
+     * @return List of all properties of {@code implementation} from the list or {@code null},
+     * if no properties are found.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
+     *
+     * @see #getModule()
      */
     public Properties getProperties( final String implementation )
     {
@@ -1135,14 +1173,16 @@
     }
 
     /**
-     * Gets all properties specified for an implementation.
+     * Gets all properties specified for an implementation from this list of modules.
      *
      * @param implementation The identifier of the implementation to return specified properties of.
      *
-     * @return List of all properties specified for {@code implementation} or {@code null}, if nothing could be
-     * resolved.
+     * @return List of all properties specified for {@code implementation} from the list or {@code null},
+     * if no properties are found.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
+     *
+     * @see #getModule()
      */
     public Properties getSpecifiedProperties( final String implementation )
     {
@@ -1181,13 +1221,16 @@
     }
 
     /**
-     * Gets all messages of an implementation.
+     * Gets all messages of an implementation from this list of modules.
      *
      * @param implementation The identifier of the implementation to get all messages of.
      *
-     * @return List of messages of {@code implementation} or {@code null}, if nothing could be resolved.
+     * @return List of messages of {@code implementation} from the list or {@code null},
+     * if no messages are found.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
+     *
+     * @see #getModule()
      */
     public Messages getMessages( final String implementation )
     {
@@ -1252,14 +1295,16 @@
     }
 
     /**
-     * Gets all implementations implementing a given specification.
+     * Gets all implementations implementing a given specification from this list of modules.
      *
      * @param specification The identifier of the specification to return implementations of.
      *
-     * @return All implementations implementing the specification identified by {@code specification} or {@code null},
-     * if no implementation implementing {@code specification} is available.
+     * @return All implementations implementing the specification identified by {@code specification}
+     * from the list or {@code null}, if no implementation implementing {@code specification} is found.
      *
      * @throws NullPointerException if {@code specification} is {@code null}.
+     *
+     * @see #getModule()
      */
     public Implementations getImplementations( final String specification )
     {

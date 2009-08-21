@@ -123,7 +123,12 @@
     <xsd:annotation>
       <xsd:appinfo>
         <jaxb:class>
-          <jaxb:javadoc><![CDATA[Schema.]]></jaxb:javadoc>
+          <jaxb:javadoc><![CDATA[Model of a schema.
+<p>A schema consists of the properties {@code publicId}, {@code systemId},
+{@code contextId} and {@code classpathId}. Property {@code publicId} holds the
+public id of the schema. Property {@code systemId} holds the system id of the
+schema. Property {@code contextId} holds the JAXB context id of the schema.
+Property {@code classpathId} holds the classpath location of the schema.]]></jaxb:javadoc>
         </jaxb:class>
       </xsd:appinfo>
     </xsd:annotation>

@@ -64,9 +64,9 @@ import org.xml.sax.SAXException;
  * <li>{@link #validateModules(org.jomc.model.Modules) }</li>
  * </ul></p>
  *
- * <p><b>Object management</b><ul>
- * <li>{@link #getInstance(org.jomc.model.Modules, org.jomc.model.Specification, org.jomc.model.Implementation, java.lang.ClassLoader) }</li>
- * <li>{@link #getInstance(org.jomc.model.Modules, org.jomc.model.Specification, org.jomc.model.Implementation, org.jomc.model.Dependency, java.lang.ClassLoader) }</li>
+ * <p><b>Queries</b><ul>
+ * <li>{@link #getInstance(org.jomc.model.Modules, org.jomc.model.Implementation, java.lang.ClassLoader) }</li>
+ * <li>{@link #getInstance(org.jomc.model.Modules, org.jomc.model.Implementation, org.jomc.model.Dependency, java.lang.ClassLoader) }</li>
  * <li>{@link #getInstance(org.jomc.model.Modules, java.lang.Object) }</li>
  * <li>{@link #getObject(org.jomc.model.Modules, org.jomc.model.Specification, org.jomc.model.Instance) }</li>
  * </ul></p>
@@ -183,34 +183,32 @@ public interface ModelManager
      * Gets an instance of an implementation.
      *
      * @param modules The modules declaring the instance to get.
-     * @param specification The specification specifying the instance to get.
      * @param implementation The implementation to get an instance of.
      * @param classLoader The class loader of the instance to get.
      *
      * @return An instance of {@code implementation} or {@code null} if no instance is available.
      *
-     * @throws NullPointerException if {@code modules}, {@code specification}, {@code implementation} or
-     * {@code classLoader} is {@code null}.
+     * @throws NullPointerException if {@code modules}, {@code implementation} or {@code classLoader} is {@code null}.
      */
-    Instance getInstance( Modules modules, Specification specification, Implementation implementation,
-                          ClassLoader classLoader ) throws NullPointerException;
+    Instance getInstance( Modules modules, Implementation implementation, ClassLoader classLoader )
+        throws NullPointerException;
 
     /**
-     * Gets an instance of an implementation of a dependency.
+     * Gets an instance of an implementation for a dependency.
      *
      * @param modules The modules declaring the instance to get.
-     * @param specification The specification specifying the instance to get.
-     * @param implementation The implementation of the dependency to get an instance of.
-     * @param dependency The dependency to get an instance of.
+     * @param implementation The implementation to get an instance of.
+     * @param dependency The dependency declaring the instance to get.
      * @param classLoader The class loader of the instance to get.
      *
      * @return An instance of {@code implementation} or {@code null} if no instance is available.
      *
-     * @throws NullPointerException if {@code modules}, {@code specification}, {@code implementation},
-     * {@code dependency} or {@code classLoader} is {@code null}.
+     * @throws NullPointerException if {@code modules}, {@code implementation}, {@code dependency} or
+     * {@code classLoader} is {@code null}.
      */
-    Instance getInstance( Modules modules, Specification specification, Implementation implementation,
-                          Dependency dependency, ClassLoader classLoader ) throws NullPointerException;
+    Instance getInstance( Modules modules, Implementation implementation, Dependency dependency,
+                          ClassLoader classLoader )
+        throws NullPointerException;
 
     /**
      * Gets the instance of an object.

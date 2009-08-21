@@ -34,34 +34,30 @@
 // SECTION-END
 package org.jomc.model.test;
 
-import java.io.ObjectInputStream;
-import org.jomc.model.ModelException;
+import org.jomc.model.DefaultModelManager;
+import org.jomc.model.ModelManager;
 
 /**
- * Testcases for class {@code org.jomc.model.ModelException}.
+ * Testcases for class {@code org.jomc.model.DefaultModelManager}.
  *
  * @author <a href="mailto:schulte2005@users.sourceforge.net">Christian Schulte</a> 1.0
  * @version $Id$
  */
-public class ModelExceptionTest
+public class DefaultModelManagerTest extends ModelManagerTest
 {
 
-    public void testSerializable() throws Exception
-    {
-        ObjectInputStream in = new ObjectInputStream( this.getClass().getResourceAsStream( "ModelException.ser" ) );
-        final ModelException e = (ModelException) in.readObject();
-        in.close();
-        System.out.println( e.toString() );
+    /** The instance tests are performed with. */
+    private ModelManager modelManager;
 
-        in = new ObjectInputStream( this.getClass().getResourceAsStream( "ModelException.Detail.ser" ) );
-        final ModelException.Detail d = (ModelException.Detail) in.readObject();
-        in.close();
-        System.out.println( d.toString() );
-    }
-
-    public void testToString() throws Exception
+    @Override
+    public ModelManager getModelManager()
     {
-        System.out.println( new ModelException() );
+        if ( this.modelManager == null )
+        {
+            this.modelManager = new DefaultModelManager();
+        }
+
+        return this.modelManager;
     }
 
 }

@@ -43,12 +43,12 @@
     <jaxb:bindings node="xs:complexType[@name='Schemas']">
       <ci:code><![CDATA[
     /**
-     * Gets a schema for a given public id.
+     * Gets a schema for a given public id from this list of schemas.
      *
-     * @param publicId The publid id of the schema to return.
+     * @param publicId The public id of the schema to return.
      *
-     * @return The schema with public id {@code publicId} or {@code null} if no
-     * schema matching {@code publicId} is found.
+     * @return The schema with public id {@code publicId} from the list or {@code null}
+     * if no schema matching {@code publicId} is found.
      *
      * @throws NullPointerException if {@code publicId} is {@code null}.
      */

@@ -578,16 +578,6 @@ public class DefaultModelManager implements ModelManager
 
                                 }
 
-                                if ( s.getScope() != Scope.MULTITON && d.getProperties() != null &&
-                                     !( d.getProperties().getProperty().isEmpty() ||
-                                        d.getProperties().getReference().isEmpty() ) )
-                                {
-                                    details.add( this.newPropertyOverwriteConstraintDetail(
-                                        this.getObjectFactory().createDependency( d ), i.getIdentifier(), d.getName(),
-                                        s.getIdentifier() ) );
-
-                                }
-
                                 if ( d.getProperties() != null && !d.getProperties().getReference().isEmpty() )
                                 {
                                     details.add( this.newDependencyPropertyReferenceConstraintDetail(
@@ -694,16 +684,12 @@ public class DefaultModelManager implements ModelManager
         }
     }
 
-    public Instance getInstance( final Modules modules, final Specification specification,
-                                 final Implementation implementation, final ClassLoader classLoader )
+    public Instance getInstance( final Modules modules, final Implementation implementation,
+                                 final ClassLoader classLoader )
     {
         if ( modules == null )
         {
             throw new NullPointerException( "modules" );
-        }
-        if ( specification == null )
-        {
-            throw new NullPointerException( "specification" );
         }
         if ( implementation == null )
         {
@@ -714,26 +700,40 @@ public class DefaultModelManager implements ModelManager
             throw new NullPointerException( "classLoader" );
         }
 
-        final Instance instance = this.getDefaultInstance( modules, implementation, classLoader );
-        if ( instance != null )
+        final Instance instance = new Instance();
+        instance.setIdentifier( implementation.getIdentifier() );
+        instance.setImplementationName( implementation.getName() );
+        instance.setClazz( implementation.getClazz() );
+        instance.setClassLoader( classLoader );
+        instance.setScope( implementation.getScope() );
+        instance.setStateless( implementation.isStateless() );
+        instance.setDependencies( modules.getDependencies( implementation.getIdentifier() ) );
+        instance.setProperties( modules.getProperties( implementation.getIdentifier() ) );
+        instance.setMessages( modules.getMessages( implementation.getIdentifier() ) );
+
+        final List<SpecificationReference> specifications = modules.getSpecifications( implementation.getIdentifier() );
+        if ( specifications != null && !specifications.isEmpty() )
         {
-            instance.setScope( specification.getScope() );
+            instance.setSpecifications( new Specifications() );
+            for ( SpecificationReference ref : specifications )
+            {
+                final Specification s = modules.getSpecification( ref.getIdentifier() );
+                if ( s != null )
+                {
+                    instance.getSpecifications().getSpecification().add( s );
+                }
+            }
         }
 
         return instance;
     }
 
-    public Instance getInstance( final Modules modules, final Specification specification,
-                                 final Implementation implementation, final Dependency dependency,
-                                 final ClassLoader classLoader )
+    public Instance getInstance( final Modules modules, final Implementation implementation,
+                                 final Dependency dependency, final ClassLoader classLoader )
     {
         if ( modules == null )
         {
             throw new NullPointerException( "modules" );
-        }
-        if ( specification == null )
-        {
-            throw new NullPointerException( "specification" );
         }
         if ( implementation == null )
         {
@@ -748,8 +748,8 @@ public class DefaultModelManager implements ModelManager
             throw new NullPointerException( "classLoader" );
         }
 
-        final Instance instance = this.getInstance( modules, specification, implementation, classLoader );
-        if ( instance.getScope() == Scope.MULTITON && dependency.getProperties() != null )
+        final Instance instance = this.getInstance( modules, implementation, classLoader );
+        if ( instance.getScope().equals( "Multiton" ) && dependency.getProperties() != null )
         {
             final Properties properties = new Properties();
             properties.getProperty().addAll( dependency.getProperties().getProperty() );
@@ -798,7 +798,7 @@ public class DefaultModelManager implements ModelManager
                         cl = ClassLoader.getSystemClassLoader();
                     }
 
-                    instance = this.getDefaultInstance( modules, i, cl );
+                    instance = this.getInstance( modules, i, cl );
                     if ( instance != null )
                     {
                         this.objects.put( object, instance );
@@ -808,51 +808,6 @@ public class DefaultModelManager implements ModelManager
 
             return instance;
         }
-    }
-
-    private Instance getDefaultInstance( final Modules modules, final Implementation implementation,
-                                         final ClassLoader classLoader )
-    {
-        if ( modules == null )
-        {
-            throw new NullPointerException( "modules" );
-        }
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-        if ( classLoader == null )
-        {
-            throw new NullPointerException( "classLoader" );
-        }
-
-        Instance instance = null;
-        instance = new Instance();
-        instance.setIdentifier( implementation.getIdentifier() );
-        instance.setImplementationName( implementation.getName() );
-        instance.setClazz( implementation.getClazz() );
-        instance.setClassLoader( classLoader );
-        instance.setScope( Scope.MULTITON );
-        instance.setStateless( implementation.isStateless() );
-        instance.setDependencies( modules.getDependencies( implementation.getIdentifier() ) );
-        instance.setProperties( modules.getProperties( implementation.getIdentifier() ) );
-        instance.setMessages( modules.getMessages( implementation.getIdentifier() ) );
-
-        final List<SpecificationReference> specifications = modules.getSpecifications( implementation.getIdentifier() );
-        if ( specifications != null && !specifications.isEmpty() )
-        {
-            instance.setSpecifications( new Specifications() );
-            for ( SpecificationReference ref : specifications )
-            {
-                final Specification s = modules.getSpecification( ref.getIdentifier() );
-                if ( s != null )
-                {
-                    instance.getSpecifications().getSpecification().add( s );
-                }
-            }
-        }
-
-        return instance;
     }
 
     public Object getObject( final Modules modules, final Specification specification, final Instance instance )
@@ -1267,7 +1222,7 @@ public class DefaultModelManager implements ModelManager
 
     /**
      * Gets the location to search for bootstrap documents.
-     * <p>The bootstrap document location is controlled by a system property with name
+     * <p>The bootstrap document location is controlled by system property
      * {@code org.jomc.model.DefaultModelManager.bootstrapDocumentLocation} holding the location to search at. If that
      * property is not set, the {@code META-INF/jomc-bootstrap.xml} default is returned.</p>
      *
@@ -1355,7 +1310,7 @@ public class DefaultModelManager implements ModelManager
 
     /**
      * Gets the default location to search for documents.
-     * <p>The default document location is controlled by a system property with name
+     * <p>The default document location is controlled by system property
      * {@code org.jomc.model.DefaultModelManager.defaultDocumentLocation} holding the location to search at by default.
      * If that property is not set, the {@code META-INF/jomc.xml} default is returned.</p>
      *
@@ -1448,7 +1403,7 @@ public class DefaultModelManager implements ModelManager
 
     /**
      * Gets the classpath module name.
-     * <p>The classpath module name is controlled by a system property with name
+     * <p>The classpath module name is controlled by system property
      * {@code org.jomc.model.DefaultModelManager.classpathModuleName} holding the classpath module name.
      * If that property is not set, the {@code Java Classpath} default is returned.</p>
      *
@@ -1632,14 +1587,12 @@ public class DefaultModelManager implements ModelManager
                     specification = new Specification();
                     specification.setIdentifier( identifier );
                     specification.setMultiplicity( Multiplicity.MANY );
-                    specification.setScope( Scope.MULTITON );
                     specification.setVendor( vendor );
                     specification.setVersion( version );
 
                     this.log( Level.FINE, this.getMessage( "classpathSpecification", new Object[]
                         {
                             specification.getIdentifier(),
-                            specification.getScope().value(),
                             specification.getMultiplicity().value()
                         } ), null );
 
@@ -1748,6 +1701,7 @@ public class DefaultModelManager implements ModelManager
                         implementation.setName( name );
                         implementation.setIdentifier( specification.getIdentifier() );
                         implementation.setClazz( specification.getIdentifier() );
+                        implementation.setScope( "Multiton" );
                         implementation.setVersion( version );
 
                         final Specifications implemented = new Specifications();

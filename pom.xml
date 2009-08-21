@@ -91,6 +91,12 @@
       <artifactId>jaxb-api</artifactId>
       <scope>compile</scope>
     </dependency>
+    <!-- Test -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
     <!-- Runtime -->
     <dependency>
       <groupId>com.sun.xml.bind</groupId>

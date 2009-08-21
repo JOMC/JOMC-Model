@@ -33,6 +33,7 @@
 package org.jomc.model;
 
 import java.io.Serializable;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
@@ -50,6 +51,9 @@ public class ModelException extends Exception
     /** {@code ModelException} detail. */
     public static class Detail implements Serializable
     {
+
+        /** Serial version UID for compatibility with 1.0.x object streams. */
+        private static final long serialVersionUID = 5383378257214671678L;
 
         /**
          * The detail level.
@@ -121,6 +125,31 @@ public class ModelException extends Exception
             this.element = value;
         }
 
+        /**
+         * Creates and returns a string representation of the object.
+         *
+         * @return A string representation of the object.
+         */
+        private String toStringInternal()
+        {
+            return new StringBuffer().append( '{' ).
+                append( "level=" ).append( this.getLevel().getLocalizedName() ).
+                append( ", message=" ).append( this.getMessage() ).
+                append( ", element=" ).append( this.getElement() ).append( '}' ).toString();
+
+        }
+
+        /**
+         * Creates and returns a string representation of the object.
+         *
+         * @return A string representation of the object.
+         */
+        @Override
+        public String toString()
+        {
+            return super.toString() + this.toStringInternal();
+        }
+
     }
 
     /** Serial version UID for compatibility with 1.0.x object streams. */
@@ -182,6 +211,39 @@ public class ModelException extends Exception
         }
 
         return this.details;
+    }
+
+    /**
+     * Creates and returns a string representation of the object.
+     *
+     * @return A string representation of the object.
+     */
+    private String toStringInternal()
+    {
+        final StringBuffer b = new StringBuffer().append( '{' ).append( "details={" );
+
+        for ( Iterator<Detail> it = this.getDetails().iterator(); it.hasNext(); )
+        {
+            b.append( it.next() );
+            if ( it.hasNext() )
+            {
+                b.append( ", " );
+            }
+        }
+        b.append( "}}" );
+
+        return b.toString();
+    }
+
+    /**
+     * Creates and returns a string representation of the object.
+     *
+     * @return A string representation of the object.
+     */
+    @Override
+    public String toString()
+    {
+        return super.toString() + this.toStringInternal();
     }
 
 }

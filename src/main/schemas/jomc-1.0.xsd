@@ -82,7 +82,11 @@
     <xsd:annotation>
       <xsd:appinfo>
         <jaxb:class>
-          <jaxb:javadoc><![CDATA[Text paired with corresponding language.]]></jaxb:javadoc>
+          <jaxb:javadoc><![CDATA[Model of text.
+<p>A text consists of the properties {@code language} and {@code value}.
+Property {@code language} holds the language uniquely identifying the
+text in a set of texts. Property {@code value} holds the text in the
+corresponding language.]]></jaxb:javadoc>
         </jaxb:class>
       </xsd:appinfo>
     </xsd:annotation>
@@ -215,7 +219,7 @@
       <xsd:annotation>
         <xsd:appinfo>
           <jaxb:property>
-            <jaxb:javadoc><![CDATA[The date this object got created.]]></jaxb:javadoc>
+            <jaxb:javadoc><![CDATA[The date this object got created or {@code null}.]]></jaxb:javadoc>
           </jaxb:property>
         </xsd:appinfo>
       </xsd:annotation>
@@ -262,7 +266,22 @@
     <xsd:annotation>
       <xsd:appinfo>
         <jaxb:class>
-          <jaxb:javadoc><![CDATA[List of modules.]]></jaxb:javadoc>
+          <jaxb:javadoc><![CDATA[List of modules.
+<p><b>Queries</b><ul>
+<li>{@link #getSpecifications() }</li>
+<li>{@link #getSpecification(java.lang.String) }</li>
+<li>{@link #getModuleOfSpecification(java.lang.String) }</li>
+<li>{@link #getImplementations() }</li>
+<li>{@link #getImplementation(java.lang.String) }</li>
+<li>{@link #getImplementation(java.lang.Class) }</li>
+<li>{@link #getModuleOfImplementation(java.lang.String) }</li>
+<li>{@link #getImplementation(java.lang.String, java.lang.String) }</li>
+<li>{@link #getImplementations(java.lang.String) }</li>
+<li>{@link #getDependencies(java.lang.String) }</li>
+<li>{@link #getMessages(java.lang.String) }</li>
+<li>{@link #getProperties(java.lang.String) }</li>
+<li>{@link #getSpecifiedProperties(java.lang.String) }</li>
+</ul></p>]]></jaxb:javadoc>
         </jaxb:class>
       </xsd:appinfo>
     </xsd:annotation>
@@ -302,12 +321,12 @@
     <xsd:annotation>
       <xsd:appinfo>
         <jaxb:class>
-          <jaxb:javadoc><![CDATA[Module meta-data.
-<p>A module consists of the properties {@code name},{@code description} and
+          <jaxb:javadoc><![CDATA[Model of a module.
+<p>A module consists of the properties {@code name}, {@code description} and
 {@code version}. Property {@code name} holds the name of the module uniquely
-identifying the module in a collectionof modules. Property {@code description}
-holds a textual description, property {@code version} a textual version of the
-module. A module defines specifications, implementations and properties.</p>]]></jaxb:javadoc>
+identifying the module in a set of modules. Property {@code description}
+holds a textual description, and property {@code version} a textual version of
+the module. A module defines specifications, implementations and properties.</p>]]></jaxb:javadoc>
         </jaxb:class>
       </xsd:appinfo>
     </xsd:annotation>
@@ -338,7 +357,7 @@ module. A module defines specifications, implementations and properties.</p>]]><
             <xsd:annotation>
               <xsd:appinfo>
                 <jaxb:property>
-                  <jaxb:javadoc><![CDATA[Properties defined in this module.]]>></jaxb:javadoc>
+                  <jaxb:javadoc><![CDATA[Properties defined in this module.]]></jaxb:javadoc>
                 </jaxb:property>
               </xsd:appinfo>
             </xsd:annotation>
@@ -366,7 +385,7 @@ module. A module defines specifications, implementations and properties.</p>]]><
           <xsd:annotation>
             <xsd:appinfo>
               <jaxb:property>
-                <jaxb:javadoc><![CDATA[Version of this module.]]></jaxb:javadoc>
+                <jaxb:javadoc><![CDATA[Version of this module or {@code null}.]]></jaxb:javadoc>
               </jaxb:property>
             </xsd:appinfo>
           </xsd:annotation>
@@ -375,7 +394,7 @@ module. A module defines specifications, implementations and properties.</p>]]><
           <xsd:annotation>
             <xsd:appinfo>
               <jaxb:property>
-                <jaxb:javadoc><![CDATA[Vendor of this module.]]></jaxb:javadoc>
+                <jaxb:javadoc><![CDATA[Vendor of this module or {@code null}.]]></jaxb:javadoc>
               </jaxb:property>
             </xsd:appinfo>
           </xsd:annotation>
@@ -435,7 +454,7 @@ module. A module defines specifications, implementations and properties.</p>]]><
     <xsd:annotation>
       <xsd:appinfo>
         <jaxb:class>
-          <jaxb:javadoc><![CDATA[Specification meta-data.
+          <jaxb:javadoc><![CDATA[Model of a specification.
 <p>A specification consists of the properties {@code identifier},
 {@code vendor}, {@code description} and {@code version}. Property
 {@code identifier} holds an identifier uniquely identifying the specification in
@@ -450,13 +469,7 @@ specifies that no more than one implementation of the specification is allowed
 to exist among a set of modules (including none). A specification with
 {@link Multiplicity#MANY} specifies that multiple implementations of the
 specification are allowed to exist among a set of modules (including none).</p>
-
-<p>Property {@code scope} specifies the scope the specification applies to. In
-multiton scope, a new object is created whenever requested. In context scope,
-objects are bound to a system's context. An object is only created if not
-already available in context. In singleton scope, objects are bound to a
-system's single instance store. An object is only created if not already
-available in that single instance store.</p>]]></jaxb:javadoc>
+]]></jaxb:javadoc>
         </jaxb:class>
       </xsd:appinfo>
     </xsd:annotation>
@@ -486,7 +499,7 @@ available in that single instance store.</p>]]></jaxb:javadoc>
           <xsd:annotation>
             <xsd:appinfo>
               <jaxb:property>
-                <jaxb:javadoc><![CDATA[The presentation vendor of this specification.]]></jaxb:javadoc>
+                <jaxb:javadoc><![CDATA[The vendor of this specification or {@code null}.]]></jaxb:javadoc>
               </jaxb:property>
             </xsd:appinfo>
           </xsd:annotation>
@@ -495,7 +508,7 @@ available in that single instance store.</p>]]></jaxb:javadoc>
           <xsd:annotation>
             <xsd:appinfo>
               <jaxb:property>
-                <jaxb:javadoc><![CDATA[The version of this specification.]]></jaxb:javadoc>
+                <jaxb:javadoc><![CDATA[The version of this specification or {@code null}.]]></jaxb:javadoc>
               </jaxb:property>
             </xsd:appinfo>
           </xsd:annotation>
@@ -511,21 +524,6 @@ specification. A multiplicity equal to {@link Multiplicity#ONE} specifies
 exactly one implementation of the specification must exist among a set of
 modules. A multiplicity equal to {@link Multiplicity#MANY} specifies that many
 implementations are allowed to exist among a set of modules (including none).]]></jaxb:javadoc>
-              </jaxb:property>
-            </xsd:appinfo>
-          </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="scope" type="jomc:Scope" use="optional"
-                       default="Multiton">
-          <xsd:annotation>
-            <xsd:appinfo>
-              <jaxb:property>
-                <jaxb:javadoc><![CDATA[
-Scope this specification applies to. {@link Scope#MULTITON} scope specifies that
-a new implementation instance is to be created each time requested.
-{@link Scope#CONTEXT} scope specifies that implementation instances are to be
-bound to a system's context. {@link Scope#SINGLETON} scope specifies that
-implementation instances are to be bound to a system's single instance store.]]></jaxb:javadoc>
               </jaxb:property>
             </xsd:appinfo>
           </xsd:annotation>
@@ -559,7 +557,7 @@ implementation instances are to be bound to a system's single instance store.]]>
           <xsd:annotation>
             <xsd:appinfo>
               <jaxb:property>
-                <jaxb:javadoc><![CDATA[The version of the referenced specification.]]></jaxb:javadoc>
+                <jaxb:javadoc><![CDATA[The version of the referenced specification or {@code null}.]]></jaxb:javadoc>
               </jaxb:property>
             </xsd:appinfo>
           </xsd:annotation>
@@ -615,25 +613,32 @@ implementation instances are to be bound to a system's single instance store.]]>
     <xsd:annotation>
       <xsd:appinfo>
         <jaxb:class>
-          <jaxb:javadoc><![CDATA[Implementation meta-data.
+          <jaxb:javadoc><![CDATA[Model of an implementation.
 <p>An implementation consists of the properties {@code identifier}, {@code name},
 {@code class}, {@code location}, {@code description}, {@code vendor} and
 {@code version}. Property {@code identifier} holds an identifier uniquely
 identifying the implementation in a set of implementations. Property
 {@code name} holds a name of the implementation uniquely identifying the
 implementation for a specification. Property {@code class} holds the name of the
-class providing implementation instances. Property {@code location} holds a
-location URI used for locating implementation instances. Property
+class providing implementation instances. Property {@code location} holds an
+URI of the location of instances of the implementation. Property
 {@code description} holds a textual description. Property {@code vendor} holds
 vendor information for the vendor providing the implementation. Property
 {@code version} holds a textual version of the implementation.</p>
 
-<p>Properties, dependencies and specifications may be inherited from a
+<p>Dependencies, messages, properties and specifications may be inherited from a
 {@code parent}. Property {@code final} flags an implementation as the final node
 in an inheritance hierarchy.</p>
 
-<p>The {@code stateless} flag indicates that an implementation does not retain
-state across operations.</p>]]></jaxb:javadoc>
+<p>The {@code stateless} flag indicates that instances of the implementation
+do not retain state across operations.</p>
+
+<p>Property {@code scope} specifies the scope instances of the implementation
+apply to. In {@code Multiton} scope, a new object is created whenever requested.
+In {@code Context} scope, objects are bound to a system's context - an object is
+only created if not already available in context. In {@code Singleton} scope,
+objects are bound to a system's single instance store - an object is only
+created if not already available in that single instance store.</p>]]></jaxb:javadoc>
         </jaxb:class>
       </xsd:appinfo>
     </xsd:annotation>
@@ -699,7 +704,21 @@ state across operations.</p>]]></jaxb:javadoc>
           <xsd:annotation>
             <xsd:appinfo>
               <jaxb:property>
-                <jaxb:javadoc><![CDATA[The name of the class providing instances of this implementation.]]></jaxb:javadoc>
+                <jaxb:javadoc><![CDATA[The name of the class providing instances of this implementation or {@code null}.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="scope" type="jomc:Identifier" use="optional"
+                       default="Multiton">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                <jaxb:javadoc><![CDATA[
+Scope this specification applies to. {@code Multiton} scope specifies that a new
+instance is to be created each time requested. {@code Context} scope specifies
+that instances are to be bound to a system's context. {@code Singleton} scope
+specifies that instances are to be bound to a system's single instance store.]]></jaxb:javadoc>
               </jaxb:property>
             </xsd:appinfo>
           </xsd:annotation>
@@ -708,7 +727,7 @@ state across operations.</p>]]></jaxb:javadoc>
           <xsd:annotation>
             <xsd:appinfo>
               <jaxb:property>
-                <jaxb:javadoc><![CDATA[The location URI used for locating instances of this implementation.]]></jaxb:javadoc>
+                <jaxb:javadoc><![CDATA[An URI of the location of instances of this implementation or {@code null}.]]></jaxb:javadoc>
               </jaxb:property>
             </xsd:appinfo>
           </xsd:annotation>
@@ -717,7 +736,7 @@ state across operations.</p>]]></jaxb:javadoc>
           <xsd:annotation>
             <xsd:appinfo>
               <jaxb:property>
-                <jaxb:javadoc><![CDATA[The presentation vendor of this implementation.]]></jaxb:javadoc>
+                <jaxb:javadoc><![CDATA[The presentation vendor of this implementation or {@code null}.]]></jaxb:javadoc>
               </jaxb:property>
             </xsd:appinfo>
           </xsd:annotation>
@@ -726,7 +745,7 @@ state across operations.</p>]]></jaxb:javadoc>
           <xsd:annotation>
             <xsd:appinfo>
               <jaxb:property>
-                <jaxb:javadoc><![CDATA[The version of this implementation.]]></jaxb:javadoc>
+                <jaxb:javadoc><![CDATA[The version of this implementation or {@code null}.]]></jaxb:javadoc>
               </jaxb:property>
             </xsd:appinfo>
           </xsd:annotation>
@@ -736,8 +755,8 @@ state across operations.</p>]]></jaxb:javadoc>
             <xsd:appinfo>
               <jaxb:property>
                 <jaxb:javadoc><![CDATA[
-Identifier of an implementation this implementation inherits from. When given,
-this implementation will inherit up the hierarchy starting at that parent.]]></jaxb:javadoc>
+Identifier of an implementation this implementation inherits from or {@code null}.
+When set, this implementation will inherit up the hierarchy starting at that parent.]]></jaxb:javadoc>
               </jaxb:property>
             </xsd:appinfo>
           </xsd:annotation>
@@ -786,8 +805,9 @@ Flags this implementation stateless.]]></jaxb:javadoc>
             <xsd:appinfo>
               <jaxb:property>
                 <jaxb:javadoc><![CDATA[
-Name of the referenced implementation of the specification. If not set, the
-specification's multiplicity determines the implementation(s) of the reference.]]></jaxb:javadoc>
+Name of the referenced implementation of the specification or {@code null}.
+If not set, the specification's multiplicity determines the implementation(s) of
+the reference.]]></jaxb:javadoc>
               </jaxb:property>
             </xsd:appinfo>
           </xsd:annotation>
@@ -834,8 +854,7 @@ specification's multiplicity determines the implementation(s) of the reference.]
     <xsd:annotation>
       <xsd:appinfo>
         <jaxb:class>
-          <jaxb:javadoc><![CDATA[
-Dependency meta-data.
+          <jaxb:javadoc><![CDATA[Model of a dependency.
 <p>A dependency consists of a name uniquely identifying the dependency in a set
 of dependencies and pairs a specification with corresponding implementations
 from a set of available implementations. Properties set with a dependency
@@ -940,8 +959,7 @@ implementation. The {@code optional} flag indicates an optional dependency.</p>]
     <xsd:annotation>
       <xsd:appinfo>
         <jaxb:class>
-           <jaxb:javadoc><![CDATA[
-Property meta-data.
+           <jaxb:javadoc><![CDATA[Model of a property.
 <p>A property consists of the properties {@code name}, {@code type} and
 {@code value}. Property {@code name} holds the name uniquely identifying the
 property in a collection of properties. Property {@code type} holds the type of
@@ -958,7 +976,7 @@ the property. Property {@code value} holds the properties value which is of type
             <xsd:annotation>
               <xsd:appinfo>
                 <jaxb:property>
-                   <jaxb:javadoc><![CDATA[Object value of this property.]]></jaxb:javadoc>
+                   <jaxb:javadoc><![CDATA[Object value of this property or {@code null}.]]></jaxb:javadoc>
                 </jaxb:property>
               </xsd:appinfo>
             </xsd:annotation>
@@ -973,12 +991,11 @@ the property. Property {@code value} holds the properties value which is of type
             </xsd:appinfo>
           </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="type" type="jomc:PropertyType" use="optional"
-                       default="java.lang.String">
+        <xsd:attribute name="type" type="jomc:Identifier" use="optional">
           <xsd:annotation>
             <xsd:appinfo>
               <jaxb:property>
-                 <jaxb:javadoc><![CDATA[Type of this property.]]></jaxb:javadoc>
+                 <jaxb:javadoc><![CDATA[Type of this property or {@code null} for the default text type.]]></jaxb:javadoc>
               </jaxb:property>
             </xsd:appinfo>
           </xsd:annotation>
@@ -987,7 +1004,7 @@ the property. Property {@code value} holds the properties value which is of type
           <xsd:annotation>
             <xsd:appinfo>
               <jaxb:property>
-                 <jaxb:javadoc><![CDATA[Value of this property.]]></jaxb:javadoc>
+                 <jaxb:javadoc><![CDATA[String value of this property or {@code null}.]]></jaxb:javadoc>
               </jaxb:property>
             </xsd:appinfo>
           </xsd:annotation>
@@ -1070,11 +1087,10 @@ the property. Property {@code value} holds the properties value which is of type
     <xsd:annotation>
       <xsd:appinfo>
         <jaxb:class>
-           <jaxb:javadoc><![CDATA[
-Message meta-data.
+           <jaxb:javadoc><![CDATA[Model of a message.
 <p>A message consists of the properties {@code name}, {@code template} and
 {@code arguments}. Property {@code name} holds a name uniquely identifying the
-message in a list of messages. Property {@code template} holds the template of
+message in a set of messages. Property {@code template} holds the template of
 the message. Property {@code arguments} holds meta-data describing arguments to
 format the message with.</p>]]></jaxb:javadoc>
         </jaxb:class>
@@ -1121,7 +1137,7 @@ format the message with.</p>]]></jaxb:javadoc>
     <xsd:annotation>
       <xsd:appinfo>
         <jaxb:class>
-           <jaxb:javadoc><![CDATA[Reference to a text message.]]></jaxb:javadoc>
+           <jaxb:javadoc><![CDATA[Reference to a message.]]></jaxb:javadoc>
         </jaxb:class>
       </xsd:appinfo>
     </xsd:annotation>
@@ -1187,8 +1203,7 @@ format the message with.</p>]]></jaxb:javadoc>
     <xsd:annotation>
       <xsd:appinfo>
         <jaxb:class>
-           <jaxb:javadoc><![CDATA[
-Argument meta-data.
+           <jaxb:javadoc><![CDATA[Model of a message argument.
 <p>An argument consists of the properties {@code index}, {@code name} and
 {@code type}. Property {@code index} holds the index of the argument in a list
 of arguments. Property {@code name} holds the name uniquely identifying the
@@ -1269,7 +1284,22 @@ argument.</p>]]></jaxb:javadoc>
     <xsd:annotation>
       <xsd:appinfo>
         <jaxb:class>
-          <jaxb:javadoc><![CDATA[Instance meta-data.]]></jaxb:javadoc>
+          <jaxb:javadoc><![CDATA[Model of an instance.
+<p>An instance consists of the properties {@code identifier},
+{@code implementationName}, {@code class}, {@code stateless} and {@code scope}.
+Property {@code identifier} holds an identifier uniquely identifying the
+instance in a set of instances. Property {@code implementationName} holds a name
+uniquely identifying the instance for a specification. Property {@code class}
+holds the class of an instance. The {@code stateless} flag indicates that the
+instance does not retain state across operations. Property {@code scope} holds
+the scope the instance applies to.</p>
+
+<p>An instance is build from implementations. An implementation declaring a
+location declares its instance to be located outside the scope of the model.
+An implementation without a class is only available during implementation
+inheritance processing. No instance is build for such implementations. Instances
+also have no relationship to the modules theire implementations are declared in.
+</p>]]></jaxb:javadoc>
         </jaxb:class>
       </xsd:appinfo>
     </xsd:annotation>
@@ -1343,8 +1373,7 @@ argument.</p>]]></jaxb:javadoc>
             </xsd:appinfo>
           </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="scope" type="jomc:Scope" use="optional"
-                       default="Multiton">
+        <xsd:attribute name="scope" type="jomc:Identifier" use="required">
           <xsd:annotation>
             <xsd:appinfo>
               <jaxb:property>
@@ -1359,6 +1388,65 @@ argument.</p>]]></jaxb:javadoc>
             <xsd:appinfo>
               <jaxb:property>
                 <jaxb:javadoc><![CDATA[Flags this instance stateless.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- Persons                                                               -->
+  <!--                                                                       -->
+  <xsd:element name="persons" type="jomc:Persons"/>
+  <xsd:complexType name="Persons">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <jaxb:class>
+           <jaxb:javadoc><![CDATA[List of persons.]]></jaxb:javadoc>
+        </jaxb:class>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="jomc:ModelObject">
+        <xsd:choice>
+          <xsd:element name="person" type="jomc:Person" minOccurs="0"
+                       maxOccurs="unbounded"/>
+        </xsd:choice>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- Person                                                                -->
+  <!--                                                                       -->
+  <xsd:element name="person" type="jomc:Person"/>
+  <xsd:complexType name="Person">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <jaxb:class>
+          <jaxb:javadoc><![CDATA[Model of a person.
+<p>A person consists of the properties {@code name} and {@code mail}. Property
+{@code name} holds the name of the person. Property {@code mail} holds the mail
+address of the person.</p>]]></jaxb:javadoc>
+        </jaxb:class>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="jomc:ModelObject">
+        <xsd:attribute name="name" type="jomc:String" use="required">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                <jaxb:javadoc><![CDATA[Name of the person.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="mail" type="jomc:String" use="optional">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                <jaxb:javadoc><![CDATA[Mail address of the person or {@code null}.]]></jaxb:javadoc>
               </jaxb:property>
             </xsd:appinfo>
           </xsd:annotation>
@@ -1395,35 +1483,19 @@ argument.</p>]]></jaxb:javadoc>
     <xsd:annotation>
       <xsd:appinfo>
         <jaxb:class>
-          <jaxb:javadoc><![CDATA[Author.]]></jaxb:javadoc>
+          <jaxb:javadoc><![CDATA[Model of an author.
+<p>An author extends a person adding property {@code version} holding the
+version of a model object created due to the author.</p>]]></jaxb:javadoc>
         </jaxb:class>
       </xsd:appinfo>
     </xsd:annotation>
     <xsd:complexContent>
-      <xsd:extension base="jomc:ModelObject">
-        <xsd:attribute name="name" type="jomc:String" use="required">
-          <xsd:annotation>
-            <xsd:appinfo>
-              <jaxb:property>
-                <jaxb:javadoc><![CDATA[Name of the author.]]></jaxb:javadoc>
-              </jaxb:property>
-            </xsd:appinfo>
-          </xsd:annotation>
-        </xsd:attribute>
+      <xsd:extension base="jomc:Person">
         <xsd:attribute name="version" type="jomc:Version" use="optional">
           <xsd:annotation>
             <xsd:appinfo>
               <jaxb:property>
-                <jaxb:javadoc><![CDATA[The version of the object created due to the author.]]></jaxb:javadoc>
-              </jaxb:property>
-            </xsd:appinfo>
-          </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="mail" type="jomc:String" use="optional">
-          <xsd:annotation>
-            <xsd:appinfo>
-              <jaxb:property>
-                <jaxb:javadoc><![CDATA[Mail address of the author.]]></jaxb:javadoc>
+                <jaxb:javadoc><![CDATA[The version of the model object created due to the author or {@code null}.]]></jaxb:javadoc>
               </jaxb:property>
             </xsd:appinfo>
           </xsd:annotation>
@@ -1458,35 +1530,6 @@ argument.</p>]]></jaxb:javadoc>
       <xsd:whiteSpace value="collapse"/>
     </xsd:restriction>
   </xsd:simpleType>
-  <xsd:simpleType name="PropertyType">
-    <xsd:annotation>
-      <xsd:appinfo>
-        <jaxb:typesafeEnumClass>
-          <jaxb:javadoc><![CDATA[Enumeration of property types.]]></jaxb:javadoc>
-        </jaxb:typesafeEnumClass>
-      </xsd:appinfo>
-    </xsd:annotation>
-    <xsd:restriction base="xsd:NCName">
-      <xsd:enumeration value="byte"/>
-      <xsd:enumeration value="short"/>
-      <xsd:enumeration value="int"/>
-      <xsd:enumeration value="long"/>
-      <xsd:enumeration value="char"/>
-      <xsd:enumeration value="float"/>
-      <xsd:enumeration value="double"/>
-      <xsd:enumeration value="boolean"/>
-      <xsd:enumeration value="java.lang.Byte"/>
-      <xsd:enumeration value="java.lang.Short"/>
-      <xsd:enumeration value="java.lang.Integer"/>
-      <xsd:enumeration value="java.lang.Long"/>
-      <xsd:enumeration value="java.lang.Character"/>
-      <xsd:enumeration value="java.lang.Float"/>
-      <xsd:enumeration value="java.lang.Double"/>
-      <xsd:enumeration value="java.lang.Boolean"/>
-      <xsd:enumeration value="java.lang.String"/>
-      <xsd:enumeration value="java.lang.Object"/>
-    </xsd:restriction>
-  </xsd:simpleType>
   <xsd:simpleType name="ArgumentType">
     <xsd:annotation>
       <xsd:appinfo>
@@ -1496,10 +1539,46 @@ argument.</p>]]></jaxb:javadoc>
       </xsd:appinfo>
     </xsd:annotation>
     <xsd:restriction base="xsd:NCName">
-      <xsd:enumeration value="Number"/>
-      <xsd:enumeration value="Date"/>
-      <xsd:enumeration value="Time"/>
-      <xsd:enumeration value="Text"/>
+      <xsd:enumeration value="Number">
+        <xsd:annotation>
+          <xsd:appinfo>
+            <jaxb:typesafeEnumMember name="NUMBER">
+              <jaxb:javadoc><![CDATA[
+Argument of type {@code java.lang.Number}.]]></jaxb:javadoc>
+            </jaxb:typesafeEnumMember>
+          </xsd:appinfo>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="Date">
+        <xsd:annotation>
+          <xsd:appinfo>
+            <jaxb:typesafeEnumMember name="DATE">
+              <jaxb:javadoc><![CDATA[
+Argument of type {@code java.util.Date}.]]></jaxb:javadoc>
+            </jaxb:typesafeEnumMember>
+          </xsd:appinfo>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="Time">
+        <xsd:annotation>
+          <xsd:appinfo>
+            <jaxb:typesafeEnumMember name="TIME">
+              <jaxb:javadoc><![CDATA[
+Argument of type {@code java.util.Date}.]]></jaxb:javadoc>
+            </jaxb:typesafeEnumMember>
+          </xsd:appinfo>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="Text">
+        <xsd:annotation>
+          <xsd:appinfo>
+            <jaxb:typesafeEnumMember name="TEXT">
+              <jaxb:javadoc><![CDATA[
+Argument of type {@code java.lang.String}.]]></jaxb:javadoc>
+            </jaxb:typesafeEnumMember>
+          </xsd:appinfo>
+        </xsd:annotation>
+      </xsd:enumeration>
     </xsd:restriction>
   </xsd:simpleType>
   <xsd:simpleType name="Multiplicity">
@@ -1530,49 +1609,6 @@ implementation of the specification is allowed to exist among a set of modules
               <jaxb:javadoc><![CDATA[
 A multiplicity equal to {@code MANY} specifies that many implementations of the
 specification are allowed to exist among a set of modules (including none).]]></jaxb:javadoc>
-            </jaxb:typesafeEnumMember>
-          </xsd:appinfo>
-        </xsd:annotation>
-      </xsd:enumeration>
-    </xsd:restriction>
-  </xsd:simpleType>
-  <xsd:simpleType name="Scope">
-    <xsd:annotation>
-      <xsd:appinfo>
-        <jaxb:typesafeEnumClass>
-          <jaxb:javadoc><![CDATA[Enumeration of scopes.]]></jaxb:javadoc>
-        </jaxb:typesafeEnumClass>
-      </xsd:appinfo>
-    </xsd:annotation>
-    <xsd:restriction base="xsd:NCName">
-      <xsd:enumeration value="Multiton">
-        <xsd:annotation>
-          <xsd:appinfo>
-            <jaxb:typesafeEnumMember name="MULTITON">
-              <jaxb:javadoc><![CDATA[
-In multiton scope, a new instance is created whenever requested.]]></jaxb:javadoc>
-            </jaxb:typesafeEnumMember>
-          </xsd:appinfo>
-        </xsd:annotation>
-      </xsd:enumeration>
-      <xsd:enumeration value="Context">
-        <xsd:annotation>
-          <xsd:appinfo>
-            <jaxb:typesafeEnumMember name="CONTEXT">
-              <jaxb:javadoc><![CDATA[
-In context scope, instances are bound to a system's context. An instance is only
-created if not already available in context.]]></jaxb:javadoc>
-            </jaxb:typesafeEnumMember>
-          </xsd:appinfo>
-        </xsd:annotation>
-      </xsd:enumeration>
-      <xsd:enumeration value="Singleton">
-        <xsd:annotation>
-          <xsd:appinfo>
-            <jaxb:typesafeEnumMember name="SINGLETON">
-              <jaxb:javadoc><![CDATA[
-In singleton scope, instances are bound to a system's single instance store. An
-instance is only created if not already available in that single instance store.]]></jaxb:javadoc>
             </jaxb:typesafeEnumMember>
           </xsd:appinfo>
         </xsd:annotation>
