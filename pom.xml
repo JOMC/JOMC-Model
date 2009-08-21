@@ -72,14 +72,15 @@
         <groupId>org.jvnet.jaxb2.maven2</groupId>
         <artifactId>maven-jaxb2-plugin</artifactId>
       </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>javacc-maven-plugin</artifactId>
-      </plugin>
     </plugins>
   </build>
   <dependencies>
     <!-- Compile -->
+    <dependency>
+      <groupId>org.jomc</groupId>
+      <artifactId>jomc-util</artifactId>
+      <scope>compile</scope>
+    </dependency>
     <dependency>
       <groupId>javax.annotation</groupId>
       <artifactId>jsr250-api</artifactId>
@@ -104,13 +105,4 @@
       <scope>runtime</scope>
     </dependency>
   </dependencies>
-  <reporting>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>javacc-maven-plugin</artifactId>
-        <version>2.5</version>
-      </plugin>
-    </plugins>
-  </reporting>
 </project>
