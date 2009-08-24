@@ -579,15 +579,6 @@ implementations are allowed to exist among a set of modules (including none).]]>
       <xsd:selector xpath=".//jomc:implementation"/>
       <xsd:field xpath="@identifier"/>
     </xsd:unique>
-    <xsd:unique name="implementation-location-uniqueness">
-      <xsd:annotation>
-        <xsd:documentation xml:lang="en"><![CDATA[
-          Checks uniquenes of implementation locations.]]>
-        </xsd:documentation>
-      </xsd:annotation>
-      <xsd:selector xpath=".//jomc:implementation"/>
-      <xsd:field xpath="@location"/>
-    </xsd:unique>
   </xsd:element>
   <xsd:complexType name="Implementations">
     <xsd:annotation>
