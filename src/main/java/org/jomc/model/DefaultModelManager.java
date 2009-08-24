@@ -1541,18 +1541,13 @@ public class DefaultModelManager implements ModelManager
             {
                 mods.getModule().add( (Module) content );
             }
-            else if ( content instanceof Modules )
+            else
             {
-                this.log( Level.FINE, this.getMessage( "usingModules", new Object[]
+                this.log( Level.WARNING, this.getMessage( "ignoringDocument", new Object[]
                     {
-                        ( mods.getDocumentation() != null
-                          ? mods.getDocumentation().getText( Locale.getDefault().getLanguage() ).getValue()
-                          : "<>" ),
-                        url.toExternalForm()
+                        content == null ? "<null>" : content.toString(), url.toExternalForm()
                     } ), null );
 
-                mods = (Modules) content;
-                break;
             }
         }
 
