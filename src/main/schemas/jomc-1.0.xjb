@@ -1338,6 +1338,135 @@
 
         return implementations.getImplementation().size() > 0 ? implementations : null;
     }
+
+    /**
+     * Merges this list of modules to a single module.
+     *
+     * @return A module holding all model objects from the list.
+     */
+    public Module getMergedModule()
+    {
+        final Modules copy = this.clone();
+        final Module mergedModule = new Module();
+
+        for ( Module module : copy.getModule() )
+        {
+            final java.util.Set<String> referencedMessages = new java.util.HashSet<String>();
+            final java.util.Set<String> referencedProperties = new java.util.HashSet<String>();
+
+            if ( module.getImplementations() != null )
+            {
+                for ( Implementation i : module.getImplementations().getImplementation() )
+                {
+                    if ( mergedModule.getImplementations() == null )
+                    {
+                        mergedModule.setImplementations( new Implementations() );
+                    }
+
+                    if ( i.getMessages() != null && !i.getMessages().getReference().isEmpty() )
+                    {
+                        for ( java.util.Iterator<MessageReference> it = i.getMessages().getReference().iterator();
+                              it.hasNext(); )
+                        {
+                            final String messageName = it.next().getName();
+                            i.getMessages().getMessage().add( module.getMessages().getMessage( messageName ) );
+                            referencedMessages.add( messageName );
+                            it.remove();
+                        }
+                    }
+
+                    if ( i.getProperties() != null && !i.getProperties().getReference().isEmpty() )
+                    {
+                        for ( java.util.Iterator<PropertyReference> it = i.getProperties().getReference().iterator();
+                              it.hasNext(); )
+                        {
+                            final String propertyName = it.next().getName();
+                            i.getProperties().getProperty().add(
+                                module.getProperties().getProperty( propertyName ) );
+
+                            referencedProperties.add( propertyName );
+                            it.remove();
+                        }
+                    }
+
+                    mergedModule.getImplementations().getImplementation().add( i );
+                }
+            }
+
+            if ( module.getSpecifications() != null )
+            {
+                if ( mergedModule.getSpecifications() == null )
+                {
+                    mergedModule.setSpecifications( new Specifications() );
+                }
+
+                for ( Specification s : module.getSpecifications().getSpecification() )
+                {
+                    if ( s.getProperties() != null && !s.getProperties().getReference().isEmpty() )
+                    {
+                        for ( java.util.Iterator<PropertyReference> it = s.getProperties().getReference().iterator();
+                              it.hasNext(); )
+                        {
+                            final String propertyName = it.next().getName();
+                            s.getProperties().getProperty().add(
+                                module.getProperties().getProperty( propertyName ) );
+
+                            referencedProperties.add( propertyName );
+                            it.remove();
+                        }
+                    }
+
+                    mergedModule.getSpecifications().getSpecification().add( s );
+                }
+            }
+
+            for ( String messageName : referencedMessages )
+            {
+                for ( java.util.Iterator<Message> it = module.getMessages().getMessage().iterator(); it.hasNext(); )
+                {
+                    if ( messageName.equals( it.next().getName() ) )
+                    {
+                        it.remove();
+                        break;
+                    }
+                }
+            }
+
+            for ( String propertyName : referencedProperties )
+            {
+                for ( java.util.Iterator<Property> it = module.getProperties().getProperty().iterator(); it.hasNext(); )
+                {
+                    if ( propertyName.equals( it.next().getName() ) )
+                    {
+                        it.remove();
+                        break;
+                    }
+                }
+            }
+
+            if ( module.getProperties() != null && !module.getProperties().getProperty().isEmpty() )
+            {
+                if ( mergedModule.getProperties() == null )
+                {
+                    mergedModule.setProperties( new Properties() );
+                }
+
+                mergedModule.getProperties().getProperty().addAll( module.getProperties().getProperty() );
+            }
+
+            if ( module.getMessages() != null && !module.getMessages().getMessage().isEmpty() )
+            {
+                if ( mergedModule.getMessages() == null )
+                {
+                    mergedModule.setMessages( new Messages() );
+                }
+
+                mergedModule.getMessages().getMessage().addAll( module.getMessages().getMessage() );
+            }
+        }
+
+        return mergedModule;
+    }
 ]]></ci:code>
     </jaxb:bindings>
   </jaxb:bindings>

@@ -268,6 +268,7 @@ corresponding language.]]></jaxb:javadoc>
         <jaxb:class>
           <jaxb:javadoc><![CDATA[List of modules.
 <p><b>Queries</b><ul>
+<li>{@link #getMergedModule() }</li>
 <li>{@link #getSpecifications() }</li>
 <li>{@link #getSpecification(java.lang.String) }</li>
 <li>{@link #getModuleOfSpecification(java.lang.String) }</li>
@@ -1515,9 +1516,7 @@ version of a model object created due to the author.</p>]]></jaxb:javadoc>
         Restricts "xsd:string" to a maximum length of 100 characters.]]>
       </xsd:documentation>
     </xsd:annotation>
-    <xsd:restriction base="xsd:string">
-      <xsd:maxLength value="100"/>
-    </xsd:restriction>
+    <xsd:restriction base="xsd:token"/>
   </xsd:simpleType>
   <xsd:simpleType name="Identifier">
     <xsd:annotation>
@@ -1525,10 +1524,7 @@ version of a model object created due to the author.</p>]]></jaxb:javadoc>
         Identifier of an entity,]]>
       </xsd:documentation>
     </xsd:annotation>
-    <xsd:restriction base="xsd:string">
-      <xsd:pattern value="\p{L}.*"/>
-      <xsd:whiteSpace value="collapse"/>
-    </xsd:restriction>
+    <xsd:restriction base="xsd:token"/>
   </xsd:simpleType>
   <xsd:simpleType name="ArgumentType">
     <xsd:annotation>

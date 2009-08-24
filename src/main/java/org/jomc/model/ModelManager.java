@@ -38,6 +38,8 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
 import javax.xml.validation.Schema;
 import org.w3c.dom.ls.LSResourceResolver;
 import org.xml.sax.EntityResolver;
@@ -62,6 +64,10 @@ import org.xml.sax.SAXException;
  * <li>{@link #getSchema() }</li>
  * <li>{@link #validateModelObject(javax.xml.bind.JAXBElement) }</li>
  * <li>{@link #validateModules(org.jomc.model.Modules) }</li>
+ * </ul></p>
+ *
+ * <p><b>Transformation</b><ul>
+ * <li>{@link #transformModelObject(javax.xml.bind.JAXBElement, javax.xml.transform.Transformer) }</li>
  * </ul></p>
  *
  * <p><b>Queries</b><ul>
@@ -178,6 +184,21 @@ public interface ModelManager
      */
     void validateModules( Modules modules )
         throws NullPointerException, ModelException, IOException, SAXException, JAXBException;
+
+    /**
+     * Transforms a given {@code ModelObject} with a given {@code Transformer}.
+     *
+     * @param modelObject The {@code ModelObject} to transform.
+     * @param transformer The {@code Transformer} to transform {@code modelObject} with.
+     *
+     * @throws NullPointerException if {@code modelObject} or {@code transformer} is {@code null}.
+     * @throws IOException if reading schema resources fails.
+     * @throws SAXException if parsing schema resources fails.
+     * @throws JAXBException if binding fails.
+     * @throws TransformerException if the transformation fails.
+     */
+    <T extends ModelObject> T transformModelObject( JAXBElement<T> modelObject, Transformer transformer )
+        throws NullPointerException, IOException, SAXException, JAXBException, TransformerException;
 
     /**
      * Gets an instance of an implementation.

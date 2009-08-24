@@ -65,10 +65,20 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.util.JAXBResult;
+import javax.xml.bind.util.JAXBSource;
+import javax.xml.transform.ErrorListener;
 import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.URIResolver;
+import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
+import org.jomc.model.bootstrap.BootstrapObject;
 import org.jomc.model.bootstrap.Schema;
 import org.jomc.model.bootstrap.Schemas;
 import org.jomc.util.ParseException;
@@ -92,6 +102,8 @@ import org.xml.sax.SAXParseException;
  * <li>{@link #getDefaultDocumentLocation() }</li>
  * <li>{@link #getClasspathModule(org.jomc.model.Modules) }</li>
  * <li>{@link #getClasspathModules(java.lang.String) }</li>
+ * <li>{@link #getDefaultStylesheetLocation() }</li>
+ * <li>{@link #getClasspathTransformers(java.lang.String) }</li>
  * </ul></p>
  *
  * <p><b>Logging</b><ul>
@@ -106,6 +118,8 @@ import org.xml.sax.SAXParseException;
  * <li>{@link #getBootstrapObjectFactory() }</li>
  * <li>{@link #getBootstrapSchema() }</li>
  * <li>{@link #getBootstrapUnmarshaller(boolean) }</li>
+ * <li>{@link #validateBootstrapObject(javax.xml.bind.JAXBElement) }</li>
+ * <li>{@link #transformBootstrapObject(javax.xml.bind.JAXBElement, javax.xml.transform.Transformer) }</li>
  * </ul></p>
  *
  * @author <a href="mailto:schulte2005@users.sourceforge.net">Christian Schulte</a>
@@ -684,6 +698,26 @@ public class DefaultModelManager implements ModelManager
         }
     }
 
+    public <T extends ModelObject> T transformModelObject(
+        final JAXBElement<T> modelObject, final Transformer transformer )
+        throws NullPointerException, IOException, SAXException, JAXBException, TransformerException
+    {
+        if ( modelObject == null )
+        {
+            throw new NullPointerException( "modelObject" );
+        }
+        if ( transformer == null )
+        {
+            throw new NullPointerException( "transformer" );
+        }
+
+        final JAXBContext ctx = this.getContext();
+        final JAXBSource source = new JAXBSource( ctx, modelObject );
+        final JAXBResult result = new JAXBResult( ctx );
+        transformer.transform( source, result );
+        return ( (JAXBElement<T>) result.getResult() ).getValue();
+    }
+
     public Instance getInstance( final Modules modules, final Implementation implementation,
                                  final ClassLoader classLoader )
     {
@@ -749,23 +783,32 @@ public class DefaultModelManager implements ModelManager
         }
 
         final Instance instance = this.getInstance( modules, implementation, classLoader );
-        if ( instance.getScope().equals( "Multiton" ) && dependency.getProperties() != null )
+        if ( dependency.getProperties() != null && !dependency.getProperties().getProperty().isEmpty() )
         {
-            final Properties properties = new Properties();
-            properties.getProperty().addAll( dependency.getProperties().getProperty() );
-
-            if ( instance.getProperties() != null )
+            if ( instance.getScope().equals( "Multiton" ) )
             {
-                for ( Property p : instance.getProperties().getProperty() )
+                final Properties properties = new Properties();
+                properties.getProperty().addAll( dependency.getProperties().getProperty() );
+
+                if ( instance.getProperties() != null )
                 {
-                    if ( properties.getProperty( p.getName() ) == null )
+                    for ( Property p : instance.getProperties().getProperty() )
                     {
-                        properties.getProperty().add( p );
+                        if ( properties.getProperty( p.getName() ) == null )
+                        {
+                            properties.getProperty().add( p );
+                        }
                     }
                 }
-            }
 
-            instance.setProperties( properties );
+                instance.setProperties( properties );
+            }
+            else
+            {
+                this.log( Level.WARNING, this.getPropertyOverwriteConstraintMessage(
+                    instance.getIdentifier(), instance.getScope(), dependency.getName() ), null );
+
+            }
         }
 
         return instance;
@@ -1007,6 +1050,12 @@ public class DefaultModelManager implements ModelManager
      */
     private static final String DEFAULT_DOCUMENT_LOCATION = "META-INF/jomc.xml";
 
+    /**
+     * Classpath location searched for style sheets by default.
+     * @see #getDefaultStylesheetLocation()
+     */
+    private static final String DEFAULT_STYLESHEET_LOCATION = "META-INF/jomc.xslt";
+
     /** Classpath location of the bootstrap schema. */
     private static final String BOOTSTRAP_SCHEMA_LOCATION =
         Schemas.class.getPackage().getName().replace( '.', '/' ) + "/jomc-bootstrap-1.0.xsd";
@@ -1176,9 +1225,112 @@ public class DefaultModelManager implements ModelManager
     }
 
     /**
+     * Validates a given bootstrap object.
+     *
+     * @param bootstrapObject The object to validate.
+     *
+     * @throws NullPointerException if {@code bootstrapObject} is {@code null}.
+     * @throws ModelException if {@code bootstrapObject} is invalid.
+     * @throws IOException if reading schema resources fails.
+     * @throws SAXException if parsing schema resources fails.
+     * @throws JAXBException if unmarshalling schema resources fails.
+     */
+    public void validateBootstrapObject( JAXBElement<? extends BootstrapObject> bootstrapObject )
+        throws NullPointerException, ModelException, IOException, SAXException, JAXBException
+    {
+        if ( bootstrapObject == null )
+        {
+            throw new NullPointerException( "bootstrapObject" );
+        }
+
+        final StringWriter stringWriter = new StringWriter();
+        final List<ModelException.Detail> details = new LinkedList<ModelException.Detail>();
+        final Validator validator = this.getBootstrapSchema().newValidator();
+        validator.setErrorHandler( new ErrorHandler()
+        {
+
+            public void warning( final SAXParseException exception ) throws SAXException
+            {
+                if ( exception.getMessage() != null )
+                {
+                    details.add( new ModelException.Detail( Level.WARNING, exception.getMessage() ) );
+                }
+            }
+
+            public void error( final SAXParseException exception ) throws SAXException
+            {
+                if ( exception.getMessage() != null )
+                {
+                    details.add( new ModelException.Detail( Level.SEVERE, exception.getMessage() ) );
+                }
+
+                throw exception;
+            }
+
+            public void fatalError( final SAXParseException exception ) throws SAXException
+            {
+                if ( exception.getMessage() != null )
+                {
+                    details.add( new ModelException.Detail( Level.SEVERE, exception.getMessage() ) );
+                }
+
+                throw exception;
+            }
+
+        } );
+
+        this.getBootstrapMarshaller( false, false ).marshal( bootstrapObject, stringWriter );
+
+        try
+        {
+            validator.validate( new StreamSource( new StringReader( stringWriter.toString() ) ) );
+        }
+        catch ( SAXException e )
+        {
+            final ModelException modelException = new ModelException( e.getMessage(), e );
+            modelException.getDetails().addAll( details );
+            throw modelException;
+        }
+    }
+
+    /**
+     * Transforms a given {@code BootstrapObject} with a given {@code Transformer}.
+     *
+     * @param bootstrapObject The {@code BootstrapObject} to transform.
+     * @param transformer The {@code Transformer} to transform {@code bootstrapObject} with.
+     *
+     * @throws NullPointerException if {@code bootstrapObject} or {@code transformer} is {@code null}.
+     * @throws IOException if reading schema resources fails.
+     * @throws SAXException if parsing schema resources fails.
+     * @throws JAXBException if binding fails.
+     * @throws TransformerException if the transformation fails.
+     */
+    public <T extends BootstrapObject> T transformBootstrapObject(
+        final JAXBElement<T> bootstrapObject, final Transformer transformer )
+        throws NullPointerException, IOException, SAXException, JAXBException, TransformerException
+    {
+        if ( bootstrapObject == null )
+        {
+            throw new NullPointerException( "bootstrapObject" );
+        }
+        if ( transformer == null )
+        {
+            throw new NullPointerException( "transformer" );
+        }
+
+        final JAXBContext ctx = this.getBootstrapContext();
+        final JAXBSource source = new JAXBSource( ctx, bootstrapObject );
+        final JAXBResult result = new JAXBResult( ctx );
+        transformer.transform( source, result );
+        return ( (JAXBElement<T>) result.getResult() ).getValue();
+    }
+
+    /**
      * Sets the object factory of the instance.
      *
      * @param value The new object factory of the instance.
+     *
+     * @see #getObjectFactory()
      */
     public void setObjectFactory( final ObjectFactory value )
     {
@@ -1189,6 +1341,8 @@ public class DefaultModelManager implements ModelManager
      * Sets the entity resolver of the instance.
      *
      * @param value The new entity resolver of the instance.
+     *
+     * @see #getEntityResolver()
      */
     public void setEntityResolver( final EntityResolver value )
     {
@@ -1199,6 +1353,8 @@ public class DefaultModelManager implements ModelManager
      * Sets the L/S resolver of the instance.
      *
      * @param value The new L/S resolver of the instance.
+     *
+     * @see #getLSResourceResolver()
      */
     public void setLSResourceResolver( final LSResourceResolver value )
     {
@@ -1209,6 +1365,8 @@ public class DefaultModelManager implements ModelManager
      * Gets the list of registered listeners.
      *
      * @return The list of registered listeners.
+     *
+     * @see #log(java.util.logging.Level, java.lang.String, java.lang.Throwable)
      */
     public List<Listener> getListeners()
     {
@@ -1447,9 +1605,134 @@ public class DefaultModelManager implements ModelManager
     }
 
     /**
+     * Gets the default location to search for style sheets.
+     * <p>The default style sheet location is controlled by system property
+     * {@code org.jomc.model.DefaultModelManager.defaultStylesheetLocation} holding the location to search at by
+     * default. If that property is not set, the {@code META-INF/jomc.xslt} default is returned.</p>
+     *
+     * @return The default location to search for style sheets.
+     *
+     * @see #getClasspathTransformers(java.lang.String)
+     */
+    public String getDefaultStylesheetLocation()
+    {
+        return System.getProperty( "org.jomc.model.DefaultModelManager.defaultStylesheetLocation",
+                                   DEFAULT_STYLESHEET_LOCATION );
+
+    }
+
+    /**
+     * Gets transformers by searching the class loader of the instance for resources.
+     *
+     * @param location The location to search at.
+     *
+     * @return All resources from the class loader of the instance matching {@code location}.
+     *
+     * @throws NullPointerException if {@code location} is {@code null}.
+     * @throws IOException if reading resources fails.
+     * @throws TransformerConfigurationException if getting the transformers fails.
+     *
+     * @see #getDefaultStylesheetLocation()
+     */
+    public List<Transformer> getClasspathTransformers( final String location )
+        throws IOException, TransformerConfigurationException
+    {
+        if ( location == null )
+        {
+            throw new NullPointerException( "location" );
+        }
+
+        this.log( Level.FINE, this.getMessage( "stylesheetLocation", new Object[]
+            {
+                location
+            } ), null );
+
+        final List<Transformer> transformers = new LinkedList<Transformer>();
+        final TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        final Enumeration<URL> resources = this.getClassLoader().getResources( location );
+        final ErrorListener errorListener = new ErrorListener()
+        {
+
+            public void warning( final TransformerException exception ) throws TransformerException
+            {
+                log( Level.WARNING, exception.getMessage(), exception );
+            }
+
+            public void error( final TransformerException exception ) throws TransformerException
+            {
+                log( Level.SEVERE, exception.getMessage(), exception );
+                throw exception;
+            }
+
+            public void fatalError( final TransformerException exception ) throws TransformerException
+            {
+                log( Level.SEVERE, exception.getMessage(), exception );
+                throw exception;
+            }
+
+        };
+
+        final URIResolver uriResolver = new URIResolver()
+        {
+
+            public Source resolve( final String href, final String base ) throws TransformerException
+            {
+                try
+                {
+                    Source source = null;
+                    final InputSource inputSource = getEntityResolver().resolveEntity( null, href );
+
+                    if ( inputSource != null )
+                    {
+                        source = new SAXSource( inputSource );
+                    }
+
+                    return source;
+                }
+                catch ( SAXException e )
+                {
+                    log( Level.SEVERE, e.getMessage(), e );
+                    throw new TransformerException( e );
+                }
+                catch ( IOException e )
+                {
+                    log( Level.SEVERE, e.getMessage(), e );
+                    throw new TransformerException( e );
+                }
+            }
+
+        };
+
+        transformerFactory.setErrorListener( errorListener );
+        transformerFactory.setURIResolver( uriResolver );
+
+        while ( resources.hasMoreElements() )
+        {
+            final URL url = resources.nextElement();
+
+            this.log( Level.FINE, this.getMessage( "processing", new Object[]
+                {
+                    url.toExternalForm()
+                } ), null );
+
+            final InputStream in = url.openStream();
+            final Transformer transformer = transformerFactory.newTransformer( new StreamSource( in ) );
+            in.close();
+
+            transformer.setErrorListener( errorListener );
+            transformer.setURIResolver( uriResolver );
+            transformers.add( transformer );
+        }
+
+        return transformers;
+    }
+
+    /**
      * Gets the class loader of the instance.
      *
      * @return The class loader of the instance.
+     *
+     * @see #setClassLoader(java.lang.ClassLoader)
      */
     public ClassLoader getClassLoader()
     {
@@ -1470,6 +1753,8 @@ public class DefaultModelManager implements ModelManager
      * Sets the class loader of the instance.
      *
      * @param value The new class loader of the instance.
+     *
+     * @see #getClassLoader()
      */
     public void setClassLoader( final ClassLoader value )
     {
@@ -1487,6 +1772,8 @@ public class DefaultModelManager implements ModelManager
      * @param level The level of the event.
      * @param message The message of the event.
      * @param throwable The throwable of the event.
+     *
+     * @see #getListeners()
      */
     protected void log( final Level level, final String message, final Throwable throwable )
     {
@@ -1866,6 +2153,17 @@ public class DefaultModelManager implements ModelManager
 
     }
 
+    private String getPropertyOverwriteConstraintMessage( final String instance,
+                                                          final String scope,
+                                                          final String dependency )
+    {
+        return this.getMessage( "propertyOverwriteConstraint", new Object[]
+            {
+                instance, scope, dependency
+            } );
+
+    }
+
     private void assertMessagesUniqueness( final Messages messages, final List<ModelException.Detail> details )
     {
         for ( Message m : messages.getMessage() )
@@ -1928,21 +2226,6 @@ public class DefaultModelManager implements ModelManager
             new ModelException.Detail( Level.SEVERE, this.getMessage( "incompatibleDependency", new Object[]
             {
                 implementation, specification, requiredVersion, availableVersion
-            } ) );
-
-        detail.setElement( element );
-        return detail;
-    }
-
-    private ModelException.Detail newPropertyOverwriteConstraintDetail( final JAXBElement element,
-                                                                        final String implementation,
-                                                                        final String dependency,
-                                                                        final String specification )
-    {
-        final ModelException.Detail detail =
-            new ModelException.Detail( Level.SEVERE, this.getMessage( "propertyOverwriteConstraint", new Object[]
-            {
-                implementation, dependency, specification
             } ) );
 
         detail.setElement( element );
