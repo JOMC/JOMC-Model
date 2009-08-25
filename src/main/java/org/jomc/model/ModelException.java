@@ -1,6 +1,6 @@
 /*
  *   Copyright (c) 2009 The JOMC Project
- *   Copyright (c) 2005 Christian Schulte <schulte2005@users.sourceforge.net>
+ *   Copyright (c) 2005 Christian Schulte <cs@jomc.org>
  *   All rights reserved.
  *
  *   Redistribution and use in source and binary forms, with or without
@@ -42,7 +42,7 @@ import javax.xml.bind.JAXBElement;
 /**
  * Gets thrown for invalid model objects.
  *
- * @author <a href="mailto:schulte2005@users.sourceforge.net">Christian Schulte</a>
+ * @author <a href="mailto:cs@jomc.org">Christian Schulte</a>
  * @version $Id$
  */
 public class ModelException extends Exception
