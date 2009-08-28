@@ -374,43 +374,52 @@ public class DefaultModelManager implements ModelManager
 
     public javax.xml.validation.Schema getSchema() throws IOException, SAXException, JAXBException
     {
-        final SchemaFactory f = SchemaFactory.newInstance( XMLConstants.W3C_XML_SCHEMA_NS_URI );
-        final List<Source> sources = new ArrayList<Source>( this.getSchemas().getSchema().size() );
-
-        for ( Schema s : this.getSchemas().getSchema() )
+        if ( this.schema == null )
         {
-            sources.add( new StreamSource( this.getClassLoader().getResourceAsStream( s.getClasspathId() ),
-                                           s.getSystemId() ) );
+            final SchemaFactory f = SchemaFactory.newInstance( XMLConstants.W3C_XML_SCHEMA_NS_URI );
+            final List<Source> sources = new ArrayList<Source>( this.getSchemas().getSchema().size() );
 
+            for ( Schema s : this.getSchemas().getSchema() )
+            {
+                sources.add( new StreamSource( this.getClassLoader().getResourceAsStream( s.getClasspathId() ),
+                                               s.getSystemId() ) );
+
+            }
+
+            this.schema = f.newSchema( sources.toArray( new Source[ sources.size() ] ) );
         }
 
-        return f.newSchema( sources.toArray( new Source[ sources.size() ] ) );
+        return this.schema;
     }
 
     public JAXBContext getContext() throws IOException, SAXException, JAXBException
     {
-        final StringBuffer context = new StringBuffer();
-
-        for ( Iterator<Schema> s = this.getSchemas().getSchema().iterator(); s.hasNext(); )
+        if ( this.context == null )
         {
-            final Schema schema = s.next();
-            context.append( schema.getContextId() );
-            if ( s.hasNext() )
+            final StringBuffer pkgs = new StringBuffer();
+
+            for ( Iterator<Schema> s = this.getSchemas().getSchema().iterator(); s.hasNext(); )
             {
-                context.append( ':' );
-            }
-        }
-
-        if ( context.length() == 0 )
-        {
-            throw new IOException( this.getMessage( "missingSchemas", new Object[]
+                pkgs.append( s.next().getContextId() );
+                if ( s.hasNext() )
                 {
-                    this.getBootstrapDocumentLocation()
-                } ) );
+                    pkgs.append( ':' );
+                }
+            }
 
+            if ( pkgs.length() == 0 )
+            {
+                throw new IOException( this.getMessage( "missingSchemas", new Object[]
+                    {
+                        this.getBootstrapDocumentLocation()
+                    } ) );
+
+            }
+
+            this.context = JAXBContext.newInstance( pkgs.toString(), this.getClassLoader() );
         }
 
-        return JAXBContext.newInstance( context.toString(), this.getClassLoader() );
+        return this.context;
     }
 
     public Marshaller getMarshaller( final boolean validating, final boolean formattedOutput )
@@ -419,11 +428,11 @@ public class DefaultModelManager implements ModelManager
         final Marshaller m = this.getContext().createMarshaller();
         final StringBuffer schemaLocation = new StringBuffer();
 
-        for ( Iterator<Schema> s = this.getSchemas().getSchema().iterator(); s.hasNext(); )
+        for ( Iterator<Schema> it = this.getSchemas().getSchema().iterator(); it.hasNext(); )
         {
-            final Schema schema = s.next();
-            schemaLocation.append( schema.getPublicId() ).append( ' ' ).append( schema.getSystemId() );
-            if ( s.hasNext() )
+            final Schema s = it.next();
+            schemaLocation.append( s.getPublicId() ).append( ' ' ).append( s.getSystemId() );
+            if ( it.hasNext() )
             {
                 schemaLocation.append( ' ' );
             }
@@ -550,23 +559,27 @@ public class DefaultModelManager implements ModelManager
                             this.assertPropertiesUniqueness( i.getProperties(), details );
                         }
 
-                        final List<SpecificationReference> specs =
-                            modules.getSpecifications( i.getIdentifier() );
-
+                        final Specifications specs = modules.getSpecifications( i.getIdentifier() );
                         final Dependencies deps = modules.getDependencies( i.getIdentifier() );
 
                         if ( specs != null )
                         {
-                            for ( SpecificationReference r : specs )
+                            for ( SpecificationReference r : specs.getReference() )
                             {
-                                final Specification s = modules.getSpecification( r.getIdentifier() );
+                                final Specification s = specs.getSpecification( r.getIdentifier() );
 
                                 if ( s != null && r.getVersion() != null && s.getVersion() != null &&
                                      VersionParser.compare( r.getVersion(), s.getVersion() ) != 0 )
                                 {
+                                    final Module moduleOfSpecification =
+                                        modules.getModuleOfSpecification( s.getIdentifier() );
+
                                     details.add( this.newIncompatibleImplementationDetail(
-                                        this.getObjectFactory().createImplementation( i ), i.getIdentifier(),
-                                        r.getIdentifier(), r.getVersion(), s.getVersion() ) );
+                                        this.getObjectFactory().createImplementation( i ),
+                                        i.getIdentifier(), m.getName(),
+                                        r.getIdentifier(), moduleOfSpecification == null
+                                                           ? "<>" : moduleOfSpecification.getName(),
+                                        r.getVersion(), s.getVersion() ) );
 
                                 }
                             }
@@ -586,9 +599,15 @@ public class DefaultModelManager implements ModelManager
                                 if ( s != null && s.getVersion() != null && d.getVersion() != null &&
                                      VersionParser.compare( d.getVersion(), s.getVersion() ) > 0 )
                                 {
+                                    final Module moduleOfSpecification =
+                                        modules.getModuleOfSpecification( s.getIdentifier() );
+
                                     details.add( this.newIncompatibleDependencyDetail(
-                                        this.getObjectFactory().createDependency( d ), i.getIdentifier(),
-                                        d.getIdentifier(), d.getVersion(), s.getVersion() ) );
+                                        this.getObjectFactory().createDependency( d ),
+                                        i.getIdentifier(), m.getName(),
+                                        d.getIdentifier(), moduleOfSpecification == null
+                                                           ? "<>" : moduleOfSpecification.getName(),
+                                        d.getVersion(), s.getVersion() ) );
 
                                 }
 
@@ -744,21 +763,7 @@ public class DefaultModelManager implements ModelManager
         instance.setDependencies( modules.getDependencies( implementation.getIdentifier() ) );
         instance.setProperties( modules.getProperties( implementation.getIdentifier() ) );
         instance.setMessages( modules.getMessages( implementation.getIdentifier() ) );
-
-        final List<SpecificationReference> specifications = modules.getSpecifications( implementation.getIdentifier() );
-        if ( specifications != null && !specifications.isEmpty() )
-        {
-            instance.setSpecifications( new Specifications() );
-            for ( SpecificationReference ref : specifications )
-            {
-                final Specification s = modules.getSpecification( ref.getIdentifier() );
-                if ( s != null )
-                {
-                    instance.getSpecifications().getSpecification().add( s );
-                }
-            }
-        }
-
+        instance.setSpecifications( modules.getSpecifications( implementation.getIdentifier() ) );
         return instance;
     }
 
@@ -1094,6 +1099,12 @@ public class DefaultModelManager implements ModelManager
     /** The L/S resolver of the instance. */
     private LSResourceResolver resourceResolver;
 
+    /** The context of the instance. */
+    private JAXBContext context;
+
+    /** The schema of the instance. */
+    private javax.xml.validation.Schema schema;
+
     /** The bootstrap schema. */
     private javax.xml.validation.Schema bootstrapSchema;
 
@@ -1328,7 +1339,7 @@ public class DefaultModelManager implements ModelManager
     /**
      * Sets the object factory of the instance.
      *
-     * @param value The new object factory of the instance.
+     * @param value The new object factory of the instance or {@code null}.
      *
      * @see #getObjectFactory()
      */
@@ -1340,7 +1351,7 @@ public class DefaultModelManager implements ModelManager
     /**
      * Sets the entity resolver of the instance.
      *
-     * @param value The new entity resolver of the instance.
+     * @param value The new entity resolver of the instance or {@code null}.
      *
      * @see #getEntityResolver()
      */
@@ -1352,13 +1363,37 @@ public class DefaultModelManager implements ModelManager
     /**
      * Sets the L/S resolver of the instance.
      *
-     * @param value The new L/S resolver of the instance.
+     * @param value The new L/S resolver of the instance or {@code null}.
      *
      * @see #getLSResourceResolver()
      */
     public void setLSResourceResolver( final LSResourceResolver value )
     {
         this.resourceResolver = value;
+    }
+
+    /**
+     * Sets the JAXB context of the instance.
+     *
+     * @param value The new JAXB context of the instance or {@code null}.
+     *
+     * @see #getContext()
+     */
+    public void setContext( final JAXBContext value )
+    {
+        this.context = value;
+    }
+
+    /**
+     * Sets the schema of the instance.
+     *
+     * @param value The new schema of the instance or {@code null}.
+     *
+     * @see #getSchema()
+     */
+    public void setSchema( final javax.xml.validation.Schema value )
+    {
+        this.schema = value;
     }
 
     /**
@@ -1755,10 +1790,12 @@ public class DefaultModelManager implements ModelManager
     {
         this.classLoader = value;
         this.bootstrapSchema = null;
-        this.schemaResources = null;
+        this.schema = null;
         this.schemas = null;
+        this.schemaResources = null;
         this.entityResolver = null;
         this.resourceResolver = null;
+        this.context = null;
     }
 
     /**
@@ -2197,14 +2234,17 @@ public class DefaultModelManager implements ModelManager
 
     private ModelException.Detail newIncompatibleImplementationDetail( final JAXBElement element,
                                                                        final String implementation,
+                                                                       final String implementationModule,
                                                                        final String specification,
+                                                                       final String specificationModule,
                                                                        final String implementedVersion,
                                                                        final String specifiedVersion )
     {
         final ModelException.Detail detail =
             new ModelException.Detail( Level.SEVERE, this.getMessage( "incompatibleImplementation", new Object[]
             {
-                implementation, specification, implementedVersion, specifiedVersion
+                implementation, implementationModule, specification, specificationModule,
+                implementedVersion, specifiedVersion
             } ) );
 
         detail.setElement( element );
@@ -2213,14 +2253,17 @@ public class DefaultModelManager implements ModelManager
 
     private ModelException.Detail newIncompatibleDependencyDetail( final JAXBElement element,
                                                                    final String implementation,
+                                                                   final String implementationModule,
                                                                    final String specification,
+                                                                   final String specificationModule,
                                                                    final String requiredVersion,
                                                                    final String availableVersion )
     {
         final ModelException.Detail detail =
             new ModelException.Detail( Level.SEVERE, this.getMessage( "incompatibleDependency", new Object[]
             {
-                implementation, specification, requiredVersion, availableVersion
+                implementation, implementationModule, specification, specificationModule,
+                requiredVersion, availableVersion
             } ) );
 
         detail.setElement( element );

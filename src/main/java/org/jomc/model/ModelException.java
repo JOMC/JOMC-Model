@@ -213,37 +213,4 @@ public class ModelException extends Exception
         return this.details;
     }
 
-    /**
-     * Creates and returns a string representation of the object.
-     *
-     * @return A string representation of the object.
-     */
-    private String toStringInternal()
-    {
-        final StringBuffer b = new StringBuffer().append( '{' ).append( "details={" );
-
-        for ( Iterator<Detail> it = this.getDetails().iterator(); it.hasNext(); )
-        {
-            b.append( it.next() );
-            if ( it.hasNext() )
-            {
-                b.append( ", " );
-            }
-        }
-        b.append( "}}" );
-
-        return b.toString();
-    }
-
-    /**
-     * Creates and returns a string representation of the object.
-     *
-     * @return A string representation of the object.
-     */
-    @Override
-    public String toString()
-    {
-        return super.toString() + this.toStringInternal();
-    }
-
 }

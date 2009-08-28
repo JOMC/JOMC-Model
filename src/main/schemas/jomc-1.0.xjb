@@ -879,27 +879,32 @@
     }
 
     /**
-     * Gets references to all specifications an implementation implements from this list of modules.
+     * Gets all specifications an implementation implements from this list of modules.
+     * <p><b>Note:</b><br/>
+     * The instance returned by this method contains specification references together with
+     * resolved specifications. When marshalling, the resulting {@code specifications} element
+     * will not validate against the schema which allows either {@code specification} elements
+     * or {@code reference} elements to appear but not both.</p>
      *
      * @param implementation The identifier of the implementation to get all implemented specifications of.
      *
-     * @return List of references to all specifications implemented by {@code implementation} from the list or
-     * {@code null}, if no implementation matching {@code implementation} is found.
+     * @return List of all specifications implemented by {@code implementation} from the list or {@code null}, if no
+     * implementation matching {@code implementation} is found.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
      *
      * @see #getModule()
      */
-    public List<SpecificationReference> getSpecifications( final String implementation )
+    public Specifications getSpecifications( final String implementation )
     {
         if ( implementation == null )
         {
             throw new NullPointerException( "implementation" );
         }
 
-        Specifications specs = new Specifications();
+        final Specifications specs = new Specifications();
         this.collectSpecifications( implementation, specs );
-        return specs.getReference().isEmpty() ? null : specs.getReference();
+        return specs.getSpecification().isEmpty() && specs.getReference().isEmpty() ? null : specs;
     }
 
     private void collectSpecifications( final String implementation, final Specifications specifications )
@@ -915,11 +920,17 @@
 
             if ( i.getSpecifications() != null )
             {
-                for ( SpecificationReference ref : i.getSpecifications().getReference() )
+                for ( SpecificationReference r : i.getSpecifications().getReference() )
                 {
-                    if ( specifications.getReference( ref.getIdentifier() ) == null )
+                    if ( specifications.getReference( r.getIdentifier() ) == null )
                     {
-                        specifications.getReference().add( ref );
+                        specifications.getReference().add( r );
+
+                        final Specification s = this.getSpecification( r.getIdentifier() );
+                        if ( s != null && specifications.getSpecification( s.getIdentifier() ) == null )
+                        {
+                            specifications.getSpecification().add( s );
+                        }
                     }
                 }
             }
@@ -1192,15 +1203,13 @@
         }
 
         final Properties properties = new Properties();
-        final List<SpecificationReference> references = this.getSpecifications( implementation );
+        final Specifications specs = this.getSpecifications( implementation );
 
-        if ( references != null )
+        if ( specs != null )
         {
-            for ( SpecificationReference r : references )
+            for ( Specification s : specs.getSpecification() )
             {
-                final Specification s = this.getSpecification( r.getIdentifier() );
-
-                if ( s != null && s.getProperties() != null )
+                if ( s.getProperties() != null )
                 {
                     properties.getProperty().addAll( s.getProperties().getProperty() );
                 }
@@ -1320,13 +1329,13 @@
             {
                 for ( Implementation i : m.getImplementations().getImplementation() )
                 {
-                    final List<SpecificationReference> references = this.getSpecifications( i.getIdentifier() );
+                    final Specifications specs = this.getSpecifications( i.getIdentifier() );
 
-                    if ( references != null )
+                    if ( specs != null )
                     {
-                        for ( SpecificationReference ref : references )
+                        for ( Specification s : specs.getSpecification() )
                         {
-                            if ( specification.equals( ref.getIdentifier() ) )
+                            if ( specification.equals( s.getIdentifier() ) )
                             {
                                 implementations.getImplementation().add( i );
                             }
