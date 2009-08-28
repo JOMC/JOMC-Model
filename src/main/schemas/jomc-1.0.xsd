@@ -110,9 +110,7 @@ corresponding language.]]></jaxb:javadoc>
   <xsd:element name="texts" type="jomc:Texts">
     <xsd:key name="text-key">
       <xsd:annotation>
-        <xsd:documentation xml:lang="en"><![CDATA[
-        Checks uniqueness of languages.]]>
-        </xsd:documentation>
+        <xsd:documentation xml:lang="en"><![CDATA[Checks uniqueness of languages.]]></xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath=".//jomc:text"/>
       <xsd:field xpath="@language"/>
@@ -409,18 +407,14 @@ the module. A module defines specifications, implementations and properties.</p>
   <xsd:element name="specifications" type="jomc:Specifications">
     <xsd:unique name="specification-uniqueness">
       <xsd:annotation>
-        <xsd:documentation xml:lang="en"><![CDATA[
-          Checks uniquenes of specifications.]]>
-        </xsd:documentation>
+        <xsd:documentation xml:lang="en"><![CDATA[Checks uniquenes of specifications.]]></xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath=".//jomc:specification"/>
       <xsd:field xpath="@identifier"/>
     </xsd:unique>
     <xsd:unique name="specification-reference-uniqueness">
       <xsd:annotation>
-        <xsd:documentation xml:lang="en"><![CDATA[
-          Checks uniquenes of specification references.]]>
-        </xsd:documentation>
+        <xsd:documentation xml:lang="en"><![CDATA[Checks uniquenes of specification references.]]></xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath=".//jomc:reference"/>
       <xsd:field xpath="@identifier"/>
@@ -520,10 +514,10 @@ specification are allowed to exist among a set of modules (including none).</p>
             <xsd:appinfo>
               <jaxb:property>
                 <jaxb:javadoc><![CDATA[
-The mandatory implementation multiplicity among a set of modules of this
-specification. A multiplicity equal to {@link Multiplicity#ONE} specifies
-exactly one implementation of the specification must exist among a set of
-modules. A multiplicity equal to {@link Multiplicity#MANY} specifies that many
+The implementation multiplicity of this specification. A multiplicity equal to
+{@link Multiplicity#ONE} specifies that no more than one implementation of the
+specification is allowed to exist among a set of modules (including none).
+A multiplicity equal to {@link Multiplicity#MANY} specifies that many
 implementations are allowed to exist among a set of modules (including none).]]></jaxb:javadoc>
               </jaxb:property>
             </xsd:appinfo>
@@ -572,9 +566,7 @@ implementations are allowed to exist among a set of modules (including none).]]>
   <xsd:element name="implementations" type="jomc:Implementations">
     <xsd:unique name="implementation-uniqueness">
       <xsd:annotation>
-        <xsd:documentation xml:lang="en"><![CDATA[
-          Checks uniquenes of implementations.]]>
-        </xsd:documentation>
+        <xsd:documentation xml:lang="en"><![CDATA[Checks uniquenes of implementations.]]></xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath=".//jomc:implementation"/>
       <xsd:field xpath="@identifier"/>
@@ -626,7 +618,7 @@ in an inheritance hierarchy.</p>
 do not retain state across operations.</p>
 
 <p>Property {@code scope} specifies the scope instances of the implementation
-apply to. In {@code Multiton} scope, a new object is created whenever requested.
+apply to. In {@code Multition} scope new objects are created whenever requested.
 In {@code Context} scope, objects are bound to a system's context - an object is
 only created if not already available in context. In {@code Singleton} scope,
 objects are bound to a system's single instance store - an object is only
@@ -706,11 +698,7 @@ created if not already available in that single instance store.</p>]]></jaxb:jav
           <xsd:annotation>
             <xsd:appinfo>
               <jaxb:property>
-                <jaxb:javadoc><![CDATA[
-Scope this specification applies to. {@code Multiton} scope specifies that a new
-instance is to be created each time requested. {@code Context} scope specifies
-that instances are to be bound to a system's context. {@code Singleton} scope
-specifies that instances are to be bound to a system's single instance store.]]></jaxb:javadoc>
+                <jaxb:javadoc><![CDATA[Scope instances of this implementation apply to.]]></jaxb:javadoc>
               </jaxb:property>
             </xsd:appinfo>
           </xsd:annotation>
@@ -746,8 +734,7 @@ specifies that instances are to be bound to a system's single instance store.]]>
           <xsd:annotation>
             <xsd:appinfo>
               <jaxb:property>
-                <jaxb:javadoc><![CDATA[
-Identifier of an implementation this implementation inherits from or {@code null}.
+                <jaxb:javadoc><![CDATA[Identifier of an implementation this implementation inherits from or {@code null}.
 When set, this implementation will inherit up the hierarchy starting at that parent.]]></jaxb:javadoc>
               </jaxb:property>
             </xsd:appinfo>
@@ -758,8 +745,7 @@ When set, this implementation will inherit up the hierarchy starting at that par
           <xsd:annotation>
             <xsd:appinfo>
               <jaxb:property>
-                <jaxb:javadoc><![CDATA[
-Flags this implementation the final node in an inheritance hierarchy.]]></jaxb:javadoc>
+                <jaxb:javadoc><![CDATA[Flags this implementation the final node in an inheritance hierarchy.]]></jaxb:javadoc>
               </jaxb:property>
             </xsd:appinfo>
           </xsd:annotation>
@@ -769,8 +755,7 @@ Flags this implementation the final node in an inheritance hierarchy.]]></jaxb:j
           <xsd:annotation>
             <xsd:appinfo>
               <jaxb:property>
-                <jaxb:javadoc><![CDATA[
-Flags this implementation stateless.]]></jaxb:javadoc>
+                <jaxb:javadoc><![CDATA[Flags this implementation stateless.]]></jaxb:javadoc>
               </jaxb:property>
             </xsd:appinfo>
           </xsd:annotation>
@@ -813,9 +798,7 @@ the reference.]]></jaxb:javadoc>
   <xsd:element name="dependencies" type="jomc:Dependencies">
     <xsd:unique name="dependency-uniqueness">
       <xsd:annotation>
-        <xsd:documentation xml:lang="en"><![CDATA[
-          Checks dependency uniquenes.]]>
-        </xsd:documentation>
+        <xsd:documentation xml:lang="en"><![CDATA[Checks dependency uniquenes.]]></xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath=".//jomc:dependency"/>
       <xsd:field xpath="@name"/>
@@ -907,18 +890,14 @@ implementation. The {@code optional} flag indicates an optional dependency.</p>]
   <xsd:element name="properties" type="jomc:Properties">
     <xsd:unique name="property-name-uniqueness">
       <xsd:annotation>
-        <xsd:documentation xml:lang="en"><![CDATA[
-          Checks property name uniquenes.]]>
-        </xsd:documentation>
+        <xsd:documentation xml:lang="en"><![CDATA[Checks property name uniquenes.]]></xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath=".//jomc:property"/>
       <xsd:field xpath="@name"/>
     </xsd:unique>
     <xsd:unique name="property-reference-uniqueness">
       <xsd:annotation>
-        <xsd:documentation xml:lang="en"><![CDATA[
-          Checks property reference uniquenes.]]>
-        </xsd:documentation>
+        <xsd:documentation xml:lang="en"><![CDATA[Checks property reference uniquenes.]]></xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath=".//jomc:reference"/>
       <xsd:field xpath="@name"/>
@@ -954,7 +933,7 @@ implementation. The {@code optional} flag indicates an optional dependency.</p>]
            <jaxb:javadoc><![CDATA[Model of a property.
 <p>A property consists of the properties {@code name}, {@code type} and
 {@code value}. Property {@code name} holds the name uniquely identifying the
-property in a collection of properties. Property {@code type} holds the type of
+property in a set of properties. Property {@code type} holds the type of
 the property. Property {@code value} holds the properties value which is of type
 {@code type}.</p>]]></jaxb:javadoc>
         </jaxb:class>
@@ -1035,18 +1014,14 @@ the property. Property {@code value} holds the properties value which is of type
   <xsd:element name="messages" type="jomc:Messages">
     <xsd:unique name="message-name-uniqueness">
       <xsd:annotation>
-        <xsd:documentation xml:lang="en"><![CDATA[
-          Checks message identifier uniquenes.]]>
-        </xsd:documentation>
+        <xsd:documentation xml:lang="en"><![CDATA[Checks message identifier uniquenes.]]></xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath=".//jomc:message"/>
       <xsd:field xpath="@name"/>
     </xsd:unique>
     <xsd:unique name="message-reference-uniqueness">
       <xsd:annotation>
-        <xsd:documentation xml:lang="en"><![CDATA[
-          Checks message reference uniquenes.]]>
-        </xsd:documentation>
+        <xsd:documentation xml:lang="en"><![CDATA[Checks message reference uniquenes.]]></xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath=".//jomc:reference"/>
       <xsd:field xpath="@name"/>
@@ -1153,18 +1128,14 @@ format the message with.</p>]]></jaxb:javadoc>
   <xsd:element name="arguments" type="jomc:Arguments">
     <xsd:unique name="argument-name-uniqueness">
       <xsd:annotation>
-        <xsd:documentation xml:lang="en"><![CDATA[
-          Checks argument name uniquenes.]]>
-        </xsd:documentation>
+        <xsd:documentation xml:lang="en"><![CDATA[Checks argument name uniquenes.]]></xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath=".//jomc:argument"/>
       <xsd:field xpath="@name"/>
     </xsd:unique>
     <xsd:unique name="argument-index-uniqueness">
       <xsd:annotation>
-        <xsd:documentation xml:lang="en"><![CDATA[
-          Checks argument index uniquenes.]]>
-        </xsd:documentation>
+        <xsd:documentation xml:lang="en"><![CDATA[Checks argument index uniquenes.]]></xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath=".//jomc:argument"/>
       <xsd:field xpath="@index"/>
@@ -1243,9 +1214,7 @@ argument.</p>]]></jaxb:javadoc>
   <xsd:element name="instances" type="jomc:Instances">
     <xsd:unique name="instance-uniqueness">
       <xsd:annotation>
-        <xsd:documentation xml:lang="en"><![CDATA[
-          Checks instance uniquenes.]]>
-        </xsd:documentation>
+        <xsd:documentation xml:lang="en"><![CDATA[Checks instance uniquenes.]]></xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath=".//jomc:instance"/>
       <xsd:field xpath="@identifier"/>
@@ -1290,8 +1259,7 @@ the scope the instance applies to.</p>
 location declares its instance to be located outside the scope of the model.
 An implementation without a class is only available during implementation
 inheritance processing. No instance is build for such implementations. Instances
-also have no relationship to the modules theire implementations are declared in.
-</p>]]></jaxb:javadoc>
+have no relationship to the modules theire implementations are declared in.</p>]]></jaxb:javadoc>
         </jaxb:class>
       </xsd:appinfo>
     </xsd:annotation>
@@ -1365,7 +1333,7 @@ also have no relationship to the modules theire implementations are declared in.
             </xsd:appinfo>
           </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="scope" type="jomc:Identifier" use="required">
+        <xsd:attribute name="scope" type="jomc:Identifier" use="optional">
           <xsd:annotation>
             <xsd:appinfo>
               <jaxb:property>
@@ -1503,17 +1471,13 @@ version of a model object created due to the author.</p>]]></jaxb:javadoc>
   </xsd:simpleType>
   <xsd:simpleType name="Version">
     <xsd:annotation>
-      <xsd:documentation xml:lang="en"><![CDATA[
-        Restricts "xsd:string" to a maximum length of 100 characters.]]>
-      </xsd:documentation>
+      <xsd:documentation xml:lang="en"><![CDATA[Version.]]></xsd:documentation>
     </xsd:annotation>
     <xsd:restriction base="xsd:token"/>
   </xsd:simpleType>
   <xsd:simpleType name="Identifier">
     <xsd:annotation>
-      <xsd:documentation xml:lang="en"><![CDATA[
-        Identifier of an entity,]]>
-      </xsd:documentation>
+      <xsd:documentation xml:lang="en"><![CDATA[Identifier of a model object.]]></xsd:documentation>
     </xsd:annotation>
     <xsd:restriction base="xsd:token"/>
   </xsd:simpleType>
@@ -1530,8 +1494,7 @@ version of a model object created due to the author.</p>]]></jaxb:javadoc>
         <xsd:annotation>
           <xsd:appinfo>
             <jaxb:typesafeEnumMember name="NUMBER">
-              <jaxb:javadoc><![CDATA[
-Argument of type {@code java.lang.Number}.]]></jaxb:javadoc>
+              <jaxb:javadoc><![CDATA[Argument of type {@code java.lang.Number}.]]></jaxb:javadoc>
             </jaxb:typesafeEnumMember>
           </xsd:appinfo>
         </xsd:annotation>
@@ -1540,8 +1503,7 @@ Argument of type {@code java.lang.Number}.]]></jaxb:javadoc>
         <xsd:annotation>
           <xsd:appinfo>
             <jaxb:typesafeEnumMember name="DATE">
-              <jaxb:javadoc><![CDATA[
-Argument of type {@code java.util.Date}.]]></jaxb:javadoc>
+              <jaxb:javadoc><![CDATA[Argument of type {@code java.util.Date}.]]></jaxb:javadoc>
             </jaxb:typesafeEnumMember>
           </xsd:appinfo>
         </xsd:annotation>
@@ -1550,8 +1512,7 @@ Argument of type {@code java.util.Date}.]]></jaxb:javadoc>
         <xsd:annotation>
           <xsd:appinfo>
             <jaxb:typesafeEnumMember name="TIME">
-              <jaxb:javadoc><![CDATA[
-Argument of type {@code java.util.Date}.]]></jaxb:javadoc>
+              <jaxb:javadoc><![CDATA[Argument of type {@code java.util.Date}.]]></jaxb:javadoc>
             </jaxb:typesafeEnumMember>
           </xsd:appinfo>
         </xsd:annotation>
@@ -1560,8 +1521,7 @@ Argument of type {@code java.util.Date}.]]></jaxb:javadoc>
         <xsd:annotation>
           <xsd:appinfo>
             <jaxb:typesafeEnumMember name="TEXT">
-              <jaxb:javadoc><![CDATA[
-Argument of type {@code java.lang.String}.]]></jaxb:javadoc>
+              <jaxb:javadoc><![CDATA[Argument of type {@code java.lang.String}.]]></jaxb:javadoc>
             </jaxb:typesafeEnumMember>
           </xsd:appinfo>
         </xsd:annotation>
