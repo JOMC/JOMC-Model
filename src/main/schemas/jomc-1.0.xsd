@@ -603,8 +603,8 @@ implementations are allowed to exist among a set of modules (including none).]]>
 {@code version}. Property {@code identifier} holds an identifier uniquely
 identifying the implementation in a set of implementations. Property
 {@code name} holds a name of the implementation uniquely identifying the
-implementation for a specification. Property {@code class} holds the name of the
-class providing implementation instances. Property {@code location} holds an
+implementation for its specifications. Property {@code class} holds the name of
+the class providing implementation instances. Property {@code location} holds an
 URI of the location of instances of the implementation. Property
 {@code description} holds a textual description. Property {@code vendor} holds
 vendor information for the vendor providing the implementation. Property
@@ -1250,7 +1250,7 @@ argument.</p>]]></jaxb:javadoc>
 {@code implementationName}, {@code class}, {@code stateless} and {@code scope}.
 Property {@code identifier} holds an identifier uniquely identifying the
 instance in a set of instances. Property {@code implementationName} holds a name
-uniquely identifying the instance for a specification. Property {@code class}
+uniquely identifying the instance for its specifications. Property {@code class}
 holds the class of an instance. The {@code stateless} flag indicates that the
 instance does not retain state across operations. Property {@code scope} holds
 the scope the instance applies to.</p>
