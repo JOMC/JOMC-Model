@@ -618,7 +618,7 @@ in an inheritance hierarchy.</p>
 do not retain state across operations.</p>
 
 <p>Property {@code scope} specifies the scope instances of the implementation
-apply to. In {@code Multition} scope new objects are created whenever requested.
+apply to. In {@code Multiton} scope new objects are created whenever requested.
 In {@code Context} scope, objects are bound to a system's context - an object is
 only created if not already available in context. In {@code Singleton} scope,
 objects are bound to a system's single instance store - an object is only
@@ -1333,7 +1333,7 @@ have no relationship to the modules theire implementations are declared in.</p>]
             </xsd:appinfo>
           </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="scope" type="jomc:Identifier" use="optional">
+        <xsd:attribute name="scope" type="jomc:Identifier" use="required">
           <xsd:annotation>
             <xsd:appinfo>
               <jaxb:property>
