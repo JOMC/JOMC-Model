@@ -464,7 +464,11 @@ specifies that no more than one implementation of the specification is allowed
 to exist among a set of modules (including none). A specification with
 {@link Multiplicity#MANY} specifies that multiple implementations of the
 specification are allowed to exist among a set of modules (including none).</p>
-]]></jaxb:javadoc>
+
+<p>Property {@code scope} specifies the scope instances of implementations apply
+to. In {@code Singleton} scope, objects are bound to a system's single instance
+store - an object is only created if not already available in that single
+instance store.</p>]]></jaxb:javadoc>
         </jaxb:class>
       </xsd:appinfo>
     </xsd:annotation>
@@ -519,6 +523,15 @@ The implementation multiplicity of this specification. A multiplicity equal to
 specification is allowed to exist among a set of modules (including none).
 A multiplicity equal to {@link Multiplicity#MANY} specifies that many
 implementations are allowed to exist among a set of modules (including none).]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="scope" type="jomc:Identifier" use="optional">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                <jaxb:javadoc><![CDATA[Scope instances of implementations apply to or {@code null} if instances of implementations are not bound to any scope (multiton).]]></jaxb:javadoc>
               </jaxb:property>
             </xsd:appinfo>
           </xsd:annotation>
@@ -615,14 +628,7 @@ vendor information for the vendor providing the implementation. Property
 in an inheritance hierarchy.</p>
 
 <p>The {@code stateless} flag indicates that instances of the implementation
-do not retain state across operations.</p>
-
-<p>Property {@code scope} specifies the scope instances of the implementation
-apply to. In {@code Multiton} scope new objects are created whenever requested.
-In {@code Context} scope, objects are bound to a system's context - an object is
-only created if not already available in context. In {@code Singleton} scope,
-objects are bound to a system's single instance store - an object is only
-created if not already available in that single instance store.</p>]]></jaxb:javadoc>
+do not retain state across operations.</p>]]></jaxb:javadoc>
         </jaxb:class>
       </xsd:appinfo>
     </xsd:annotation>
@@ -693,21 +699,11 @@ created if not already available in that single instance store.</p>]]></jaxb:jav
             </xsd:appinfo>
           </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="scope" type="jomc:Identifier" use="optional"
-                       default="Multiton">
-          <xsd:annotation>
-            <xsd:appinfo>
-              <jaxb:property>
-                <jaxb:javadoc><![CDATA[Scope instances of this implementation apply to.]]></jaxb:javadoc>
-              </jaxb:property>
-            </xsd:appinfo>
-          </xsd:annotation>
-        </xsd:attribute>
         <xsd:attribute name="location" type="xsd:anyURI" use="optional">
           <xsd:annotation>
             <xsd:appinfo>
               <jaxb:property>
-                <jaxb:javadoc><![CDATA[An URI of the location of instances of this implementation or {@code null}.]]></jaxb:javadoc>
+                <jaxb:javadoc><![CDATA[An URI of the location providing instances of this implementation or {@code null}.]]></jaxb:javadoc>
               </jaxb:property>
             </xsd:appinfo>
           </xsd:annotation>
@@ -1247,13 +1243,12 @@ argument.</p>]]></jaxb:javadoc>
         <jaxb:class>
           <jaxb:javadoc><![CDATA[Model of an instance.
 <p>An instance consists of the properties {@code identifier},
-{@code implementationName}, {@code class}, {@code stateless} and {@code scope}.
-Property {@code identifier} holds an identifier uniquely identifying the
-instance in a set of instances. Property {@code implementationName} holds a name
-uniquely identifying the instance for its specifications. Property {@code class}
-holds the class of an instance. The {@code stateless} flag indicates that the
-instance does not retain state across operations. Property {@code scope} holds
-the scope the instance applies to.</p>
+{@code implementationName}, {@code class} and {@code stateless}. Property
+{@code identifier} holds an identifier uniquely identifying the instance in a
+set of instances. Property {@code implementationName} holds a name uniquely
+identifying the instance for its specifications. Property {@code class} holds
+the class of an instance. The {@code stateless} flag indicates that the instance
+does not retain state across operations.</p>
 
 <p>An instance is build from implementations. An implementation declaring a
 location declares its instance to be located outside the scope of the model.
@@ -1329,15 +1324,6 @@ have no relationship to the modules theire implementations are declared in.</p>]
             <xsd:appinfo>
               <jaxb:property>
                 <jaxb:javadoc><![CDATA[The class of this instance.]]></jaxb:javadoc>
-              </jaxb:property>
-            </xsd:appinfo>
-          </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="scope" type="jomc:Identifier" use="required">
-          <xsd:annotation>
-            <xsd:appinfo>
-              <jaxb:property>
-                <jaxb:javadoc><![CDATA[Scope this instance is bound to.]]></jaxb:javadoc>
               </jaxb:property>
             </xsd:appinfo>
           </xsd:annotation>

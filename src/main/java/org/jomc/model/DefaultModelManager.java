@@ -589,33 +589,43 @@ public class DefaultModelManager implements ModelManager
                         {
                             for ( Dependency d : deps.getDependency() )
                             {
-                                if ( d.getProperties() != null )
-                                {
-                                    this.assertPropertiesUniqueness( d.getProperties(), details );
-                                }
-
                                 final Specification s = modules.getSpecification( d.getIdentifier() );
 
-                                if ( s != null && s.getVersion() != null && d.getVersion() != null &&
-                                     VersionParser.compare( d.getVersion(), s.getVersion() ) > 0 )
+                                if ( s != null )
                                 {
-                                    final Module moduleOfSpecification =
-                                        modules.getModuleOfSpecification( s.getIdentifier() );
+                                    if ( s.getVersion() != null && d.getVersion() != null &&
+                                         VersionParser.compare( d.getVersion(), s.getVersion() ) > 0 )
+                                    {
+                                        final Module moduleOfSpecification =
+                                            modules.getModuleOfSpecification( s.getIdentifier() );
 
-                                    details.add( this.newIncompatibleDependencyDetail(
-                                        this.getObjectFactory().createDependency( d ),
-                                        i.getIdentifier(), m.getName(),
-                                        d.getIdentifier(), moduleOfSpecification == null
-                                                           ? "<>" : moduleOfSpecification.getName(),
-                                        d.getVersion(), s.getVersion() ) );
+                                        details.add( this.newIncompatibleDependencyDetail(
+                                            this.getObjectFactory().createDependency( d ),
+                                            i.getIdentifier(), m.getName(),
+                                            d.getIdentifier(), moduleOfSpecification == null
+                                                               ? "<>" : moduleOfSpecification.getName(),
+                                            d.getVersion(), s.getVersion() ) );
 
-                                }
+                                    }
 
-                                if ( d.getProperties() != null && !d.getProperties().getReference().isEmpty() )
-                                {
-                                    details.add( this.newDependencyPropertyReferenceConstraintDetail(
-                                        this.getObjectFactory().createDependency( d ), i, d ) );
+                                    if ( d.getProperties() != null )
+                                    {
+                                        this.assertPropertiesUniqueness( d.getProperties(), details );
 
+                                        if ( !d.getProperties().getReference().isEmpty() )
+                                        {
+                                            details.add( this.newDependencyPropertyReferenceConstraintDetail(
+                                                this.getObjectFactory().createDependency( d ), i, d ) );
+
+                                        }
+
+                                        if ( s.getScope() != null && !d.getProperties().getProperty().isEmpty() )
+                                        {
+                                            details.add( this.newPropertyOverwriteConstraintDetail(
+                                                this.getObjectFactory().createDependency( d ), i, d, s, s.getScope() ) );
+
+                                        }
+                                    }
                                 }
 
                                 final Implementations available = modules.getImplementations( d.getIdentifier() );
@@ -758,7 +768,6 @@ public class DefaultModelManager implements ModelManager
         instance.setImplementationName( implementation.getName() );
         instance.setClazz( implementation.getClazz() );
         instance.setClassLoader( classLoader );
-        instance.setScope( implementation.getScope() );
         instance.setStateless( implementation.isStateless() );
         instance.setDependencies( modules.getDependencies( implementation.getIdentifier() ) );
         instance.setProperties( modules.getProperties( implementation.getIdentifier() ) );
@@ -788,32 +797,26 @@ public class DefaultModelManager implements ModelManager
         }
 
         final Instance instance = this.getInstance( modules, implementation, classLoader );
-        if ( dependency.getProperties() != null && !dependency.getProperties().getProperty().isEmpty() )
-        {
-            if ( instance.getScope().equals( "Multiton" ) )
-            {
-                final Properties properties = new Properties();
-                properties.getProperty().addAll( dependency.getProperties().getProperty() );
+        final Specification dependencySpecification = modules.getSpecification( dependency.getIdentifier() );
 
-                if ( instance.getProperties() != null )
+        if ( dependencySpecification != null && dependencySpecification.getScope() == null &&
+             dependency.getProperties() != null && !dependency.getProperties().getProperty().isEmpty() )
+        {
+            final Properties properties = new Properties();
+            properties.getProperty().addAll( dependency.getProperties().getProperty() );
+
+            if ( instance.getProperties() != null )
+            {
+                for ( Property p : instance.getProperties().getProperty() )
                 {
-                    for ( Property p : instance.getProperties().getProperty() )
+                    if ( properties.getProperty( p.getName() ) == null )
                     {
-                        if ( properties.getProperty( p.getName() ) == null )
-                        {
-                            properties.getProperty().add( p );
-                        }
+                        properties.getProperty().add( p );
                     }
                 }
-
-                instance.setProperties( properties );
             }
-            else
-            {
-                this.log( Level.WARNING, this.getPropertyOverwriteConstraintMessage(
-                    instance.getIdentifier(), instance.getScope(), dependency.getName() ), null );
 
-            }
+            instance.setProperties( properties );
         }
 
         return instance;
@@ -1580,7 +1583,7 @@ public class DefaultModelManager implements ModelManager
             {
                 this.log( Level.WARNING, this.getMessage( "ignoringDocument", new Object[]
                     {
-                        content == null ? "<null>" : content.toString(), url.toExternalForm()
+                        content == null ? "<>" : content.toString(), url.toExternalForm()
                     } ), null );
 
             }
@@ -2020,7 +2023,6 @@ public class DefaultModelManager implements ModelManager
                         implementation.setName( name );
                         implementation.setIdentifier( specification.getIdentifier() );
                         implementation.setClazz( specification.getIdentifier() );
-                        implementation.setScope( "Multiton" );
                         implementation.setVersion( version );
 
                         final Specifications implemented = new Specifications();
@@ -2185,17 +2187,6 @@ public class DefaultModelManager implements ModelManager
 
     }
 
-    private String getPropertyOverwriteConstraintMessage( final String instance,
-                                                          final String scope,
-                                                          final String dependency )
-    {
-        return this.getMessage( "propertyOverwriteConstraint", new Object[]
-            {
-                instance, scope, dependency
-            } );
-
-    }
-
     private void assertMessagesUniqueness( final Messages messages, final List<ModelException.Detail> details )
     {
         for ( Message m : messages.getMessage() )
@@ -2336,6 +2327,22 @@ public class DefaultModelManager implements ModelManager
             Level.SEVERE, this.getMessage( "dependencyPropertyReferenceConstraint", new Object[]
             {
                 implementation.getIdentifier(), dependency.getName()
+            } ) );
+
+        detail.setElement( element );
+        return detail;
+    }
+
+    private ModelException.Detail newPropertyOverwriteConstraintDetail( final JAXBElement element,
+                                                                        final Implementation implementation,
+                                                                        final Dependency dependency,
+                                                                        final Specification specification,
+                                                                        final String scope )
+    {
+        final ModelException.Detail detail = new ModelException.Detail(
+            Level.SEVERE, this.getMessage( "propertyOverwriteConstraint", new Object[]
+            {
+                implementation.getIdentifier(), dependency.getName(), specification.getIdentifier(), scope
             } ) );
 
         detail.setElement( element );

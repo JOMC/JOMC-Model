@@ -35,6 +35,8 @@
 package org.jomc.model.test;
 
 import junit.framework.Assert;
+import junit.framework.TestCase;
+import org.jomc.model.DefaultModelManager;
 import org.jomc.model.Dependency;
 import org.jomc.model.Implementation;
 import org.jomc.model.ModelManager;
@@ -47,15 +49,36 @@ import org.jomc.model.Specification;
  * @author <a href="mailto:cs@jomc.org">Christian Schulte</a> 1.0
  * @version $Id$
  */
-public abstract class ModelManagerTest
+public class ModelManagerTest extends TestCase
 {
+
+    /** The instance tests are performed with. */
+    private ModelManager modelManager;
 
     /**
      * Gets the {@code ModelManager} instance to test.
      *
      * @return The {@code ModelManager} instance to test.
      */
-    public abstract ModelManager getModelManager();
+    public ModelManager getModelManager()
+    {
+        if ( this.modelManager == null )
+        {
+            this.modelManager = new DefaultModelManager();
+        }
+
+        return this.modelManager;
+    }
+
+    /**
+     * Sets the {@code ModelManager} instance to test.
+     *
+     * @param value The new {@code ModelManager} instance to test.
+     */
+    public void setModelManager( final ModelManager value )
+    {
+        this.modelManager = value;
+    }
 
     /** Tests the {@link ModelManager#getContext()} method. */
     public void testGetContext() throws Exception
@@ -94,7 +117,7 @@ public abstract class ModelManagerTest
     }
 
     /** Tests the {@link ModelManager#getUnmarshaller()} method. */
-    public void testgetUnmarshaller() throws Exception
+    public void testGetUnmarshaller() throws Exception
     {
         Assert.assertNotNull( this.getModelManager().getUnmarshaller( true ) );
     }
@@ -256,6 +279,32 @@ public abstract class ModelManagerTest
         try
         {
             this.getModelManager().validateModules( null );
+            throw new AssertionError();
+        }
+        catch ( NullPointerException e )
+        {
+            Assert.assertNotNull( e.getMessage() );
+            System.out.println( e.toString() );
+        }
+    }
+
+    public void testTransformModelObject() throws Exception
+    {
+        try
+        {
+            this.getModelManager().transformModelObject( null, null );
+            throw new AssertionError();
+        }
+        catch ( NullPointerException e )
+        {
+            Assert.assertNotNull( e.getMessage() );
+            System.out.println( e.toString() );
+        }
+        try
+        {
+            this.getModelManager().transformModelObject(
+                this.getModelManager().getObjectFactory().createModules( new Modules() ), null );
+
             throw new AssertionError();
         }
         catch ( NullPointerException e )
