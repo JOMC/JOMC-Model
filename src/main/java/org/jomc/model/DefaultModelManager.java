@@ -632,7 +632,8 @@ public class DefaultModelManager implements ModelManager
                                         if ( s.getScope() != null && !d.getProperties().getProperty().isEmpty() )
                                         {
                                             details.add( this.newPropertyOverwriteConstraintDetail(
-                                                this.getObjectFactory().createDependency( d ), i, d, s, s.getScope() ) );
+                                                this.getObjectFactory().createDependency( d ), i, d, s,
+                                                s.getScope() ) );
 
                                         }
                                     }
@@ -684,6 +685,13 @@ public class DefaultModelManager implements ModelManager
 
                 if ( m.getSpecifications() != null )
                 {
+                    for ( SpecificationReference r : m.getSpecifications().getReference() )
+                    {
+                        details.add( this.newModuleSpecificationReferenceConstraintDetail(
+                            this.getObjectFactory().createModule( m ), m, r ) );
+
+                    }
+
                     for ( Specification s : m.getSpecifications().getSpecification() )
                     {
                         if ( s.getProperties() != null )
@@ -2233,13 +2241,10 @@ public class DefaultModelManager implements ModelManager
         }
     }
 
-    private ModelException.Detail newIncompatibleImplementationDetail( final JAXBElement element,
-                                                                       final String implementation,
-                                                                       final String implementationModule,
-                                                                       final String specification,
-                                                                       final String specificationModule,
-                                                                       final String implementedVersion,
-                                                                       final String specifiedVersion )
+    private ModelException.Detail newIncompatibleImplementationDetail(
+        final JAXBElement<? extends ModelObject> element, final String implementation,
+        final String implementationModule, final String specification, final String specificationModule,
+        final String implementedVersion, final String specifiedVersion )
     {
         final ModelException.Detail detail =
             new ModelException.Detail( Level.SEVERE, this.getMessage( "incompatibleImplementation", new Object[]
@@ -2252,13 +2257,10 @@ public class DefaultModelManager implements ModelManager
         return detail;
     }
 
-    private ModelException.Detail newIncompatibleDependencyDetail( final JAXBElement element,
-                                                                   final String implementation,
-                                                                   final String implementationModule,
-                                                                   final String specification,
-                                                                   final String specificationModule,
-                                                                   final String requiredVersion,
-                                                                   final String availableVersion )
+    private ModelException.Detail newIncompatibleDependencyDetail(
+        final JAXBElement<? extends ModelObject> element, final String implementation,
+        final String implementationModule, final String specification, final String specificationModule,
+        final String requiredVersion, final String availableVersion )
     {
         final ModelException.Detail detail =
             new ModelException.Detail( Level.SEVERE, this.getMessage( "incompatibleDependency", new Object[]
@@ -2271,9 +2273,8 @@ public class DefaultModelManager implements ModelManager
         return detail;
     }
 
-    private ModelException.Detail newImplementationNameConstraintDetail( final JAXBElement element,
-                                                                         final String specification,
-                                                                         final String implementations )
+    private ModelException.Detail newImplementationNameConstraintDetail(
+        final JAXBElement<? extends ModelObject> element, final String specification, final String implementations )
     {
         final ModelException.Detail detail =
             new ModelException.Detail( Level.SEVERE, this.getMessage( "implementationNameConstraint", new Object[]
@@ -2285,9 +2286,8 @@ public class DefaultModelManager implements ModelManager
         return detail;
     }
 
-    private ModelException.Detail newMandatoryDependencyConstraintDetail( final JAXBElement element,
-                                                                          final String implementation,
-                                                                          final String dependencyName )
+    private ModelException.Detail newMandatoryDependencyConstraintDetail(
+        final JAXBElement<? extends ModelObject> element, final String implementation, final String dependencyName )
     {
         final ModelException.Detail detail =
             new ModelException.Detail( Level.SEVERE, this.getMessage( "mandatoryDependencyConstraint", new Object[]
@@ -2299,11 +2299,9 @@ public class DefaultModelManager implements ModelManager
         return detail;
     }
 
-    private ModelException.Detail newMultiplicityConstraintDetail( final JAXBElement element,
-                                                                   final Number implementations,
-                                                                   final String specification,
-                                                                   final Number expected,
-                                                                   final Multiplicity multiplicity )
+    private ModelException.Detail newMultiplicityConstraintDetail(
+        final JAXBElement<? extends ModelObject> element, final Number implementations, final String specification,
+        final Number expected, final Multiplicity multiplicity )
     {
         final ModelException.Detail detail =
             new ModelException.Detail( Level.SEVERE, this.getMessage( "multiplicityConstraint", new Object[]
@@ -2315,9 +2313,8 @@ public class DefaultModelManager implements ModelManager
         return detail;
     }
 
-    private ModelException.Detail newInheritanceConstraintDetail( final JAXBElement element,
-                                                                  final Implementation child,
-                                                                  final Implementation parent )
+    private ModelException.Detail newInheritanceConstraintDetail(
+        final JAXBElement<? extends ModelObject> element, final Implementation child, final Implementation parent )
     {
         final ModelException.Detail detail =
             new ModelException.Detail( Level.SEVERE, this.getMessage( "inheritanceConstraint", new Object[]
@@ -2329,9 +2326,9 @@ public class DefaultModelManager implements ModelManager
         return detail;
     }
 
-    private ModelException.Detail newDependencyPropertyReferenceConstraintDetail( final JAXBElement element,
-                                                                                  final Implementation implementation,
-                                                                                  final Dependency dependency )
+    private ModelException.Detail newDependencyPropertyReferenceConstraintDetail(
+        final JAXBElement<? extends ModelObject> element, final Implementation implementation,
+        final Dependency dependency )
     {
         final ModelException.Detail detail = new ModelException.Detail(
             Level.SEVERE, this.getMessage( "dependencyPropertyReferenceConstraint", new Object[]
@@ -2343,11 +2340,9 @@ public class DefaultModelManager implements ModelManager
         return detail;
     }
 
-    private ModelException.Detail newPropertyOverwriteConstraintDetail( final JAXBElement element,
-                                                                        final Implementation implementation,
-                                                                        final Dependency dependency,
-                                                                        final Specification specification,
-                                                                        final String scope )
+    private ModelException.Detail newPropertyOverwriteConstraintDetail(
+        final JAXBElement<? extends ModelObject> element, final Implementation implementation,
+        final Dependency dependency, final Specification specification, final String scope )
     {
         final ModelException.Detail detail = new ModelException.Detail(
             Level.SEVERE, this.getMessage( "propertyOverwriteConstraint", new Object[]
@@ -2360,12 +2355,26 @@ public class DefaultModelManager implements ModelManager
     }
 
     private ModelException.Detail newImplementationSpecificationDeclarationConstraintDetail(
-        final JAXBElement element, final Implementation implementation, final Specification specification )
+        final JAXBElement<? extends ModelObject> element, final Implementation implementation,
+        final Specification specification )
     {
         final ModelException.Detail detail = new ModelException.Detail(
             Level.SEVERE, this.getMessage( "implementationSpecificationDeclarationConstraint", new Object[]
             {
                 implementation.getIdentifier(), specification.getIdentifier()
+            } ) );
+
+        detail.setElement( element );
+        return detail;
+    }
+
+    private ModelException.Detail newModuleSpecificationReferenceConstraintDetail(
+        final JAXBElement<? extends ModelObject> element, final Module module, final SpecificationReference reference )
+    {
+        final ModelException.Detail detail = new ModelException.Detail(
+            Level.SEVERE, this.getMessage( "moduleSpecificationReferenceConstraint", new Object[]
+            {
+                module.getName(), reference.getIdentifier()
             } ) );
 
         detail.setElement( element );
