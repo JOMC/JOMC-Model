@@ -102,7 +102,8 @@
     <xsd:annotation>
       <xsd:appinfo>
         <jaxb:class>
-          <jaxb:javadoc><![CDATA[List of schemas.]]></jaxb:javadoc>
+          <jaxb:javadoc><![CDATA[List of schemas.
+@see Schema]]></jaxb:javadoc>
         </jaxb:class>
       </xsd:appinfo>
     </xsd:annotation>

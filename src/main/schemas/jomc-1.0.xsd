@@ -125,7 +125,8 @@ corresponding language.]]></jaxb:javadoc>
     <xsd:annotation>
       <xsd:appinfo>
         <jaxb:class>
-          <jaxb:javadoc><![CDATA[List of texts.]]></jaxb:javadoc>
+          <jaxb:javadoc><![CDATA[List of texts.
+@see Text]]></jaxb:javadoc>
         </jaxb:class>
       </xsd:appinfo>
     </xsd:annotation>
@@ -280,7 +281,9 @@ corresponding language.]]></jaxb:javadoc>
 <li>{@link #getMessages(java.lang.String) }</li>
 <li>{@link #getProperties(java.lang.String) }</li>
 <li>{@link #getSpecifiedProperties(java.lang.String) }</li>
-</ul></p>]]></jaxb:javadoc>
+</ul></p>
+
+@see Module]]></jaxb:javadoc>
         </jaxb:class>
       </xsd:appinfo>
     </xsd:annotation>
@@ -424,7 +427,8 @@ the module. A module defines specifications, implementations and properties.</p>
     <xsd:annotation>
       <xsd:appinfo>
         <jaxb:class>
-          <jaxb:javadoc><![CDATA[List of specications.]]></jaxb:javadoc>
+          <jaxb:javadoc><![CDATA[List of specications.
+@see Specification]]></jaxb:javadoc>
         </jaxb:class>
       </xsd:appinfo>
     </xsd:annotation>
@@ -546,7 +550,8 @@ implementations are allowed to exist among a set of modules (including none).]]>
     <xsd:annotation>
       <xsd:appinfo>
         <jaxb:class>
-           <jaxb:javadoc><![CDATA[Reference to a specification.]]></jaxb:javadoc>
+           <jaxb:javadoc><![CDATA[Reference to a specification.
+@see Specification]]></jaxb:javadoc>
         </jaxb:class>
       </xsd:appinfo>
     </xsd:annotation>
@@ -589,7 +594,8 @@ implementations are allowed to exist among a set of modules (including none).]]>
     <xsd:annotation>
       <xsd:appinfo>
         <jaxb:class>
-          <jaxb:javadoc><![CDATA[List of implementations.]]></jaxb:javadoc>
+          <jaxb:javadoc><![CDATA[List of implementations.
+@see Implementation]]></jaxb:javadoc>
         </jaxb:class>
       </xsd:appinfo>
     </xsd:annotation>
@@ -766,7 +772,8 @@ When set, this implementation will inherit up the hierarchy starting at that par
     <xsd:annotation>
       <xsd:appinfo>
         <jaxb:class>
-           <jaxb:javadoc><![CDATA[Reference to an implementation.]]></jaxb:javadoc>
+           <jaxb:javadoc><![CDATA[Reference to an implementation.
+@see Implementation]]></jaxb:javadoc>
         </jaxb:class>
       </xsd:appinfo>
     </xsd:annotation>
@@ -804,7 +811,8 @@ the reference.]]></jaxb:javadoc>
     <xsd:annotation>
       <xsd:appinfo>
         <jaxb:class>
-          <jaxb:javadoc><![CDATA[List of dependencies.]]></jaxb:javadoc>
+          <jaxb:javadoc><![CDATA[List of dependencies.
+@see Dependency]]></jaxb:javadoc>
         </jaxb:class>
       </xsd:appinfo>
     </xsd:annotation>
@@ -903,7 +911,8 @@ implementation. The {@code optional} flag indicates an optional dependency.</p>]
     <xsd:annotation>
       <xsd:appinfo>
         <jaxb:class>
-           <jaxb:javadoc><![CDATA[List of properties.]]></jaxb:javadoc>
+           <jaxb:javadoc><![CDATA[List of properties.
+@see Property]]></jaxb:javadoc>
         </jaxb:class>
       </xsd:appinfo>
     </xsd:annotation>
@@ -986,7 +995,8 @@ the property. Property {@code value} holds the properties value which is of type
     <xsd:annotation>
       <xsd:appinfo>
         <jaxb:class>
-           <jaxb:javadoc><![CDATA[Reference to a property.]]></jaxb:javadoc>
+           <jaxb:javadoc><![CDATA[Reference to a property.
+@see Property]]></jaxb:javadoc>
         </jaxb:class>
       </xsd:appinfo>
     </xsd:annotation>
@@ -1027,7 +1037,8 @@ the property. Property {@code value} holds the properties value which is of type
     <xsd:annotation>
       <xsd:appinfo>
         <jaxb:class>
-           <jaxb:javadoc><![CDATA[List of messages.]]></jaxb:javadoc>
+           <jaxb:javadoc><![CDATA[List of messages.
+@see Message]]></jaxb:javadoc>
         </jaxb:class>
       </xsd:appinfo>
     </xsd:annotation>
@@ -1100,7 +1111,8 @@ format the message with.</p>]]></jaxb:javadoc>
     <xsd:annotation>
       <xsd:appinfo>
         <jaxb:class>
-           <jaxb:javadoc><![CDATA[Reference to a message.]]></jaxb:javadoc>
+           <jaxb:javadoc><![CDATA[Reference to a message.
+@see Message]]></jaxb:javadoc>
         </jaxb:class>
       </xsd:appinfo>
     </xsd:annotation>
@@ -1141,7 +1153,8 @@ format the message with.</p>]]></jaxb:javadoc>
     <xsd:annotation>
       <xsd:appinfo>
         <jaxb:class>
-           <jaxb:javadoc><![CDATA[List of arguments.]]></jaxb:javadoc>
+           <jaxb:javadoc><![CDATA[List of arguments.
+@see Argument]]></jaxb:javadoc>
         </jaxb:class>
       </xsd:appinfo>
     </xsd:annotation>
@@ -1220,7 +1233,8 @@ argument.</p>]]></jaxb:javadoc>
     <xsd:annotation>
       <xsd:appinfo>
         <jaxb:class>
-           <jaxb:javadoc><![CDATA[List of instances.]]></jaxb:javadoc>
+           <jaxb:javadoc><![CDATA[List of instances.
+@see Instance]]></jaxb:javadoc>
         </jaxb:class>
       </xsd:appinfo>
     </xsd:annotation>
@@ -1349,7 +1363,8 @@ have no relationship to the modules theire implementations are declared in.</p>]
     <xsd:annotation>
       <xsd:appinfo>
         <jaxb:class>
-           <jaxb:javadoc><![CDATA[List of persons.]]></jaxb:javadoc>
+           <jaxb:javadoc><![CDATA[List of persons.
+@see Person]]></jaxb:javadoc>
         </jaxb:class>
       </xsd:appinfo>
     </xsd:annotation>
@@ -1408,7 +1423,8 @@ address of the person.</p>]]></jaxb:javadoc>
     <xsd:annotation>
       <xsd:appinfo>
         <jaxb:class>
-           <jaxb:javadoc><![CDATA[List of authors.]]></jaxb:javadoc>
+           <jaxb:javadoc><![CDATA[List of authors.
+@see Author]]></jaxb:javadoc>
         </jaxb:class>
       </xsd:appinfo>
     </xsd:annotation>
