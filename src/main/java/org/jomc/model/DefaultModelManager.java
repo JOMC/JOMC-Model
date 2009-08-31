@@ -559,6 +559,16 @@ public class DefaultModelManager implements ModelManager
                             this.assertPropertiesUniqueness( i.getProperties(), details );
                         }
 
+                        if ( i.getSpecifications() != null && !i.getSpecifications().getSpecification().isEmpty() )
+                        {
+                            for ( Specification s : i.getSpecifications().getSpecification() )
+                            {
+                                details.add( this.newImplementationSpecificationDeclarationConstraintDetail(
+                                    this.getObjectFactory().createImplementation( i ), i, s ) );
+
+                            }
+                        }
+
                         final Specifications specs = modules.getSpecifications( i.getIdentifier() );
                         final Dependencies deps = modules.getDependencies( i.getIdentifier() );
 
@@ -2343,6 +2353,19 @@ public class DefaultModelManager implements ModelManager
             Level.SEVERE, this.getMessage( "propertyOverwriteConstraint", new Object[]
             {
                 implementation.getIdentifier(), dependency.getName(), specification.getIdentifier(), scope
+            } ) );
+
+        detail.setElement( element );
+        return detail;
+    }
+
+    private ModelException.Detail newImplementationSpecificationDeclarationConstraintDetail(
+        final JAXBElement element, final Implementation implementation, final Specification specification )
+    {
+        final ModelException.Detail detail = new ModelException.Detail(
+            Level.SEVERE, this.getMessage( "implementationSpecificationDeclarationConstraint", new Object[]
+            {
+                implementation.getIdentifier(), specification.getIdentifier()
             } ) );
 
         detail.setElement( element );

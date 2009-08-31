@@ -880,11 +880,6 @@
 
     /**
      * Gets all specifications an implementation implements from this list of modules.
-     * <p><b>Note:</b><br/>
-     * The instance returned by this method contains specification references together with
-     * resolved specifications. When marshalling, the resulting {@code specifications} element
-     * will not validate against the schema which allows either {@code specification} elements
-     * or {@code reference} elements to appear but not both.</p>
      *
      * @param implementation The identifier of the implementation to get all implemented specifications of.
      *

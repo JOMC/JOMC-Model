@@ -410,14 +410,14 @@ the module. A module defines specifications, implementations and properties.</p>
   <xsd:element name="specifications" type="jomc:Specifications">
     <xsd:unique name="specification-uniqueness">
       <xsd:annotation>
-        <xsd:documentation xml:lang="en"><![CDATA[Checks uniquenes of specifications.]]></xsd:documentation>
+        <xsd:documentation xml:lang="en"><![CDATA[Checks uniqueness of specifications.]]></xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath=".//jomc:specification"/>
       <xsd:field xpath="@identifier"/>
     </xsd:unique>
     <xsd:unique name="specification-reference-uniqueness">
       <xsd:annotation>
-        <xsd:documentation xml:lang="en"><![CDATA[Checks uniquenes of specification references.]]></xsd:documentation>
+        <xsd:documentation xml:lang="en"><![CDATA[Checks uniqueness of specification references.]]></xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath=".//jomc:reference"/>
       <xsd:field xpath="@identifier"/>
@@ -427,21 +427,20 @@ the module. A module defines specifications, implementations and properties.</p>
     <xsd:annotation>
       <xsd:appinfo>
         <jaxb:class>
-          <jaxb:javadoc><![CDATA[List of specications.
+          <jaxb:javadoc><![CDATA[List of specifications.
 @see Specification]]></jaxb:javadoc>
         </jaxb:class>
       </xsd:appinfo>
     </xsd:annotation>
     <xsd:complexContent>
       <xsd:extension base="jomc:ModelObject">
-        <xsd:choice>
+        <xsd:sequence>
           <xsd:element ref="jomc:specification" minOccurs="0"
                        maxOccurs="unbounded"/>
           <xsd:element name="reference"
                        type="jomc:SpecificationReference"
                        minOccurs="0" maxOccurs="unbounded"/>
-
-        </xsd:choice>
+        </xsd:sequence>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -584,7 +583,7 @@ implementations are allowed to exist among a set of modules (including none).]]>
   <xsd:element name="implementations" type="jomc:Implementations">
     <xsd:unique name="implementation-uniqueness">
       <xsd:annotation>
-        <xsd:documentation xml:lang="en"><![CDATA[Checks uniquenes of implementations.]]></xsd:documentation>
+        <xsd:documentation xml:lang="en"><![CDATA[Checks uniqueness of implementations.]]></xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath=".//jomc:implementation"/>
       <xsd:field xpath="@identifier"/>
@@ -801,7 +800,7 @@ the reference.]]></jaxb:javadoc>
   <xsd:element name="dependencies" type="jomc:Dependencies">
     <xsd:unique name="dependency-uniqueness">
       <xsd:annotation>
-        <xsd:documentation xml:lang="en"><![CDATA[Checks dependency uniquenes.]]></xsd:documentation>
+        <xsd:documentation xml:lang="en"><![CDATA[Checks dependency uniqueness.]]></xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath=".//jomc:dependency"/>
       <xsd:field xpath="@name"/>
@@ -894,14 +893,14 @@ implementation. The {@code optional} flag indicates an optional dependency.</p>]
   <xsd:element name="properties" type="jomc:Properties">
     <xsd:unique name="property-name-uniqueness">
       <xsd:annotation>
-        <xsd:documentation xml:lang="en"><![CDATA[Checks property name uniquenes.]]></xsd:documentation>
+        <xsd:documentation xml:lang="en"><![CDATA[Checks property name uniqueness.]]></xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath=".//jomc:property"/>
       <xsd:field xpath="@name"/>
     </xsd:unique>
     <xsd:unique name="property-reference-uniqueness">
       <xsd:annotation>
-        <xsd:documentation xml:lang="en"><![CDATA[Checks property reference uniquenes.]]></xsd:documentation>
+        <xsd:documentation xml:lang="en"><![CDATA[Checks property reference uniqueness.]]></xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath=".//jomc:reference"/>
       <xsd:field xpath="@name"/>
@@ -1020,14 +1019,14 @@ the property. Property {@code value} holds the properties value which is of type
   <xsd:element name="messages" type="jomc:Messages">
     <xsd:unique name="message-name-uniqueness">
       <xsd:annotation>
-        <xsd:documentation xml:lang="en"><![CDATA[Checks message identifier uniquenes.]]></xsd:documentation>
+        <xsd:documentation xml:lang="en"><![CDATA[Checks message identifier uniqueness.]]></xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath=".//jomc:message"/>
       <xsd:field xpath="@name"/>
     </xsd:unique>
     <xsd:unique name="message-reference-uniqueness">
       <xsd:annotation>
-        <xsd:documentation xml:lang="en"><![CDATA[Checks message reference uniquenes.]]></xsd:documentation>
+        <xsd:documentation xml:lang="en"><![CDATA[Checks message reference uniqueness.]]></xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath=".//jomc:reference"/>
       <xsd:field xpath="@name"/>
@@ -1136,14 +1135,14 @@ format the message with.</p>]]></jaxb:javadoc>
   <xsd:element name="arguments" type="jomc:Arguments">
     <xsd:unique name="argument-name-uniqueness">
       <xsd:annotation>
-        <xsd:documentation xml:lang="en"><![CDATA[Checks argument name uniquenes.]]></xsd:documentation>
+        <xsd:documentation xml:lang="en"><![CDATA[Checks argument name uniqueness.]]></xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath=".//jomc:argument"/>
       <xsd:field xpath="@name"/>
     </xsd:unique>
     <xsd:unique name="argument-index-uniqueness">
       <xsd:annotation>
-        <xsd:documentation xml:lang="en"><![CDATA[Checks argument index uniquenes.]]></xsd:documentation>
+        <xsd:documentation xml:lang="en"><![CDATA[Checks argument index uniqueness.]]></xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath=".//jomc:argument"/>
       <xsd:field xpath="@index"/>
@@ -1223,7 +1222,7 @@ argument.</p>]]></jaxb:javadoc>
   <xsd:element name="instances" type="jomc:Instances">
     <xsd:unique name="instance-uniqueness">
       <xsd:annotation>
-        <xsd:documentation xml:lang="en"><![CDATA[Checks instance uniquenes.]]></xsd:documentation>
+        <xsd:documentation xml:lang="en"><![CDATA[Checks instance uniqueness.]]></xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath=".//jomc:instance"/>
       <xsd:field xpath="@identifier"/>
@@ -1370,10 +1369,10 @@ have no relationship to the modules theire implementations are declared in.</p>]
     </xsd:annotation>
     <xsd:complexContent>
       <xsd:extension base="jomc:ModelObject">
-        <xsd:choice>
+        <xsd:sequence>
           <xsd:element name="person" type="jomc:Person" minOccurs="0"
                        maxOccurs="unbounded"/>
-        </xsd:choice>
+        </xsd:sequence>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -1430,10 +1429,10 @@ address of the person.</p>]]></jaxb:javadoc>
     </xsd:annotation>
     <xsd:complexContent>
       <xsd:extension base="jomc:ModelObject">
-        <xsd:choice>
+        <xsd:sequence>
           <xsd:element name="author" type="jomc:Author" minOccurs="0"
                        maxOccurs="unbounded"/>
-        </xsd:choice>
+        </xsd:sequence>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
