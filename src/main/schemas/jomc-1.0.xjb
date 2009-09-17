@@ -112,6 +112,37 @@
     }
 
     /**
+     * Gets a specification for a given class from the list of specifications.
+     *
+     * @param specification The class of the specification to return.
+     *
+     * @return The specification identified by {@code specification} from the list or {@code null}, if no specification
+     * matching {@code specification} is found.
+     *
+     * @throws NullPointerException if {@code specification} is {@code null}.
+     *
+     * @see #getSpecification()
+     */
+    public Specification getSpecification( final Class specification )
+    {
+        if ( specification == null )
+        {
+            throw new NullPointerException( "specification" );
+        }
+
+        for ( Specification s : this.getSpecification() )
+        {
+            if ( specification.getName().equals( s.getIdentifier() ) &&
+                 s.getIdentifier().equals( s.getClazz() ) )
+            {
+                return s;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Gets a specification reference for a given identifier from the list of
      * references.
      *
@@ -204,7 +235,7 @@
     }
 
     /**
-     * Gets an implementation for a given clazz from the list.
+     * Gets an implementation for a given class from the list.
      *
      * @param implementation The class of the implementation to return.
      *
@@ -879,6 +910,40 @@
     }
 
     /**
+     * Gets a specification for a given class from this list of modules.
+     *
+     * @param specification The class of the specification to return.
+     *
+     * @return The specification identified by {@code specification} from the list or {@code null},
+     * if no specification matching {@code specification} is found.
+     *
+     * @throws NullPointerException if {@code specification} is {@code null}.
+     *
+     * @see #getModule()
+     */
+    public Specification getSpecification( final Class specification )
+    {
+        if ( specification == null )
+        {
+            throw new NullPointerException( "specification" );
+        }
+
+        for ( Module m : this.getModule() )
+        {
+            if ( m.getSpecifications() != null )
+            {
+                final Specification s = m.getSpecifications().getSpecification( specification );
+                if ( s != null )
+                {
+                    return s;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Gets all specifications an implementation implements from this list of modules.
      *
      * @param implementation The identifier of the implementation to get all implemented specifications of.
@@ -899,6 +964,69 @@
 
         final Specifications specs = new Specifications();
         this.collectSpecifications( implementation, specs );
+
+        Implementation declaration = null;
+        final Implementation impl = this.getImplementation( implementation );
+
+        if ( impl != null && impl.getClazz() != null && !impl.getIdentifier().equals( impl.getClazz() ) )
+        {
+            for ( Module m : this.getModule() )
+            {
+                if ( m.getImplementations() != null )
+                {
+                    for ( Implementation i : m.getImplementations().getImplementation() )
+                    {
+                        if ( i.getClazz() != null && i.getClazz().equals( i.getIdentifier() ) &&
+                             i.getClazz().equals( impl.getClazz() ) )
+                        {
+                            declaration = i;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        if ( declaration != null )
+        {
+            final Specifications declaredSpecifications = this.getSpecifications( declaration.getIdentifier() );
+            if ( declaredSpecifications != null )
+            {
+                for ( SpecificationReference r : declaredSpecifications.getReference() )
+                {
+                    if ( specs.getReference( r.getIdentifier() ) == null )
+                    {
+                        specs.getReference().add( r );
+                        final Specification s = declaredSpecifications.getSpecification( r.getIdentifier() );
+                        if ( s != null )
+                        {
+                            specs.getSpecification().add( s );
+                        }
+                    }
+                }
+            }
+        }
+
+        java.util.Collections.sort( specs.getSpecification(), new java.util.Comparator<Specification>()
+        {
+
+            public int compare( final Specification o1, final Specification o2 )
+            {
+                return o1.getIdentifier().compareTo( o2.getIdentifier() );
+            }
+
+        } );
+
+        java.util.Collections.sort( specs.getReference(), new java.util.Comparator<SpecificationReference>()
+        {
+
+            public int compare( final SpecificationReference o1, final SpecificationReference o2 )
+            {
+                return o1.getIdentifier().compareTo( o2.getIdentifier() );
+            }
+
+        } );
+
         return specs.getSpecification().isEmpty() && specs.getReference().isEmpty() ? null : specs;
     }
 
@@ -908,11 +1036,6 @@
 
         if ( i != null )
         {
-            if ( i.getParent() != null )
-            {
-                this.collectSpecifications( i.getParent(), specifications );
-            }
-
             if ( i.getSpecifications() != null )
             {
                 for ( SpecificationReference r : i.getSpecifications().getReference() )
@@ -928,6 +1051,11 @@
                         }
                     }
                 }
+            }
+
+            if ( i.getParent() != null )
+            {
+                this.collectSpecifications( i.getParent(), specifications );
             }
         }
     }
@@ -1055,6 +1183,44 @@
 
         final Dependencies dependencies = new Dependencies();
         this.collectDependencies( implementation, dependencies );
+
+        Implementation declaration = null;
+        final Implementation impl = this.getImplementation( implementation );
+
+        if ( impl != null && impl.getClazz() != null && !impl.getIdentifier().equals( impl.getClazz() ) )
+        {
+            for ( Module m : this.getModule() )
+            {
+                if ( m.getImplementations() != null )
+                {
+                    for ( Implementation i : m.getImplementations().getImplementation() )
+                    {
+                        if ( i.getClazz() != null && i.getClazz().equals( i.getIdentifier() ) &&
+                             i.getClazz().equals( impl.getClazz() ) )
+                        {
+                            declaration = i;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        if ( declaration != null )
+        {
+            final Dependencies declaredDependencies = this.getDependencies( declaration.getIdentifier() );
+            if ( declaredDependencies != null )
+            {
+                for ( Dependency d : declaredDependencies.getDependency() )
+                {
+                    if ( dependencies.getDependency( d.getName() ) == null )
+                    {
+                        dependencies.getDependency().add( d );
+                    }
+                }
+            }
+        }
+
         java.util.Collections.sort( dependencies.getDependency(), new java.util.Comparator<Dependency>()
         {
 
@@ -1078,7 +1244,26 @@
             {
                 for ( Dependency d : i.getDependencies().getDependency() )
                 {
-                    if ( dependencies.getDependency( d.getName() ) == null )
+                    final Dependency dependency = dependencies.getDependency( d.getName() );
+                    if ( dependency != null )
+                    {
+                        if ( d.getProperties() != null )
+                        {
+                            if ( dependency.getProperties() == null )
+                            {
+                                dependency.setProperties( new Properties() );
+                            }
+
+                            for ( Property p : d.getProperties().getProperty() )
+                            {
+                                if ( dependency.getProperties().getProperty( p.getName() ) == null )
+                                {
+                                    dependency.getProperties().getProperty().add( p );
+                                }
+                            }
+                        }
+                    }
+                    else
                     {
                         dependencies.getDependency().add( d );
                     }
@@ -1113,9 +1298,47 @@
 
         final Properties properties = new Properties();
         this.collectProperties( implementation, properties );
+
+        Implementation declaration = null;
+        final Implementation impl = this.getImplementation( implementation );
+
+        if ( impl != null && impl.getClazz() != null && !impl.getIdentifier().equals( impl.getClazz() ) )
+        {
+            for ( Module m : this.getModule() )
+            {
+                if ( m.getImplementations() != null )
+                {
+                    for ( Implementation i : m.getImplementations().getImplementation() )
+                    {
+                        if ( i.getClazz() != null && i.getClazz().equals( i.getIdentifier() ) &&
+                             i.getClazz().equals( impl.getClazz() ) )
+                        {
+                            declaration = i;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        if ( declaration != null )
+        {
+            final Properties declaredProperties = this.getProperties( declaration.getIdentifier() );
+            if ( declaredProperties != null )
+            {
+                for ( Property p : declaredProperties.getProperty() )
+                {
+                    if ( properties.getProperty( p.getName() ) == null )
+                    {
+                        properties.getProperty().add( p );
+                    }
+                }
+            }
+        }
+
         final Properties specified = this.getSpecifiedProperties( implementation );
 
-        if ( properties != null && specified != null )
+        if ( specified != null )
         {
             for ( Property p : specified.getProperty() )
             {
@@ -1246,6 +1469,43 @@
         final Messages msgs = new Messages();
         this.collectMessages( implementation, msgs );
 
+        Implementation declaration = null;
+        final Implementation impl = this.getImplementation( implementation );
+
+        if ( impl != null && impl.getClazz() != null && !impl.getIdentifier().equals( impl.getClazz() ) )
+        {
+            for ( Module m : this.getModule() )
+            {
+                if ( m.getImplementations() != null )
+                {
+                    for ( Implementation i : m.getImplementations().getImplementation() )
+                    {
+                        if ( i.getClazz() != null && i.getClazz().equals( i.getIdentifier() ) &&
+                             i.getClazz().equals( impl.getClazz() ) )
+                        {
+                            declaration = i;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        if ( declaration != null )
+        {
+            final Messages declaredMessages = this.getMessages( declaration.getIdentifier() );
+            if ( declaredMessages != null )
+            {
+                for ( Message m : declaredMessages.getMessage() )
+                {
+                    if ( msgs.getMessage( m.getName() ) == null )
+                    {
+                        msgs.getMessage().add( m );
+                    }
+                }
+            }
+        }
+
         java.util.Collections.sort( msgs.getMessage(), new java.util.Comparator<Message>()
         {
 
@@ -1353,14 +1613,14 @@
         final Modules copy = this.clone();
         final Module mergedModule = new Module();
 
-        for ( Module module : copy.getModule() )
+        for ( Module m : copy.getModule() )
         {
             final java.util.Set<String> referencedMessages = new java.util.HashSet<String>();
             final java.util.Set<String> referencedProperties = new java.util.HashSet<String>();
 
-            if ( module.getImplementations() != null )
+            if ( m.getImplementations() != null )
             {
-                for ( Implementation i : module.getImplementations().getImplementation() )
+                for ( Implementation i : m.getImplementations().getImplementation() )
                 {
                     if ( mergedModule.getImplementations() == null )
                     {
@@ -1373,7 +1633,7 @@
                               it.hasNext(); )
                         {
                             final String messageName = it.next().getName();
-                            i.getMessages().getMessage().add( module.getMessages().getMessage( messageName ) );
+                            i.getMessages().getMessage().add( m.getMessages().getMessage( messageName ) );
                             referencedMessages.add( messageName );
                             it.remove();
                         }
@@ -1385,9 +1645,7 @@
                               it.hasNext(); )
                         {
                             final String propertyName = it.next().getName();
-                            i.getProperties().getProperty().add(
-                                module.getProperties().getProperty( propertyName ) );
-
+                            i.getProperties().getProperty().add( m.getProperties().getProperty( propertyName ) );
                             referencedProperties.add( propertyName );
                             it.remove();
                         }
@@ -1397,14 +1655,14 @@
                 }
             }
 
-            if ( module.getSpecifications() != null )
+            if ( m.getSpecifications() != null )
             {
                 if ( mergedModule.getSpecifications() == null )
                 {
                     mergedModule.setSpecifications( new Specifications() );
                 }
 
-                for ( Specification s : module.getSpecifications().getSpecification() )
+                for ( Specification s : m.getSpecifications().getSpecification() )
                 {
                     if ( s.getProperties() != null && !s.getProperties().getReference().isEmpty() )
                     {
@@ -1412,9 +1670,7 @@
                               it.hasNext(); )
                         {
                             final String propertyName = it.next().getName();
-                            s.getProperties().getProperty().add(
-                                module.getProperties().getProperty( propertyName ) );
-
+                            s.getProperties().getProperty().add( m.getProperties().getProperty( propertyName ) );
                             referencedProperties.add( propertyName );
                             it.remove();
                         }
@@ -1426,7 +1682,7 @@
 
             for ( String messageName : referencedMessages )
             {
-                for ( java.util.Iterator<Message> it = module.getMessages().getMessage().iterator(); it.hasNext(); )
+                for ( java.util.Iterator<Message> it = m.getMessages().getMessage().iterator(); it.hasNext(); )
                 {
                     if ( messageName.equals( it.next().getName() ) )
                     {
@@ -1438,7 +1694,7 @@
 
             for ( String propertyName : referencedProperties )
             {
-                for ( java.util.Iterator<Property> it = module.getProperties().getProperty().iterator(); it.hasNext(); )
+                for ( java.util.Iterator<Property> it = m.getProperties().getProperty().iterator(); it.hasNext(); )
                 {
                     if ( propertyName.equals( it.next().getName() ) )
                     {
@@ -1448,24 +1704,24 @@
                 }
             }
 
-            if ( module.getProperties() != null && !module.getProperties().getProperty().isEmpty() )
+            if ( m.getProperties() != null && !m.getProperties().getProperty().isEmpty() )
             {
                 if ( mergedModule.getProperties() == null )
                 {
                     mergedModule.setProperties( new Properties() );
                 }
 
-                mergedModule.getProperties().getProperty().addAll( module.getProperties().getProperty() );
+                mergedModule.getProperties().getProperty().addAll( m.getProperties().getProperty() );
             }
 
-            if ( module.getMessages() != null && !module.getMessages().getMessage().isEmpty() )
+            if ( m.getMessages() != null && !m.getMessages().getMessage().isEmpty() )
             {
                 if ( mergedModule.getMessages() == null )
                 {
                     mergedModule.setMessages( new Messages() );
                 }
 
-                mergedModule.getMessages().getMessage().addAll( module.getMessages().getMessage() );
+                mergedModule.getMessages().getMessage().addAll( m.getMessages().getMessage() );
             }
         }
 

@@ -46,6 +46,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -711,9 +712,12 @@ public class DefaultModelManager implements ModelManager
                                 {
                                     details.add( this.newImplementationNameConstraintDetail(
                                         this.getObjectFactory().createSpecification( s ), s.getIdentifier(),
-                                        i.getIdentifier() + ", " + map.get( i.getName() ).getIdentifier() ) );
+                                        i.getIdentifier() + ", " + map.get( i.getName() ).getIdentifier(),
+                                        i.getName() ) );
 
                                 }
+
+                                map.put( i.getName(), i );
                             }
 
                             if ( s.getMultiplicity() == Multiplicity.ONE && impls.getImplementation().size() > 1 )
@@ -899,7 +903,7 @@ public class DefaultModelManager implements ModelManager
 
         try
         {
-            final Class specClass = Class.forName( specification.getIdentifier(), true, instance.getClassLoader() );
+            final Class specClass = Class.forName( specification.getClazz(), true, instance.getClassLoader() );
             final Class clazz = Class.forName( instance.getClazz(), true, instance.getClassLoader() );
 
             if ( Modifier.isPublic( clazz.getModifiers() ) )
@@ -1567,6 +1571,7 @@ public class DefaultModelManager implements ModelManager
                 location
             } ), null );
 
+        final long t0 = System.currentTimeMillis();
         final Text text = new Text();
         text.setLanguage( "en" );
         text.setValue( this.getMessage( "classpathModulesInfo", new Object[]
@@ -1582,8 +1587,10 @@ public class DefaultModelManager implements ModelManager
         final Unmarshaller u = this.getUnmarshaller( false );
         final Enumeration<URL> resources = this.getClassLoader().getResources( location );
 
+        Integer count = 0;
         while ( resources.hasMoreElements() )
         {
+            count++;
             final URL url = resources.nextElement();
 
             this.log( Level.FINE, this.getMessage( "processing", new Object[]
@@ -1606,6 +1613,11 @@ public class DefaultModelManager implements ModelManager
 
             }
         }
+
+        this.log( Level.FINE, this.getMessage( "classpathReport", new Object[]
+            {
+                count, new Date( System.currentTimeMillis() - t0 )
+            } ), null );
 
         return mods;
     }
@@ -1698,6 +1710,7 @@ public class DefaultModelManager implements ModelManager
                 location
             } ), null );
 
+        final long t0 = System.currentTimeMillis();
         final List<Transformer> transformers = new LinkedList<Transformer>();
         final TransformerFactory transformerFactory = TransformerFactory.newInstance();
         final Enumeration<URL> resources = this.getClassLoader().getResources( location );
@@ -1757,8 +1770,10 @@ public class DefaultModelManager implements ModelManager
         transformerFactory.setErrorListener( errorListener );
         transformerFactory.setURIResolver( uriResolver );
 
+        Integer count = 0;
         while ( resources.hasMoreElements() )
         {
+            count++;
             final URL url = resources.nextElement();
 
             this.log( Level.FINE, this.getMessage( "processing", new Object[]
@@ -1774,6 +1789,11 @@ public class DefaultModelManager implements ModelManager
             transformer.setURIResolver( uriResolver );
             transformers.add( transformer );
         }
+
+        this.log( Level.FINE, this.getMessage( "classpathReport", new Object[]
+            {
+                count, new Date( System.currentTimeMillis() - t0 )
+            } ), null );
 
         return transformers;
     }
@@ -1926,6 +1946,7 @@ public class DefaultModelManager implements ModelManager
 
                     specification = new Specification();
                     specification.setIdentifier( identifier );
+                    specification.setClazz( classpathSpec.getName() );
                     specification.setMultiplicity( Multiplicity.MANY );
                     specification.setVendor( vendor );
                     specification.setVersion( version );
@@ -1976,7 +1997,7 @@ public class DefaultModelManager implements ModelManager
 
             try
             {
-                final Class classpathImpl = Class.forName( specification.getIdentifier(), true, this.getClassLoader() );
+                final Class classpathImpl = Class.forName( specification.getClazz(), true, this.getClassLoader() );
                 boolean classpathImplementation = false;
 
                 if ( Modifier.isPublic( classpathImpl.getModifiers() ) )
@@ -1985,7 +2006,7 @@ public class DefaultModelManager implements ModelManager
                     {
                         try
                         {
-                            classpathImpl.getConstructor( new Class[ 0 ] );
+                            classpathImpl.getConstructor( NO_CLASSES );
                             name = "init";
                             classpathImplementation = true;
                         }
@@ -1997,13 +2018,12 @@ public class DefaultModelManager implements ModelManager
                                 } ), null );
 
                         }
-
                     }
 
                     if ( !classpathImplementation )
                     {
-                        final char[] c = specification.getIdentifier().substring(
-                            specification.getIdentifier().lastIndexOf( '.' ) + 1 ).toCharArray();
+                        final char[] c = classpathImpl.getName().substring(
+                            classpathImpl.getPackage().getName().length() + 1 ).toCharArray();
 
                         name = String.valueOf( c );
                         c[0] = Character.toUpperCase( c[0] );
@@ -2040,7 +2060,7 @@ public class DefaultModelManager implements ModelManager
                         implementation.setFinal( true );
                         implementation.setName( name );
                         implementation.setIdentifier( specification.getIdentifier() );
-                        implementation.setClazz( specification.getIdentifier() );
+                        implementation.setClazz( classpathImpl.getName() );
                         implementation.setVersion( version );
 
                         final Specifications implemented = new Specifications();
@@ -2091,7 +2111,7 @@ public class DefaultModelManager implements ModelManager
 
         try
         {
-            final Method m = clazz.getMethod( methodName, new Class[ 0 ] );
+            final Method m = clazz.getMethod( methodName, NO_CLASSES );
             factoryMethod = Modifier.isStatic( m.getModifiers() ) && type.isAssignableFrom( m.getReturnType() );
         }
         catch ( NoSuchMethodException e )
@@ -2274,12 +2294,13 @@ public class DefaultModelManager implements ModelManager
     }
 
     private ModelException.Detail newImplementationNameConstraintDetail(
-        final JAXBElement<? extends ModelObject> element, final String specification, final String implementations )
+        final JAXBElement<? extends ModelObject> element, final String specification, final String implementations,
+        final String nonUniqueName )
     {
         final ModelException.Detail detail =
             new ModelException.Detail( Level.SEVERE, this.getMessage( "implementationNameConstraint", new Object[]
             {
-                specification, implementations
+                specification, implementations, nonUniqueName
             } ) );
 
         detail.setElement( element );

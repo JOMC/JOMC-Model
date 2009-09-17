@@ -270,6 +270,7 @@ corresponding language.]]></jaxb:javadoc>
 <li>{@link #getMergedModule() }</li>
 <li>{@link #getSpecifications() }</li>
 <li>{@link #getSpecification(java.lang.String) }</li>
+<li>{@link #getSpecification(java.lang.Class) }</li>
 <li>{@link #getModuleOfSpecification(java.lang.String) }</li>
 <li>{@link #getImplementations() }</li>
 <li>{@link #getImplementation(java.lang.String) }</li>
@@ -373,6 +374,8 @@ the module. A module defines specifications, implementations and properties.</p>
               </xsd:appinfo>
             </xsd:annotation>
           </xsd:element>
+          <xsd:any namespace="##other" processContents="lax" minOccurs="0"
+                   maxOccurs="unbounded"/>
         </xsd:sequence>
         <xsd:attribute name="name" type="jomc:Identifier" use="required">
           <xsd:annotation>
@@ -453,13 +456,14 @@ the module. A module defines specifications, implementations and properties.</p>
       <xsd:appinfo>
         <jaxb:class>
           <jaxb:javadoc><![CDATA[Model of a specification.
-<p>A specification consists of the properties {@code identifier},
+<p>A specification consists of the properties {@code identifier}, {@code class},
 {@code vendor}, {@code description} and {@code version}. Property
 {@code identifier} holds an identifier uniquely identifying the specification in
-a set of specifications. Property {@code vendor} holds vendor information for
-the vendor providing the specification. Property {@code description} holds a
-textual description and property {@code version} holds a textual version of the
-specification.
+a set of specifications. Property {@code class} holds the name of the class
+providing the programming interface of the specification. Property
+{@code vendor} holds vendor information for the vendor providing the
+specification. Property {@code description} holds a textual description and
+property {@code version} holds a textual version of the specification.
 
 <p>Property {@code multiplicity} specifies the number of implementations allowed
 to exist among a set of modules. A specification with {@link Multiplicity#ONE}
@@ -487,12 +491,23 @@ instance store.</p>]]></jaxb:javadoc>
               </xsd:appinfo>
             </xsd:annotation>
           </xsd:element>
+          <xsd:any namespace="##other" processContents="lax" minOccurs="0"
+                   maxOccurs="unbounded"/>
         </xsd:sequence>
         <xsd:attribute name="identifier" type="jomc:Identifier" use="required">
           <xsd:annotation>
             <xsd:appinfo>
               <jaxb:property>
                 <jaxb:javadoc><![CDATA[The identifier of this specification.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="class" type="jomc:Identifier" use="required">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                <jaxb:javadoc><![CDATA[The name of the class providing the programming interface of this specification.]]></jaxb:javadoc>
               </jaxb:property>
             </xsd:appinfo>
           </xsd:annotation>
@@ -676,6 +691,8 @@ do not retain state across operations.</p>]]></jaxb:javadoc>
               </xsd:appinfo>
             </xsd:annotation>
           </xsd:element>
+          <xsd:any namespace="##other" processContents="lax" minOccurs="0"
+                   maxOccurs="unbounded"/>
         </xsd:sequence>
         <xsd:attribute name="identifier" type="jomc:Identifier" use="required">
           <xsd:annotation>
@@ -854,6 +871,8 @@ implementation. The {@code optional} flag indicates an optional dependency.</p>]
               </xsd:appinfo>
             </xsd:annotation>
           </xsd:element>
+          <xsd:any namespace="##other" processContents="lax" minOccurs="0"
+                   maxOccurs="unbounded"/>
         </xsd:sequence>
         <xsd:attribute name="name" type="jomc:Identifier" use="required">
           <xsd:annotation>
@@ -1090,6 +1109,8 @@ format the message with.</p>]]></jaxb:javadoc>
               </xsd:appinfo>
             </xsd:annotation>
           </xsd:element>
+          <xsd:any namespace="##other" processContents="lax" minOccurs="0"
+                   maxOccurs="unbounded"/>
         </xsd:sequence>
         <xsd:attribute name="name" type="jomc:Identifier" use="required">
           <xsd:annotation>
@@ -1185,6 +1206,10 @@ argument.</p>]]></jaxb:javadoc>
     </xsd:annotation>
     <xsd:complexContent>
       <xsd:extension base="jomc:ModelObject">
+        <xsd:sequence>
+          <xsd:any namespace="##other" processContents="lax" minOccurs="0"
+                   maxOccurs="unbounded"/>
+        </xsd:sequence>
         <xsd:attribute name="index" type="xsd:int" use="required">
           <xsd:annotation>
             <xsd:appinfo>
@@ -1310,6 +1335,8 @@ have no relationship to the modules theire implementations are declared in.</p>]
               </xsd:appinfo>
             </xsd:annotation>
           </xsd:element>
+          <xsd:any namespace="##other" processContents="lax" minOccurs="0"
+                   maxOccurs="unbounded"/>
         </xsd:sequence>
         <xsd:attribute name="identifier" type="jomc:Identifier"
                        use="required">
@@ -1393,6 +1420,18 @@ address of the person.</p>]]></jaxb:javadoc>
     </xsd:annotation>
     <xsd:complexContent>
       <xsd:extension base="jomc:ModelObject">
+        <xsd:sequence>
+          <xsd:any namespace="##other" processContents="lax" minOccurs="0"
+                   maxOccurs="unbounded">
+            <xsd:annotation>
+              <xsd:appinfo>
+                <jaxb:property>
+                  <jaxb:javadoc><![CDATA[Elements from other namespaces.]]></jaxb:javadoc>
+                </jaxb:property>
+              </xsd:appinfo>
+            </xsd:annotation>
+          </xsd:any>
+        </xsd:sequence>
         <xsd:attribute name="name" type="jomc:String" use="required">
           <xsd:annotation>
             <xsd:appinfo>
