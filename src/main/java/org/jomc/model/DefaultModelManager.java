@@ -46,7 +46,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -89,10 +88,8 @@ import org.jomc.util.WeakIdentityHashMap;
 import org.w3c.dom.ls.LSInput;
 import org.w3c.dom.ls.LSResourceResolver;
 import org.xml.sax.EntityResolver;
-import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 
 /**
  * Default {@code ModelManager} implementation.
@@ -218,7 +215,7 @@ public class DefaultModelManager implements ModelManager
                             }
                         }
                     }
-                    catch ( URISyntaxException e )
+                    catch ( final URISyntaxException e )
                     {
                         log( Level.WARNING, getMessage( "unsupportedSystemIdUri", new Object[]
                             {
@@ -227,7 +224,7 @@ public class DefaultModelManager implements ModelManager
 
                         schemaSource = null;
                     }
-                    catch ( JAXBException e )
+                    catch ( final JAXBException e )
                     {
                         throw (IOException) new IOException( e.getMessage() ).initCause( e );
                     }
@@ -345,7 +342,7 @@ public class DefaultModelManager implements ModelManager
                         }
 
                     }
-                    catch ( SAXException e )
+                    catch ( final SAXException e )
                     {
                         log( Level.WARNING, getMessage( "unsupportedSystemIdUri", new Object[]
                             {
@@ -354,7 +351,7 @@ public class DefaultModelManager implements ModelManager
 
                         input = null;
                     }
-                    catch ( IOException e )
+                    catch ( final IOException e )
                     {
                         log( Level.WARNING, getMessage( "unsupportedSystemIdUri", new Object[]
                             {
@@ -397,9 +394,9 @@ public class DefaultModelManager implements ModelManager
     {
         if ( this.context == null )
         {
-            final StringBuffer pkgs = new StringBuffer();
+            final StringBuilder pkgs = new StringBuilder();
 
-            for ( Iterator<Schema> s = this.getSchemas().getSchema().iterator(); s.hasNext(); )
+            for ( final Iterator<Schema> s = this.getSchemas().getSchema().iterator(); s.hasNext(); )
             {
                 pkgs.append( s.next().getContextId() );
                 if ( s.hasNext() )
@@ -427,9 +424,9 @@ public class DefaultModelManager implements ModelManager
         throws IOException, SAXException, JAXBException
     {
         final Marshaller m = this.getContext().createMarshaller();
-        final StringBuffer schemaLocation = new StringBuffer();
+        final StringBuilder schemaLocation = new StringBuilder();
 
-        for ( Iterator<Schema> it = this.getSchemas().getSchema().iterator(); it.hasNext(); )
+        for ( final Iterator<Schema> it = this.getSchemas().getSchema().iterator(); it.hasNext(); )
         {
             final Schema s = it.next();
             schemaLocation.append( s.getPublicId() ).append( ' ' ).append( s.getSystemId() );
@@ -472,51 +469,19 @@ public class DefaultModelManager implements ModelManager
         }
 
         final StringWriter stringWriter = new StringWriter();
-        final List<ModelException.Detail> details = new LinkedList<ModelException.Detail>();
         final Validator validator = this.getSchema().newValidator();
-        validator.setErrorHandler( new ErrorHandler()
-        {
-
-            public void warning( final SAXParseException exception ) throws SAXException
-            {
-                if ( exception.getMessage() != null )
-                {
-                    details.add( new ModelException.Detail( Level.WARNING, exception.getMessage() ) );
-                }
-            }
-
-            public void error( final SAXParseException exception ) throws SAXException
-            {
-                if ( exception.getMessage() != null )
-                {
-                    details.add( new ModelException.Detail( Level.SEVERE, exception.getMessage() ) );
-                }
-
-                throw exception;
-            }
-
-            public void fatalError( final SAXParseException exception ) throws SAXException
-            {
-                if ( exception.getMessage() != null )
-                {
-                    details.add( new ModelException.Detail( Level.SEVERE, exception.getMessage() ) );
-                }
-
-                throw exception;
-            }
-
-        } );
-
+        final ModelExceptionErrorHandler errorHandler = new ModelExceptionErrorHandler();
+        validator.setErrorHandler( errorHandler );
         this.getMarshaller( false, false ).marshal( modelObject, stringWriter );
 
         try
         {
             validator.validate( new StreamSource( new StringReader( stringWriter.toString() ) ) );
         }
-        catch ( SAXException e )
+        catch ( final SAXException e )
         {
             final ModelException modelException = new ModelException( e.getMessage(), e );
-            modelException.getDetails().addAll( details );
+            modelException.getDetails().addAll( errorHandler.getDetails() );
             throw modelException;
         }
     }
@@ -739,11 +704,11 @@ public class DefaultModelManager implements ModelManager
                 throw modelException;
             }
         }
-        catch ( TokenMgrError e )
+        catch ( final TokenMgrError e )
         {
             throw new ModelException( e.getMessage(), e );
         }
-        catch ( ParseException e )
+        catch ( final ParseException e )
         {
             throw new ModelException( e.getMessage(), e );
         }
@@ -751,7 +716,7 @@ public class DefaultModelManager implements ModelManager
 
     public <T extends ModelObject> T transformModelObject(
         final JAXBElement<T> modelObject, final Transformer transformer )
-        throws NullPointerException, IOException, SAXException, JAXBException, TransformerException
+        throws IOException, SAXException, JAXBException, TransformerException
     {
         if ( modelObject == null )
         {
@@ -769,8 +734,7 @@ public class DefaultModelManager implements ModelManager
         return ( (JAXBElement<T>) result.getResult() ).getValue();
     }
 
-    public Instance getInstance( final Modules modules, final Implementation implementation,
-                                 final ClassLoader classLoader )
+    public Instance getInstance( final Modules modules, final Implementation implementation, final ClassLoader cl )
     {
         if ( modules == null )
         {
@@ -780,7 +744,7 @@ public class DefaultModelManager implements ModelManager
         {
             throw new NullPointerException( "implementation" );
         }
-        if ( classLoader == null )
+        if ( cl == null )
         {
             throw new NullPointerException( "classLoader" );
         }
@@ -789,7 +753,7 @@ public class DefaultModelManager implements ModelManager
         instance.setIdentifier( implementation.getIdentifier() );
         instance.setImplementationName( implementation.getName() );
         instance.setClazz( implementation.getClazz() );
-        instance.setClassLoader( classLoader );
+        instance.setClassLoader( cl );
         instance.setStateless( implementation.isStateless() );
         instance.setDependencies( modules.getDependencies( implementation.getIdentifier() ) );
         instance.setProperties( modules.getProperties( implementation.getIdentifier() ) );
@@ -799,7 +763,7 @@ public class DefaultModelManager implements ModelManager
     }
 
     public Instance getInstance( final Modules modules, final Implementation implementation,
-                                 final Dependency dependency, final ClassLoader classLoader )
+                                 final Dependency dependency, final ClassLoader cl )
     {
         if ( modules == null )
         {
@@ -813,12 +777,12 @@ public class DefaultModelManager implements ModelManager
         {
             throw new NullPointerException( "dependency" );
         }
-        if ( classLoader == null )
+        if ( cl == null )
         {
-            throw new NullPointerException( "classLoader" );
+            throw new NullPointerException( "cl" );
         }
 
-        final Instance instance = this.getInstance( modules, implementation, classLoader );
+        final Instance instance = this.getInstance( modules, implementation, cl );
         final Specification dependencySpecification = modules.getSpecification( dependency.getIdentifier() );
 
         if ( dependencySpecification != null && dependencySpecification.getScope() == null &&
@@ -914,7 +878,7 @@ public class DefaultModelManager implements ModelManager
                 {
                     ctor = clazz.getConstructor( NO_CLASSES );
                 }
-                catch ( NoSuchMethodException e )
+                catch ( final NoSuchMethodException e )
                 {
                     this.log( Level.FINE, this.getMessage( "noSuchMethod", new Object[]
                         {
@@ -934,7 +898,7 @@ public class DefaultModelManager implements ModelManager
                 }
                 else
                 {
-                    final StringBuffer methodNames = new StringBuffer().append( '[' );
+                    final StringBuilder methodNames = new StringBuilder().append( '[' );
                     Method factoryMethod = null;
                     String methodName = null;
 
@@ -1035,17 +999,17 @@ public class DefaultModelManager implements ModelManager
 
             return object;
         }
-        catch ( InvocationTargetException e )
+        catch ( final InvocationTargetException e )
         {
             throw (InstantiationException) new InstantiationException().initCause(
                 e.getTargetException() != null ? e.getTargetException() : e );
 
         }
-        catch ( IllegalAccessException e )
+        catch ( final IllegalAccessException e )
         {
             throw (InstantiationException) new InstantiationException().initCause( e );
         }
-        catch ( ClassNotFoundException e )
+        catch ( final ClassNotFoundException e )
         {
             throw (InstantiationException) new InstantiationException().initCause( e );
         }
@@ -1054,7 +1018,7 @@ public class DefaultModelManager implements ModelManager
     // SECTION-END
     // SECTION-START[DefaultModelManager]
     /** Listener interface. */
-    public static abstract class Listener
+    public interface Listener
     {
 
         /**
@@ -1064,7 +1028,7 @@ public class DefaultModelManager implements ModelManager
          * @param message The message of the event or {@code null}.
          * @param t The throwable of the event or {@code null}.
          */
-        public abstract void onLog( Level level, String message, Throwable t );
+        void onLog( Level level, String message, Throwable t );
 
     }
 
@@ -1198,7 +1162,7 @@ public class DefaultModelManager implements ModelManager
      * @throws SAXException if parsing schema resources fails.
      * @throws JAXBException if unmarshalling schema resources fails.
      */
-    public Marshaller getBootstrapMarshaller( boolean validating, boolean formattedOutput )
+    public Marshaller getBootstrapMarshaller( final boolean validating, final boolean formattedOutput )
         throws IOException, SAXException, JAXBException
     {
         final Marshaller m = this.getBootstrapContext().createMarshaller();
@@ -1225,7 +1189,7 @@ public class DefaultModelManager implements ModelManager
      * @throws SAXException if parsing schema resources fails.
      * @throws JAXBException if unmarshalling schema resources fails.
      */
-    public Unmarshaller getBootstrapUnmarshaller( boolean validating )
+    public Unmarshaller getBootstrapUnmarshaller( final boolean validating )
         throws IOException, SAXException, JAXBException
     {
         final Unmarshaller u = this.getBootstrapContext().createUnmarshaller();
@@ -1271,8 +1235,8 @@ public class DefaultModelManager implements ModelManager
      * @throws SAXException if parsing schema resources fails.
      * @throws JAXBException if unmarshalling schema resources fails.
      */
-    public void validateBootstrapObject( JAXBElement<? extends BootstrapObject> bootstrapObject )
-        throws NullPointerException, ModelException, IOException, SAXException, JAXBException
+    public void validateBootstrapObject( final JAXBElement<? extends BootstrapObject> bootstrapObject )
+        throws ModelException, IOException, SAXException, JAXBException
     {
         if ( bootstrapObject == null )
         {
@@ -1280,51 +1244,19 @@ public class DefaultModelManager implements ModelManager
         }
 
         final StringWriter stringWriter = new StringWriter();
-        final List<ModelException.Detail> details = new LinkedList<ModelException.Detail>();
         final Validator validator = this.getBootstrapSchema().newValidator();
-        validator.setErrorHandler( new ErrorHandler()
-        {
-
-            public void warning( final SAXParseException exception ) throws SAXException
-            {
-                if ( exception.getMessage() != null )
-                {
-                    details.add( new ModelException.Detail( Level.WARNING, exception.getMessage() ) );
-                }
-            }
-
-            public void error( final SAXParseException exception ) throws SAXException
-            {
-                if ( exception.getMessage() != null )
-                {
-                    details.add( new ModelException.Detail( Level.SEVERE, exception.getMessage() ) );
-                }
-
-                throw exception;
-            }
-
-            public void fatalError( final SAXParseException exception ) throws SAXException
-            {
-                if ( exception.getMessage() != null )
-                {
-                    details.add( new ModelException.Detail( Level.SEVERE, exception.getMessage() ) );
-                }
-
-                throw exception;
-            }
-
-        } );
-
+        final ModelExceptionErrorHandler errorHandler = new ModelExceptionErrorHandler();
+        validator.setErrorHandler( errorHandler );
         this.getBootstrapMarshaller( false, false ).marshal( bootstrapObject, stringWriter );
 
         try
         {
             validator.validate( new StreamSource( new StringReader( stringWriter.toString() ) ) );
         }
-        catch ( SAXException e )
+        catch ( final SAXException e )
         {
             final ModelException modelException = new ModelException( e.getMessage(), e );
-            modelException.getDetails().addAll( details );
+            modelException.getDetails().addAll( errorHandler.getDetails() );
             throw modelException;
         }
     }
@@ -1334,6 +1266,9 @@ public class DefaultModelManager implements ModelManager
      *
      * @param bootstrapObject The {@code BootstrapObject} to transform.
      * @param transformer The {@code Transformer} to transform {@code bootstrapObject} with.
+     * @param <T> The type of {@code bootstrapObject}.
+     *
+     * @return {@code bootstrapObject} transformed with {@code transformer}.
      *
      * @throws NullPointerException if {@code bootstrapObject} or {@code transformer} is {@code null}.
      * @throws IOException if reading schema resources fails.
@@ -1343,7 +1278,7 @@ public class DefaultModelManager implements ModelManager
      */
     public <T extends BootstrapObject> T transformBootstrapObject(
         final JAXBElement<T> bootstrapObject, final Transformer transformer )
-        throws NullPointerException, IOException, SAXException, JAXBException, TransformerException
+        throws IOException, SAXException, JAXBException, TransformerException
     {
         if ( bootstrapObject == null )
         {
@@ -1491,33 +1426,32 @@ public class DefaultModelManager implements ModelManager
                         url.toExternalForm()
                     } ), null );
 
-                final Object content = u.unmarshal( url );
+                Object content = u.unmarshal( url );
                 if ( content instanceof JAXBElement )
                 {
-                    final JAXBElement element = (JAXBElement) content;
-                    if ( element.getValue() instanceof Schema )
+                    content = ( (JAXBElement) content ).getValue();
+                }
+
+                if ( content instanceof Schema )
+                {
+                    final Schema s = (Schema) content;
+                    this.log( Level.FINE, this.getMessage( "addingSchema", new Object[]
+                        {
+                            s.getPublicId(), s.getSystemId(), s.getContextId(), s.getClasspathId()
+                        } ), null );
+
+                    this.schemas.getSchema().add( s );
+                }
+                else if ( content instanceof Schemas )
+                {
+                    for ( Schema s : ( (Schemas) content ).getSchema() )
                     {
-                        final Schema schema = (Schema) element.getValue();
                         this.log( Level.FINE, this.getMessage( "addingSchema", new Object[]
                             {
-                                schema.getPublicId(), schema.getSystemId(), schema.getContextId(),
-                                schema.getClasspathId()
+                                s.getPublicId(), s.getSystemId(), s.getContextId(), s.getClasspathId()
                             } ), null );
 
-                        this.schemas.getSchema().add( (Schema) element.getValue() );
-                    }
-                    else if ( element.getValue() instanceof Schemas )
-                    {
-                        for ( Schema schema : ( (Schemas) element.getValue() ).getSchema() )
-                        {
-                            this.log( Level.FINE, this.getMessage( "addingSchema", new Object[]
-                                {
-                                    schema.getPublicId(), schema.getSystemId(), schema.getContextId(),
-                                    schema.getClasspathId()
-                                } ), null );
-
-                            this.schemas.getSchema().add( schema );
-                        }
+                        this.schemas.getSchema().add( s );
                     }
                 }
             }
@@ -1579,7 +1513,7 @@ public class DefaultModelManager implements ModelManager
                 location
             } ) );
 
-        Modules mods = new Modules();
+        final Modules mods = new Modules();
         mods.setDocumentation( new Texts() );
         mods.getDocumentation().setDefaultLanguage( "en" );
         mods.getDocumentation().getText().add( text );
@@ -1598,7 +1532,11 @@ public class DefaultModelManager implements ModelManager
                     url.toExternalForm()
                 } ), null );
 
-            final Object content = ( (JAXBElement) u.unmarshal( url ) ).getValue();
+            Object content = u.unmarshal( url );
+            if ( content instanceof JAXBElement )
+            {
+                content = ( (JAXBElement) content ).getValue();
+            }
 
             if ( content instanceof Module )
             {
@@ -1616,7 +1554,7 @@ public class DefaultModelManager implements ModelManager
 
         this.log( Level.FINE, this.getMessage( "classpathReport", new Object[]
             {
-                count, new Date( System.currentTimeMillis() - t0 )
+                count, Long.valueOf( System.currentTimeMillis() - t0 )
             } ), null );
 
         return mods;
@@ -1753,12 +1691,12 @@ public class DefaultModelManager implements ModelManager
 
                     return source;
                 }
-                catch ( SAXException e )
+                catch ( final SAXException e )
                 {
                     log( Level.SEVERE, e.getMessage(), e );
                     throw new TransformerException( e );
                 }
-                catch ( IOException e )
+                catch ( final IOException e )
                 {
                     log( Level.SEVERE, e.getMessage(), e );
                     throw new TransformerException( e );
@@ -1792,7 +1730,7 @@ public class DefaultModelManager implements ModelManager
 
         this.log( Level.FINE, this.getMessage( "classpathReport", new Object[]
             {
-                count, new Date( System.currentTimeMillis() - t0 )
+                count, Long.valueOf( System.currentTimeMillis() - t0 )
             } ), null );
 
         return transformers;
@@ -1843,8 +1781,8 @@ public class DefaultModelManager implements ModelManager
      * Notifies registered listeners.
      *
      * @param level The level of the event.
-     * @param message The message of the event.
-     * @param throwable The throwable of the event.
+     * @param message The message of the event or {@code null}.
+     * @param throwable The throwable of the event {@code null}.
      *
      * @see #getListeners()
      */
@@ -1969,7 +1907,7 @@ public class DefaultModelManager implements ModelManager
                 }
 
             }
-            catch ( ClassNotFoundException e )
+            catch ( final ClassNotFoundException e )
             {
                 this.log( Level.FINE, this.getMessage( "noSuchClass", new Object[]
                     {
@@ -2010,7 +1948,7 @@ public class DefaultModelManager implements ModelManager
                             name = "init";
                             classpathImplementation = true;
                         }
-                        catch ( NoSuchMethodException e )
+                        catch ( final NoSuchMethodException e )
                         {
                             this.log( Level.FINE, this.getMessage( "noSuchMethod", new Object[]
                                 {
@@ -2094,7 +2032,7 @@ public class DefaultModelManager implements ModelManager
                     }
                 }
             }
-            catch ( ClassNotFoundException e )
+            catch ( final ClassNotFoundException e )
             {
                 this.log( Level.FINE, this.getMessage( "noSuchClass", new Object[]
                     {
@@ -2114,7 +2052,7 @@ public class DefaultModelManager implements ModelManager
             final Method m = clazz.getMethod( methodName, NO_CLASSES );
             factoryMethod = Modifier.isStatic( m.getModifiers() ) && type.isAssignableFrom( m.getReturnType() );
         }
-        catch ( NoSuchMethodException e )
+        catch ( final NoSuchMethodException e )
         {
             this.log( Level.FINE, this.getMessage( "noSuchMethod", new Object[]
                 {
@@ -2135,7 +2073,7 @@ public class DefaultModelManager implements ModelManager
         {
             m = clazz.getMethod( methodName, NO_CLASSES );
         }
-        catch ( NoSuchMethodException e )
+        catch ( final NoSuchMethodException e )
         {
             this.log( Level.FINE, this.getMessage( "noSuchMethod", new Object[]
                 {
@@ -2162,7 +2100,7 @@ public class DefaultModelManager implements ModelManager
         {
             this.schemaResources = new HashSet<URL>();
 
-            for ( Enumeration<URL> e = this.getClassLoader().getResources( "META-INF/MANIFEST.MF" );
+            for ( final Enumeration<URL> e = this.getClassLoader().getResources( "META-INF/MANIFEST.MF" );
                   e.hasMoreElements(); )
             {
                 final URL manifestUrl = e.nextElement();
@@ -2197,6 +2135,7 @@ public class DefaultModelManager implements ModelManager
     /**
      * Gets the implementation of an object.
      *
+     * @param modules The modules to search for the implementation of {@code object}.
      * @param object The object to get the implementation for.
      *
      * @return The implementation for {@code object} or {@code null}, if nothing is known about {@code object}.

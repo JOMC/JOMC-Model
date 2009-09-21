@@ -190,6 +190,9 @@ public interface ModelManager
      *
      * @param modelObject The {@code ModelObject} to transform.
      * @param transformer The {@code Transformer} to transform {@code modelObject} with.
+     * @param <T> The type of {@code modelObject}.
+     *
+     * @return {@code modelObject} transformed with {@code transformer}.
      *
      * @throws NullPointerException if {@code modelObject} or {@code transformer} is {@code null}.
      * @throws IOException if reading schema resources fails.

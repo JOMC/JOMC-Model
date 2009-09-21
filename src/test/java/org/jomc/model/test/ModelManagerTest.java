@@ -98,7 +98,7 @@ public class ModelManagerTest extends TestCase
         Assert.assertNotNull( this.getModelManager().getLSResourceResolver() );
     }
 
-    /** Tests the {@link ModelManager#getMarshaller()} method. */
+    /** Tests the {@link ModelManager#getMarshaller(boolean, boolean)} method. */
     public void testGetMarshaller() throws Exception
     {
         Assert.assertNotNull( this.getModelManager().getMarshaller( true, true ) );
@@ -116,7 +116,7 @@ public class ModelManagerTest extends TestCase
         Assert.assertNotNull( this.getModelManager().getSchema() );
     }
 
-    /** Tests the {@link ModelManager#getUnmarshaller()} method. */
+    /** Tests the {@link ModelManager#getUnmarshaller(boolean)} method. */
     public void testGetUnmarshaller() throws Exception
     {
         Assert.assertNotNull( this.getModelManager().getUnmarshaller( true ) );

@@ -131,7 +131,7 @@ public class ModelException extends Exception
          */
         private String toStringInternal()
         {
-            return new StringBuffer().append( '{' ).
+            return new StringBuilder().append( '{' ).
                 append( "level=" ).append( this.getLevel().getLocalizedName() ).
                 append( ", message=" ).append( this.getMessage() ).
                 append( ", element=" ).append( this.getElement() ).append( '}' ).toString();
@@ -158,7 +158,7 @@ public class ModelException extends Exception
      * Details of the instance.
      * @serial
      */
-    private List<Detail> details;
+    private final List<Detail> details = new LinkedList<Detail>();
 
     /** Creates a new {@code ModelException} instance. */
     public ModelException()
@@ -204,11 +204,6 @@ public class ModelException extends Exception
      */
     public List<Detail> getDetails()
     {
-        if ( this.details == null )
-        {
-            this.details = new LinkedList<Detail>();
-        }
-
         return this.details;
     }
 
