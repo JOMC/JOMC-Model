@@ -575,6 +575,9 @@ public class DefaultModelManager implements ModelManager
                 {
                     for ( Implementation i : m.getImplementations().getImplementation() )
                     {
+                        this.assertImplementationMessagesUniqueness( i, details );
+                        this.assertImplementationPropertiesUniqueness( i, details );
+
                         if ( i.getImplementations() != null )
                         {
                             for ( Implementation decl : i.getImplementations().getImplementation() )
@@ -583,16 +586,6 @@ public class DefaultModelManager implements ModelManager
                                     this.getObjectFactory().createImplementations( i.getImplementations() ), i, decl ) );
 
                             }
-                        }
-
-                        if ( i.getMessages() != null )
-                        {
-                            this.assertImplementationMessagesUniqueness( i.getMessages(), details );
-                        }
-
-                        if ( i.getProperties() != null )
-                        {
-                            this.assertImplementationPropertiesUniqueness( i.getProperties(), details );
                         }
 
                         if ( i.getSpecifications() != null )
@@ -615,7 +608,7 @@ public class DefaultModelManager implements ModelManager
                         final Implementation cycle = this.findInheritanceCycle( modules, i, i, new Implementations() );
                         if ( cycle != null )
                         {
-                            details.add( this.newImplementationInheritanceCycleConstraint(
+                            details.add( this.newImplementationInheritanceCycleConstraintDetail(
                                 this.getObjectFactory().createImplementation( i ), i, cycle ) );
 
                         }
@@ -633,8 +626,8 @@ public class DefaultModelManager implements ModelManager
                                 {
                                     if ( s.getVersion() == null )
                                     {
-                                        details.add( this.newSpecificationVersioningConstraint(
-                                            this.getObjectFactory().createImplementation( i ), s ) );
+                                        details.add( this.newSpecificationVersioningConstraintDetail(
+                                            this.getObjectFactory().createSpecifications( specs ), i, s ) );
 
                                     }
                                     else if ( VersionParser.compare( r.getVersion(), s.getVersion() ) != 0 )
@@ -666,8 +659,8 @@ public class DefaultModelManager implements ModelManager
                                     {
                                         if ( s.getVersion() == null )
                                         {
-                                            details.add( this.newSpecificationVersioningConstraint(
-                                                this.getObjectFactory().createImplementation( i ), s ) );
+                                            details.add( this.newSpecificationVersioningConstraintDetail(
+                                                this.getObjectFactory().createDependency( d ), i, s ) );
 
                                         }
                                         else if ( VersionParser.compare( d.getVersion(), s.getVersion() ) > 0 )
@@ -757,13 +750,14 @@ public class DefaultModelManager implements ModelManager
                                 {
                                     if ( referenced.getVersion() == null )
                                     {
-                                        details.add( this.newImplementationVersioningConstraint(
-                                            this.getObjectFactory().createImplementation( i ), referenced ) );
+                                        details.add( this.newImplementationVersioningConstraintDetail(
+                                            this.getObjectFactory().createImplementations( i.getImplementations() ),
+                                            i, referenced ) );
 
                                     }
                                     else if ( VersionParser.compare( r.getVersion(), referenced.getVersion() ) > 0 )
                                     {
-                                        details.add( this.newImplementationInheritanceCompatibilityConstraint(
+                                        details.add( this.newImplementationInheritanceCompatibilityConstraintDetail(
                                             this.getObjectFactory().createImplementation( i ), i, referenced,
                                             r.getVersion() ) );
 
@@ -1097,7 +1091,7 @@ public class DefaultModelManager implements ModelManager
                                        i.getSpecifications().getReference( e.getKey() ) == null ) )
                                 {
                                     details.add(
-                                        this.newSpecificationMultipleInheritanceContraint(
+                                        this.newSpecificationMultipleInheritanceContraintDetail(
                                         this.getObjectFactory().createImplementation( i ), i, e.getValue().get( 0 ) ) );
 
                                 }
@@ -1110,7 +1104,7 @@ public class DefaultModelManager implements ModelManager
                                        i.getDependencies().getDependency( e.getKey() ) == null ) )
                                 {
                                     details.add(
-                                        this.newDependencyMultipleInheritanceContraint(
+                                        this.newDependencyMultipleInheritanceContraintDetail(
                                         this.getObjectFactory().createImplementation( i ), i, e.getValue().get( 0 ) ) );
 
                                 }
@@ -1124,7 +1118,7 @@ public class DefaultModelManager implements ModelManager
                                          i.getMessages().getReference( e.getKey() ) == null ) ) )
                                 {
                                     details.add(
-                                        this.newMessageMultipleInheritanceContraint(
+                                        this.newMessageMultipleInheritanceContraintDetail(
                                         this.getObjectFactory().createImplementation( i ), i, e.getValue().get( 0 ) ) );
 
                                 }
@@ -1138,7 +1132,7 @@ public class DefaultModelManager implements ModelManager
                                          i.getProperties().getReference( e.getKey() ) == null ) ) )
                                 {
                                     details.add(
-                                        this.newPropertyMultipleInheritanceContraint(
+                                        this.newPropertyMultipleInheritanceContraintDetail(
                                         this.getObjectFactory().createImplementation( i ), i, e.getValue().get( 0 ) ) );
 
                                 }
@@ -1155,7 +1149,7 @@ public class DefaultModelManager implements ModelManager
                         {
                             for ( PropertyReference r : s.getProperties().getReference() )
                             {
-                                details.add( this.newSpecificationPropertyReferenceDeclarationConstraint(
+                                details.add( this.newSpecificationPropertyReferenceDeclarationConstraintDetail(
                                     this.getObjectFactory().createSpecification( s ), s, r ) );
 
                             }
@@ -2893,41 +2887,47 @@ public class DefaultModelManager implements ModelManager
     }
 
     private void assertImplementationMessagesUniqueness(
-        final Messages messages, final List<ModelException.Detail> details )
+        final Implementation implementation, final List<ModelException.Detail> details )
     {
-        for ( Message m : messages.getMessage() )
+        if ( implementation.getMessages() != null )
         {
-            if ( messages.getReference( m.getName() ) != null )
+            for ( Message m : implementation.getMessages().getMessage() )
             {
-                final ModelException.Detail detail = new ModelException.Detail(
-                    "IMPLEMENTATION_MESSAGES_UNIQUENESS_CONSTRAINT", Level.SEVERE,
-                    this.getMessage( "messagesUniquenessConstraint", new Object[]
-                    {
-                        m.getName()
-                    } ) );
+                if ( implementation.getMessages().getReference( m.getName() ) != null )
+                {
+                    final ModelException.Detail detail = new ModelException.Detail(
+                        "IMPLEMENTATION_MESSAGES_UNIQUENESS_CONSTRAINT", Level.SEVERE,
+                        this.getMessage( "messagesUniquenessConstraint", new Object[]
+                        {
+                            implementation.getIdentifier(), m.getName()
+                        } ) );
 
-                detail.setElement( this.getObjectFactory().createMessages( messages ) );
-                details.add( detail );
+                    detail.setElement( this.getObjectFactory().createImplementation( implementation ) );
+                    details.add( detail );
+                }
             }
         }
     }
 
     private void assertImplementationPropertiesUniqueness(
-        final Properties properties, final List<ModelException.Detail> details )
+        final Implementation implementation, final List<ModelException.Detail> details )
     {
-        for ( Property p : properties.getProperty() )
+        if ( implementation.getProperties() != null )
         {
-            if ( properties.getReference( p.getName() ) != null )
+            for ( Property p : implementation.getProperties().getProperty() )
             {
-                final ModelException.Detail detail = new ModelException.Detail(
-                    "IMPLEMENTATION_PROPERTIES_UNIQUENESS_CONSTRAINT", Level.SEVERE,
-                    this.getMessage( "propertiesUniquenessConstraint", new Object[]
-                    {
-                        p.getName()
-                    } ) );
+                if ( implementation.getProperties().getReference( p.getName() ) != null )
+                {
+                    final ModelException.Detail detail = new ModelException.Detail(
+                        "IMPLEMENTATION_PROPERTIES_UNIQUENESS_CONSTRAINT", Level.SEVERE,
+                        this.getMessage( "propertiesUniquenessConstraint", new Object[]
+                        {
+                            implementation.getIdentifier(), p.getName()
+                        } ) );
 
-                detail.setElement( this.getObjectFactory().createProperties( properties ) );
-                details.add( detail );
+                    detail.setElement( this.getObjectFactory().createImplementation( implementation ) );
+                    details.add( detail );
+                }
             }
         }
     }
@@ -3386,7 +3386,7 @@ public class DefaultModelManager implements ModelManager
         return detail;
     }
 
-    private ModelException.Detail newSpecificationPropertyReferenceDeclarationConstraint(
+    private ModelException.Detail newSpecificationPropertyReferenceDeclarationConstraintDetail(
         final JAXBElement<? extends ModelObject> element, final Specification specification,
         final PropertyReference reference )
     {
@@ -3401,7 +3401,7 @@ public class DefaultModelManager implements ModelManager
         return detail;
     }
 
-    private ModelException.Detail newSpecificationMultipleInheritanceContraint(
+    private ModelException.Detail newSpecificationMultipleInheritanceContraintDetail(
         final JAXBElement<? extends ModelObject> element, final Implementation implementation,
         final SpecificationReference reference )
     {
@@ -3416,7 +3416,7 @@ public class DefaultModelManager implements ModelManager
         return detail;
     }
 
-    private ModelException.Detail newDependencyMultipleInheritanceContraint(
+    private ModelException.Detail newDependencyMultipleInheritanceContraintDetail(
         final JAXBElement<? extends ModelObject> element, final Implementation implementation,
         final Dependency dependency )
     {
@@ -3431,7 +3431,7 @@ public class DefaultModelManager implements ModelManager
         return detail;
     }
 
-    private ModelException.Detail newMessageMultipleInheritanceContraint(
+    private ModelException.Detail newMessageMultipleInheritanceContraintDetail(
         final JAXBElement<? extends ModelObject> element, final Implementation implementation,
         final Message message )
     {
@@ -3446,7 +3446,7 @@ public class DefaultModelManager implements ModelManager
         return detail;
     }
 
-    private ModelException.Detail newPropertyMultipleInheritanceContraint(
+    private ModelException.Detail newPropertyMultipleInheritanceContraintDetail(
         final JAXBElement<? extends ModelObject> element, final Implementation implementation,
         final Property property )
     {
@@ -3461,7 +3461,7 @@ public class DefaultModelManager implements ModelManager
         return detail;
     }
 
-    private ModelException.Detail newImplementationInheritanceCycleConstraint(
+    private ModelException.Detail newImplementationInheritanceCycleConstraintDetail(
         final JAXBElement<? extends ModelObject> element, final Implementation implementation,
         final Implementation cycle )
     {
@@ -3476,7 +3476,7 @@ public class DefaultModelManager implements ModelManager
         return detail;
     }
 
-    private ModelException.Detail newImplementationInheritanceCompatibilityConstraint(
+    private ModelException.Detail newImplementationInheritanceCompatibilityConstraintDetail(
         final JAXBElement<? extends ModelObject> element, final Implementation implementation,
         final Implementation superImplementation, final String expectedVersion )
     {
@@ -3492,28 +3492,30 @@ public class DefaultModelManager implements ModelManager
         return detail;
     }
 
-    private ModelException.Detail newSpecificationVersioningConstraint(
-        final JAXBElement<? extends ModelObject> element, final Specification specification )
+    private ModelException.Detail newSpecificationVersioningConstraintDetail(
+        final JAXBElement<? extends ModelObject> element, final Implementation implementation,
+        final Specification specification )
     {
         final ModelException.Detail detail = new ModelException.Detail(
             "SPECIFICATION_VERSIONING_CONSTRAINT", Level.SEVERE,
             this.getMessage( "specificationVersioningConstraint", new Object[]
             {
-                specification.getIdentifier()
+                implementation.getIdentifier(), specification.getIdentifier()
             } ) );
 
         detail.setElement( element );
         return detail;
     }
 
-    private ModelException.Detail newImplementationVersioningConstraint(
-        final JAXBElement<? extends ModelObject> element, final Implementation implementation )
+    private ModelException.Detail newImplementationVersioningConstraintDetail(
+        final JAXBElement<? extends ModelObject> element, final Implementation declaring,
+        final Implementation implementation )
     {
         final ModelException.Detail detail = new ModelException.Detail(
             "IMPLEMENTATION_VERSIONING_CONSTRAINT", Level.SEVERE,
             this.getMessage( "implementationVersioningConstraint", new Object[]
             {
-                implementation.getIdentifier()
+                declaring.getIdentifier(), implementation.getIdentifier()
             } ) );
 
         detail.setElement( element );
