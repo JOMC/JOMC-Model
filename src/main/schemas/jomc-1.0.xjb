@@ -75,7 +75,8 @@
 
         return defaultText;
     }
-]]></ci:code>
+]]>
+      </ci:code>
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Specifications']">
       <ci:code><![CDATA[
@@ -173,7 +174,8 @@
 
         return null;
     }
-]]></ci:code>
+]]>
+      </ci:code>
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Implementation']">
       <ci:code><![CDATA[
@@ -201,7 +203,8 @@
             throw new AssertionError( e );
         }
     }
-]]></ci:code>
+]]>
+      </ci:code>
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Implementations']">
       <ci:code><![CDATA[
@@ -291,7 +294,40 @@
 
         return null;
     }
-]]></ci:code>
+
+    /**
+     * Gets an implementation reference for a given identifier from the list of
+     * references.
+     *
+     * @param implementation The identifier of the reference to return.
+     *
+     * @return The implementation reference identified by {@code implementation}
+     * from the list or {@code null}, if no implementation reference matching
+     * {@code implementation} is found.
+     *
+     * @throws NullPointerException if {@code implementation} is {@code null}.
+     *
+     * @see #getReference()
+     */
+    public ImplementationReference getReference( final String implementation )
+    {
+        if ( implementation == null )
+        {
+            throw new NullPointerException( "implementation" );
+        }
+
+        for ( ImplementationReference r : this.getReference() )
+        {
+            if ( implementation.equals( r.getIdentifier() ) )
+            {
+                return r;
+            }
+        }
+
+        return null;
+    }
+]]>
+      </ci:code>
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Dependencies']">
       <ci:code><![CDATA[
@@ -324,7 +360,8 @@
 
         return null;
     }
-]]></ci:code>
+]]>
+      </ci:code>
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Properties']">
       <ci:code><![CDATA[
@@ -387,7 +424,8 @@
 
         return null;
     }
-]]></ci:code>
+]]>
+      </ci:code>
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Property']">
       <ci:code><![CDATA[
@@ -461,50 +499,58 @@
             }
         }
 
-        try
+        Object javaValue = null;
+
+        if ( this.getValue() != null )
         {
-            final Object arg;
-            final java.lang.reflect.Constructor ctor;
-
-            if ( javaType == Character.class )
+            try
             {
-                ctor = javaType.getConstructor( new Class[]
-                    {
-                        char.class
-                    } );
+                final Object arg;
+                final java.lang.reflect.Constructor ctor;
 
-                arg = new Character( this.getValue().charAt( 0 ) );
-            }
-            else
-            {
-                ctor = javaType.getConstructor( new Class[]
-                    {
-                        String.class
-                    } );
-
-                arg = this.getValue();
-            }
-
-            return ctor.newInstance( new Object[]
+                if ( javaType == Character.class )
                 {
-                    arg
-                } );
+                    ctor = javaType.getConstructor( new Class[]
+                        {
+                            char.class
+                        } );
 
+                    arg = new Character( this.getValue().charAt( 0 ) );
+                }
+                else
+                {
+                    ctor = javaType.getConstructor( new Class[]
+                        {
+                            String.class
+                        } );
+
+                    arg = this.getValue();
+                }
+
+                javaValue = ctor.newInstance( new Object[]
+                    {
+                        arg
+                    } );
+
+            }
+            catch ( IllegalAccessException e )
+            {
+                throw (InstantiationException) new InstantiationException( e.getMessage() ).initCause( e );
+            }
+            catch ( java.lang.reflect.InvocationTargetException e )
+            {
+                throw (InstantiationException) new InstantiationException( e.getMessage() ).initCause( e );
+            }
+            catch ( NoSuchMethodException e )
+            {
+                throw (InstantiationException) new InstantiationException( e.getMessage() ).initCause( e );
+            }
         }
-        catch ( IllegalAccessException e )
-        {
-            throw (InstantiationException) new InstantiationException( e.getMessage() ).initCause( e );
-        }
-        catch ( java.lang.reflect.InvocationTargetException e )
-        {
-            throw (InstantiationException) new InstantiationException( e.getMessage() ).initCause( e );
-        }
-        catch ( NoSuchMethodException e )
-        {
-            throw (InstantiationException) new InstantiationException( e.getMessage() ).initCause( e );
-        }
+
+        return javaValue;
     }
-]]></ci:code>
+]]>
+      </ci:code>
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Messages']">
       <ci:code><![CDATA[
@@ -567,7 +613,8 @@
 
         return null;
     }
-]]></ci:code>
+]]>
+      </ci:code>
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Arguments']">
       <ci:code><![CDATA[
@@ -630,7 +677,8 @@
 
         return null;
     }
-]]></ci:code>
+]]>
+      </ci:code>
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Instances']">
       <ci:code><![CDATA[
@@ -663,7 +711,8 @@
 
         return null;
     }
-]]></ci:code>
+]]>
+      </ci:code>
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Instance']">
       <ci:code><![CDATA[
@@ -725,7 +774,8 @@
 
         return this.propertyObjects;
     }
-]]></ci:code>
+]]>
+      </ci:code>
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Modules']">
       <ci:code><![CDATA[
@@ -963,7 +1013,7 @@
         }
 
         final Specifications specs = new Specifications();
-        this.collectSpecifications( implementation, specs );
+        this.collectSpecifications( this.getImplementation( implementation ), specs, new Implementations(), true );
 
         Implementation declaration = null;
         final Implementation impl = this.getImplementation( implementation );
@@ -1030,32 +1080,41 @@
         return specs.getSpecification().isEmpty() && specs.getReference().isEmpty() ? null : specs;
     }
 
-    private void collectSpecifications( final String implementation, final Specifications specifications )
+    void collectSpecifications( final Implementation implementation, final Specifications specifications,
+                                final Implementations seen, final boolean includeDeclared )
     {
-        final Implementation i = this.getImplementation( implementation );
-
-        if ( i != null )
+        if ( implementation != null )
         {
-            if ( i.getSpecifications() != null )
+            if ( seen.getImplementation( implementation.getIdentifier() ) == null )
             {
-                for ( SpecificationReference r : i.getSpecifications().getReference() )
-                {
-                    if ( specifications.getReference( r.getIdentifier() ) == null )
-                    {
-                        specifications.getReference().add( r );
+                seen.getImplementation().add( implementation );
 
-                        final Specification s = this.getSpecification( r.getIdentifier() );
-                        if ( s != null && specifications.getSpecification( s.getIdentifier() ) == null )
+                if ( includeDeclared && implementation.getSpecifications() != null )
+                {
+                    for ( SpecificationReference r : implementation.getSpecifications().getReference() )
+                    {
+                        if ( specifications.getReference( r.getIdentifier() ) == null )
                         {
-                            specifications.getSpecification().add( s );
+                            specifications.getReference().add( r );
+
+                            final Specification s = this.getSpecification( r.getIdentifier() );
+                            if ( s != null && specifications.getSpecification( s.getIdentifier() ) == null )
+                            {
+                                specifications.getSpecification().add( s );
+                            }
                         }
                     }
                 }
-            }
 
-            if ( i.getParent() != null )
-            {
-                this.collectSpecifications( i.getParent(), specifications );
+                if ( implementation.getImplementations() != null )
+                {
+                    for ( ImplementationReference r : implementation.getImplementations().getReference() )
+                    {
+                        this.collectSpecifications(
+                            this.getImplementation( r.getIdentifier() ), specifications, seen, true );
+
+                    }
+                }
             }
         }
     }
@@ -1182,7 +1241,7 @@
         }
 
         final Dependencies dependencies = new Dependencies();
-        this.collectDependencies( implementation, dependencies );
+        this.collectDependencies( this.getImplementation( implementation ), dependencies, new Implementations(), true );
 
         Implementation declaration = null;
         final Implementation impl = this.getImplementation( implementation );
@@ -1234,45 +1293,55 @@
         return dependencies.getDependency().isEmpty() ? null : dependencies;
     }
 
-    private void collectDependencies( final String implementation, final Dependencies dependencies )
+    void collectDependencies( final Implementation implementation, final Dependencies dependencies,
+                              final Implementations seen, final boolean includeDeclared )
     {
-        final Implementation i = this.getImplementation( implementation );
-
-        if ( i != null )
+        if ( implementation != null )
         {
-            if ( i.getDependencies() != null )
+            if ( seen.getImplementation( implementation.getIdentifier() ) == null )
             {
-                for ( Dependency d : i.getDependencies().getDependency() )
-                {
-                    final Dependency dependency = dependencies.getDependency( d.getName() );
-                    if ( dependency != null )
-                    {
-                        if ( d.getProperties() != null )
-                        {
-                            if ( dependency.getProperties() == null )
-                            {
-                                dependency.setProperties( new Properties() );
-                            }
+                seen.getImplementation().add( implementation );
 
-                            for ( Property p : d.getProperties().getProperty() )
+                if ( includeDeclared && implementation.getDependencies() != null )
+                {
+                    for ( Dependency d : implementation.getDependencies().getDependency() )
+                    {
+                        final Dependency dependency = dependencies.getDependency( d.getName() );
+
+                        if ( dependency != null )
+                        {
+                            if ( d.getProperties() != null )
                             {
-                                if ( dependency.getProperties().getProperty( p.getName() ) == null )
+                                if ( dependency.getProperties() == null )
                                 {
-                                    dependency.getProperties().getProperty().add( p );
+                                    dependency.setProperties( new Properties() );
+                                }
+
+                                for ( Property p : d.getProperties().getProperty() )
+                                {
+                                    if ( dependency.getProperties().getProperty( p.getName() ) == null )
+                                    {
+                                        dependency.getProperties().getProperty().add( p );
+                                    }
                                 }
                             }
                         }
-                    }
-                    else
-                    {
-                        dependencies.getDependency().add( d );
+                        else
+                        {
+                            dependencies.getDependency().add( d );
+                        }
                     }
                 }
-            }
 
-            if ( i.getParent() != null )
-            {
-                this.collectDependencies( i.getParent(), dependencies );
+                if ( implementation.getImplementations() != null )
+                {
+                    for ( ImplementationReference r : implementation.getImplementations().getReference() )
+                    {
+                        this.collectDependencies(
+                            this.getImplementation( r.getIdentifier() ), dependencies, seen, true );
+
+                    }
+                }
             }
         }
     }
@@ -1297,7 +1366,7 @@
         }
 
         final Properties properties = new Properties();
-        this.collectProperties( implementation, properties );
+        this.collectProperties( this.getImplementation( implementation ), properties, new Implementations(), true );
 
         Implementation declaration = null;
         final Implementation impl = this.getImplementation( implementation );
@@ -1362,41 +1431,56 @@
         return properties.getProperty().isEmpty() ? null : properties;
     }
 
-    private void collectProperties( final String implementation, final Properties properties )
+    void collectProperties( final Implementation implementation, final Properties properties,
+                            final Implementations seen, final boolean includeDeclared )
     {
-        final Implementation i = this.getImplementation( implementation );
-
-        if ( i != null )
+        if ( implementation != null )
         {
-            if ( i.getProperties() != null )
+            if ( seen.getImplementation( implementation.getIdentifier() ) == null )
             {
-                for ( Property p : i.getProperties().getProperty() )
-                {
-                    if ( properties.getProperty( p.getName() ) == null )
-                    {
-                        properties.getProperty().add( p );
-                    }
-                }
-                if ( !i.getProperties().getReference().isEmpty() )
-                {
-                    final Module m = this.getModuleOfImplementation( i.getIdentifier() );
+                seen.getImplementation().add( implementation );
 
-                    if ( m != null )
+                if ( includeDeclared && implementation.getProperties() != null )
+                {
+                    for ( Property p : implementation.getProperties().getProperty() )
                     {
-                        for ( PropertyReference ref : i.getProperties().getReference() )
+                        if ( properties.getProperty( p.getName() ) == null )
                         {
-                            if ( properties.getProperty( ref.getName() ) == null )
+                            properties.getProperty().add( p );
+                        }
+                    }
+                    if ( !implementation.getProperties().getReference().isEmpty() )
+                    {
+                        final Module m = this.getModuleOfImplementation( implementation.getIdentifier() );
+
+                        if ( m != null )
+                        {
+                            for ( PropertyReference ref : implementation.getProperties().getReference() )
                             {
-                                properties.getProperty().add( m.getProperties().getProperty( ref.getName() ) );
+                                if ( properties.getProperty( ref.getName() ) == null )
+                                {
+                                    Property referenced = m.getProperties().getProperty( ref.getName() );
+                                    if ( referenced != null )
+                                    {
+                                        referenced = new Property( referenced );
+                                        referenced.setDeprecated( ref.isDeprecated() );
+                                        referenced.setFinal( ref.isFinal() );
+                                        referenced.setOverride( ref.isOverride() );
+                                        properties.getProperty().add( referenced );
+                                    }
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            if ( i.getParent() != null )
-            {
-                this.collectProperties( i.getParent(), properties );
+                if ( implementation.getImplementations() != null )
+                {
+                    for ( ImplementationReference r : implementation.getImplementations().getReference() )
+                    {
+                        this.collectProperties( this.getImplementation( r.getIdentifier() ), properties, seen, true );
+                    }
+                }
             }
         }
     }
@@ -1467,7 +1551,7 @@
         }
 
         final Messages msgs = new Messages();
-        this.collectMessages( implementation, msgs );
+        this.collectMessages( this.getImplementation( implementation ), msgs, new Implementations(), true );
 
         Implementation declaration = null;
         final Implementation impl = this.getImplementation( implementation );
@@ -1519,41 +1603,56 @@
         return msgs.getMessage().isEmpty() ? null : msgs;
     }
 
-    private void collectMessages( final String implementation, final Messages messages )
+    void collectMessages( final Implementation implementation, final Messages messages,
+                          final Implementations seen, boolean includeDeclared )
     {
-        final Implementation i = this.getImplementation( implementation );
-
-        if ( i != null )
+        if ( implementation != null )
         {
-            if ( i.getMessages() != null )
+            if ( seen.getImplementation( implementation.getIdentifier() ) == null )
             {
-                for ( Message msg : i.getMessages().getMessage() )
-                {
-                    if ( messages.getMessage( msg.getName() ) == null )
-                    {
-                        messages.getMessage().add( msg );
-                    }
-                }
-                if ( !i.getMessages().getReference().isEmpty() )
-                {
-                    final Module m = this.getModuleOfImplementation( i.getIdentifier() );
+                seen.getImplementation().add( implementation );
 
-                    if ( m != null )
+                if ( includeDeclared && implementation.getMessages() != null )
+                {
+                    for ( Message msg : implementation.getMessages().getMessage() )
                     {
-                        for ( MessageReference ref : i.getMessages().getReference() )
+                        if ( messages.getMessage( msg.getName() ) == null )
                         {
-                            if ( messages.getMessage( ref.getName() ) == null )
+                            messages.getMessage().add( msg );
+                        }
+                    }
+                    if ( !implementation.getMessages().getReference().isEmpty() )
+                    {
+                        final Module m = this.getModuleOfImplementation( implementation.getIdentifier() );
+
+                        if ( m != null )
+                        {
+                            for ( MessageReference ref : implementation.getMessages().getReference() )
                             {
-                                messages.getMessage().add( m.getMessages().getMessage( ref.getName() ) );
+                                if ( messages.getMessage( ref.getName() ) == null )
+                                {
+                                    Message referenced = m.getMessages().getMessage( ref.getName() );
+                                    if ( referenced != null )
+                                    {
+                                        referenced = new Message( referenced );
+                                        referenced.setDeprecated( ref.isDeprecated() );
+                                        referenced.setFinal( ref.isFinal() );
+                                        referenced.setOverride( ref.isOverride() );
+                                        messages.getMessage().add( referenced );
+                                    }
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            if ( i.getParent() != null )
-            {
-                this.collectMessages( i.getParent(), messages );
+                if ( implementation.getImplementations() != null )
+                {
+                    for ( ImplementationReference r : implementation.getImplementations().getReference() )
+                    {
+                        this.collectMessages( this.getImplementation( r.getIdentifier() ), messages, seen, true );
+                    }
+                }
             }
         }
     }
@@ -1727,7 +1826,8 @@
 
         return mergedModule;
     }
-]]></ci:code>
+]]>
+      </ci:code>
     </jaxb:bindings>
   </jaxb:bindings>
 </jaxb:bindings>

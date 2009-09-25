@@ -501,31 +501,101 @@ public class DefaultModelManager implements ModelManager
         {
             for ( Module m : modules.getModule() )
             {
+                if ( m.getSpecifications() != null )
+                {
+                    for ( SpecificationReference r : m.getSpecifications().getReference() )
+                    {
+                        details.add( this.newModuleSpecificationReferenceDeclarationConstraintDetail(
+                            this.getObjectFactory().createModule( m ), m, r ) );
+
+                    }
+                }
+
+                if ( m.getImplementations() != null )
+                {
+                    for ( ImplementationReference r : m.getImplementations().getReference() )
+                    {
+                        details.add( this.newModuleImplementationReferenceDeclarationConstraintDetail(
+                            this.getObjectFactory().createImplementations( m.getImplementations() ), m, r ) );
+
+                    }
+                }
+
                 if ( m.getMessages() != null )
                 {
-                    this.assertMessagesUniqueness( m.getMessages(), details );
+                    for ( Message msg : m.getMessages().getMessage() )
+                    {
+                        if ( msg.isFinal() )
+                        {
+                            details.add( this.newFinalModuleMessageConstraintDetail(
+                                this.getObjectFactory().createMessage( msg ), m, msg ) );
+
+                        }
+                        if ( msg.isOverride() )
+                        {
+                            details.add( this.newOverrideModuleMessageConstraintDetail(
+                                this.getObjectFactory().createMessage( msg ), m, msg ) );
+
+                        }
+                    }
+                    for ( MessageReference r : m.getMessages().getReference() )
+                    {
+                        details.add( this.newModuleMessageReferenceDeclarationConstraintDetail(
+                            this.getObjectFactory().createMessages( m.getMessages() ), m, r ) );
+
+                    }
                 }
 
                 if ( m.getProperties() != null )
                 {
-                    this.assertPropertiesUniqueness( m.getProperties(), details );
+                    for ( Property p : m.getProperties().getProperty() )
+                    {
+                        if ( p.isFinal() )
+                        {
+                            details.add( this.newFinalModulePropertyConstraintDetail(
+                                this.getObjectFactory().createProperty( p ), m, p ) );
+
+                        }
+                        if ( p.isOverride() )
+                        {
+                            details.add( this.newOverrideModulePropertyConstraintDetail(
+                                this.getObjectFactory().createProperty( p ), m, p ) );
+
+                        }
+                    }
+                    for ( PropertyReference r : m.getProperties().getReference() )
+                    {
+                        details.add( this.newModulePropertyReferenceDeclarationConstraintDetail(
+                            this.getObjectFactory().createProperties( m.getProperties() ), m, r ) );
+
+                    }
                 }
 
                 if ( m.getImplementations() != null )
                 {
                     for ( Implementation i : m.getImplementations().getImplementation() )
                     {
+                        if ( i.getImplementations() != null )
+                        {
+                            for ( Implementation decl : i.getImplementations().getImplementation() )
+                            {
+                                details.add( this.newImplementationImplementationDeclarationConstraintDetail(
+                                    this.getObjectFactory().createImplementations( i.getImplementations() ), i, decl ) );
+
+                            }
+                        }
+
                         if ( i.getMessages() != null )
                         {
-                            this.assertMessagesUniqueness( i.getMessages(), details );
+                            this.assertImplementationMessagesUniqueness( i.getMessages(), details );
                         }
 
                         if ( i.getProperties() != null )
                         {
-                            this.assertPropertiesUniqueness( i.getProperties(), details );
+                            this.assertImplementationPropertiesUniqueness( i.getProperties(), details );
                         }
 
-                        if ( i.getSpecifications() != null && !i.getSpecifications().getSpecification().isEmpty() )
+                        if ( i.getSpecifications() != null )
                         {
                             for ( Specification s : i.getSpecifications().getSpecification() )
                             {
@@ -533,6 +603,21 @@ public class DefaultModelManager implements ModelManager
                                     this.getObjectFactory().createImplementation( i ), i, s ) );
 
                             }
+                        }
+
+                        if ( i.isAbstract() && i.getLocation() != null )
+                        {
+                            details.add( this.newAbstractLocationConstraintDetail(
+                                this.getObjectFactory().createImplementation( i ), i, i.getLocation() ) );
+
+                        }
+
+                        final Implementation cycle = this.findInheritanceCycle( modules, i, i, new Implementations() );
+                        if ( cycle != null )
+                        {
+                            details.add( this.newImplementationInheritanceCycleConstraint(
+                                this.getObjectFactory().createImplementation( i ), i, cycle ) );
+
                         }
 
                         final Specifications specs = modules.getSpecifications( i.getIdentifier() );
@@ -544,19 +629,27 @@ public class DefaultModelManager implements ModelManager
                             {
                                 final Specification s = specs.getSpecification( r.getIdentifier() );
 
-                                if ( s != null && r.getVersion() != null && s.getVersion() != null &&
-                                     VersionParser.compare( r.getVersion(), s.getVersion() ) != 0 )
+                                if ( s != null && r.getVersion() != null )
                                 {
-                                    final Module moduleOfSpecification =
-                                        modules.getModuleOfSpecification( s.getIdentifier() );
+                                    if ( s.getVersion() == null )
+                                    {
+                                        details.add( this.newSpecificationVersioningConstraint(
+                                            this.getObjectFactory().createImplementation( i ), s ) );
 
-                                    details.add( this.newIncompatibleImplementationDetail(
-                                        this.getObjectFactory().createImplementation( i ),
-                                        i.getIdentifier(), m.getName(),
-                                        r.getIdentifier(), moduleOfSpecification == null
-                                                           ? "<>" : moduleOfSpecification.getName(),
-                                        r.getVersion(), s.getVersion() ) );
+                                    }
+                                    else if ( VersionParser.compare( r.getVersion(), s.getVersion() ) != 0 )
+                                    {
+                                        final Module moduleOfSpecification =
+                                            modules.getModuleOfSpecification( s.getIdentifier() );
 
+                                        details.add( this.newIncompatibleImplementationDetail(
+                                            this.getObjectFactory().createImplementation( i ),
+                                            i.getIdentifier(), m.getName(),
+                                            r.getIdentifier(), moduleOfSpecification == null
+                                                               ? "<>" : moduleOfSpecification.getName(),
+                                            r.getVersion(), s.getVersion() ) );
+
+                                    }
                                 }
                             }
                         }
@@ -569,38 +662,46 @@ public class DefaultModelManager implements ModelManager
 
                                 if ( s != null )
                                 {
-                                    if ( s.getVersion() != null && d.getVersion() != null &&
-                                         VersionParser.compare( d.getVersion(), s.getVersion() ) > 0 )
+                                    if ( d.getVersion() != null )
                                     {
-                                        final Module moduleOfSpecification =
-                                            modules.getModuleOfSpecification( s.getIdentifier() );
+                                        if ( s.getVersion() == null )
+                                        {
+                                            details.add( this.newSpecificationVersioningConstraint(
+                                                this.getObjectFactory().createImplementation( i ), s ) );
 
-                                        details.add( this.newIncompatibleDependencyDetail(
-                                            this.getObjectFactory().createDependency( d ),
-                                            i.getIdentifier(), m.getName(),
-                                            d.getIdentifier(), moduleOfSpecification == null
-                                                               ? "<>" : moduleOfSpecification.getName(),
-                                            d.getVersion(), s.getVersion() ) );
+                                        }
+                                        else if ( VersionParser.compare( d.getVersion(), s.getVersion() ) > 0 )
+                                        {
+                                            final Module moduleOfSpecification =
+                                                modules.getModuleOfSpecification( s.getIdentifier() );
 
+                                            details.add( this.newIncompatibleDependencyDetail(
+                                                this.getObjectFactory().createDependency( d ),
+                                                i.getIdentifier(), m.getName(),
+                                                d.getIdentifier(), moduleOfSpecification == null
+                                                                   ? "<>" : moduleOfSpecification.getName(),
+                                                d.getVersion(), s.getVersion() ) );
+
+                                        }
                                     }
 
                                     if ( d.getProperties() != null )
                                     {
-                                        this.assertPropertiesUniqueness( d.getProperties(), details );
-
-                                        if ( !d.getProperties().getReference().isEmpty() )
+                                        for ( PropertyReference r : d.getProperties().getReference() )
                                         {
-                                            details.add( this.newDependencyPropertyReferenceConstraintDetail(
-                                                this.getObjectFactory().createDependency( d ), i, d ) );
+                                            details.add( this.newDependencyPropertyReferenceDeclarationConstraintDetail(
+                                                this.getObjectFactory().createDependency( d ), i, d, r ) );
 
                                         }
 
-                                        if ( s.getScope() != null && !d.getProperties().getProperty().isEmpty() )
+                                        if ( s.getScope() != null )
                                         {
-                                            details.add( this.newPropertyOverwriteConstraintDetail(
-                                                this.getObjectFactory().createDependency( d ), i, d, s,
-                                                s.getScope() ) );
+                                            for ( Property p : d.getProperties().getProperty() )
+                                            {
+                                                details.add( this.newDependencyPropertiesOverrideConstraintDetail(
+                                                    this.getObjectFactory().createDependency( d ), i, d, s, p ) );
 
+                                            }
                                         }
                                     }
                                 }
@@ -636,14 +737,411 @@ public class DefaultModelManager implements ModelManager
                             }
                         }
 
-                        if ( i.getParent() != null )
+                        if ( i.getImplementations() != null )
                         {
-                            final Implementation parent = modules.getImplementation( i.getParent() );
-                            if ( parent != null && parent.isFinal() )
-                            {
-                                details.add( this.newInheritanceConstraintDetail(
-                                    this.getObjectFactory().createImplementation( i ), i, parent ) );
+                            final Implementations finalSuperImplementations = new Implementations();
+                            this.collectFinalSuperImplementations( modules, i, finalSuperImplementations,
+                                                                   new Implementations(), false );
 
+                            for ( Implementation finalSuper : finalSuperImplementations.getImplementation() )
+                            {
+                                details.add( this.newImplementationInheritanceConstraintDetail(
+                                    this.getObjectFactory().createImplementation( i ), i, finalSuper ) );
+
+                            }
+
+                            for ( ImplementationReference r : i.getImplementations().getReference() )
+                            {
+                                final Implementation referenced = modules.getImplementation( r.getIdentifier() );
+                                if ( referenced != null && r.getVersion() != null )
+                                {
+                                    if ( referenced.getVersion() == null )
+                                    {
+                                        details.add( this.newImplementationVersioningConstraint(
+                                            this.getObjectFactory().createImplementation( i ), referenced ) );
+
+                                    }
+                                    else if ( VersionParser.compare( r.getVersion(), referenced.getVersion() ) > 0 )
+                                    {
+                                        details.add( this.newImplementationInheritanceCompatibilityConstraint(
+                                            this.getObjectFactory().createImplementation( i ), i, referenced,
+                                            r.getVersion() ) );
+
+                                    }
+                                }
+                            }
+                        }
+
+                        if ( i.getSpecifications() != null )
+                        {
+                            final Specifications superSpecifications = new Specifications();
+                            modules.collectSpecifications( i, superSpecifications, new Implementations(), false );
+
+                            for ( SpecificationReference r : i.getSpecifications().getReference() )
+                            {
+                                boolean override = false;
+
+                                if ( i.getImplementations() != null )
+                                {
+                                    final Implementations finalSuperSpecifications = new Implementations();
+                                    this.collectFinalSuperSpecifications( modules, i, r.getIdentifier(),
+                                                                          finalSuperSpecifications,
+                                                                          new Implementations(), false );
+
+                                    for ( Implementation finalSuper : finalSuperSpecifications.getImplementation() )
+                                    {
+                                        details.add( this.newSpecificationInheritanceConstraintDetail(
+                                            this.getObjectFactory().createImplementation( i ), i, r, finalSuper ) );
+
+                                    }
+
+                                    override = superSpecifications.getReference( r.getIdentifier() ) != null;
+                                }
+
+                                if ( r.isOverride() && !override )
+                                {
+                                    details.add( this.newSpecificationOverrideConstraintDetail(
+                                        this.getObjectFactory().createSpecifications( i.getSpecifications() ), i, r ) );
+
+                                }
+                                if ( !r.isOverride() && override )
+                                {
+                                    this.log( Level.WARNING, this.getMessage( "specificationOverrideWarning",
+                                                                              new Object[]
+                                        {
+                                            i.getIdentifier(), r.getIdentifier()
+                                        } ), null );
+
+                                }
+                            }
+                        }
+
+                        if ( i.getDependencies() != null )
+                        {
+                            final Dependencies superDependencies = new Dependencies();
+                            modules.collectDependencies( i, superDependencies, new Implementations(), false );
+
+                            for ( Dependency d : i.getDependencies().getDependency() )
+                            {
+                                boolean override = false;
+
+                                if ( i.getImplementations() != null )
+                                {
+                                    final Implementations finalSuperDependencies = new Implementations();
+                                    this.collectFinalSuperDependencies( modules, i, d.getName(), finalSuperDependencies,
+                                                                        new Implementations(), false );
+
+                                    for ( Implementation finalSuper : finalSuperDependencies.getImplementation() )
+                                    {
+                                        details.add( this.newDependencyInheritanceConstraintDetail(
+                                            this.getObjectFactory().createImplementation( i ), i, d, finalSuper ) );
+
+                                    }
+
+                                    override = superDependencies.getDependency( d.getName() ) != null;
+                                }
+
+                                if ( d.isOverride() && !override )
+                                {
+                                    details.add( this.newDependencyOverrideConstraintDetail(
+                                        this.getObjectFactory().createDependency( d ), i, d ) );
+
+                                }
+                                if ( !d.isOverride() && override )
+                                {
+                                    this.log( Level.WARNING, this.getMessage( "dependencyOverrideWarning", new Object[]
+                                        {
+                                            i.getIdentifier(), d.getName()
+                                        } ), null );
+
+                                }
+                            }
+                        }
+
+                        if ( i.getProperties() != null )
+                        {
+                            final Properties superProperties = new Properties();
+                            modules.collectProperties( i, superProperties, new Implementations(), false );
+
+                            for ( Property p : i.getProperties().getProperty() )
+                            {
+                                boolean override = false;
+
+                                if ( i.getImplementations() != null )
+                                {
+                                    final Implementations finalSuperProperties = new Implementations();
+                                    this.collectFinalSuperProperties( modules, i, p.getName(), finalSuperProperties,
+                                                                      new Implementations(), false );
+
+                                    for ( Implementation finalSuper : finalSuperProperties.getImplementation() )
+                                    {
+                                        details.add( this.newPropertyInheritanceConstraintDetail(
+                                            this.getObjectFactory().createImplementation( i ), i, p, finalSuper ) );
+
+                                    }
+
+                                    override = superProperties.getProperty( p.getName() ) != null;
+                                }
+
+                                if ( p.isOverride() && !override )
+                                {
+                                    details.add( this.newPropertyOverrideConstraintDetail(
+                                        this.getObjectFactory().createProperty( p ), i, p ) );
+
+                                }
+                                if ( !p.isOverride() && override )
+                                {
+                                    this.log( Level.WARNING, this.getMessage( "propertyOverrideWarning", new Object[]
+                                        {
+                                            i.getIdentifier(), p.getName()
+                                        } ), null );
+
+                                }
+                            }
+
+                            for ( PropertyReference r : i.getProperties().getReference() )
+                            {
+                                boolean override = false;
+
+                                if ( i.getImplementations() != null )
+                                {
+                                    final Implementations finalSuperProperties = new Implementations();
+                                    this.collectFinalSuperProperties( modules, i, r.getName(), finalSuperProperties,
+                                                                      new Implementations(), false );
+
+                                    for ( Implementation finalSuper : finalSuperProperties.getImplementation() )
+                                    {
+                                        details.add( this.newPropertyInheritanceConstraintDetail(
+                                            this.getObjectFactory().createImplementation( i ), i, r, finalSuper ) );
+
+                                    }
+
+                                    override = superProperties.getProperty( r.getName() ) != null;
+                                }
+
+                                if ( r.isOverride() && !override )
+                                {
+                                    details.add( this.newPropertyOverrideConstraintDetail(
+                                        this.getObjectFactory().createProperties( i.getProperties() ), i, r ) );
+
+                                }
+                                if ( !r.isOverride() && override )
+                                {
+                                    this.log( Level.WARNING, this.getMessage( "propertyOverrideWarning", new Object[]
+                                        {
+                                            i.getIdentifier(), r.getName()
+                                        } ), null );
+
+                                }
+                            }
+                        }
+
+                        if ( i.getMessages() != null )
+                        {
+                            final Messages superMessages = new Messages();
+                            modules.collectMessages( i, superMessages, new Implementations(), false );
+
+                            for ( Message msg : i.getMessages().getMessage() )
+                            {
+                                boolean override = false;
+
+                                if ( i.getImplementations() != null )
+                                {
+                                    final Implementations finalSuperMessages = new Implementations();
+                                    this.collectFinalSuperMessages( modules, i, msg.getName(), finalSuperMessages,
+                                                                    new Implementations(), false );
+
+                                    for ( Implementation finalSuper : finalSuperMessages.getImplementation() )
+                                    {
+                                        details.add( this.newMessageInheritanceConstraintDetail(
+                                            this.getObjectFactory().createImplementation( i ), i, msg, finalSuper ) );
+
+                                    }
+
+                                    override = superMessages.getMessage( msg.getName() ) != null;
+                                }
+
+                                if ( msg.isOverride() && !override )
+                                {
+                                    details.add( this.newMessageOverrideConstraintDetail(
+                                        this.getObjectFactory().createMessage( msg ), i, msg ) );
+
+                                }
+                                if ( !msg.isOverride() && override )
+                                {
+                                    this.log( Level.WARNING, this.getMessage( "messageOverrideWarning", new Object[]
+                                        {
+                                            i.getIdentifier(), msg.getName()
+                                        } ), null );
+
+                                }
+                            }
+
+                            for ( MessageReference r : i.getMessages().getReference() )
+                            {
+                                boolean override = false;
+
+                                if ( i.getImplementations() != null )
+                                {
+                                    final Implementations finalSuperMessages = new Implementations();
+                                    this.collectFinalSuperMessages( modules, i, r.getName(), finalSuperMessages,
+                                                                    new Implementations(), false );
+
+                                    for ( Implementation finalSuper : finalSuperMessages.getImplementation() )
+                                    {
+                                        details.add( this.newMessageInheritanceConstraintDetail(
+                                            this.getObjectFactory().createImplementation( i ), i, r, finalSuper ) );
+
+                                    }
+
+                                    override = superMessages.getMessage( r.getName() ) != null;
+                                }
+
+                                if ( r.isOverride() && !override )
+                                {
+                                    details.add( this.newMessageOverrideConstraintDetail(
+                                        this.getObjectFactory().createMessages( i.getMessages() ), i, r ) );
+
+                                }
+                                if ( !r.isOverride() && override )
+                                {
+                                    this.log( Level.WARNING, this.getMessage( "messageOverrideWarning", new Object[]
+                                        {
+                                            i.getIdentifier(), r.getName()
+                                        } ), null );
+
+                                }
+                            }
+                        }
+
+                        if ( i.getImplementations() != null )
+                        {
+                            final Map<String, List<SpecificationReference>> specMap =
+                                new HashMap<String, List<SpecificationReference>>();
+
+                            final Map<String, List<Dependency>> dependencyMap =
+                                new HashMap<String, List<Dependency>>();
+
+                            final Map<String, List<Message>> messageMap =
+                                new HashMap<String, List<Message>>();
+
+                            final Map<String, List<Property>> propertyMap =
+                                new HashMap<String, List<Property>>();
+
+                            for ( ImplementationReference r : i.getImplementations().getReference() )
+                            {
+                                final Specifications currentSpecs = new Specifications();
+                                final Dependencies currentDependencies = new Dependencies();
+                                final Properties currentProperties = new Properties();
+                                final Messages currentMessages = new Messages();
+                                final Implementation current = modules.getImplementation( r.getIdentifier() );
+
+                                modules.collectSpecifications( current, currentSpecs, new Implementations(), true );
+                                modules.collectDependencies( current, currentDependencies, new Implementations(), true );
+                                modules.collectMessages( current, currentMessages, new Implementations(), true );
+                                modules.collectProperties( current, currentProperties, new Implementations(), true );
+
+                                for ( SpecificationReference ref : currentSpecs.getReference() )
+                                {
+                                    List<SpecificationReference> list = specMap.get( ref.getIdentifier() );
+                                    if ( list == null )
+                                    {
+                                        list = new LinkedList<SpecificationReference>();
+                                        specMap.put( ref.getIdentifier(), list );
+                                    }
+
+                                    list.add( ref );
+                                }
+
+                                for ( Dependency d : currentDependencies.getDependency() )
+                                {
+                                    List<Dependency> list = dependencyMap.get( d.getName() );
+                                    if ( list == null )
+                                    {
+                                        list = new LinkedList<Dependency>();
+                                        dependencyMap.put( d.getName(), list );
+                                    }
+
+                                    list.add( d );
+                                }
+
+                                for ( Message msg : currentMessages.getMessage() )
+                                {
+                                    List<Message> list = messageMap.get( msg.getName() );
+                                    if ( list == null )
+                                    {
+                                        list = new LinkedList<Message>();
+                                        messageMap.put( msg.getName(), list );
+                                    }
+
+                                    list.add( msg );
+                                }
+
+                                for ( Property p : currentProperties.getProperty() )
+                                {
+                                    List<Property> list = propertyMap.get( p.getName() );
+                                    if ( list == null )
+                                    {
+                                        list = new LinkedList<Property>();
+                                        propertyMap.put( p.getName(), list );
+                                    }
+
+                                    list.add( p );
+                                }
+                            }
+
+                            for ( Map.Entry<String, List<SpecificationReference>> e : specMap.entrySet() )
+                            {
+                                if ( e.getValue().size() > 1 &&
+                                     ( i.getSpecifications() == null ||
+                                       i.getSpecifications().getReference( e.getKey() ) == null ) )
+                                {
+                                    details.add(
+                                        this.newSpecificationMultipleInheritanceContraint(
+                                        this.getObjectFactory().createImplementation( i ), i, e.getValue().get( 0 ) ) );
+
+                                }
+                            }
+
+                            for ( Map.Entry<String, List<Dependency>> e : dependencyMap.entrySet() )
+                            {
+                                if ( e.getValue().size() > 1 &&
+                                     ( i.getDependencies() == null ||
+                                       i.getDependencies().getDependency( e.getKey() ) == null ) )
+                                {
+                                    details.add(
+                                        this.newDependencyMultipleInheritanceContraint(
+                                        this.getObjectFactory().createImplementation( i ), i, e.getValue().get( 0 ) ) );
+
+                                }
+                            }
+
+                            for ( Map.Entry<String, List<Message>> e : messageMap.entrySet() )
+                            {
+                                if ( e.getValue().size() > 1 &&
+                                     ( i.getMessages() == null ||
+                                       ( i.getMessages().getMessage( e.getKey() ) == null &&
+                                         i.getMessages().getReference( e.getKey() ) == null ) ) )
+                                {
+                                    details.add(
+                                        this.newMessageMultipleInheritanceContraint(
+                                        this.getObjectFactory().createImplementation( i ), i, e.getValue().get( 0 ) ) );
+
+                                }
+                            }
+
+                            for ( Map.Entry<String, List<Property>> e : propertyMap.entrySet() )
+                            {
+                                if ( e.getValue().size() > 1 &&
+                                     ( i.getProperties() == null ||
+                                       ( i.getProperties().getProperty( e.getKey() ) == null &&
+                                         i.getProperties().getReference( e.getKey() ) == null ) ) )
+                                {
+                                    details.add(
+                                        this.newPropertyMultipleInheritanceContraint(
+                                        this.getObjectFactory().createImplementation( i ), i, e.getValue().get( 0 ) ) );
+
+                                }
                             }
                         }
                     }
@@ -651,46 +1149,57 @@ public class DefaultModelManager implements ModelManager
 
                 if ( m.getSpecifications() != null )
                 {
-                    for ( SpecificationReference r : m.getSpecifications().getReference() )
-                    {
-                        details.add( this.newModuleSpecificationReferenceConstraintDetail(
-                            this.getObjectFactory().createModule( m ), m, r ) );
-
-                    }
-
                     for ( Specification s : m.getSpecifications().getSpecification() )
                     {
                         if ( s.getProperties() != null )
                         {
-                            this.assertPropertiesUniqueness( s.getProperties(), details );
+                            for ( PropertyReference r : s.getProperties().getReference() )
+                            {
+                                details.add( this.newSpecificationPropertyReferenceDeclarationConstraint(
+                                    this.getObjectFactory().createSpecification( s ), s, r ) );
+
+                            }
                         }
 
                         final Implementations impls = modules.getImplementations( s.getIdentifier() );
 
                         if ( impls != null )
                         {
-                            final Map<String, Implementation> map = new HashMap<String, Implementation>();
+                            final Map<String, Implementations> map = new HashMap<String, Implementations>();
 
                             for ( Implementation i : impls.getImplementation() )
                             {
-                                if ( map.containsKey( i.getName() ) )
+                                Implementations implementations = map.get( i.getName() );
+                                if ( implementations == null )
                                 {
-                                    details.add( this.newImplementationNameConstraintDetail(
-                                        this.getObjectFactory().createSpecification( s ), s.getIdentifier(),
-                                        i.getIdentifier() + ", " + map.get( i.getName() ).getIdentifier(),
-                                        i.getName() ) );
-
+                                    implementations = new Implementations();
+                                    map.put( i.getName(), implementations );
                                 }
 
-                                map.put( i.getName(), i );
+                                implementations.getImplementation().add( i );
+                            }
+
+                            for ( Map.Entry<String, Implementations> e : map.entrySet() )
+                            {
+                                if ( e.getValue().getImplementation().size() > 1 )
+                                {
+                                    for ( Implementation i : e.getValue().getImplementation() )
+                                    {
+                                        details.add( this.newImplementationNameConstraintDetail(
+                                            this.getObjectFactory().createSpecification( s ), s, i ) );
+
+                                    }
+                                }
                             }
 
                             if ( s.getMultiplicity() == Multiplicity.ONE && impls.getImplementation().size() > 1 )
                             {
-                                details.add( this.newMultiplicityConstraintDetail(
-                                    this.getObjectFactory().createSpecification( s ), impls.getImplementation().size(),
-                                    s.getIdentifier(), 1, s.getMultiplicity() ) );
+                                for ( Implementation i : impls.getImplementation() )
+                                {
+                                    details.add( this.newMultiplicityConstraintDetail(
+                                        this.getObjectFactory().createImplementation( i ), s, i ) );
 
+                                }
                             }
                         }
                     }
@@ -2156,6 +2665,225 @@ public class DefaultModelManager implements ModelManager
         return i;
     }
 
+    private void collectFinalSuperDependencies(
+        final Modules modules, final Implementation implementation, final String dependencyName,
+        final Implementations implementations, final Implementations seen, final boolean includeImplementation )
+    {
+        if ( implementation != null )
+        {
+            if ( seen.getImplementation( implementation.getIdentifier() ) == null )
+            {
+                seen.getImplementation().add( implementation );
+
+                if ( includeImplementation )
+                {
+                    final Dependencies dependencies = modules.getDependencies( implementation.getIdentifier() );
+
+                    if ( dependencies != null )
+                    {
+                        for ( Dependency d : dependencies.getDependency() )
+                        {
+                            if ( dependencyName.equals( d.getName() ) && d.isFinal() &&
+                                 implementations.getImplementation( implementation.getIdentifier() ) == null )
+                            {
+                                implementations.getImplementation().add( implementation );
+                            }
+                        }
+                    }
+                }
+
+                if ( implementation.getImplementations() != null )
+                {
+                    for ( ImplementationReference r : implementation.getImplementations().getReference() )
+                    {
+                        this.collectFinalSuperDependencies( modules, modules.getImplementation( r.getIdentifier() ),
+                                                            dependencyName, implementations, seen, true );
+
+                    }
+                }
+            }
+        }
+    }
+
+    private void collectFinalSuperMessages(
+        final Modules modules, final Implementation implementation, final String messageName,
+        final Implementations implementations, final Implementations seen, final boolean includeImplementation )
+    {
+        if ( implementation != null )
+        {
+            if ( seen.getImplementation( implementation.getIdentifier() ) == null )
+            {
+                seen.getImplementation().add( implementation );
+
+                if ( includeImplementation )
+                {
+                    final Messages messages = modules.getMessages( implementation.getIdentifier() );
+
+                    if ( messages != null )
+                    {
+                        for ( Message m : messages.getMessage() )
+                        {
+                            if ( messageName.equals( m.getName() ) && m.isFinal() &&
+                                 implementations.getImplementation( implementation.getIdentifier() ) == null )
+                            {
+                                implementations.getImplementation().add( implementation );
+                            }
+                        }
+                    }
+                }
+
+                if ( implementation.getImplementations() != null )
+                {
+                    for ( ImplementationReference r : implementation.getImplementations().getReference() )
+                    {
+                        this.collectFinalSuperMessages( modules, modules.getImplementation( r.getIdentifier() ),
+                                                        messageName, implementations, seen, true );
+
+                    }
+                }
+            }
+        }
+    }
+
+    private void collectFinalSuperProperties(
+        final Modules modules, final Implementation implementation, final String propertyName,
+        final Implementations implementations, final Implementations seen, final boolean includeImplementation )
+    {
+        if ( implementation != null )
+        {
+            if ( seen.getImplementation( implementation.getIdentifier() ) == null )
+            {
+                seen.getImplementation().add( implementation );
+
+                if ( includeImplementation )
+                {
+                    final Properties properties = modules.getProperties( implementation.getIdentifier() );
+
+                    if ( properties != null )
+                    {
+                        for ( Property p : properties.getProperty() )
+                        {
+                            if ( propertyName.equals( p.getName() ) && p.isFinal() &&
+                                 implementations.getImplementation( implementation.getIdentifier() ) == null )
+                            {
+                                implementations.getImplementation().add( implementation );
+                            }
+                        }
+                    }
+                }
+
+                if ( implementation.getImplementations() != null )
+                {
+                    for ( ImplementationReference r : implementation.getImplementations().getReference() )
+                    {
+                        this.collectFinalSuperProperties( modules, modules.getImplementation( r.getIdentifier() ),
+                                                          propertyName, implementations, seen, true );
+
+                    }
+                }
+            }
+        }
+    }
+
+    private void collectFinalSuperSpecifications(
+        final Modules modules, final Implementation implementation, final String specificationIdentifier,
+        final Implementations implementations, final Implementations seen, final boolean includeImplementation )
+    {
+        if ( implementation != null )
+        {
+            if ( seen.getImplementation( implementation.getIdentifier() ) == null )
+            {
+                seen.getImplementation().add( implementation );
+
+                if ( includeImplementation )
+                {
+                    final Specifications specifications = modules.getSpecifications( implementation.getIdentifier() );
+
+                    if ( specifications != null )
+                    {
+                        for ( SpecificationReference r : specifications.getReference() )
+                        {
+                            if ( specificationIdentifier.equals( r.getIdentifier() ) && r.isFinal() &&
+                                 implementations.getImplementation( implementation.getIdentifier() ) == null )
+                            {
+                                implementations.getImplementation().add( implementation );
+                            }
+                        }
+                    }
+                }
+
+                if ( implementation.getImplementations() != null )
+                {
+                    for ( ImplementationReference r : implementation.getImplementations().getReference() )
+                    {
+                        this.collectFinalSuperSpecifications( modules, modules.getImplementation( r.getIdentifier() ),
+                                                              specificationIdentifier, implementations, seen, true );
+
+                    }
+                }
+            }
+        }
+    }
+
+    private void collectFinalSuperImplementations( final Modules modules, final Implementation implementation,
+                                                   final Implementations implementations, final Implementations seen,
+                                                   final boolean includeImplementation )
+    {
+        if ( implementation != null )
+        {
+            if ( seen.getImplementation( implementation.getIdentifier() ) == null )
+            {
+                seen.getImplementation().add( implementation );
+
+                if ( includeImplementation )
+                {
+                    if ( implementation.isFinal() &&
+                         implementations.getImplementation( implementation.getIdentifier() ) == null )
+                    {
+                        implementations.getImplementation().add( implementation );
+                    }
+                }
+
+
+                if ( implementation.getImplementations() != null )
+                {
+                    for ( ImplementationReference r : implementation.getImplementations().getReference() )
+                    {
+                        this.collectFinalSuperImplementations( modules, modules.getImplementation( r.getIdentifier() ),
+                                                               implementations, seen, true );
+
+                    }
+                }
+            }
+        }
+    }
+
+    private Implementation findInheritanceCycle( final Modules modules, final Implementation current,
+                                                 final Implementation report, final Implementations implementations )
+    {
+        if ( current != null )
+        {
+            if ( implementations.getImplementation( current.getIdentifier() ) != null )
+            {
+                return report;
+            }
+
+            implementations.getImplementation().add( current );
+
+            if ( current.getImplementations() != null )
+            {
+                for ( ImplementationReference r : current.getImplementations().getReference() )
+                {
+                    return this.findInheritanceCycle( modules, modules.getImplementation( r.getIdentifier() ),
+                                                      current, implementations );
+
+                }
+            }
+        }
+
+        return null;
+    }
+
     private String getMessage( final String key, final Object args )
     {
         return new MessageFormat(
@@ -2164,14 +2892,16 @@ public class DefaultModelManager implements ModelManager
 
     }
 
-    private void assertMessagesUniqueness( final Messages messages, final List<ModelException.Detail> details )
+    private void assertImplementationMessagesUniqueness(
+        final Messages messages, final List<ModelException.Detail> details )
     {
         for ( Message m : messages.getMessage() )
         {
             if ( messages.getReference( m.getName() ) != null )
             {
-                final ModelException.Detail detail = new ModelException.Detail( Level.SEVERE, this.getMessage(
-                    "messagesUniquessConstraint", new Object[]
+                final ModelException.Detail detail = new ModelException.Detail(
+                    "IMPLEMENTATION_MESSAGES_UNIQUENESS_CONSTRAINT", Level.SEVERE,
+                    this.getMessage( "messagesUniquenessConstraint", new Object[]
                     {
                         m.getName()
                     } ) );
@@ -2182,14 +2912,16 @@ public class DefaultModelManager implements ModelManager
         }
     }
 
-    private void assertPropertiesUniqueness( final Properties properties, final List<ModelException.Detail> details )
+    private void assertImplementationPropertiesUniqueness(
+        final Properties properties, final List<ModelException.Detail> details )
     {
         for ( Property p : properties.getProperty() )
         {
             if ( properties.getReference( p.getName() ) != null )
             {
-                final ModelException.Detail detail = new ModelException.Detail( Level.SEVERE, this.getMessage(
-                    "propertiesUniquessConstraint", new Object[]
+                final ModelException.Detail detail = new ModelException.Detail(
+                    "IMPLEMENTATION_PROPERTIES_UNIQUENESS_CONSTRAINT", Level.SEVERE,
+                    this.getMessage( "propertiesUniquenessConstraint", new Object[]
                     {
                         p.getName()
                     } ) );
@@ -2205,8 +2937,9 @@ public class DefaultModelManager implements ModelManager
         final String implementationModule, final String specification, final String specificationModule,
         final String implementedVersion, final String specifiedVersion )
     {
-        final ModelException.Detail detail =
-            new ModelException.Detail( Level.SEVERE, this.getMessage( "incompatibleImplementation", new Object[]
+        final ModelException.Detail detail = new ModelException.Detail(
+            "IMPLEMENTATION_COMPATIBILITY_CONSTRAINT", Level.SEVERE,
+            this.getMessage( "incompatibleImplementation", new Object[]
             {
                 implementation, implementationModule, specification, specificationModule,
                 implementedVersion, specifiedVersion
@@ -2221,8 +2954,8 @@ public class DefaultModelManager implements ModelManager
         final String implementationModule, final String specification, final String specificationModule,
         final String requiredVersion, final String availableVersion )
     {
-        final ModelException.Detail detail =
-            new ModelException.Detail( Level.SEVERE, this.getMessage( "incompatibleDependency", new Object[]
+        final ModelException.Detail detail = new ModelException.Detail(
+            "DEPENDENCY_COMPATIBILITY_CONSTRAINT", Level.SEVERE, this.getMessage( "incompatibleDependency", new Object[]
             {
                 implementation, implementationModule, specification, specificationModule,
                 requiredVersion, availableVersion
@@ -2233,13 +2966,14 @@ public class DefaultModelManager implements ModelManager
     }
 
     private ModelException.Detail newImplementationNameConstraintDetail(
-        final JAXBElement<? extends ModelObject> element, final String specification, final String implementations,
-        final String nonUniqueName )
+        final JAXBElement<? extends ModelObject> element, final Specification specification,
+        final Implementation implementation )
     {
-        final ModelException.Detail detail =
-            new ModelException.Detail( Level.SEVERE, this.getMessage( "implementationNameConstraint", new Object[]
+        final ModelException.Detail detail = new ModelException.Detail(
+            "IMPLEMENTATION_NAME_CONSTRAINT", Level.SEVERE,
+            this.getMessage( "implementationNameConstraint", new Object[]
             {
-                specification, implementations, nonUniqueName
+                implementation.getIdentifier(), specification.getIdentifier(), implementation.getName()
             } ) );
 
         detail.setElement( element );
@@ -2249,8 +2983,9 @@ public class DefaultModelManager implements ModelManager
     private ModelException.Detail newMandatoryDependencyConstraintDetail(
         final JAXBElement<? extends ModelObject> element, final String implementation, final String dependencyName )
     {
-        final ModelException.Detail detail =
-            new ModelException.Detail( Level.SEVERE, this.getMessage( "mandatoryDependencyConstraint", new Object[]
+        final ModelException.Detail detail = new ModelException.Detail(
+            "MANDATORY_DEPENDENCY_CONSTRAINT", Level.SEVERE,
+            this.getMessage( "mandatoryDependencyConstraint", new Object[]
             {
                 implementation, dependencyName
             } ) );
@@ -2260,54 +2995,149 @@ public class DefaultModelManager implements ModelManager
     }
 
     private ModelException.Detail newMultiplicityConstraintDetail(
-        final JAXBElement<? extends ModelObject> element, final Number implementations, final String specification,
-        final Number expected, final Multiplicity multiplicity )
-    {
-        final ModelException.Detail detail =
-            new ModelException.Detail( Level.SEVERE, this.getMessage( "multiplicityConstraint", new Object[]
-            {
-                implementations, specification, expected, multiplicity.value()
-            } ) );
-
-        detail.setElement( element );
-        return detail;
-    }
-
-    private ModelException.Detail newInheritanceConstraintDetail(
-        final JAXBElement<? extends ModelObject> element, final Implementation child, final Implementation parent )
-    {
-        final ModelException.Detail detail =
-            new ModelException.Detail( Level.SEVERE, this.getMessage( "inheritanceConstraint", new Object[]
-            {
-                child.getIdentifier(), parent.getIdentifier()
-            } ) );
-
-        detail.setElement( element );
-        return detail;
-    }
-
-    private ModelException.Detail newDependencyPropertyReferenceConstraintDetail(
-        final JAXBElement<? extends ModelObject> element, final Implementation implementation,
-        final Dependency dependency )
+        final JAXBElement<? extends ModelObject> element, final Specification specification,
+        final Implementation implementation )
     {
         final ModelException.Detail detail = new ModelException.Detail(
-            Level.SEVERE, this.getMessage( "dependencyPropertyReferenceConstraint", new Object[]
+            "MULTIPLICITY_CONSTRAINT", Level.SEVERE, this.getMessage( "multiplicityConstraint", new Object[]
             {
-                implementation.getIdentifier(), dependency.getName()
+                implementation.getIdentifier(), specification.getIdentifier(), specification.getMultiplicity().value()
             } ) );
 
         detail.setElement( element );
         return detail;
     }
 
-    private ModelException.Detail newPropertyOverwriteConstraintDetail(
+    private ModelException.Detail newImplementationInheritanceConstraintDetail(
         final JAXBElement<? extends ModelObject> element, final Implementation implementation,
-        final Dependency dependency, final Specification specification, final String scope )
+        final Implementation finalSuperImplementation )
     {
         final ModelException.Detail detail = new ModelException.Detail(
-            Level.SEVERE, this.getMessage( "propertyOverwriteConstraint", new Object[]
+            "IMPLEMENTATION_INHERITANCE_CONSTRAINT", Level.SEVERE,
+            this.getMessage( "implementationInheritanceConstraint", new Object[]
             {
-                implementation.getIdentifier(), dependency.getName(), specification.getIdentifier(), scope
+                implementation.getIdentifier(), finalSuperImplementation.getIdentifier()
+            } ) );
+
+        detail.setElement( element );
+        return detail;
+    }
+
+    private ModelException.Detail newSpecificationInheritanceConstraintDetail(
+        final JAXBElement<? extends ModelObject> element, final Implementation implementation,
+        final SpecificationReference specification, final Implementation finalSuperSpecification )
+    {
+        final ModelException.Detail detail = new ModelException.Detail(
+            "SPECIFICATION_INHERITANCE_CONSTRANT", Level.SEVERE,
+            this.getMessage( "specificationInheritanceConstraint", new Object[]
+            {
+                implementation.getIdentifier(), specification.getIdentifier(), finalSuperSpecification.getIdentifier()
+            } ) );
+
+        detail.setElement( element );
+        return detail;
+    }
+
+    private ModelException.Detail newDependencyInheritanceConstraintDetail(
+        final JAXBElement<? extends ModelObject> element, final Implementation implementation,
+        final Dependency dependency, final Implementation finalSuperDependency )
+    {
+        final ModelException.Detail detail = new ModelException.Detail(
+            "DEPENDENCY_INHERITANCE_CONSTRAINT", Level.SEVERE,
+            this.getMessage( "dependencyInheritanceConstraint", new Object[]
+            {
+                implementation.getIdentifier(), dependency.getName(), finalSuperDependency.getIdentifier()
+            } ) );
+
+        detail.setElement( element );
+        return detail;
+    }
+
+    private ModelException.Detail newPropertyInheritanceConstraintDetail(
+        final JAXBElement<? extends ModelObject> element, final Implementation implementation,
+        final Property property, final Implementation finalSuperProperty )
+    {
+        final ModelException.Detail detail = new ModelException.Detail(
+            "PROPERTY_INHERITANCE_CONSTRAINT", Level.SEVERE,
+            this.getMessage( "propertyInheritanceConstraint", new Object[]
+            {
+                implementation.getIdentifier(), property.getName(), finalSuperProperty.getIdentifier()
+            } ) );
+
+        detail.setElement( element );
+        return detail;
+    }
+
+    private ModelException.Detail newPropertyInheritanceConstraintDetail(
+        final JAXBElement<? extends ModelObject> element, final Implementation implementation,
+        final PropertyReference reference, final Implementation finalSuperProperty )
+    {
+        final ModelException.Detail detail = new ModelException.Detail(
+            "PROPERTY_INHERITANCE_CONSTRAINT", Level.SEVERE,
+            this.getMessage( "propertyInheritanceConstraint", new Object[]
+            {
+                implementation.getIdentifier(), reference.getName(), finalSuperProperty.getIdentifier()
+            } ) );
+
+        detail.setElement( element );
+        return detail;
+    }
+
+    private ModelException.Detail newMessageInheritanceConstraintDetail(
+        final JAXBElement<? extends ModelObject> element, final Implementation implementation,
+        final Message message, final Implementation finalSuperMessage )
+    {
+        final ModelException.Detail detail = new ModelException.Detail(
+            "MESSAGE_INHERITANCE_CONSTRAINT", Level.SEVERE,
+            this.getMessage( "messageInheritanceConstraint", new Object[]
+            {
+                implementation.getIdentifier(), message.getName(), finalSuperMessage.getIdentifier()
+            } ) );
+
+        detail.setElement( element );
+        return detail;
+    }
+
+    private ModelException.Detail newMessageInheritanceConstraintDetail(
+        final JAXBElement<? extends ModelObject> element, final Implementation implementation,
+        final MessageReference reference, final Implementation finalSuperMessage )
+    {
+        final ModelException.Detail detail = new ModelException.Detail(
+            "MESSAGE_INHERITANCE_CONSTRAINT", Level.SEVERE,
+            this.getMessage( "messageInheritanceConstraint", new Object[]
+            {
+                implementation.getIdentifier(), reference.getName(), finalSuperMessage.getIdentifier()
+            } ) );
+
+        detail.setElement( element );
+        return detail;
+    }
+
+    private ModelException.Detail newDependencyPropertyReferenceDeclarationConstraintDetail(
+        final JAXBElement<? extends ModelObject> element, final Implementation implementation,
+        final Dependency dependency, final PropertyReference reference )
+    {
+        final ModelException.Detail detail = new ModelException.Detail(
+            "DEPENDENCY_PROPERTY_REFERENCE_DECLARATION_CONSTRAINT", Level.SEVERE,
+            this.getMessage( "dependencyPropertyReferenceDeclarationConstraint", new Object[]
+            {
+                implementation.getIdentifier(), dependency.getName(), reference.getName()
+            } ) );
+
+        detail.setElement( element );
+        return detail;
+    }
+
+    private ModelException.Detail newDependencyPropertiesOverrideConstraintDetail(
+        final JAXBElement<? extends ModelObject> element, final Implementation implementation,
+        final Dependency dependency, final Specification specification, final Property property )
+    {
+        final ModelException.Detail detail = new ModelException.Detail(
+            "DEPENDENCY_PROPERTIES_OVERRIDE_CONSTRAINT", Level.SEVERE,
+            this.getMessage( "dependencyPropertiesOverrideConstraint", new Object[]
+            {
+                implementation.getIdentifier(), dependency.getName(), specification.getIdentifier(),
+                specification.getScope(), property.getName()
             } ) );
 
         detail.setElement( element );
@@ -2319,7 +3149,8 @@ public class DefaultModelManager implements ModelManager
         final Specification specification )
     {
         final ModelException.Detail detail = new ModelException.Detail(
-            Level.SEVERE, this.getMessage( "implementationSpecificationDeclarationConstraint", new Object[]
+            "IMPLEMENTATION_SPECIFICATION_DECLARATION_CONSTRAINT", Level.SEVERE,
+            this.getMessage( "implementationSpecificationDeclarationConstraint", new Object[]
             {
                 implementation.getIdentifier(), specification.getIdentifier()
             } ) );
@@ -2328,13 +3159,361 @@ public class DefaultModelManager implements ModelManager
         return detail;
     }
 
-    private ModelException.Detail newModuleSpecificationReferenceConstraintDetail(
+    private ModelException.Detail newModuleMessageReferenceDeclarationConstraintDetail(
+        final JAXBElement<? extends ModelObject> element, final Module module, final MessageReference reference )
+    {
+        final ModelException.Detail detail = new ModelException.Detail(
+            "MODULE_MESSAGE_REFERENCE_DECLARATION_CONSTRAINT", Level.SEVERE,
+            this.getMessage( "moduleMessageReferenceDeclarationConstraint", new Object[]
+            {
+                module.getName(), reference.getName()
+            } ) );
+
+        detail.setElement( element );
+        return detail;
+    }
+
+    private ModelException.Detail newModulePropertyReferenceDeclarationConstraintDetail(
+        final JAXBElement<? extends ModelObject> element, final Module module, final PropertyReference reference )
+    {
+        final ModelException.Detail detail = new ModelException.Detail(
+            "MODULE_PROPERTY_REFERENCE_DECLARATION_CONSTRAINT", Level.SEVERE,
+            this.getMessage( "modulePropertyReferenceDeclarationConstraint", new Object[]
+            {
+                module.getName(), reference.getName()
+            } ) );
+
+        detail.setElement( element );
+        return detail;
+    }
+
+    private ModelException.Detail newModuleImplementationReferenceDeclarationConstraintDetail(
+        final JAXBElement<? extends ModelObject> element, final Module module, final ImplementationReference reference )
+    {
+        final ModelException.Detail detail = new ModelException.Detail(
+            "MODULE_IMPLEMENTATION_REFERENCE_DECLARATION_CONSTRAINT", Level.SEVERE,
+            this.getMessage( "moduleImplementationReferenceDeclarationConstraint", new Object[]
+            {
+                module.getName(), reference.getIdentifier()
+            } ) );
+
+        detail.setElement( element );
+        return detail;
+    }
+
+    private ModelException.Detail newImplementationImplementationDeclarationConstraintDetail(
+        final JAXBElement<? extends ModelObject> element, final Implementation implementation,
+        final Implementation declaration )
+    {
+        final ModelException.Detail detail = new ModelException.Detail(
+            "IMPLEMENTATION_IMPLEMENTATION_DECLARATION_CONSTRAINT", Level.SEVERE,
+            this.getMessage( "implementationImplementationDeclarationConstraint", new Object[]
+            {
+                implementation.getIdentifier(), declaration.getIdentifier()
+            } ) );
+
+        detail.setElement( element );
+        return detail;
+    }
+
+    private ModelException.Detail newModuleSpecificationReferenceDeclarationConstraintDetail(
         final JAXBElement<? extends ModelObject> element, final Module module, final SpecificationReference reference )
     {
         final ModelException.Detail detail = new ModelException.Detail(
-            Level.SEVERE, this.getMessage( "moduleSpecificationReferenceConstraint", new Object[]
+            "MODULE_SPECIFICATION_REFERENCE_DECLARATION_CONSTRAINT", Level.SEVERE,
+            this.getMessage( "moduleSpecificationReferenceDeclarationConstraint", new Object[]
             {
                 module.getName(), reference.getIdentifier()
+            } ) );
+
+        detail.setElement( element );
+        return detail;
+    }
+
+    private ModelException.Detail newDependencyOverrideConstraintDetail(
+        final JAXBElement<? extends ModelObject> element, final Implementation implementation,
+        final Dependency dependency )
+    {
+        final ModelException.Detail detail = new ModelException.Detail(
+            "DEPENDENCY_OVERRIDE_CONSTRAINT", Level.SEVERE,
+            this.getMessage( "dependencyOverrideConstraint", new Object[]
+            {
+                implementation.getIdentifier(), dependency.getName()
+            } ) );
+
+        detail.setElement( element );
+        return detail;
+    }
+
+    private ModelException.Detail newMessageOverrideConstraintDetail(
+        final JAXBElement<? extends ModelObject> element, final Implementation implementation,
+        final Message message )
+    {
+        final ModelException.Detail detail = new ModelException.Detail(
+            "MESSAGE_OVERRIDE_CONSTRAINT", Level.SEVERE, this.getMessage( "messageOverrideConstraint", new Object[]
+            {
+                implementation.getIdentifier(), message.getName()
+            } ) );
+
+        detail.setElement( element );
+        return detail;
+    }
+
+    private ModelException.Detail newMessageOverrideConstraintDetail(
+        final JAXBElement<? extends ModelObject> element, final Implementation implementation,
+        final MessageReference reference )
+    {
+        final ModelException.Detail detail = new ModelException.Detail(
+            "MESSAGE_OVERRIDE_CONSTRAINT", Level.SEVERE, this.getMessage( "messageOverrideConstraint", new Object[]
+            {
+                implementation.getIdentifier(), reference.getName()
+            } ) );
+
+        detail.setElement( element );
+        return detail;
+    }
+
+    private ModelException.Detail newPropertyOverrideConstraintDetail(
+        final JAXBElement<? extends ModelObject> element, final Implementation implementation,
+        final Property property )
+    {
+        final ModelException.Detail detail = new ModelException.Detail(
+            "PROPERTY_OVERRIDE_CONSTRAINT", Level.SEVERE, this.getMessage( "propertyOverrideConstraint", new Object[]
+            {
+                implementation.getIdentifier(), property.getName()
+            } ) );
+
+        detail.setElement( element );
+        return detail;
+    }
+
+    private ModelException.Detail newPropertyOverrideConstraintDetail(
+        final JAXBElement<? extends ModelObject> element, final Implementation implementation,
+        final PropertyReference reference )
+    {
+        final ModelException.Detail detail = new ModelException.Detail(
+            "PROPERTY_OVERRIDE_CONSTRAINT", Level.SEVERE, this.getMessage( "propertyOverrideConstraint", new Object[]
+            {
+                implementation.getIdentifier(), reference.getName()
+            } ) );
+
+        detail.setElement( element );
+        return detail;
+    }
+
+    private ModelException.Detail newSpecificationOverrideConstraintDetail(
+        final JAXBElement<? extends ModelObject> element, final Implementation implementation,
+        final SpecificationReference reference )
+    {
+        final ModelException.Detail detail = new ModelException.Detail(
+            "SPECIFICATION_OVERRIDE_CONSTRAINT", Level.SEVERE,
+            this.getMessage( "specificationOverrideConstraint", new Object[]
+            {
+                implementation.getIdentifier(), reference.getIdentifier()
+            } ) );
+
+        detail.setElement( element );
+        return detail;
+    }
+
+    private ModelException.Detail newAbstractLocationConstraintDetail(
+        final JAXBElement<? extends ModelObject> element, final Implementation implementation, final String location )
+    {
+        final ModelException.Detail detail = new ModelException.Detail(
+            "ABSTRACT_IMPLEMENTATION_LOCATION_CONSTRAINT", Level.SEVERE,
+            this.getMessage( "abstractLocationConstraint", new Object[]
+            {
+                implementation.getIdentifier(), location
+            } ) );
+
+        detail.setElement( element );
+        return detail;
+    }
+
+    private ModelException.Detail newFinalModuleMessageConstraintDetail(
+        final JAXBElement<? extends ModelObject> element, final Module module, final Message message )
+    {
+        final ModelException.Detail detail = new ModelException.Detail(
+            "FINAL_MODULE_MESSAGE_CONSTRAINT", Level.SEVERE,
+            this.getMessage( "finalModuleMessageConstraint", new Object[]
+            {
+                module.getName(), message.getName()
+            } ) );
+
+        detail.setElement( element );
+        return detail;
+    }
+
+    private ModelException.Detail newOverrideModuleMessageConstraintDetail(
+        final JAXBElement<? extends ModelObject> element, final Module module, final Message message )
+    {
+        final ModelException.Detail detail = new ModelException.Detail(
+            "OVERRIDE_MODULE_MESSAGE_CONSTRAINT", Level.SEVERE,
+            this.getMessage( "overrideModuleMessageConstraint", new Object[]
+            {
+                module.getName(), message.getName()
+            } ) );
+
+        detail.setElement( element );
+        return detail;
+    }
+
+    private ModelException.Detail newFinalModulePropertyConstraintDetail(
+        final JAXBElement<? extends ModelObject> element, final Module module, final Property property )
+    {
+        final ModelException.Detail detail = new ModelException.Detail(
+            "FINAL_MODULE_PROPERTY_CONSTRAINT", Level.SEVERE,
+            this.getMessage( "finalModulePropertyConstraint", new Object[]
+            {
+                module.getName(), property.getName()
+            } ) );
+
+        detail.setElement( element );
+        return detail;
+    }
+
+    private ModelException.Detail newOverrideModulePropertyConstraintDetail(
+        final JAXBElement<? extends ModelObject> element, final Module module, final Property property )
+    {
+        final ModelException.Detail detail = new ModelException.Detail(
+            "OVERRIDE_MODULE_PROPERTY_CONSTRAINT", Level.SEVERE,
+            this.getMessage( "overrideModulePropertyConstraint", new Object[]
+            {
+                module.getName(), property.getName()
+            } ) );
+
+        detail.setElement( element );
+        return detail;
+    }
+
+    private ModelException.Detail newSpecificationPropertyReferenceDeclarationConstraint(
+        final JAXBElement<? extends ModelObject> element, final Specification specification,
+        final PropertyReference reference )
+    {
+        final ModelException.Detail detail = new ModelException.Detail(
+            "SPECIFICATION_PROPERTY_REFERENCE_DECLARATION_CONSTRAINT", Level.SEVERE,
+            this.getMessage( "specificationPropertyReferenceDeclarationConstraint", new Object[]
+            {
+                specification.getIdentifier(), reference.getName()
+            } ) );
+
+        detail.setElement( element );
+        return detail;
+    }
+
+    private ModelException.Detail newSpecificationMultipleInheritanceContraint(
+        final JAXBElement<? extends ModelObject> element, final Implementation implementation,
+        final SpecificationReference reference )
+    {
+        final ModelException.Detail detail = new ModelException.Detail(
+            "SPECIFICATION_MULTIPLE_INHERITANCE_CONSTRAINT", Level.SEVERE,
+            this.getMessage( "multipleInheritanceSpecificationConstraint", new Object[]
+            {
+                implementation.getIdentifier(), reference.getIdentifier()
+            } ) );
+
+        detail.setElement( element );
+        return detail;
+    }
+
+    private ModelException.Detail newDependencyMultipleInheritanceContraint(
+        final JAXBElement<? extends ModelObject> element, final Implementation implementation,
+        final Dependency dependency )
+    {
+        final ModelException.Detail detail = new ModelException.Detail(
+            "DEPENDENCY_MULTIPLE_INHERITANCE_CONSTRAINT", Level.SEVERE,
+            this.getMessage( "multipleInheritanceDependencyConstraint", new Object[]
+            {
+                implementation.getIdentifier(), dependency.getName()
+            } ) );
+
+        detail.setElement( element );
+        return detail;
+    }
+
+    private ModelException.Detail newMessageMultipleInheritanceContraint(
+        final JAXBElement<? extends ModelObject> element, final Implementation implementation,
+        final Message message )
+    {
+        final ModelException.Detail detail = new ModelException.Detail(
+            "MESSAGE_MULTIPLE_INHERITANCE_CONSTRAINT", Level.SEVERE,
+            this.getMessage( "multipleInheritanceMessageConstraint", new Object[]
+            {
+                implementation.getIdentifier(), message.getName()
+            } ) );
+
+        detail.setElement( element );
+        return detail;
+    }
+
+    private ModelException.Detail newPropertyMultipleInheritanceContraint(
+        final JAXBElement<? extends ModelObject> element, final Implementation implementation,
+        final Property property )
+    {
+        final ModelException.Detail detail = new ModelException.Detail(
+            "PROPERTY_MULTIPLE_INHERITANCE_CONSTRAINT", Level.SEVERE,
+            this.getMessage( "multipleInheritancePropertyConstraint", new Object[]
+            {
+                implementation.getIdentifier(), property.getName()
+            } ) );
+
+        detail.setElement( element );
+        return detail;
+    }
+
+    private ModelException.Detail newImplementationInheritanceCycleConstraint(
+        final JAXBElement<? extends ModelObject> element, final Implementation implementation,
+        final Implementation cycle )
+    {
+        final ModelException.Detail detail = new ModelException.Detail(
+            "IMPLEMENTATION_INHERITANCE_CYCLE_CONSTRAINT", Level.SEVERE,
+            this.getMessage( "implementationInheritanceCycleConstraint", new Object[]
+            {
+                implementation.getIdentifier(), cycle.getIdentifier()
+            } ) );
+
+        detail.setElement( element );
+        return detail;
+    }
+
+    private ModelException.Detail newImplementationInheritanceCompatibilityConstraint(
+        final JAXBElement<? extends ModelObject> element, final Implementation implementation,
+        final Implementation superImplementation, final String expectedVersion )
+    {
+        final ModelException.Detail detail = new ModelException.Detail(
+            "IMPLEMENTATION_INHERITANCE_COMPATIBILITY_CONSTRAINT", Level.SEVERE,
+            this.getMessage( "implementationInheritanceCompatibilityConstraint", new Object[]
+            {
+                implementation.getIdentifier(), superImplementation.getIdentifier(), superImplementation.getVersion(),
+                expectedVersion
+            } ) );
+
+        detail.setElement( element );
+        return detail;
+    }
+
+    private ModelException.Detail newSpecificationVersioningConstraint(
+        final JAXBElement<? extends ModelObject> element, final Specification specification )
+    {
+        final ModelException.Detail detail = new ModelException.Detail(
+            "SPECIFICATION_VERSIONING_CONSTRAINT", Level.SEVERE,
+            this.getMessage( "specificationVersioningConstraint", new Object[]
+            {
+                specification.getIdentifier()
+            } ) );
+
+        detail.setElement( element );
+        return detail;
+    }
+
+    private ModelException.Detail newImplementationVersioningConstraint(
+        final JAXBElement<? extends ModelObject> element, final Implementation implementation )
+    {
+        final ModelException.Detail detail = new ModelException.Detail(
+            "IMPLEMENTATION_VERSIONING_CONSTRAINT", Level.SEVERE,
+            this.getMessage( "implementationVersioningConstraint", new Object[]
+            {
+                implementation.getIdentifier()
             } ) );
 
         detail.setElement( element );

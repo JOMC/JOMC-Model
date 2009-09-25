@@ -94,7 +94,7 @@
       <xsd:annotation>
         <xsd:documentation xml:lang="en"><![CDATA[Key of a schema.]]></xsd:documentation>
       </xsd:annotation>
-      <xsd:selector xpath=".//bootstrap:schema"/>
+      <xsd:selector xpath="bootstrap:schema"/>
       <xsd:field xpath="@public-id"/>
     </xsd:key>
   </xsd:element>

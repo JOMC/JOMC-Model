@@ -33,6 +33,7 @@
 package org.jomc.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
@@ -55,6 +56,12 @@ public class ModelException extends Exception
         private static final long serialVersionUID = 5383378257214671678L;
 
         /**
+         * The detail identifier.
+         * @serial
+         */
+        private String identifier;
+
+        /**
          * The detail level.
          * @serial
          */
@@ -75,19 +82,31 @@ public class ModelException extends Exception
         /**
          * Creates a new {@code Detail} taking a detail level and message.
          *
+         * @param identifier The detail identifier.
          * @param level The detail level.
          * @param message The detail message.
          */
-        public Detail( final Level level, final String message )
+        public Detail( final String identifier, final Level level, final String message )
         {
+            this.identifier = identifier;
             this.level = level;
             this.message = message;
         }
 
         /**
+         * Gets the identifier of this detail.
+         *
+         * @return The identifier of this detail or {@code null}.
+         */
+        public String getIdentifier()
+        {
+            return this.identifier;
+        }
+
+        /**
          * Gets the level of this detail.
          *
-         * @return The level of this detail.
+         * @return The level of this detail or {@code null}.
          */
         public Level getLevel()
         {
@@ -97,7 +116,7 @@ public class ModelException extends Exception
         /**
          * Gets the message of this detail.
          *
-         * @return The message of this detail.
+         * @return The message of this detail or {@code null}.
          */
         public String getMessage()
         {
@@ -132,7 +151,8 @@ public class ModelException extends Exception
         private String toStringInternal()
         {
             return new StringBuilder().append( '{' ).
-                append( "level=" ).append( this.getLevel().getLocalizedName() ).
+                append( "identifier=" ).append( this.getIdentifier() ).
+                append( ", level=" ).append( this.getLevel().getLocalizedName() ).
                 append( ", message=" ).append( this.getMessage() ).
                 append( ", element=" ).append( this.getElement() ).append( '}' ).toString();
 
@@ -198,13 +218,39 @@ public class ModelException extends Exception
     }
 
     /**
-     * Gets the details of the instance.
+     * Gets all details of the instance.
      *
-     * @return The details of the instance.
+     * @return All details of the instance.
      */
     public List<Detail> getDetails()
     {
         return this.details;
+    }
+
+    /**
+     * Gets all details of the instance matching a given identifier.
+     *
+     * @param identifier The identifier of the details to return or {@code null}.
+     *
+     * @return All details of the instance matching {@code identifier}.
+     */
+    public List<Detail> getDetails( final String identifier )
+    {
+        final List<Detail> list = new ArrayList( this.getDetails().size() );
+
+        for ( Detail d : this.getDetails() )
+        {
+            if ( identifier == null && d.getIdentifier() == null )
+            {
+                list.add( d );
+            }
+            if ( identifier != null && identifier.equals( d.getIdentifier() ) )
+            {
+                list.add( d );
+            }
+        }
+
+        return list;
     }
 
 }

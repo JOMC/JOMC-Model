@@ -71,28 +71,23 @@ final class ModelExceptionErrorHandler implements ErrorHandler
 
     public void warning( final SAXParseException exception ) throws SAXException
     {
-        if ( exception.getMessage() != null )
-        {
-            this.getDetails().add( new ModelException.Detail( Level.WARNING, exception.getMessage() ) );
-        }
+        this.getDetails().add( new ModelException.Detail(
+            exception.getClass().getName(), Level.WARNING, exception.getMessage() ) );
+
     }
 
     public void error( final SAXParseException exception ) throws SAXException
     {
-        if ( exception.getMessage() != null )
-        {
-            this.getDetails().add( new ModelException.Detail( Level.SEVERE, exception.getMessage() ) );
-        }
+        this.getDetails().add( new ModelException.Detail(
+            exception.getClass().getName(), Level.SEVERE, exception.getMessage() ) );
 
         throw exception;
     }
 
     public void fatalError( final SAXParseException exception ) throws SAXException
     {
-        if ( exception.getMessage() != null )
-        {
-            this.getDetails().add( new ModelException.Detail( Level.SEVERE, exception.getMessage() ) );
-        }
+        this.getDetails().add( new ModelException.Detail(
+            exception.getClass().getName(), Level.SEVERE, exception.getMessage() ) );
 
         throw exception;
     }

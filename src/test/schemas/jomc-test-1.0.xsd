@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+  Copyright (c) 2009 The JOMC Project
+  Copyright (c) 2005 Christian Schulte <cs@jomc.org>
+  All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions
+  are met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in
+      the documentation and/or other materials provided with the
+      distribution.
+
+  THIS SOFTWARE IS PROVIDED BY THE JOMC PROJECT AND CONTRIBUTORS "AS IS"
+  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+  THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE JOMC PROJECT OR
+  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+  $Id$
+
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://jomc.org/model/test"
+            xmlns:test="http://jomc.org/model/test"
+            xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+            jaxb:version="2.0"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en"><![CDATA[
+
+  Copyright (c) 2009 The JOMC Project
+  Copyright (c) 2005 Christian Schulte <cs@jomc.org>
+  All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions
+  are met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in
+      the documentation and/or other materials provided with the
+      distribution.
+
+  THIS SOFTWARE IS PROVIDED BY THE JOMC PROJECT AND CONTRIBUTORS "AS IS"
+  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+  THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE JOMC PROJECT OR
+  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+  $Id$
+
+]]>
+    </xsd:documentation>
+  </xsd:annotation>
+  <!--                                                                       -->
+  <!-- TestSuite                                                             -->
+  <!--                                                                       -->
+  <xsd:element name="testsuite" type="test:TestSuite">
+    <xsd:unique name="schema-constraints-test-uniqueness">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">Checks uniqueness of schema constraints tests.</xsd:documentation>
+      </xsd:annotation>
+      <xsd:selector xpath="test:schema-constraints-test"/>
+      <xsd:field xpath="@identifier"/>
+    </xsd:unique>
+    <xsd:unique name="modules-constraints-test-uniqueness">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">Checks uniqueness of modules constraints tests.</xsd:documentation>
+      </xsd:annotation>
+      <xsd:selector xpath="test:modules-constraints-test"/>
+      <xsd:field xpath="@identifier"/>
+    </xsd:unique>
+    <xsd:unique name="modules-constraints-test-details-uniqueness">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">Checks uniqueness of modules constraints tests details.</xsd:documentation>
+      </xsd:annotation>
+      <xsd:selector xpath="test:modules-constraints-test/test:detail"/>
+      <xsd:field xpath="@identifier"/>
+    </xsd:unique>
+    <xsd:unique name="implementation-test-uniqueness">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">Checks uniqueness of implementation tests.</xsd:documentation>
+      </xsd:annotation>
+      <xsd:selector xpath="test:implementation-test"/>
+      <xsd:field xpath="@identifier"/>
+    </xsd:unique>
+  </xsd:element>
+  <xsd:complexType name="TestSuite">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <jaxb:class>
+          <jaxb:javadoc>List of tests.</jaxb:javadoc>
+        </jaxb:class>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="schema-constraints-test"
+                   type="test:SchemaConstraintsTest"
+                   minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="modules-constraints-test"
+                   type="test:ModulesConstraintsTest"
+                   minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="implementation-test"
+                   type="test:ImplementationTest"
+                   minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- SchemaConstraintTest                                                  -->
+  <!--                                                                       -->
+  <xsd:complexType name="SchemaConstraintsTest">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <jaxb:class>
+          <jaxb:javadoc>Performs schema validation.</jaxb:javadoc>
+        </jaxb:class>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="model-object" type="test:AnyModelObject" minOccurs="0"
+                   maxOccurs="1"/>
+    </xsd:sequence>
+    <xsd:attribute name="identifier" type="xsd:string" use="required">
+      <xsd:annotation>
+        <xsd:appinfo>
+          <jaxb:property>
+            <jaxb:javadoc>Identifier of this test.</jaxb:javadoc>
+          </jaxb:property>
+        </xsd:appinfo>
+      </xsd:annotation>
+    </xsd:attribute>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- ModulesConstraintsTest                                                -->
+  <!--                                                                       -->
+  <xsd:complexType name="ModulesConstraintsTest">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <jaxb:class>
+          <jaxb:javadoc>Performs modules validation.</jaxb:javadoc>
+        </jaxb:class>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="modules" type="test:AnyModelObject" minOccurs="0"
+                   maxOccurs="1"/>
+      <xsd:element name="detail" type="test:ModelExceptionDetail" minOccurs="0"
+                   maxOccurs="unbounded"/>
+    </xsd:sequence>
+    <xsd:attribute name="identifier" type="xsd:string" use="required">
+      <xsd:annotation>
+        <xsd:appinfo>
+          <jaxb:property>
+            <jaxb:javadoc>Identifier of this test.</jaxb:javadoc>
+          </jaxb:property>
+        </xsd:appinfo>
+      </xsd:annotation>
+    </xsd:attribute>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- ImplementationTest                                                    -->
+  <!--                                                                       -->
+  <xsd:complexType name="ImplementationTest">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <jaxb:class>
+          <jaxb:javadoc>Performs implementation tests.</jaxb:javadoc>
+        </jaxb:class>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="modules" type="test:AnyModelObject" minOccurs="0"
+                   maxOccurs="1"/>
+      <xsd:element name="implementation" type="test:AnyModelObject"
+                   minOccurs="1" maxOccurs="1"/>
+    </xsd:sequence>
+    <xsd:attribute name="identifier" type="xsd:string" use="required">
+      <xsd:annotation>
+        <xsd:appinfo>
+          <jaxb:property>
+            <jaxb:javadoc>Identifier of this test.</jaxb:javadoc>
+          </jaxb:property>
+        </xsd:appinfo>
+      </xsd:annotation>
+    </xsd:attribute>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- AnyModelObject                                                        -->
+  <!--                                                                       -->
+  <xsd:complexType name="AnyModelObject">
+    <xsd:sequence>
+      <xsd:any namespace="http://jomc.org/model" minOccurs="0" maxOccurs="1"
+               processContents="lax"/>
+    </xsd:sequence>
+    <xsd:attribute name="valid" type="xsd:boolean" use="required">
+      <xsd:annotation>
+        <xsd:appinfo>
+          <jaxb:property>
+            <jaxb:javadoc>Flag indicating the model object is expected to be valid.</jaxb:javadoc>
+          </jaxb:property>
+        </xsd:appinfo>
+      </xsd:annotation>
+    </xsd:attribute>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- ModelExceptionDetail                                                  -->
+  <!--                                                                       -->
+  <xsd:complexType name="ModelExceptionDetail">
+    <xsd:attribute name="identifier" type="xsd:string" use="required">
+      <xsd:annotation>
+        <xsd:appinfo>
+          <jaxb:property>
+            <jaxb:javadoc>Identifier of the detail.</jaxb:javadoc>
+          </jaxb:property>
+        </xsd:appinfo>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="count" type="xsd:int" use="required">
+      <xsd:annotation>
+        <xsd:appinfo>
+          <jaxb:property>
+            <jaxb:javadoc>Number of expected details with {@code identifier}.</jaxb:javadoc>
+          </jaxb:property>
+        </xsd:appinfo>
+      </xsd:annotation>
+    </xsd:attribute>
+  </xsd:complexType>
+</xsd:schema>
