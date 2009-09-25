@@ -2663,37 +2663,34 @@ public class DefaultModelManager implements ModelManager
         final Modules modules, final Implementation implementation, final String dependencyName,
         final Implementations implementations, final Implementations seen, final boolean includeImplementation )
     {
-        if ( implementation != null )
+        if ( implementation != null && seen.getImplementation( implementation.getIdentifier() ) == null )
         {
-            if ( seen.getImplementation( implementation.getIdentifier() ) == null )
+            seen.getImplementation().add( implementation );
+
+            if ( includeImplementation )
             {
-                seen.getImplementation().add( implementation );
+                final Dependencies dependencies = modules.getDependencies( implementation.getIdentifier() );
 
-                if ( includeImplementation )
+                if ( dependencies != null )
                 {
-                    final Dependencies dependencies = modules.getDependencies( implementation.getIdentifier() );
-
-                    if ( dependencies != null )
+                    for ( Dependency d : dependencies.getDependency() )
                     {
-                        for ( Dependency d : dependencies.getDependency() )
+                        if ( dependencyName.equals( d.getName() ) && d.isFinal() &&
+                             implementations.getImplementation( implementation.getIdentifier() ) == null )
                         {
-                            if ( dependencyName.equals( d.getName() ) && d.isFinal() &&
-                                 implementations.getImplementation( implementation.getIdentifier() ) == null )
-                            {
-                                implementations.getImplementation().add( implementation );
-                            }
+                            implementations.getImplementation().add( implementation );
                         }
                     }
                 }
+            }
 
-                if ( implementation.getImplementations() != null )
+            if ( implementation.getImplementations() != null )
+            {
+                for ( ImplementationReference r : implementation.getImplementations().getReference() )
                 {
-                    for ( ImplementationReference r : implementation.getImplementations().getReference() )
-                    {
-                        this.collectFinalSuperDependencies( modules, modules.getImplementation( r.getIdentifier() ),
-                                                            dependencyName, implementations, seen, true );
+                    this.collectFinalSuperDependencies( modules, modules.getImplementation( r.getIdentifier() ),
+                                                        dependencyName, implementations, seen, true );
 
-                    }
                 }
             }
         }
@@ -2703,37 +2700,34 @@ public class DefaultModelManager implements ModelManager
         final Modules modules, final Implementation implementation, final String messageName,
         final Implementations implementations, final Implementations seen, final boolean includeImplementation )
     {
-        if ( implementation != null )
+        if ( implementation != null && seen.getImplementation( implementation.getIdentifier() ) == null )
         {
-            if ( seen.getImplementation( implementation.getIdentifier() ) == null )
+            seen.getImplementation().add( implementation );
+
+            if ( includeImplementation )
             {
-                seen.getImplementation().add( implementation );
+                final Messages messages = modules.getMessages( implementation.getIdentifier() );
 
-                if ( includeImplementation )
+                if ( messages != null )
                 {
-                    final Messages messages = modules.getMessages( implementation.getIdentifier() );
-
-                    if ( messages != null )
+                    for ( Message m : messages.getMessage() )
                     {
-                        for ( Message m : messages.getMessage() )
+                        if ( messageName.equals( m.getName() ) && m.isFinal() &&
+                             implementations.getImplementation( implementation.getIdentifier() ) == null )
                         {
-                            if ( messageName.equals( m.getName() ) && m.isFinal() &&
-                                 implementations.getImplementation( implementation.getIdentifier() ) == null )
-                            {
-                                implementations.getImplementation().add( implementation );
-                            }
+                            implementations.getImplementation().add( implementation );
                         }
                     }
                 }
+            }
 
-                if ( implementation.getImplementations() != null )
+            if ( implementation.getImplementations() != null )
+            {
+                for ( ImplementationReference r : implementation.getImplementations().getReference() )
                 {
-                    for ( ImplementationReference r : implementation.getImplementations().getReference() )
-                    {
-                        this.collectFinalSuperMessages( modules, modules.getImplementation( r.getIdentifier() ),
-                                                        messageName, implementations, seen, true );
+                    this.collectFinalSuperMessages( modules, modules.getImplementation( r.getIdentifier() ),
+                                                    messageName, implementations, seen, true );
 
-                    }
                 }
             }
         }
@@ -2743,37 +2737,34 @@ public class DefaultModelManager implements ModelManager
         final Modules modules, final Implementation implementation, final String propertyName,
         final Implementations implementations, final Implementations seen, final boolean includeImplementation )
     {
-        if ( implementation != null )
+        if ( implementation != null && seen.getImplementation( implementation.getIdentifier() ) == null )
         {
-            if ( seen.getImplementation( implementation.getIdentifier() ) == null )
+            seen.getImplementation().add( implementation );
+
+            if ( includeImplementation )
             {
-                seen.getImplementation().add( implementation );
+                final Properties properties = modules.getProperties( implementation.getIdentifier() );
 
-                if ( includeImplementation )
+                if ( properties != null )
                 {
-                    final Properties properties = modules.getProperties( implementation.getIdentifier() );
-
-                    if ( properties != null )
+                    for ( Property p : properties.getProperty() )
                     {
-                        for ( Property p : properties.getProperty() )
+                        if ( propertyName.equals( p.getName() ) && p.isFinal() &&
+                             implementations.getImplementation( implementation.getIdentifier() ) == null )
                         {
-                            if ( propertyName.equals( p.getName() ) && p.isFinal() &&
-                                 implementations.getImplementation( implementation.getIdentifier() ) == null )
-                            {
-                                implementations.getImplementation().add( implementation );
-                            }
+                            implementations.getImplementation().add( implementation );
                         }
                     }
                 }
+            }
 
-                if ( implementation.getImplementations() != null )
+            if ( implementation.getImplementations() != null )
+            {
+                for ( ImplementationReference r : implementation.getImplementations().getReference() )
                 {
-                    for ( ImplementationReference r : implementation.getImplementations().getReference() )
-                    {
-                        this.collectFinalSuperProperties( modules, modules.getImplementation( r.getIdentifier() ),
-                                                          propertyName, implementations, seen, true );
+                    this.collectFinalSuperProperties( modules, modules.getImplementation( r.getIdentifier() ),
+                                                      propertyName, implementations, seen, true );
 
-                    }
                 }
             }
         }
@@ -2783,37 +2774,34 @@ public class DefaultModelManager implements ModelManager
         final Modules modules, final Implementation implementation, final String specificationIdentifier,
         final Implementations implementations, final Implementations seen, final boolean includeImplementation )
     {
-        if ( implementation != null )
+        if ( implementation != null && seen.getImplementation( implementation.getIdentifier() ) == null )
         {
-            if ( seen.getImplementation( implementation.getIdentifier() ) == null )
+            seen.getImplementation().add( implementation );
+
+            if ( includeImplementation )
             {
-                seen.getImplementation().add( implementation );
+                final Specifications specifications = modules.getSpecifications( implementation.getIdentifier() );
 
-                if ( includeImplementation )
+                if ( specifications != null )
                 {
-                    final Specifications specifications = modules.getSpecifications( implementation.getIdentifier() );
-
-                    if ( specifications != null )
+                    for ( SpecificationReference r : specifications.getReference() )
                     {
-                        for ( SpecificationReference r : specifications.getReference() )
+                        if ( specificationIdentifier.equals( r.getIdentifier() ) && r.isFinal() &&
+                             implementations.getImplementation( implementation.getIdentifier() ) == null )
                         {
-                            if ( specificationIdentifier.equals( r.getIdentifier() ) && r.isFinal() &&
-                                 implementations.getImplementation( implementation.getIdentifier() ) == null )
-                            {
-                                implementations.getImplementation().add( implementation );
-                            }
+                            implementations.getImplementation().add( implementation );
                         }
                     }
                 }
+            }
 
-                if ( implementation.getImplementations() != null )
+            if ( implementation.getImplementations() != null )
+            {
+                for ( ImplementationReference r : implementation.getImplementations().getReference() )
                 {
-                    for ( ImplementationReference r : implementation.getImplementations().getReference() )
-                    {
-                        this.collectFinalSuperSpecifications( modules, modules.getImplementation( r.getIdentifier() ),
-                                                              specificationIdentifier, implementations, seen, true );
+                    this.collectFinalSuperSpecifications( modules, modules.getImplementation( r.getIdentifier() ),
+                                                          specificationIdentifier, implementations, seen, true );
 
-                    }
                 }
             }
         }
@@ -2823,30 +2811,23 @@ public class DefaultModelManager implements ModelManager
                                                    final Implementations implementations, final Implementations seen,
                                                    final boolean includeImplementation )
     {
-        if ( implementation != null )
+        if ( implementation != null && seen.getImplementation( implementation.getIdentifier() ) == null )
         {
-            if ( seen.getImplementation( implementation.getIdentifier() ) == null )
+            seen.getImplementation().add( implementation );
+
+            if ( includeImplementation && implementation.isFinal() &&
+                 implementations.getImplementation( implementation.getIdentifier() ) == null )
             {
-                seen.getImplementation().add( implementation );
+                implementations.getImplementation().add( implementation );
+            }
 
-                if ( includeImplementation )
+            if ( implementation.getImplementations() != null )
+            {
+                for ( ImplementationReference r : implementation.getImplementations().getReference() )
                 {
-                    if ( implementation.isFinal() &&
-                         implementations.getImplementation( implementation.getIdentifier() ) == null )
-                    {
-                        implementations.getImplementation().add( implementation );
-                    }
-                }
+                    this.collectFinalSuperImplementations( modules, modules.getImplementation( r.getIdentifier() ),
+                                                           implementations, seen, true );
 
-
-                if ( implementation.getImplementations() != null )
-                {
-                    for ( ImplementationReference r : implementation.getImplementations().getReference() )
-                    {
-                        this.collectFinalSuperImplementations( modules, modules.getImplementation( r.getIdentifier() ),
-                                                               implementations, seen, true );
-
-                    }
                 }
             }
         }
