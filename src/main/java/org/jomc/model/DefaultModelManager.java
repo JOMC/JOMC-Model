@@ -480,7 +480,7 @@ public class DefaultModelManager implements ModelManager
         }
         catch ( final SAXException e )
         {
-            final ModelException modelException = new ModelException( e.getMessage(), e );
+            final ModelException modelException = new ModelException( this.getMessage( "validationFailed", null ), e );
             modelException.getDetails().addAll( errorHandler.getDetails() );
             throw modelException;
         }
@@ -1758,7 +1758,7 @@ public class DefaultModelManager implements ModelManager
         }
         catch ( final SAXException e )
         {
-            final ModelException modelException = new ModelException( e.getMessage(), e );
+            final ModelException modelException = new ModelException( this.getMessage( "validationFailed", null ), e );
             modelException.getDetails().addAll( errorHandler.getDetails() );
             throw modelException;
         }
