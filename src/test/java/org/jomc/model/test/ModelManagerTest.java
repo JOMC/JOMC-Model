@@ -61,7 +61,7 @@ import org.jomc.model.Specifications;
 import org.xml.sax.SAXException;
 
 /**
- * Testcases for {@code org.jomc.model.ModelManager} implementations.
+ * Test cases for {@code org.jomc.model.ModelManager} implementations.
  *
  * @author <a href="mailto:cs@jomc.org">Christian Schulte</a> 1.0
  * @version $Id$

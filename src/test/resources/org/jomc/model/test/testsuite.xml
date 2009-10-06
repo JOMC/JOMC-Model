@@ -961,6 +961,77 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="PROPERTY_INHERITANCE_CONSTRAINT_2">
+    <modules valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="TEST">
+          <implementations>
+            <implementation identifier="Final 1" name="Final 1">
+              <properties>
+                <property name="Final 1" final="true"/>
+                <reference name="REF 1" final="true"/>
+              </properties>
+            </implementation>
+            <implementation identifier="Final 2" name="Final 2">
+              <properties>
+                <property name="Final 2" final="true"/>
+                <reference name="REF 2" final="true"/>
+              </properties>
+            </implementation>
+            <implementation identifier="Final 3" name="Final 3">
+              <properties>
+                <property name="Final 3" final="true"/>
+                <reference name="REF 3" final="true"/>
+              </properties>
+            </implementation>
+            <implementation identifier="Final 4" name="Final 4">
+              <properties>
+                <property name="Final 4" final="true"/>
+                <reference name="REF 4" final="true"/>
+              </properties>
+            </implementation>
+            <implementation identifier="Final 5" name="Final 5">
+              <properties>
+                <property name="Final 5" final="true"/>
+                <reference name="REF 5" final="true"/>
+              </properties>
+            </implementation>
+            <implementation identifier="TEST 1" name="TEST 1" final="true">
+              <implementations>
+                <reference identifier="Final 1"/>
+                <reference identifier="Final 2"/>
+                <reference identifier="Final 3"/>
+                <reference identifier="Final 4"/>
+                <reference identifier="Final 5"/>
+              </implementations>
+              <properties>
+                <property name="Final 1" final="true"/>
+                <property name="Final 2" final="true"/>
+                <property name="Final 3" final="true"/>
+                <property name="Final 4" final="true"/>
+                <property name="Final 5" final="true"/>
+                <reference name="REF 1" final="true"/>
+                <reference name="REF 2" final="true"/>
+                <reference name="REF 3" final="true"/>
+                <reference name="REF 4" final="true"/>
+                <reference name="REF 5" final="true"/>
+              </properties>
+            </implementation>
+          </implementations>
+          <properties>
+            <property name="REF 1"/>
+            <property name="REF 2"/>
+            <property name="REF 3"/>
+            <property name="REF 4"/>
+            <property name="REF 5"/>
+          </properties>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="PROPERTY_INHERITANCE_CONSTRAINT" count="10"/>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
   <modules-constraints-test identifier="MESSAGE_INHERITANCE_CONSTRAINT">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
@@ -1015,6 +1086,77 @@
                 <message name="REF 3" final="true"/>
                 <message name="REF 4" final="true"/>
                 <message name="REF 5" final="true"/>
+              </messages>
+            </implementation>
+          </implementations>
+          <messages>
+            <message name="REF 1"/>
+            <message name="REF 2"/>
+            <message name="REF 3"/>
+            <message name="REF 4"/>
+            <message name="REF 5"/>
+          </messages>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="MESSAGE_INHERITANCE_CONSTRAINT" count="10"/>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="MESSAGE_INHERITANCE_CONSTRAINT_2">
+    <modules valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="TEST">
+          <implementations>
+            <implementation identifier="Final 1" name="Final 1">
+              <messages>
+                <message name="Final 1" final="true"/>
+                <reference name="REF 1" final="true"/>
+              </messages>
+            </implementation>
+            <implementation identifier="Final 2" name="Final 2">
+              <messages>
+                <message name="Final 2" final="true"/>
+                <reference name="REF 2" final="true"/>
+              </messages>
+            </implementation>
+            <implementation identifier="Final 3" name="Final 3">
+              <messages>
+                <message name="Final 3" final="true"/>
+                <reference name="REF 3" final="true"/>
+              </messages>
+            </implementation>
+            <implementation identifier="Final 4" name="Final 4">
+              <messages>
+                <message name="Final 4" final="true"/>
+                <reference name="REF 4" final="true"/>
+              </messages>
+            </implementation>
+            <implementation identifier="Final 5" name="Final 5">
+              <messages>
+                <message name="Final 5" final="true"/>
+                <reference name="REF 5" final="true"/>
+              </messages>
+            </implementation>
+            <implementation identifier="TEST 1" name="TEST 1" final="true">
+              <implementations>
+                <reference identifier="Final 1"/>
+                <reference identifier="Final 2"/>
+                <reference identifier="Final 3"/>
+                <reference identifier="Final 4"/>
+                <reference identifier="Final 5"/>
+              </implementations>
+              <messages>
+                <message name="Final 1" final="true"/>
+                <message name="Final 2" final="true"/>
+                <message name="Final 3" final="true"/>
+                <message name="Final 4" final="true"/>
+                <message name="Final 5" final="true"/>
+                <reference name="REF 1" final="true"/>
+                <reference name="REF 2" final="true"/>
+                <reference name="REF 3" final="true"/>
+                <reference name="REF 4" final="true"/>
+                <reference name="REF 5" final="true"/>
               </messages>
             </implementation>
           </implementations>
