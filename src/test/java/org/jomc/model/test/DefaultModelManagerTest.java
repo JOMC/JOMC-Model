@@ -34,7 +34,9 @@
 // SECTION-END
 package org.jomc.model.test;
 
+import java.util.List;
 import java.util.logging.Level;
+import javax.xml.transform.Transformer;
 import junit.framework.Assert;
 import org.jomc.model.DefaultModelManager;
 import org.jomc.model.Implementation;
@@ -134,6 +136,23 @@ public class DefaultModelManagerTest extends ModelManagerTest
             }
 
             throw e;
+        }
+    }
+
+    public void testClasspathTransformers() throws Exception
+    {
+        final List<Transformer> transformers =
+            this.getModelManager().getClasspathTransformers( this.getModelManager().getDefaultStylesheetLocation() );
+
+        Assert.assertNotNull( transformers );
+        Assert.assertFalse( transformers.isEmpty() );
+
+        Modules modules = new Modules();
+        for ( Transformer t : transformers )
+        {
+            modules = this.getModelManager().transformModelObject(
+                this.getModelManager().getObjectFactory().createModules( modules ), t );
+
         }
     }
 
