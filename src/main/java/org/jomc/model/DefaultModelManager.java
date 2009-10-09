@@ -67,6 +67,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.util.JAXBResult;
 import javax.xml.bind.util.JAXBSource;
+import javax.xml.namespace.QName;
 import javax.xml.transform.ErrorListener;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -1262,6 +1263,12 @@ public class DefaultModelManager implements ModelManager
         instance.setProperties( modules.getProperties( implementation.getIdentifier() ) );
         instance.setMessages( modules.getMessages( implementation.getIdentifier() ) );
         instance.setSpecifications( modules.getSpecifications( implementation.getIdentifier() ) );
+
+        final List<Object> any = new LinkedList<Object>();
+        final Map<QName, JAXBElement> elements = new HashMap<QName, JAXBElement>();
+        this.collectAnyObjects( modules, implementation, new Implementations(), any, elements );
+        instance.getAny().addAll( any );
+
         return instance;
     }
 
@@ -2857,6 +2864,42 @@ public class DefaultModelManager implements ModelManager
         }
 
         return null;
+    }
+
+    private void collectAnyObjects( final Modules modules, final Implementation current, final Implementations seen,
+                                    final List<Object> any, final Map<QName, JAXBElement> elements )
+    {
+        if ( current != null && seen.getImplementation( current.getIdentifier() ) == null )
+        {
+            seen.getImplementation().add( current );
+
+            for ( Object o : current.getAny() )
+            {
+                if ( o instanceof JAXBElement )
+                {
+                    final JAXBElement e = (JAXBElement) o;
+                    if ( !elements.containsKey( e.getName() ) )
+                    {
+                        elements.put( e.getName(), e );
+                        any.add( o );
+                    }
+                }
+                else
+                {
+                    any.add( o );
+                }
+            }
+
+            if ( current.getImplementations() != null )
+            {
+                for ( ImplementationReference r : current.getImplementations().getReference() )
+                {
+                    this.collectAnyObjects(
+                        modules, modules.getImplementation( r.getIdentifier() ), seen, any, elements );
+
+                }
+            }
+        }
     }
 
     private String getMessage( final String key, final Object args )
