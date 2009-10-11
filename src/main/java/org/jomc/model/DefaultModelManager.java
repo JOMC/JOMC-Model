@@ -1484,16 +1484,21 @@ public class DefaultModelManager implements ModelManager
 
                     if ( Modifier.isStatic( factoryMethod.getModifiers() ) )
                     {
-                        object = factoryMethod.invoke( null, NO_OBJECTS );
+                        synchronized ( this.objects )
+                        {
+                            object = factoryMethod.invoke( null, NO_OBJECTS );
+                            this.objects.put( object, instance );
+                        }
                     }
                     else if ( ctor != null )
                     {
                         synchronized ( this.objects )
                         {
-                            object = ctor.newInstance();
+                            final Object o = ctor.newInstance();
+                            this.objects.put( o, instance );
+                            object = factoryMethod.invoke( o, NO_OBJECTS );
                             this.objects.put( object, instance );
-                            object = factoryMethod.invoke( object, NO_OBJECTS );
-                            this.objects.put( object, instance );
+                            this.objects.remove( o );
                         }
                     }
                     else
