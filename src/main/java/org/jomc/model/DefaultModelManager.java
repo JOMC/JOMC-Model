@@ -106,7 +106,10 @@ import org.xml.sax.SAXException;
  * </ul></p>
  *
  * <p><b>Logging</b><ul>
+ * <li>{@link #getLogLevel() }</li>
+ * <li>{@link #setLogLevel(java.util.logging.Level) }</li>
  * <li>{@link #getListeners() }</li>
+ * <li>{@link #isLoggable(java.util.logging.Level) }</li>
  * <li>{@link #log(java.util.logging.Level, java.lang.String, java.lang.Throwable) }</li>
  * </ul></p>
  *
@@ -195,11 +198,15 @@ public class DefaultModelManager implements ModelManager
                                         schemaSource.setPublicId( publicId );
                                         schemaSource.setSystemId( url.toExternalForm() );
 
-                                        log( Level.FINE, getMessage( "resolvedSystemIdUri", new Object[]
-                                            {
-                                                systemUri.toASCIIString(),
-                                                schemaSource.getSystemId()
-                                            } ), null );
+                                        if ( isLoggable( Level.FINE ) )
+                                        {
+                                            log( Level.FINE, getMessage( "resolvedSystemIdUri", new Object[]
+                                                {
+                                                    systemUri.toASCIIString(),
+                                                    schemaSource.getSystemId()
+                                                } ), null );
+
+                                        }
 
                                         break;
                                     }
@@ -207,10 +214,14 @@ public class DefaultModelManager implements ModelManager
                             }
                             else
                             {
-                                log( Level.WARNING, getMessage( "unsupportedSystemIdUri", new Object[]
-                                    {
-                                        systemId, systemUri.toASCIIString()
-                                    } ), null );
+                                if ( isLoggable( Level.WARNING ) )
+                                {
+                                    log( Level.WARNING, getMessage( "unsupportedSystemIdUri", new Object[]
+                                        {
+                                            systemId, systemUri.toASCIIString()
+                                        } ), null );
+
+                                }
 
                                 schemaSource = null;
                             }
@@ -218,10 +229,14 @@ public class DefaultModelManager implements ModelManager
                     }
                     catch ( final URISyntaxException e )
                     {
-                        log( Level.WARNING, getMessage( "unsupportedSystemIdUri", new Object[]
-                            {
-                                systemId, e.getMessage()
-                            } ), null );
+                        if ( isLoggable( Level.WARNING ) )
+                        {
+                            log( Level.WARNING, getMessage( "unsupportedSystemIdUri", new Object[]
+                                {
+                                    systemId, e.getMessage()
+                                } ), null );
+
+                        }
 
                         schemaSource = null;
                     }
@@ -345,19 +360,27 @@ public class DefaultModelManager implements ModelManager
                     }
                     catch ( final SAXException e )
                     {
-                        log( Level.WARNING, getMessage( "unsupportedSystemIdUri", new Object[]
-                            {
-                                systemId, e.getMessage()
-                            } ), null );
+                        if ( isLoggable( Level.WARNING ) )
+                        {
+                            log( Level.WARNING, getMessage( "unsupportedSystemIdUri", new Object[]
+                                {
+                                    systemId, e.getMessage()
+                                } ), null );
+
+                        }
 
                         input = null;
                     }
                     catch ( final IOException e )
                     {
-                        log( Level.WARNING, getMessage( "unsupportedSystemIdUri", new Object[]
-                            {
-                                systemId, e.getMessage()
-                            } ), null );
+                        if ( isLoggable( Level.WARNING ) )
+                        {
+                            log( Level.WARNING, getMessage( "unsupportedSystemIdUri", new Object[]
+                                {
+                                    systemId, e.getMessage()
+                                } ), null );
+
+                        }
 
                         input = null;
                     }
@@ -799,7 +822,7 @@ public class DefaultModelManager implements ModelManager
                                         this.getObjectFactory().createImplementation( i ), i, r ) );
 
                                 }
-                                if ( !r.isOverride() && override )
+                                if ( !r.isOverride() && override && this.isLoggable( Level.WARNING ) )
                                 {
                                     this.log( Level.WARNING, this.getMessage( "specificationOverrideWarning",
                                                                               new Object[]
@@ -842,7 +865,7 @@ public class DefaultModelManager implements ModelManager
                                         this.getObjectFactory().createImplementation( i ), i, d ) );
 
                                 }
-                                if ( !d.isOverride() && override )
+                                if ( !d.isOverride() && override && this.isLoggable( Level.WARNING ) )
                                 {
                                     this.log( Level.WARNING, this.getMessage( "dependencyOverrideWarning", new Object[]
                                         {
@@ -884,7 +907,7 @@ public class DefaultModelManager implements ModelManager
                                         this.getObjectFactory().createImplementation( i ), i, p ) );
 
                                 }
-                                if ( !p.isOverride() && override )
+                                if ( !p.isOverride() && override && this.isLoggable( Level.WARNING ) )
                                 {
                                     this.log( Level.WARNING, this.getMessage( "propertyOverrideWarning", new Object[]
                                         {
@@ -920,7 +943,7 @@ public class DefaultModelManager implements ModelManager
                                         this.getObjectFactory().createImplementation( i ), i, r ) );
 
                                 }
-                                if ( !r.isOverride() && override )
+                                if ( !r.isOverride() && override && this.isLoggable( Level.WARNING ) )
                                 {
                                     this.log( Level.WARNING, this.getMessage( "propertyOverrideWarning", new Object[]
                                         {
@@ -962,7 +985,7 @@ public class DefaultModelManager implements ModelManager
                                         this.getObjectFactory().createImplementation( i ), i, msg ) );
 
                                 }
-                                if ( !msg.isOverride() && override )
+                                if ( !msg.isOverride() && override && this.isLoggable( Level.WARNING ) )
                                 {
                                     this.log( Level.WARNING, this.getMessage( "messageOverrideWarning", new Object[]
                                         {
@@ -998,7 +1021,7 @@ public class DefaultModelManager implements ModelManager
                                         this.getObjectFactory().createImplementation( i ), i, r ) );
 
                                 }
-                                if ( !r.isOverride() && override )
+                                if ( !r.isOverride() && override && this.isLoggable( Level.WARNING ) )
                                 {
                                     this.log( Level.WARNING, this.getMessage( "messageOverrideWarning", new Object[]
                                         {
@@ -1390,10 +1413,14 @@ public class DefaultModelManager implements ModelManager
                 }
                 catch ( final NoSuchMethodException e )
                 {
-                    this.log( Level.FINE, this.getMessage( "noSuchMethod", new Object[]
-                        {
-                            e.getMessage()
-                        } ), null );
+                    if ( this.isLoggable( Level.FINE ) )
+                    {
+                        this.log( Level.FINE, this.getMessage( "noSuchMethod", new Object[]
+                            {
+                                e.getMessage()
+                            } ), null );
+
+                    }
 
                     ctor = null;
                 }
@@ -1542,6 +1569,8 @@ public class DefaultModelManager implements ModelManager
          * @param level The level of the event.
          * @param message The message of the event or {@code null}.
          * @param t The throwable of the event or {@code null}.
+         *
+         * @throws NullPointerException if {@code level} is {@code null}.
          */
         void onLog( Level level, String message, Throwable t );
 
@@ -1629,6 +1658,9 @@ public class DefaultModelManager implements ModelManager
 
     /** Maps objects to {@code Instance}s. */
     private final Map objects = new WeakIdentityHashMap( 1024 );
+
+    /** Log level of the instance. */
+    private Level logLevel;
 
     /** Creates a new {@code DefaultModelManager} instance. */
     public DefaultModelManager()
@@ -1728,10 +1760,14 @@ public class DefaultModelManager implements ModelManager
         if ( this.bootstrapSchema == null )
         {
             final URL url = this.getClassLoader().getResource( BOOTSTRAP_SCHEMA_LOCATION );
-            this.log( Level.FINE, this.getMessage( "processing", new Object[]
-                {
-                    url.toExternalForm()
-                } ), null );
+            if ( this.isLoggable( Level.FINE ) )
+            {
+                this.log( Level.FINE, this.getMessage( "processing", new Object[]
+                    {
+                        url.toExternalForm()
+                    } ), null );
+
+            }
 
             this.bootstrapSchema = SchemaFactory.newInstance( XMLConstants.W3C_XML_SCHEMA_NS_URI ).newSchema( url );
         }
@@ -1925,10 +1961,14 @@ public class DefaultModelManager implements ModelManager
             final JAXBContext ctx = JAXBContext.newInstance( BOOTSTRAP_CONTEXT, this.getClassLoader() );
             final Unmarshaller u = ctx.createUnmarshaller();
             final String bootstrapLocation = this.getBootstrapDocumentLocation();
-            this.log( Level.FINE, this.getMessage( "bootstrapLocation", new Object[]
-                {
-                    bootstrapLocation
-                } ), null );
+            if ( this.isLoggable( Level.FINE ) )
+            {
+                this.log( Level.FINE, this.getMessage( "bootstrapLocation", new Object[]
+                    {
+                        bootstrapLocation
+                    } ), null );
+
+            }
 
             final Enumeration<URL> e = this.getClassLoader().getResources( bootstrapLocation );
             u.setSchema( this.getBootstrapSchema() );
@@ -1936,10 +1976,14 @@ public class DefaultModelManager implements ModelManager
             while ( e.hasMoreElements() )
             {
                 final URL url = e.nextElement();
-                this.log( Level.FINE, this.getMessage( "processing", new Object[]
-                    {
-                        url.toExternalForm()
-                    } ), null );
+                if ( this.isLoggable( Level.FINE ) )
+                {
+                    this.log( Level.FINE, this.getMessage( "processing", new Object[]
+                        {
+                            url.toExternalForm()
+                        } ), null );
+
+                }
 
                 Object content = u.unmarshal( url );
                 if ( content instanceof JAXBElement )
@@ -1950,10 +1994,14 @@ public class DefaultModelManager implements ModelManager
                 if ( content instanceof Schema )
                 {
                     final Schema s = (Schema) content;
-                    this.log( Level.FINE, this.getMessage( "addingSchema", new Object[]
-                        {
-                            s.getPublicId(), s.getSystemId(), s.getContextId(), s.getClasspathId()
-                        } ), null );
+                    if ( this.isLoggable( Level.FINE ) )
+                    {
+                        this.log( Level.FINE, this.getMessage( "addingSchema", new Object[]
+                            {
+                                s.getPublicId(), s.getSystemId(), s.getContextId(), s.getClasspathId()
+                            } ), null );
+
+                    }
 
                     this.schemas.getSchema().add( s );
                 }
@@ -1961,10 +2009,14 @@ public class DefaultModelManager implements ModelManager
                 {
                     for ( Schema s : ( (Schemas) content ).getSchema() )
                     {
-                        this.log( Level.FINE, this.getMessage( "addingSchema", new Object[]
-                            {
-                                s.getPublicId(), s.getSystemId(), s.getContextId(), s.getClasspathId()
-                            } ), null );
+                        if ( this.isLoggable( Level.FINE ) )
+                        {
+                            this.log( Level.FINE, this.getMessage( "addingSchema", new Object[]
+                                {
+                                    s.getPublicId(), s.getSystemId(), s.getContextId(), s.getClasspathId()
+                                } ), null );
+
+                        }
 
                         this.schemas.getSchema().add( s );
                     }
@@ -2015,10 +2067,14 @@ public class DefaultModelManager implements ModelManager
             throw new NullPointerException( "location" );
         }
 
-        this.log( Level.FINE, this.getMessage( "documentLocation", new Object[]
-            {
-                location
-            } ), null );
+        if ( this.isLoggable( Level.FINE ) )
+        {
+            this.log( Level.FINE, this.getMessage( "documentLocation", new Object[]
+                {
+                    location
+                } ), null );
+
+        }
 
         final long t0 = System.currentTimeMillis();
         final Text text = new Text();
@@ -2042,10 +2098,14 @@ public class DefaultModelManager implements ModelManager
             count++;
             final URL url = resources.nextElement();
 
-            this.log( Level.FINE, this.getMessage( "processing", new Object[]
-                {
-                    url.toExternalForm()
-                } ), null );
+            if ( this.isLoggable( Level.FINE ) )
+            {
+                this.log( Level.FINE, this.getMessage( "processing", new Object[]
+                    {
+                        url.toExternalForm()
+                    } ), null );
+
+            }
 
             Object content = u.unmarshal( url );
             if ( content instanceof JAXBElement )
@@ -2057,7 +2117,7 @@ public class DefaultModelManager implements ModelManager
             {
                 mods.getModule().add( (Module) content );
             }
-            else
+            else if ( this.isLoggable( Level.WARNING ) )
             {
                 this.log( Level.WARNING, this.getMessage( "ignoringDocument", new Object[]
                     {
@@ -2067,10 +2127,14 @@ public class DefaultModelManager implements ModelManager
             }
         }
 
-        this.log( Level.FINE, this.getMessage( "classpathReport", new Object[]
-            {
-                count, Long.valueOf( System.currentTimeMillis() - t0 )
-            } ), null );
+        if ( this.isLoggable( Level.FINE ) )
+        {
+            this.log( Level.FINE, this.getMessage( "classpathReport", new Object[]
+                {
+                    count, Long.valueOf( System.currentTimeMillis() - t0 )
+                } ), null );
+
+        }
 
         return mods;
     }
@@ -2158,10 +2222,14 @@ public class DefaultModelManager implements ModelManager
             throw new NullPointerException( "location" );
         }
 
-        this.log( Level.FINE, this.getMessage( "stylesheetLocation", new Object[]
-            {
-                location
-            } ), null );
+        if ( this.isLoggable( Level.FINE ) )
+        {
+            this.log( Level.FINE, this.getMessage( "stylesheetLocation", new Object[]
+                {
+                    location
+                } ), null );
+
+        }
 
         final long t0 = System.currentTimeMillis();
         final List<Transformer> transformers = new LinkedList<Transformer>();
@@ -2172,18 +2240,29 @@ public class DefaultModelManager implements ModelManager
 
             public void warning( final TransformerException exception ) throws TransformerException
             {
-                log( Level.WARNING, exception.getMessage(), exception );
+                if ( isLoggable( Level.WARNING ) )
+                {
+                    log( Level.WARNING, exception.getMessage(), exception );
+                }
             }
 
             public void error( final TransformerException exception ) throws TransformerException
             {
-                log( Level.SEVERE, exception.getMessage(), exception );
+                if ( isLoggable( Level.SEVERE ) )
+                {
+                    log( Level.SEVERE, exception.getMessage(), exception );
+                }
+
                 throw exception;
             }
 
             public void fatalError( final TransformerException exception ) throws TransformerException
             {
-                log( Level.SEVERE, exception.getMessage(), exception );
+                if ( isLoggable( Level.SEVERE ) )
+                {
+                    log( Level.SEVERE, exception.getMessage(), exception );
+                }
+
                 throw exception;
             }
 
@@ -2208,12 +2287,20 @@ public class DefaultModelManager implements ModelManager
                 }
                 catch ( final SAXException e )
                 {
-                    log( Level.SEVERE, e.getMessage(), e );
+                    if ( isLoggable( Level.SEVERE ) )
+                    {
+                        log( Level.SEVERE, e.getMessage(), e );
+                    }
+
                     throw new TransformerException( e );
                 }
                 catch ( final IOException e )
                 {
-                    log( Level.SEVERE, e.getMessage(), e );
+                    if ( isLoggable( Level.SEVERE ) )
+                    {
+                        log( Level.SEVERE, e.getMessage(), e );
+                    }
+
                     throw new TransformerException( e );
                 }
             }
@@ -2229,10 +2316,14 @@ public class DefaultModelManager implements ModelManager
             count++;
             final URL url = resources.nextElement();
 
-            this.log( Level.FINE, this.getMessage( "processing", new Object[]
-                {
-                    url.toExternalForm()
-                } ), null );
+            if ( this.isLoggable( Level.FINE ) )
+            {
+                this.log( Level.FINE, this.getMessage( "processing", new Object[]
+                    {
+                        url.toExternalForm()
+                    } ), null );
+
+            }
 
             final InputStream in = url.openStream();
             final Transformer transformer = transformerFactory.newTransformer( new StreamSource( in ) );
@@ -2243,10 +2334,14 @@ public class DefaultModelManager implements ModelManager
             transformers.add( transformer );
         }
 
-        this.log( Level.FINE, this.getMessage( "classpathReport", new Object[]
-            {
-                count, Long.valueOf( System.currentTimeMillis() - t0 )
-            } ), null );
+        if ( this.isLoggable( Level.FINE ) )
+        {
+            this.log( Level.FINE, this.getMessage( "classpathReport", new Object[]
+                {
+                    count, Long.valueOf( System.currentTimeMillis() - t0 )
+                } ), null );
+
+        }
 
         return transformers;
     }
@@ -2293,19 +2388,90 @@ public class DefaultModelManager implements ModelManager
     }
 
     /**
+     * Gets the log level of the instance.
+     * <p>The default log level of the instance is controlled by system property
+     * {@code org.jomc.model.DefaultModelManager.logLevel} holding the default log level of the instance.
+     * If that system property is not set, a {@code WARNING} log level is returned.</p>
+     *
+     * @return The log level of the instance.
+     *
+     * @see #setLogLevel(java.util.logging.Level)
+     * @see #isLoggable(java.util.logging.Level)
+     * @see Level#parse(java.lang.String)
+     */
+    public Level getLogLevel()
+    {
+        if ( this.logLevel == null )
+        {
+            this.logLevel = Level.parse( System.getProperty( "org.jomc.model.DefaultModelManager.logLevel",
+                                                             Level.WARNING.getName() ) );
+
+        }
+
+        return this.logLevel;
+    }
+
+    /**
+     * Sets the log level of the instance.
+     *
+     * @param value The new log level of the instance or {@code null}.
+     *
+     * @see #getLogLevel()
+     * @see #isLoggable(java.util.logging.Level)
+     */
+    public void setLogLevel( final Level value )
+    {
+        this.logLevel = value;
+    }
+
+    /**
+     * Checks if a message at a given level is provided to the listeners of the instance.
+     *
+     * @param level The level to test.
+     *
+     * @return {@code true} if messages at {@code level} are provided to the listeners of the instance;
+     * {@code false} if messages at {@code level} are not provided to the listeners of the instance.
+     *
+     * @throws NullPointerException if {@code level} is {@code null}.
+     *
+     * @see #getLogLevel()
+     * @see #setLogLevel(java.util.logging.Level)
+     */
+    public boolean isLoggable( final Level level )
+    {
+        if ( level == null )
+        {
+            throw new NullPointerException( "level" );
+        }
+
+        return level.intValue() >= this.getLogLevel().intValue();
+    }
+
+    /**
      * Notifies registered listeners.
      *
      * @param level The level of the event.
      * @param message The message of the event or {@code null}.
      * @param throwable The throwable of the event {@code null}.
      *
+     * @throws NullPointerException if {@code level} is {@code null}.
+     *
      * @see #getListeners()
+     * @see #isLoggable(java.util.logging.Level)
      */
     protected void log( final Level level, final String message, final Throwable throwable )
     {
-        for ( Listener l : this.getListeners() )
+        if ( level == null )
         {
-            l.onLog( level, message, throwable );
+            throw new NullPointerException( "level" );
+        }
+
+        if ( this.isLoggable( level ) )
+        {
+            for ( Listener l : this.getListeners() )
+            {
+                l.onLog( level, message, throwable );
+            }
         }
     }
 
@@ -2404,12 +2570,15 @@ public class DefaultModelManager implements ModelManager
                     specification.setVendor( vendor );
                     specification.setVersion( version );
 
-                    this.log( Level.FINE, this.getMessage( "classpathSpecification", new Object[]
-                        {
-                            specification.getIdentifier(),
-                            specification.getMultiplicity().value()
-                        } ), null );
+                    if ( this.isLoggable( Level.FINE ) )
+                    {
+                        this.log( Level.FINE, this.getMessage( "classpathSpecification", new Object[]
+                            {
+                                specification.getIdentifier(),
+                                specification.getMultiplicity().value()
+                            } ), null );
 
+                    }
 
                     if ( cpModule.getSpecifications() == null )
                     {
@@ -2424,11 +2593,14 @@ public class DefaultModelManager implements ModelManager
             }
             catch ( final ClassNotFoundException e )
             {
-                this.log( Level.FINE, this.getMessage( "noSuchClass", new Object[]
-                    {
-                        e.getMessage()
-                    } ), null );
+                if ( this.isLoggable( Level.FINE ) )
+                {
+                    this.log( Level.FINE, this.getMessage( "noSuchClass", new Object[]
+                        {
+                            e.getMessage()
+                        } ), null );
 
+                }
             }
         }
     }
@@ -2465,11 +2637,14 @@ public class DefaultModelManager implements ModelManager
                         }
                         catch ( final NoSuchMethodException e )
                         {
-                            this.log( Level.FINE, this.getMessage( "noSuchMethod", new Object[]
-                                {
-                                    e.getMessage()
-                                } ), null );
+                            if ( this.isLoggable( Level.FINE ) )
+                            {
+                                this.log( Level.FINE, this.getMessage( "noSuchMethod", new Object[]
+                                    {
+                                        e.getMessage()
+                                    } ), null );
 
+                            }
                         }
                     }
 
@@ -2523,12 +2698,16 @@ public class DefaultModelManager implements ModelManager
                         implemented.getReference().add( ref );
                         implementation.setSpecifications( implemented );
 
-                        this.log( Level.FINE, this.getMessage( "classpathImplementation", new Object[]
-                            {
-                                implementation.getIdentifier(),
-                                specification.getIdentifier(),
-                                implementation.getName()
-                            } ), null );
+                        if ( this.isLoggable( Level.FINE ) )
+                        {
+                            this.log( Level.FINE, this.getMessage( "classpathImplementation", new Object[]
+                                {
+                                    implementation.getIdentifier(),
+                                    specification.getIdentifier(),
+                                    implementation.getName()
+                                } ), null );
+
+                        }
 
                         if ( cpModule.getImplementations() == null )
                         {
@@ -2537,7 +2716,7 @@ public class DefaultModelManager implements ModelManager
 
                         cpModule.getImplementations().getImplementation().add( implementation );
                     }
-                    else
+                    else if ( this.isLoggable( Level.FINE ) )
                     {
                         this.log( Level.FINE, this.getMessage( "noClasspathImplementation", new Object[]
                             {
@@ -2549,11 +2728,14 @@ public class DefaultModelManager implements ModelManager
             }
             catch ( final ClassNotFoundException e )
             {
-                this.log( Level.FINE, this.getMessage( "noSuchClass", new Object[]
-                    {
-                        e.getMessage()
-                    } ), null );
+                if ( this.isLoggable( Level.FINE ) )
+                {
+                    this.log( Level.FINE, this.getMessage( "noSuchClass", new Object[]
+                        {
+                            e.getMessage()
+                        } ), null );
 
+                }
             }
         }
     }
@@ -2569,10 +2751,14 @@ public class DefaultModelManager implements ModelManager
         }
         catch ( final NoSuchMethodException e )
         {
-            this.log( Level.FINE, this.getMessage( "noSuchMethod", new Object[]
-                {
-                    e.getMessage()
-                } ), null );
+            if ( this.isLoggable( Level.FINE ) )
+            {
+                this.log( Level.FINE, this.getMessage( "noSuchMethod", new Object[]
+                    {
+                        e.getMessage()
+                    } ), null );
+
+            }
 
             factoryMethod = false;
         }
@@ -2590,10 +2776,14 @@ public class DefaultModelManager implements ModelManager
         }
         catch ( final NoSuchMethodException e )
         {
-            this.log( Level.FINE, this.getMessage( "noSuchMethod", new Object[]
-                {
-                    e.getMessage()
-                } ), null );
+            if ( this.isLoggable( Level.FINE ) )
+            {
+                this.log( Level.FINE, this.getMessage( "noSuchMethod", new Object[]
+                    {
+                        e.getMessage()
+                    } ), null );
+
+            }
 
             m = null;
         }
@@ -2633,11 +2823,15 @@ public class DefaultModelManager implements ModelManager
                         {
                             final URL schemaUrl = new URL( baseUrl + entry.getKey() );
                             this.schemaResources.add( schemaUrl );
-                            this.log( Level.FINE, this.getMessage( "processing", new Object[]
-                                {
-                                    schemaUrl.toExternalForm()
-                                } ), null );
 
+                            if ( this.isLoggable( Level.FINE ) )
+                            {
+                                this.log( Level.FINE, this.getMessage( "processing", new Object[]
+                                    {
+                                        schemaUrl.toExternalForm()
+                                    } ), null );
+
+                            }
                         }
                     }
                 }
