@@ -260,6 +260,11 @@ corresponding language.]]></jaxb:javadoc>
       <xsd:selector xpath=".//jomc:implementations/jomc:reference"/>
       <xsd:field xpath="@identifier"/>
     </xsd:keyref>
+    <xsd:keyref name="implementation-implementation-reference"
+                refer="jomc:implementation-key">
+      <xsd:selector xpath=".//jomc:implementations/jomc:implementation/jomc:implementations/jomc:reference"/>
+      <xsd:field xpath="@identifier"/>
+    </xsd:keyref>
     <xsd:keyref name="dependency-specification-reference"
                 refer="jomc:specification-key">
       <xsd:selector xpath=".//jomc:dependency"/>

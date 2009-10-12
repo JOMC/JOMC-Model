@@ -407,6 +407,10 @@ public class ModelManagerTest extends TestCase
                 {
                     Assert.assertNotNull( e.getMessage() );
                     System.out.println( "\t" + e.toString() );
+                    for ( ModelException.Detail d : e.getDetails() )
+                    {
+                        System.out.println( "\t" + d.toString() );
+                    }
                 }
             }
         }

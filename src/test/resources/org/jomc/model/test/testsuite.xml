@@ -148,12 +148,12 @@
       <modules xmlns="http://jomc.org/model">
         <module name="TEST 1">
           <specifications>
-            <specification identifier="TEST"/>
+            <specification identifier="TEST" class="java.lang.Object"/>
           </specifications>
         </module>
         <module name="TEST 2">
           <specifications>
-            <specification identifier="TEST"/>
+            <specification identifier="TEST" class="java.lang.Object"/>
           </specifications>
         </module>
       </modules>
@@ -166,12 +166,12 @@
       <modules xmlns="http://jomc.org/model">
         <module name="TEST 1">
           <implementations>
-            <implementation identifier="TEST"/>
+            <implementation identifier="TEST" name="TEST"/>
           </implementations>
         </module>
         <module name="TEST 2">
           <implementations>
-            <implementation identifier="TEST"/>
+            <implementation identifier="TEST" name="TEST"/>
           </implementations>
         </module>
       </modules>
@@ -199,6 +199,57 @@
           <property name="TEST"/>
         </properties>
       </module>
+    </model-object>
+  </schema-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <schema-constraints-test identifier="MODULES_SPECIFICATION_NOT_FOUND_1">
+    <model-object valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="TEST">
+          <implementations>
+            <implementation identifier="TEST" name="TEST">
+              <dependencies>
+                <dependency name="TEST" identifier="DOES_NOT_EXIST"/>
+              </dependencies>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
+    </model-object>
+  </schema-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <schema-constraints-test identifier="MODULES_SPECIFICATION_NOT_FOUND_2">
+    <model-object valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="TEST">
+          <implementations>
+            <implementation identifier="TEST" name="TEST">
+              <specifications>
+                <reference identifier="DOES_NOT_EXIST"/>
+              </specifications>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
+    </model-object>
+  </schema-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <schema-constraints-test identifier="MODULES_IMPLEMENTATION_NOT_FOUND">
+    <model-object valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="TEST">
+          <implementations>
+            <implementation identifier="TEST" name="TEST">
+              <implementations>
+                <reference identifier="DOES_NOT_EXIST"/>
+              </implementations>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
     </model-object>
   </schema-constraints-test>
 
