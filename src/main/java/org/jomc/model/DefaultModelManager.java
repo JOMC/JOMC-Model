@@ -517,7 +517,7 @@ public class DefaultModelManager implements ModelManager
                     for ( ImplementationReference r : m.getImplementations().getReference() )
                     {
                         details.add( this.newModuleImplementationReferenceDeclarationConstraintDetail(
-                            this.getObjectFactory().createImplementations( m.getImplementations() ), m, r ) );
+                            this.getObjectFactory().createModule( m ), m, r ) );
 
                     }
                 }
@@ -529,20 +529,20 @@ public class DefaultModelManager implements ModelManager
                         if ( msg.isFinal() )
                         {
                             details.add( this.newFinalModuleMessageConstraintDetail(
-                                this.getObjectFactory().createMessage( msg ), m, msg ) );
+                                this.getObjectFactory().createModule( m ), m, msg ) );
 
                         }
                         if ( msg.isOverride() )
                         {
                             details.add( this.newOverrideModuleMessageConstraintDetail(
-                                this.getObjectFactory().createMessage( msg ), m, msg ) );
+                                this.getObjectFactory().createModule( m ), m, msg ) );
 
                         }
                     }
                     for ( MessageReference r : m.getMessages().getReference() )
                     {
                         details.add( this.newModuleMessageReferenceDeclarationConstraintDetail(
-                            this.getObjectFactory().createMessages( m.getMessages() ), m, r ) );
+                            this.getObjectFactory().createModule( m ), m, r ) );
 
                     }
                 }
@@ -554,20 +554,20 @@ public class DefaultModelManager implements ModelManager
                         if ( p.isFinal() )
                         {
                             details.add( this.newFinalModulePropertyConstraintDetail(
-                                this.getObjectFactory().createProperty( p ), m, p ) );
+                                this.getObjectFactory().createModule( m ), m, p ) );
 
                         }
                         if ( p.isOverride() )
                         {
                             details.add( this.newOverrideModulePropertyConstraintDetail(
-                                this.getObjectFactory().createProperty( p ), m, p ) );
+                                this.getObjectFactory().createModule( m ), m, p ) );
 
                         }
                     }
                     for ( PropertyReference r : m.getProperties().getReference() )
                     {
                         details.add( this.newModulePropertyReferenceDeclarationConstraintDetail(
-                            this.getObjectFactory().createProperties( m.getProperties() ), m, r ) );
+                            this.getObjectFactory().createModule( m ), m, r ) );
 
                     }
                 }
@@ -584,7 +584,7 @@ public class DefaultModelManager implements ModelManager
                             for ( Implementation decl : i.getImplementations().getImplementation() )
                             {
                                 details.add( this.newImplementationImplementationDeclarationConstraintDetail(
-                                    this.getObjectFactory().createImplementations( i.getImplementations() ), i, decl ) );
+                                    this.getObjectFactory().createImplementation( i ), i, decl ) );
 
                             }
                         }
@@ -628,7 +628,7 @@ public class DefaultModelManager implements ModelManager
                                     if ( s.getVersion() == null )
                                     {
                                         details.add( this.newSpecificationVersioningConstraintDetail(
-                                            this.getObjectFactory().createSpecifications( specs ), i, s ) );
+                                            this.getObjectFactory().createImplementation( i ), i, s ) );
 
                                     }
                                     else if ( VersionParser.compare( r.getVersion(), s.getVersion() ) != 0 )
@@ -661,7 +661,7 @@ public class DefaultModelManager implements ModelManager
                                         if ( s.getVersion() == null )
                                         {
                                             details.add( this.newSpecificationVersioningConstraintDetail(
-                                                this.getObjectFactory().createDependency( d ), i, s ) );
+                                                this.getObjectFactory().createImplementation( i ), i, s ) );
 
                                         }
                                         else if ( VersionParser.compare( d.getVersion(), s.getVersion() ) > 0 )
@@ -670,7 +670,7 @@ public class DefaultModelManager implements ModelManager
                                                 modules.getModuleOfSpecification( s.getIdentifier() );
 
                                             details.add( this.newIncompatibleDependencyDetail(
-                                                this.getObjectFactory().createDependency( d ),
+                                                this.getObjectFactory().createImplementation( i ),
                                                 i.getIdentifier(), m.getName(),
                                                 d.getIdentifier(), moduleOfSpecification == null
                                                                    ? "<>" : moduleOfSpecification.getName(),
@@ -684,7 +684,7 @@ public class DefaultModelManager implements ModelManager
                                         for ( PropertyReference r : d.getProperties().getReference() )
                                         {
                                             details.add( this.newDependencyPropertyReferenceDeclarationConstraintDetail(
-                                                this.getObjectFactory().createDependency( d ), i, d, r ) );
+                                                this.getObjectFactory().createImplementation( i ), i, d, r ) );
 
                                         }
 
@@ -693,7 +693,7 @@ public class DefaultModelManager implements ModelManager
                                             for ( Property p : d.getProperties().getProperty() )
                                             {
                                                 details.add( this.newDependencyPropertiesOverrideConstraintDetail(
-                                                    this.getObjectFactory().createDependency( d ), i, d, s, p ) );
+                                                    this.getObjectFactory().createImplementation( i ), i, d, s, p ) );
 
                                             }
                                         }
@@ -723,7 +723,7 @@ public class DefaultModelManager implements ModelManager
                                     if ( missing )
                                     {
                                         details.add( this.newMandatoryDependencyConstraintDetail(
-                                            this.getObjectFactory().createDependency( d ), i.getIdentifier(),
+                                            this.getObjectFactory().createImplementation( i ), i.getIdentifier(),
                                             d.getName() ) );
 
                                     }
@@ -752,7 +752,7 @@ public class DefaultModelManager implements ModelManager
                                     if ( referenced.getVersion() == null )
                                     {
                                         details.add( this.newImplementationVersioningConstraintDetail(
-                                            this.getObjectFactory().createImplementations( i.getImplementations() ),
+                                            this.getObjectFactory().createImplementation( i ),
                                             i, referenced ) );
 
                                     }
@@ -796,7 +796,7 @@ public class DefaultModelManager implements ModelManager
                                 if ( r.isOverride() && !override )
                                 {
                                     details.add( this.newSpecificationOverrideConstraintDetail(
-                                        this.getObjectFactory().createSpecifications( i.getSpecifications() ), i, r ) );
+                                        this.getObjectFactory().createImplementation( i ), i, r ) );
 
                                 }
                                 if ( !r.isOverride() && override )
@@ -839,7 +839,7 @@ public class DefaultModelManager implements ModelManager
                                 if ( d.isOverride() && !override )
                                 {
                                     details.add( this.newDependencyOverrideConstraintDetail(
-                                        this.getObjectFactory().createDependency( d ), i, d ) );
+                                        this.getObjectFactory().createImplementation( i ), i, d ) );
 
                                 }
                                 if ( !d.isOverride() && override )
@@ -881,7 +881,7 @@ public class DefaultModelManager implements ModelManager
                                 if ( p.isOverride() && !override )
                                 {
                                     details.add( this.newPropertyOverrideConstraintDetail(
-                                        this.getObjectFactory().createProperty( p ), i, p ) );
+                                        this.getObjectFactory().createImplementation( i ), i, p ) );
 
                                 }
                                 if ( !p.isOverride() && override )
@@ -917,7 +917,7 @@ public class DefaultModelManager implements ModelManager
                                 if ( r.isOverride() && !override )
                                 {
                                     details.add( this.newPropertyOverrideConstraintDetail(
-                                        this.getObjectFactory().createProperties( i.getProperties() ), i, r ) );
+                                        this.getObjectFactory().createImplementation( i ), i, r ) );
 
                                 }
                                 if ( !r.isOverride() && override )
@@ -959,7 +959,7 @@ public class DefaultModelManager implements ModelManager
                                 if ( msg.isOverride() && !override )
                                 {
                                     details.add( this.newMessageOverrideConstraintDetail(
-                                        this.getObjectFactory().createMessage( msg ), i, msg ) );
+                                        this.getObjectFactory().createImplementation( i ), i, msg ) );
 
                                 }
                                 if ( !msg.isOverride() && override )
@@ -995,7 +995,7 @@ public class DefaultModelManager implements ModelManager
                                 if ( r.isOverride() && !override )
                                 {
                                     details.add( this.newMessageOverrideConstraintDetail(
-                                        this.getObjectFactory().createMessages( i.getMessages() ), i, r ) );
+                                        this.getObjectFactory().createImplementation( i ), i, r ) );
 
                                 }
                                 if ( !r.isOverride() && override )
@@ -1181,7 +1181,7 @@ public class DefaultModelManager implements ModelManager
                                     for ( Implementation i : e.getValue().getImplementation() )
                                     {
                                         details.add( this.newImplementationNameConstraintDetail(
-                                            this.getObjectFactory().createSpecification( s ), s, i ) );
+                                            this.getObjectFactory().createImplementation( i ), s, i ) );
 
                                     }
                                 }
