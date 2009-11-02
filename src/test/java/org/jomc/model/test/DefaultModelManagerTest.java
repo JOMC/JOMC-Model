@@ -1,4 +1,3 @@
-// SECTION-START[License Header]
 /*
  *   Copyright (c) 2009 The JOMC Project
  *   Copyright (c) 2005 Christian Schulte <cs@jomc.org>
@@ -31,17 +30,16 @@
  *   $Id$
  *
  */
-// SECTION-END
 package org.jomc.model.test;
 
 import java.util.List;
 import java.util.logging.Level;
+import javax.xml.XMLConstants;
 import javax.xml.transform.Transformer;
 import junit.framework.Assert;
 import org.jomc.model.DefaultModelManager;
 import org.jomc.model.Implementation;
 import org.jomc.model.Implementations;
-import org.jomc.model.ModelException;
 import org.jomc.model.Module;
 import org.jomc.model.Modules;
 import org.jomc.model.SpecificationReference;
@@ -69,25 +67,26 @@ public class DefaultModelManagerTest extends ModelManagerTest
     {
         if ( this.modelManager == null )
         {
-            final DefaultModelManager defaultModelManager = new DefaultModelManager();
-            defaultModelManager.getListeners().add( new DefaultModelManager.Listener()
+            this.modelManager = new DefaultModelManager();
+            this.modelManager.setLogLevel( Level.ALL );
+            this.modelManager.getListeners().add( new DefaultModelManager.Listener()
             {
 
                 public void onLog( final Level level, final String message, final Throwable t )
                 {
+                    System.out.print( "[" + level.getLocalizedName() + "] " );
                     if ( message != null )
                     {
-                        System.out.println( "[" + level.getLocalizedName() + "] " + message );
+                        System.out.print( message );
                     }
                     if ( t != null )
                     {
-                        t.printStackTrace();
+                        System.out.print( ( message == null ? "" : " - " ) + t.toString() );
                     }
+                    System.out.println();
                 }
 
             } );
-
-            this.modelManager = defaultModelManager;
         }
 
         return this.modelManager;
@@ -95,65 +94,72 @@ public class DefaultModelManagerTest extends ModelManagerTest
 
     public void testClasspathResolution() throws Exception
     {
-        try
-        {
-            final Modules modules = new Modules();
-            final Module module = new Module();
-            final Implementations implementations = new Implementations();
-            final Implementation implementation = new Implementation();
-            final Specifications specifications = new Specifications();
-            final SpecificationReference ref = new SpecificationReference();
+        final Modules modules = new Modules();
+        final Module module = new Module();
+        final Implementations implementations = new Implementations();
+        final Implementation implementation = new Implementation();
+        final Specifications specifications = new Specifications();
+        final SpecificationReference ref = new SpecificationReference();
 
-            modules.getModule().add( module );
-            module.setImplementations( implementations );
-            implementations.getImplementation().add( implementation );
-            implementation.setSpecifications( specifications );
-            specifications.getReference().add( ref );
+        modules.getModule().add( module );
+        module.setImplementations( implementations );
+        implementations.getImplementation().add( implementation );
+        implementation.setSpecifications( specifications );
+        specifications.getReference().add( ref );
 
-            module.setName( "Test" );
-            implementation.setIdentifier( "Implementation" );
-            implementation.setName( "Implementation" );
-            implementation.setClazz( "Implementation" );
-            ref.setIdentifier( "java.util.Locale" );
+        module.setName( "Test" );
+        implementation.setIdentifier( "Implementation" );
+        implementation.setName( "Implementation" );
+        implementation.setClazz( "Implementation" );
+        ref.setIdentifier( "java.util.Locale" );
 
-            final Module classpathModule = this.getModelManager().getClasspathModule( modules );
-            Assert.assertNotNull( classpathModule );
-            Assert.assertNotNull( classpathModule.getSpecifications() );
-            Assert.assertNotNull( classpathModule.getSpecifications().getSpecification( "java.util.Locale" ) );
-            Assert.assertNotNull( classpathModule.getImplementations() );
-            Assert.assertNotNull( classpathModule.getImplementations().getImplementation( "java.util.Locale" ) );
+        final Module classpathModule = modules.getClasspathModule(
+            Modules.getDefaultClasspathModuleName(), this.getClass().getClassLoader() );
 
-            modules.getModule().add( classpathModule );
-            this.getModelManager().validateModules( modules );
-        }
-        catch ( ModelException e )
-        {
-            System.out.println( e.toString() );
+        Assert.assertNotNull( classpathModule );
+        Assert.assertNotNull( classpathModule.getSpecifications() );
+        Assert.assertNotNull( classpathModule.getSpecifications().getSpecification( "java.util.Locale" ) );
+        Assert.assertNotNull( classpathModule.getImplementations() );
+        Assert.assertNotNull( classpathModule.getImplementations().getImplementation( "java.util.Locale" ) );
 
-            for ( ModelException.Detail d : e.getDetails() )
-            {
-                System.out.println( "\t" + d.toString() );
-            }
-
-            throw e;
-        }
+        modules.getModule().add( classpathModule );
     }
 
     public void testClasspathTransformers() throws Exception
     {
-        final List<Transformer> transformers =
-            this.getModelManager().getClasspathTransformers( this.getModelManager().getDefaultStylesheetLocation() );
+        final List<Transformer> transformers = this.getModelManager().getClasspathTransformers(
+            this.getClass().getClassLoader(), DefaultModelManager.getDefaultTransformerLocation() );
 
         Assert.assertNotNull( transformers );
         Assert.assertFalse( transformers.isEmpty() );
+    }
 
-        Modules modules = new Modules();
-        for ( Transformer t : transformers )
-        {
-            modules = this.getModelManager().transformModelObject(
-                this.getModelManager().getObjectFactory().createModules( modules ), t );
+    public void testEntityResolver() throws Exception
+    {
+        Assert.assertNotNull( this.getModelManager().getEntityResolver( this.getClass().getClassLoader() ).
+            resolveEntity( "http://jomc.org/model", "UNKNOWN" ) );
 
-        }
+        Assert.assertNull( this.getModelManager().getEntityResolver( this.getClass().getClassLoader() ).
+            resolveEntity( null, "UNKNOWN" ) );
+
+    }
+
+    public void testResourceResolver() throws Exception
+    {
+        Assert.assertNotNull( this.getModelManager().getResourceResolver( this.getClass().getClassLoader() ).
+            resolveResource( XMLConstants.W3C_XML_SCHEMA_NS_URI, "http://jomc.org/model", null, null, null ) );
+
+        Assert.assertNotNull( this.getModelManager().getResourceResolver( this.getClass().getClassLoader() ).
+            resolveResource( XMLConstants.W3C_XML_SCHEMA_NS_URI, "http://jomc.org/model", null,
+                             "http://jomc.org/model/jomc-1.0.xsd", null ) );
+
+        Assert.assertNotNull( this.getModelManager().getResourceResolver( this.getClass().getClassLoader() ).
+            resolveResource( XMLConstants.W3C_XML_SCHEMA_NS_URI, null, "http://jomc.org/model",
+                             "http://jomc.org/model/jomc-1.0.xsd", null ) );
+
+        Assert.assertNull( this.getModelManager().getResourceResolver( this.getClass().getClassLoader() ).
+            resolveResource( "UNSUPPORTED", null, null, null, null ) );
+
     }
 
 }

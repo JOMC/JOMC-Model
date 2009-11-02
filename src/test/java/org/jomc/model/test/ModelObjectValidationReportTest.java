@@ -1,4 +1,3 @@
-// SECTION-START[License Header]
 /*
  *   Copyright (c) 2009 The JOMC Project
  *   Copyright (c) 2005 Christian Schulte <cs@jomc.org>
@@ -31,37 +30,32 @@
  *   $Id$
  *
  */
-// SECTION-END
 package org.jomc.model.test;
 
 import java.io.ObjectInputStream;
-import org.jomc.model.ModelException;
 
 /**
- * Testcases for class {@code org.jomc.model.ModelException}.
+ * Test cases for class {@code org.jomc.model.ModelObjectValidationReport}.
  *
  * @author <a href="mailto:cs@jomc.org">Christian Schulte</a> 1.0
  * @version $Id$
  */
-public class ModelExceptionTest
+public class ModelObjectValidationReportTest
 {
 
-    public void testSerializable() throws Exception
+    public void testSerializabe() throws Exception
     {
-        ObjectInputStream in = new ObjectInputStream( this.getClass().getResourceAsStream( "ModelException.ser" ) );
-        final ModelException e = (ModelException) in.readObject();
-        in.close();
-        System.out.println( e.toString() );
+        final ObjectInputStream reportStream =
+            new ObjectInputStream( this.getClass().getResourceAsStream( "ModelObjectValidationReport.ser" ) );
 
-        in = new ObjectInputStream( this.getClass().getResourceAsStream( "ModelException.Detail.ser" ) );
-        final ModelException.Detail d = (ModelException.Detail) in.readObject();
-        in.close();
-        System.out.println( d.toString() );
-    }
+        final ObjectInputStream detailStream =
+            new ObjectInputStream( this.getClass().getResourceAsStream( "ModelObjectValidationReportDetail.ser" ) );
 
-    public void testToString() throws Exception
-    {
-        System.out.println( new ModelException() );
+        System.out.println( reportStream.readObject() );
+        System.out.println( detailStream.readObject() );
+
+        reportStream.close();
+        detailStream.close();
     }
 
 }

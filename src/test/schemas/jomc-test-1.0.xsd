@@ -167,7 +167,7 @@
     <xsd:sequence>
       <xsd:element name="modules" type="test:AnyModelObject" minOccurs="0"
                    maxOccurs="1"/>
-      <xsd:element name="detail" type="test:ModelExceptionDetail" minOccurs="0"
+      <xsd:element name="detail" type="test:ModelObjectValidationReportDetail" minOccurs="0"
                    maxOccurs="unbounded"/>
     </xsd:sequence>
     <xsd:attribute name="identifier" type="xsd:string" use="required">
@@ -226,9 +226,9 @@
     </xsd:attribute>
   </xsd:complexType>
   <!--                                                                       -->
-  <!-- ModelExceptionDetail                                                  -->
+  <!-- ModelObjectValidationReportDetail                                     -->
   <!--                                                                       -->
-  <xsd:complexType name="ModelExceptionDetail">
+  <xsd:complexType name="ModelObjectValidationReportDetail">
     <xsd:attribute name="identifier" type="xsd:string" use="required">
       <xsd:annotation>
         <xsd:appinfo>

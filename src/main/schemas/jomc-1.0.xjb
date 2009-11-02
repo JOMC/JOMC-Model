@@ -184,6 +184,8 @@
      *
      * @return The location URI used for locating instances of this implementation or {@code null}, if instances of this
      * implementation do not need to be located.
+     *
+     * @see #getLocation()
      */
     public java.net.URI getLocationUri()
     {
@@ -218,6 +220,8 @@
      * {@code implementation} is found.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
+     *
+     * @see #getImplementation()
      */
     public Implementation getImplementation( final String implementation )
     {
@@ -247,6 +251,8 @@
      * {@code implementation} is found.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
+     *
+     * @see #getImplementation()
      */
     public Implementation getImplementation( final Class implementation )
     {
@@ -276,6 +282,8 @@
      * {@code null}, if no implementation matching {@code name} is found.
      *
      * @throws NullPointerException if {@code name} is {@code null}.
+     *
+     * @see #getImplementation()
      */
     public Implementation getImplementationByName( final String name )
     {
@@ -722,29 +730,6 @@
     /** Maps property names to property objects. */
     @javax.xml.bind.annotation.XmlTransient private java.util.Map<String, Object> propertyObjects;
 
-    /** The classloader of the instance. */
-    @javax.xml.bind.annotation.XmlTransient private ClassLoader classLoader;
-
-    /**
-     * Gets the classloader of the instance.
-     *
-     * @return The classloader of the instance.
-     */
-    public ClassLoader getClassLoader()
-    {
-        return this.classLoader;
-    }
-
-    /**
-     * Sets the classloader of the instance.
-     *
-     * @param value The new classloader of the instance.
-     */
-    public void setClassLoader( final ClassLoader value )
-    {
-        this.classLoader = value;
-    }
-
     /**
      * Gets a mapping of dependency names to objects bound to the instance.
      *
@@ -779,6 +764,134 @@
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Modules']">
       <ci:code><![CDATA[
+
+    /**
+     * Constant for the default name of the classpath module.
+     * @see #getClasspathModuleName()
+     */
+    private static final String DEFAULT_CLASSPATH_MODULE_NAME = "Java Classpath";
+
+    /** Default classpath module name. */
+    private static volatile String defaultClasspathModuleName;
+
+    /** Empty {@code Class} array. */
+    private static final Class[] NO_CLASSES =
+    {
+    };
+
+    /** Maps objects to {@code Instance}s. */
+    @javax.xml.bind.annotation.XmlTransient private java.util.Map<Object,Instance> objects = new org.jomc.util.WeakIdentityHashMap();
+
+    /**
+     * Creates a new {@code Modules} instance taking a map backing the instance.
+     *
+     * @param objects The map backing the instance.
+     */
+    public Modules( final java.util.Map<Object, Instance> objects )
+    {
+        if ( objects == null )
+        {
+            throw new NullPointerException( "objects" );
+        }
+
+        this.objects = objects;
+    }
+
+    /**
+     * Creates a new {@code Modules} instance by deeply copying a given {@code Modules} instance taking a map backing
+     * the instance.
+     *
+     * @param o The instance to copy.
+     * @param objects The map backing the instance.
+     *
+     * @throws NullPointerException if {@code o} or {@code objects} is {@code null}.
+     */
+    public Modules( final Modules o, final java.util.Map<Object, Instance> objects )
+    {
+        super( o );
+        if ( o == null )
+        {
+            throw new NullPointerException( "Cannot create a copy of 'Modules' from 'null'." );
+        }
+        if ( objects == null )
+        {
+            throw new NullPointerException( "objects" );
+        }
+
+        copyModule( o.getModule(), getModule() );
+        this.objects = objects;
+    }
+
+    /**
+     * Gets the default classpath module name.
+     * <p>The default classpath module name is controlled by system property
+     * {@code org.jomc.model.Modules.defaultClasspathModuleName} holding the default classpath module name. If that
+     * property is not set, the {@code Java Classpath} default is returned.</p>
+     *
+     * @return The default classpath module name.
+     *
+     * @see #getClasspathModule(java.lang.String, java.lang.ClassLoader)
+     */
+    public static String getDefaultClasspathModuleName()
+    {
+        if ( defaultClasspathModuleName == null )
+        {
+            defaultClasspathModuleName = System.getProperty( "org.jomc.model.Modules.defaultClasspathModuleName",
+                                                             DEFAULT_CLASSPATH_MODULE_NAME );
+
+        }
+
+        return defaultClasspathModuleName;
+    }
+
+    /**
+     * Sets the default classpath module name.
+     *
+     * @param value The new default classpath module name or {@code null},
+     */
+    public static void setDefaultClasspathModuleName( final String value )
+    {
+        defaultClasspathModuleName = value;
+    }
+
+    /**
+     * Gets a module holding model objects resolved by inspecting a given class loader.
+     * <p>This method searches this list of modules for unresolved references and tries to resolve each unresolved
+     * reference by inspecting the given class loader.</p>
+     *
+     * @param moduleName The name of the module to return.
+     * @param classLoader The class loader to use for resolving entities or {@code null} to resolve entities using the
+     * bootstrap class loader.
+     *
+     * @return A module holding model objects resolved by inspecting the given class loader or {@code null} if nothing
+     * is resolved.
+     *
+     * @throws NullPointerException if {@code moduleName} is {@code null}.
+     *
+     * @see #getDefaultClasspathModuleName()
+     * @see #getModule()
+     */
+    public Module getClasspathModule( final String moduleName, final ClassLoader classLoader )
+    {
+        if ( moduleName == null )
+        {
+            throw new NullPointerException( "moduleName," );
+        }
+
+        final Module classpathModule = new Module();
+        classpathModule.setVersion( System.getProperty( "java.specification.version" ) );
+        classpathModule.setName( moduleName );
+
+        this.resolveClasspath( classpathModule, classLoader );
+
+        final boolean resolved = ( classpathModule.getSpecifications() != null &&
+                                   !classpathModule.getSpecifications().getSpecification().isEmpty() ) ||
+                                 ( classpathModule.getImplementations() != null &&
+                                   !classpathModule.getImplementations().getImplementation().isEmpty() );
+
+        return resolved ? classpathModule : null;
+    }
+
     /**
      * Gets a module for a given name from this list of modules.
      *
@@ -999,7 +1112,8 @@
      * @param implementation The identifier of the implementation to get all implemented specifications of.
      *
      * @return List of all specifications implemented by {@code implementation} from the list or {@code null}, if no
-     * implementation matching {@code implementation} is found.
+     * implementation matching {@code implementation} is found or if that implementation does not implement any
+     * specification.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
      *
@@ -1080,45 +1194,6 @@
         return specs.getSpecification().isEmpty() && specs.getReference().isEmpty() ? null : specs;
     }
 
-    void collectSpecifications( final Implementation implementation, final Specifications specifications,
-                                final Implementations seen, final boolean includeDeclared )
-    {
-        if ( implementation != null )
-        {
-            if ( seen.getImplementation( implementation.getIdentifier() ) == null )
-            {
-                seen.getImplementation().add( implementation );
-
-                if ( includeDeclared && implementation.getSpecifications() != null )
-                {
-                    for ( SpecificationReference r : implementation.getSpecifications().getReference() )
-                    {
-                        if ( specifications.getReference( r.getIdentifier() ) == null )
-                        {
-                            specifications.getReference().add( r );
-
-                            final Specification s = this.getSpecification( r.getIdentifier() );
-                            if ( s != null && specifications.getSpecification( s.getIdentifier() ) == null )
-                            {
-                                specifications.getSpecification().add( s );
-                            }
-                        }
-                    }
-                }
-
-                if ( implementation.getImplementations() != null )
-                {
-                    for ( ImplementationReference r : implementation.getImplementations().getReference() )
-                    {
-                        this.collectSpecifications(
-                            this.getImplementation( r.getIdentifier() ), specifications, seen, true );
-
-                    }
-                }
-            }
-        }
-    }
-
     /**
      * Gets an implementation for a given identifier from this list of modules.
      *
@@ -1185,6 +1260,23 @@
         }
 
         return null;
+    }
+
+    /**
+     * Gets an implementation for a given object from this list of modules.
+     *
+     * @param object The object of the implementation to return.
+     *
+     * @return The implementation identified by {@code object} from the list or {@code null},
+     * if no implementation matching {@code object} is found.
+     *
+     * @throws NullPointerException if {@code object} is {@code null}.
+     *
+     * @see #getModule()
+     */
+    public Implementation getImplementation( final Object object )
+    {
+        return this.collectImplementation( object.getClass() );
     }
 
     /**
@@ -1293,59 +1385,6 @@
         return dependencies.getDependency().isEmpty() ? null : dependencies;
     }
 
-    void collectDependencies( final Implementation implementation, final Dependencies dependencies,
-                              final Implementations seen, final boolean includeDeclared )
-    {
-        if ( implementation != null )
-        {
-            if ( seen.getImplementation( implementation.getIdentifier() ) == null )
-            {
-                seen.getImplementation().add( implementation );
-
-                if ( includeDeclared && implementation.getDependencies() != null )
-                {
-                    for ( Dependency d : implementation.getDependencies().getDependency() )
-                    {
-                        final Dependency dependency = dependencies.getDependency( d.getName() );
-
-                        if ( dependency != null )
-                        {
-                            if ( d.getProperties() != null )
-                            {
-                                if ( dependency.getProperties() == null )
-                                {
-                                    dependency.setProperties( new Properties() );
-                                }
-
-                                for ( Property p : d.getProperties().getProperty() )
-                                {
-                                    if ( dependency.getProperties().getProperty( p.getName() ) == null )
-                                    {
-                                        dependency.getProperties().getProperty().add( p );
-                                    }
-                                }
-                            }
-                        }
-                        else
-                        {
-                            dependencies.getDependency().add( d );
-                        }
-                    }
-                }
-
-                if ( implementation.getImplementations() != null )
-                {
-                    for ( ImplementationReference r : implementation.getImplementations().getReference() )
-                    {
-                        this.collectDependencies(
-                            this.getImplementation( r.getIdentifier() ), dependencies, seen, true );
-
-                    }
-                }
-            }
-        }
-    }
-
     /**
      * Gets all properties of an implementation from this list of modules.
      *
@@ -1431,60 +1470,6 @@
         return properties.getProperty().isEmpty() ? null : properties;
     }
 
-    void collectProperties( final Implementation implementation, final Properties properties,
-                            final Implementations seen, final boolean includeDeclared )
-    {
-        if ( implementation != null )
-        {
-            if ( seen.getImplementation( implementation.getIdentifier() ) == null )
-            {
-                seen.getImplementation().add( implementation );
-
-                if ( includeDeclared && implementation.getProperties() != null )
-                {
-                    for ( Property p : implementation.getProperties().getProperty() )
-                    {
-                        if ( properties.getProperty( p.getName() ) == null )
-                        {
-                            properties.getProperty().add( p );
-                        }
-                    }
-                    if ( !implementation.getProperties().getReference().isEmpty() )
-                    {
-                        final Module m = this.getModuleOfImplementation( implementation.getIdentifier() );
-
-                        if ( m != null )
-                        {
-                            for ( PropertyReference ref : implementation.getProperties().getReference() )
-                            {
-                                if ( properties.getProperty( ref.getName() ) == null )
-                                {
-                                    Property referenced = m.getProperties().getProperty( ref.getName() );
-                                    if ( referenced != null )
-                                    {
-                                        referenced = new Property( referenced );
-                                        referenced.setDeprecated( ref.isDeprecated() );
-                                        referenced.setFinal( ref.isFinal() );
-                                        referenced.setOverride( ref.isOverride() );
-                                        properties.getProperty().add( referenced );
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if ( implementation.getImplementations() != null )
-                {
-                    for ( ImplementationReference r : implementation.getImplementations().getReference() )
-                    {
-                        this.collectProperties( this.getImplementation( r.getIdentifier() ), properties, seen, true );
-                    }
-                }
-            }
-        }
-    }
-
     /**
      * Gets all properties specified for an implementation from this list of modules.
      *
@@ -1536,7 +1521,7 @@
      *
      * @param implementation The identifier of the implementation to get all messages of.
      *
-     * @return List of messages of {@code implementation} from the list or {@code null},
+     * @return List of all messages of {@code implementation} from the list or {@code null},
      * if no messages are found.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
@@ -1603,64 +1588,10 @@
         return msgs.getMessage().isEmpty() ? null : msgs;
     }
 
-    void collectMessages( final Implementation implementation, final Messages messages,
-                          final Implementations seen, boolean includeDeclared )
-    {
-        if ( implementation != null )
-        {
-            if ( seen.getImplementation( implementation.getIdentifier() ) == null )
-            {
-                seen.getImplementation().add( implementation );
-
-                if ( includeDeclared && implementation.getMessages() != null )
-                {
-                    for ( Message msg : implementation.getMessages().getMessage() )
-                    {
-                        if ( messages.getMessage( msg.getName() ) == null )
-                        {
-                            messages.getMessage().add( msg );
-                        }
-                    }
-                    if ( !implementation.getMessages().getReference().isEmpty() )
-                    {
-                        final Module m = this.getModuleOfImplementation( implementation.getIdentifier() );
-
-                        if ( m != null )
-                        {
-                            for ( MessageReference ref : implementation.getMessages().getReference() )
-                            {
-                                if ( messages.getMessage( ref.getName() ) == null )
-                                {
-                                    Message referenced = m.getMessages().getMessage( ref.getName() );
-                                    if ( referenced != null )
-                                    {
-                                        referenced = new Message( referenced );
-                                        referenced.setDeprecated( ref.isDeprecated() );
-                                        referenced.setFinal( ref.isFinal() );
-                                        referenced.setOverride( ref.isOverride() );
-                                        messages.getMessage().add( referenced );
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if ( implementation.getImplementations() != null )
-                {
-                    for ( ImplementationReference r : implementation.getImplementations().getReference() )
-                    {
-                        this.collectMessages( this.getImplementation( r.getIdentifier() ), messages, seen, true );
-                    }
-                }
-            }
-        }
-    }
-
     /**
      * Gets all implementations implementing a given specification from this list of modules.
      *
-     * @param specification The identifier of the specification to return implementations of.
+     * @param specification The identifier of the specification to return all implementations of.
      *
      * @return All implementations implementing the specification identified by {@code specification}
      * from the list or {@code null}, if no implementation implementing {@code specification} is found.
@@ -1825,6 +1756,796 @@
         }
 
         return mergedModule;
+    }
+
+    /**
+     * Gets the instance of an object from this list of modules.
+     *
+     * @param object The object to get the instance of.
+     *
+     * @return The instance of {@code object} from the list or {@code null} if no such instance is found.
+     *
+     * @throws NullPointerException if {@code object} is {@code null}.
+     *
+     * @see #getModule()
+     * @see #createObject(org.jomc.model.Instance instance, java.lang.ClassLoader classLoader)
+     */
+    public Instance getInstance( final Object object )
+    {
+        if ( object == null )
+        {
+            throw new NullPointerException( "object" );
+        }
+
+        synchronized ( this.objects )
+        {
+            Instance instance = (Instance) this.objects.get( object );
+
+            if ( instance == null )
+            {
+                final Implementation i = this.getImplementation( object );
+
+                if ( i != null )
+                {
+                    instance = this.getInstance( i.getIdentifier() );
+                    if ( instance != null )
+                    {
+                        this.objects.put( object, instance );
+                    }
+                }
+            }
+
+            return instance;
+        }
+    }
+
+    /**
+     * Gets an instance for an implementation from this list of modules.
+     *
+     * @param implementation The identifier of the implementation to get an instance for.
+     *
+     * @return An instance for the implementation identified by {@code implementation} from the list or {@code null}, if
+     * no such instance is found.
+     *
+     * @throws NullPointerException if {@code implementation} is {@code null}.
+     *
+     * @see #getModule()
+     */
+    public Instance getInstance( final String implementation )
+    {
+        if ( implementation == null )
+        {
+            throw new NullPointerException( "implementation" );
+        }
+
+        final Implementation i = this.getImplementation( implementation );
+
+        if ( i != null )
+        {
+            final Instance instance = new Instance();
+            instance.setIdentifier( i.getIdentifier() );
+            instance.setImplementationName( i.getName() );
+            instance.setClazz( i.getClazz() );
+            instance.setStateless( i.isStateless() );
+            instance.setDependencies( this.getDependencies( implementation ) );
+            instance.setProperties( this.getProperties( implementation ) );
+            instance.setMessages( this.getMessages( implementation ) );
+            instance.setSpecifications( this.getSpecifications( implementation ) );
+
+            final java.util.Map<javax.xml.namespace.QName, javax.xml.bind.JAXBElement> elements =
+                new java.util.HashMap<javax.xml.namespace.QName, javax.xml.bind.JAXBElement>();
+
+            this.collectAnyInstanceObjects( i, new Implementations(), instance.getAny(), elements );
+            return instance;
+        }
+
+        return null;
+    }
+
+    /**
+     * Gets an instance for an implementation from this list of modules overridden with a given dependency.
+     *
+     * @param implementation The identifier of the implementation to get an instance for.
+     * @param dependency The dependency to use for overriding model objects of the instance.
+     *
+     * @return An instance for the implementation identified by {@code implementation} from the list with any model
+     * objects overridden using {@code dependency} or {@code null}, if no such instance is found.
+     *
+     * @throws NullPointerException if {@code implementation} or {@code dependency} is {@code null}.
+     *
+     * @see #getModule()
+     */
+    public Instance getInstance( final String implementation, final Dependency dependency )
+    {
+        if ( implementation == null )
+        {
+            throw new NullPointerException( "implementation" );
+        }
+        if ( dependency == null )
+        {
+            throw new NullPointerException( "dependency" );
+        }
+
+        Instance instance = this.getInstance( implementation );
+
+        if ( instance != null )
+        {
+            final Specification dependencySpecification = this.getSpecification( dependency.getIdentifier() );
+            if ( dependencySpecification != null && dependencySpecification.getScope() == null &&
+                 dependency.getProperties() != null && !dependency.getProperties().getProperty().isEmpty() )
+            {
+                instance = new Instance( instance );
+                final Properties properties = new Properties();
+                properties.getProperty().addAll( dependency.getProperties().getProperty() );
+
+                if ( instance.getProperties() != null )
+                {
+                    for ( Property p : instance.getProperties().getProperty() )
+                    {
+                        if ( properties.getProperty( p.getName() ) == null )
+                        {
+                            properties.getProperty().add( p );
+                        }
+                    }
+                }
+
+                instance.setProperties( properties );
+            }
+        }
+
+        return instance;
+    }
+
+    /**
+     * Creates an object for a given instance from this list of modules.
+     *
+     * @param instance The instance to create an object of.
+     * @param classLoader The class loader to use for creating the object or {@code null} to use the bootstrap class
+     * loader.
+     *
+     * @return A new object of {@code instance} from the list or {@code null} if no such object is found.
+     *
+     * @throws NullPointerException if {@code instance}  is {@code null},
+     * @throws InstantiationException if creating an object fails.
+     *
+     * @see #getModule()
+     */
+    public Object createObject( final Instance instance, final ClassLoader classLoader ) throws InstantiationException
+    {
+        if ( instance == null )
+        {
+            throw new NullPointerException( "instance" );
+        }
+
+        Object object = null;
+
+        try
+        {
+            final Class clazz = Class.forName( instance.getClazz(), true, classLoader );
+
+            if ( java.lang.reflect.Modifier.isPublic( clazz.getModifiers() ) )
+            {
+                java.lang.reflect.Constructor ctor = null;
+
+                if ( !java.lang.reflect.Modifier.isAbstract( clazz.getModifiers() ) )
+                {
+                    try
+                    {
+                        ctor = clazz.getConstructor( NO_CLASSES );
+                    }
+                    catch ( final NoSuchMethodException e )
+                    {
+                        ctor = null;
+                    }
+                }
+
+                boolean assignable = true;
+                if ( instance.getSpecifications() != null )
+                {
+                    for ( Specification s : instance.getSpecifications().getSpecification() )
+                    {
+                        final Class specClass = Class.forName( s.getClazz(), true, classLoader );
+                        if ( !specClass.isAssignableFrom( clazz ) )
+                        {
+                            assignable = false;
+                            break;
+                        }
+                    }
+                }
+
+                if ( ctor != null && assignable )
+                {
+                    synchronized ( this.objects )
+                    {
+                        object = clazz.newInstance();
+                        this.objects.put( object, instance );
+                    }
+                }
+                else
+                {
+                    java.lang.reflect.Method factoryMethod = null;
+                    String methodName = null;
+
+                    char[] c = instance.getImplementationName().toCharArray();
+                    c[0] = Character.toUpperCase( c[0] );
+                    methodName = "get" + String.valueOf( c );
+
+                    boolean javaIdentifier = Character.isJavaIdentifierStart( c[0] );
+                    if ( javaIdentifier )
+                    {
+                        for ( int idx = c.length - 1; idx > 0; idx-- )
+                        {
+                            if ( !Character.isJavaIdentifierPart( c[idx] ) )
+                            {
+                                javaIdentifier = false;
+                                break;
+                            }
+                        }
+                    }
+
+                    if ( javaIdentifier )
+                    {
+                        try
+                        {
+                            factoryMethod = clazz.getMethod( methodName, (Class[]) null );
+                        }
+                        catch ( NoSuchMethodException e )
+                        {
+                            factoryMethod = null;
+                        }
+                    }
+
+                    if ( factoryMethod == null )
+                    {
+                        try
+                        {
+                            factoryMethod = clazz.getMethod( "getObject", (Class[]) null );
+                        }
+                        catch ( NoSuchMethodException e )
+                        {
+                            factoryMethod = null;
+                        }
+                    }
+
+                    if ( factoryMethod == null )
+                    {
+                        throw new InstantiationException( this.getMessage( "failedCreatingObject", new Object[]
+                            {
+                                instance.getIdentifier(), clazz.getName(), methodName
+                            } ) );
+
+                    }
+
+                    if ( java.lang.reflect.Modifier.isStatic( factoryMethod.getModifiers() ) )
+                    {
+                        synchronized ( this.objects )
+                        {
+                            object = factoryMethod.invoke( null, (Object[]) null );
+                            this.objects.put( object, instance );
+                        }
+                    }
+                    else if ( ctor != null )
+                    {
+                        synchronized ( this.objects )
+                        {
+                            final Object o = ctor.newInstance();
+                            this.objects.put( o, instance );
+                            object = factoryMethod.invoke( o, (Object[]) null );
+                            this.objects.put( object, instance );
+                            this.objects.remove( o );
+                        }
+                    }
+                    else
+                    {
+                        throw new InstantiationException( this.getMessage( "failedCreatingObject", new Object[]
+                            {
+                                instance.getIdentifier(), clazz.getName(), methodName
+                            } ) );
+
+                    }
+                }
+            }
+
+            return object;
+        }
+        catch ( final java.lang.reflect.InvocationTargetException e )
+        {
+            throw (InstantiationException) new InstantiationException().initCause(
+                e.getTargetException() != null ? e.getTargetException() : e );
+
+        }
+        catch ( final IllegalAccessException e )
+        {
+            throw (InstantiationException) new InstantiationException().initCause( e );
+        }
+        catch ( final ClassNotFoundException e )
+        {
+            throw (InstantiationException) new InstantiationException().initCause( e );
+        }
+    }
+
+    void collectSpecifications( final Implementation implementation, final Specifications specifications,
+                                final Implementations seen, final boolean includeDeclared )
+    {
+        if ( implementation != null )
+        {
+            if ( seen.getImplementation( implementation.getIdentifier() ) == null )
+            {
+                seen.getImplementation().add( implementation );
+
+                if ( includeDeclared && implementation.getSpecifications() != null )
+                {
+                    for ( SpecificationReference r : implementation.getSpecifications().getReference() )
+                    {
+                        if ( specifications.getReference( r.getIdentifier() ) == null )
+                        {
+                            specifications.getReference().add( r );
+
+                            final Specification s = this.getSpecification( r.getIdentifier() );
+                            if ( s != null && specifications.getSpecification( s.getIdentifier() ) == null )
+                            {
+                                specifications.getSpecification().add( s );
+                            }
+                        }
+                    }
+                }
+
+                if ( implementation.getImplementations() != null )
+                {
+                    for ( ImplementationReference r : implementation.getImplementations().getReference() )
+                    {
+                        this.collectSpecifications(
+                            this.getImplementation( r.getIdentifier() ), specifications, seen, true );
+
+                    }
+                }
+            }
+        }
+    }
+
+    void collectDependencies( final Implementation implementation, final Dependencies dependencies,
+                              final Implementations seen, final boolean includeDeclared )
+    {
+        if ( implementation != null )
+        {
+            if ( seen.getImplementation( implementation.getIdentifier() ) == null )
+            {
+                seen.getImplementation().add( implementation );
+
+                if ( includeDeclared && implementation.getDependencies() != null )
+                {
+                    for ( Dependency d : implementation.getDependencies().getDependency() )
+                    {
+                        final Dependency dependency = dependencies.getDependency( d.getName() );
+
+                        if ( dependency != null )
+                        {
+                            if ( d.getProperties() != null )
+                            {
+                                if ( dependency.getProperties() == null )
+                                {
+                                    dependency.setProperties( new Properties() );
+                                }
+
+                                for ( Property p : d.getProperties().getProperty() )
+                                {
+                                    if ( dependency.getProperties().getProperty( p.getName() ) == null )
+                                    {
+                                        dependency.getProperties().getProperty().add( p );
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            dependencies.getDependency().add( d );
+                        }
+                    }
+                }
+
+                if ( implementation.getImplementations() != null )
+                {
+                    for ( ImplementationReference r : implementation.getImplementations().getReference() )
+                    {
+                        this.collectDependencies(
+                            this.getImplementation( r.getIdentifier() ), dependencies, seen, true );
+
+                    }
+                }
+            }
+        }
+    }
+
+    void collectProperties( final Implementation implementation, final Properties properties,
+                            final Implementations seen, final boolean includeDeclared )
+    {
+        if ( implementation != null )
+        {
+            if ( seen.getImplementation( implementation.getIdentifier() ) == null )
+            {
+                seen.getImplementation().add( implementation );
+
+                if ( includeDeclared && implementation.getProperties() != null )
+                {
+                    for ( Property p : implementation.getProperties().getProperty() )
+                    {
+                        if ( properties.getProperty( p.getName() ) == null )
+                        {
+                            properties.getProperty().add( p );
+                        }
+                    }
+                    if ( !implementation.getProperties().getReference().isEmpty() )
+                    {
+                        final Module m = this.getModuleOfImplementation( implementation.getIdentifier() );
+
+                        if ( m != null )
+                        {
+                            for ( PropertyReference ref : implementation.getProperties().getReference() )
+                            {
+                                if ( properties.getProperty( ref.getName() ) == null )
+                                {
+                                    Property referenced = m.getProperties().getProperty( ref.getName() );
+                                    if ( referenced != null )
+                                    {
+                                        referenced = new Property( referenced );
+                                        referenced.setDeprecated( ref.isDeprecated() );
+                                        referenced.setFinal( ref.isFinal() );
+                                        referenced.setOverride( ref.isOverride() );
+                                        properties.getProperty().add( referenced );
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if ( implementation.getImplementations() != null )
+                {
+                    for ( ImplementationReference r : implementation.getImplementations().getReference() )
+                    {
+                        this.collectProperties( this.getImplementation( r.getIdentifier() ), properties, seen, true );
+                    }
+                }
+            }
+        }
+    }
+
+    void collectMessages( final Implementation implementation, final Messages messages,
+                          final Implementations seen, boolean includeDeclared )
+    {
+        if ( implementation != null )
+        {
+            if ( seen.getImplementation( implementation.getIdentifier() ) == null )
+            {
+                seen.getImplementation().add( implementation );
+
+                if ( includeDeclared && implementation.getMessages() != null )
+                {
+                    for ( Message msg : implementation.getMessages().getMessage() )
+                    {
+                        if ( messages.getMessage( msg.getName() ) == null )
+                        {
+                            messages.getMessage().add( msg );
+                        }
+                    }
+                    if ( !implementation.getMessages().getReference().isEmpty() )
+                    {
+                        final Module m = this.getModuleOfImplementation( implementation.getIdentifier() );
+
+                        if ( m != null )
+                        {
+                            for ( MessageReference ref : implementation.getMessages().getReference() )
+                            {
+                                if ( messages.getMessage( ref.getName() ) == null )
+                                {
+                                    Message referenced = m.getMessages().getMessage( ref.getName() );
+                                    if ( referenced != null )
+                                    {
+                                        referenced = new Message( referenced );
+                                        referenced.setDeprecated( ref.isDeprecated() );
+                                        referenced.setFinal( ref.isFinal() );
+                                        referenced.setOverride( ref.isOverride() );
+                                        messages.getMessage().add( referenced );
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if ( implementation.getImplementations() != null )
+                {
+                    for ( ImplementationReference r : implementation.getImplementations().getReference() )
+                    {
+                        this.collectMessages( this.getImplementation( r.getIdentifier() ), messages, seen, true );
+                    }
+                }
+            }
+        }
+    }
+
+    private void collectAnyInstanceObjects(
+        final Implementation current, final Implementations seen, final java.util.List<Object> any,
+        final java.util.Map<javax.xml.namespace.QName, javax.xml.bind.JAXBElement> elements )
+    {
+        if ( current != null && seen.getImplementation( current.getIdentifier() ) == null )
+        {
+            seen.getImplementation().add( current );
+
+            for ( Object o : current.getAny() )
+            {
+                if ( o instanceof javax.xml.bind.JAXBElement )
+                {
+                    final javax.xml.bind.JAXBElement e = (javax.xml.bind.JAXBElement) o;
+                    if ( !elements.containsKey( e.getName() ) )
+                    {
+                        elements.put( e.getName(), e );
+                        any.add( o );
+                    }
+                }
+                else
+                {
+                    any.add( o );
+                }
+            }
+
+            if ( current.getImplementations() != null )
+            {
+                for ( ImplementationReference r : current.getImplementations().getReference() )
+                {
+                    this.collectAnyInstanceObjects(
+                        this.getImplementation( r.getIdentifier() ), seen, any, elements );
+
+                }
+            }
+        }
+    }
+
+    private Implementation collectImplementation( final Class clazz )
+    {
+        Implementation i = this.getImplementation( clazz );
+        if ( i == null && clazz.getSuperclass() != null )
+        {
+            i = this.collectImplementation( clazz.getSuperclass() );
+        }
+
+        return i;
+    }
+
+    private void resolveClasspath( final Module cpModule, final ClassLoader classLoader )
+    {
+        for ( Module m : this.getModule() )
+        {
+            if ( m.getSpecifications() != null )
+            {
+                this.resolveClasspath( m.getSpecifications(), cpModule, classLoader );
+            }
+
+            if ( m.getImplementations() != null )
+            {
+                this.resolveClasspath( m.getImplementations(), cpModule, classLoader );
+            }
+        }
+    }
+
+    private void resolveClasspath( final SpecificationReference ref, final Module cpModule,
+                                   final ClassLoader classLoader )
+    {
+        if ( this.getSpecification( ref.getIdentifier() ) == null )
+        {
+            this.resolveClasspath( ref.getIdentifier(), cpModule, classLoader );
+        }
+    }
+
+    private void resolveClasspath( final Specifications references, final Module cpModule,
+                                   final ClassLoader classLoader )
+    {
+        for ( SpecificationReference ref : references.getReference() )
+        {
+            this.resolveClasspath( ref, cpModule, classLoader );
+        }
+    }
+
+    private void resolveClasspath( final Implementations implementations, final Module cpModule,
+                                   final ClassLoader classLoader )
+    {
+        for ( Implementation implementation : implementations.getImplementation() )
+        {
+            if ( implementation.getSpecifications() != null )
+            {
+                this.resolveClasspath( implementation.getSpecifications(), cpModule, classLoader );
+            }
+
+            if ( implementation.getDependencies() != null )
+            {
+                this.resolveClasspath( implementation.getDependencies(), cpModule, classLoader );
+            }
+        }
+    }
+
+    private void resolveClasspath( final Dependencies dependencies, final Module cpModule,
+                                   final ClassLoader classLoader )
+    {
+        for ( Dependency dependency : dependencies.getDependency() )
+        {
+            this.resolveClasspath( dependency, cpModule, classLoader );
+        }
+    }
+
+    private boolean resolveClasspath( final String identifier, final Module cpModule, final ClassLoader classLoader )
+    {
+        boolean classpathSpecification = false;
+        Specification specification = cpModule.getSpecifications() == null
+                                      ? null : cpModule.getSpecifications().getSpecification( identifier );
+
+        if ( specification == null )
+        {
+            try
+            {
+                final Class classpathSpec = Class.forName( identifier, true, classLoader );
+                if ( java.lang.reflect.Modifier.isPublic( classpathSpec.getModifiers() ) )
+                {
+                    classpathSpecification = true;
+                    String vendor = null;
+                    String version = null;
+
+                    if ( classpathSpec.getPackage() != null )
+                    {
+                        vendor = classpathSpec.getPackage().getSpecificationVendor();
+                        version = classpathSpec.getPackage().getSpecificationVersion();
+                    }
+
+                    specification = new Specification();
+                    specification.setIdentifier( identifier );
+                    specification.setClazz( classpathSpec.getName() );
+                    specification.setMultiplicity( Multiplicity.MANY );
+                    specification.setVendor( vendor );
+                    specification.setVersion( version );
+
+                    if ( cpModule.getSpecifications() == null )
+                    {
+                        cpModule.setSpecifications( new Specifications() );
+                    }
+
+                    cpModule.getSpecifications().getSpecification().add( specification );
+
+                    this.resolveClasspath( specification, cpModule, classLoader );
+                }
+            }
+            catch ( final ClassNotFoundException e )
+            {
+                classpathSpecification = false;
+            }
+        }
+
+        return classpathSpecification;
+    }
+
+    private boolean resolveClasspath( final Specification specification, final Module cpModule,
+                                      final ClassLoader classLoader )
+    {
+        boolean classpathImplementation = false;
+        Implementation implementation =
+            cpModule.getImplementations() == null ? null
+            : cpModule.getImplementations().getImplementation( specification.getIdentifier() );
+
+        if ( implementation == null )
+        {
+            String name = null;
+
+            try
+            {
+                final Class classpathImpl = Class.forName( specification.getClazz(), true, classLoader );
+
+                if ( java.lang.reflect.Modifier.isPublic( classpathImpl.getModifiers() ) )
+                {
+                    if ( !java.lang.reflect.Modifier.isAbstract( classpathImpl.getModifiers() ) )
+                    {
+                        try
+                        {
+                            classpathImpl.getConstructor( NO_CLASSES );
+                            name = "init";
+                            classpathImplementation = true;
+                        }
+                        catch ( final NoSuchMethodException e )
+                        {
+                            classpathImplementation = false;
+                        }
+                    }
+
+                    if ( !classpathImplementation )
+                    {
+                        final char[] c = classpathImpl.getName().substring(
+                            classpathImpl.getPackage().getName().length() + 1 ).toCharArray();
+
+                        name = String.valueOf( c );
+                        c[0] = Character.toUpperCase( c[0] );
+
+                        if ( this.checkFactoryMethod( classpathImpl, classpathImpl, "getDefault" ) )
+                        {
+                            name = "default";
+                            classpathImplementation = true;
+                        }
+                        else if ( this.checkFactoryMethod( classpathImpl, classpathImpl, "getInstance" ) )
+                        {
+                            name = "instance";
+                            classpathImplementation = true;
+                        }
+                        else if ( this.checkFactoryMethod( classpathImpl, classpathImpl, "get" + String.valueOf( c ) ) )
+                        {
+                            classpathImplementation = true;
+                        }
+
+                    }
+
+                    if ( classpathImplementation )
+                    {
+                        String vendor = null;
+                        String version = null;
+                        if ( classpathImpl.getPackage() != null )
+                        {
+                            vendor = classpathImpl.getPackage().getImplementationVendor();
+                            version = classpathImpl.getPackage().getImplementationVersion();
+                        }
+
+                        implementation = new Implementation();
+                        implementation.setVendor( vendor );
+                        implementation.setFinal( true );
+                        implementation.setName( name );
+                        implementation.setIdentifier( specification.getIdentifier() );
+                        implementation.setClazz( classpathImpl.getName() );
+                        implementation.setVersion( version );
+
+                        final Specifications implemented = new Specifications();
+                        final SpecificationReference ref = new SpecificationReference();
+                        ref.setIdentifier( specification.getIdentifier() );
+                        ref.setVersion( specification.getVersion() );
+                        implemented.getReference().add( ref );
+                        implementation.setSpecifications( implemented );
+
+                        if ( cpModule.getImplementations() == null )
+                        {
+                            cpModule.setImplementations( new Implementations() );
+                        }
+
+                        cpModule.getImplementations().getImplementation().add( implementation );
+                    }
+                }
+            }
+            catch ( final ClassNotFoundException e )
+            {
+                classpathImplementation = false;
+            }
+        }
+
+        return classpathImplementation;
+    }
+
+    private boolean checkFactoryMethod( final Class clazz, final Class type, final String methodName )
+    {
+        boolean factoryMethod = false;
+
+        try
+        {
+            final java.lang.reflect.Method m = clazz.getMethod( methodName, (Class[]) null );
+            factoryMethod = java.lang.reflect.Modifier.isStatic( m.getModifiers() ) &&
+                            type.isAssignableFrom( m.getReturnType() );
+
+        }
+        catch ( final NoSuchMethodException e )
+        {
+            factoryMethod = false;
+        }
+
+        return factoryMethod;
+    }
+
+    private String getMessage( final String key, final Object args )
+    {
+        return new java.text.MessageFormat( java.util.ResourceBundle.getBundle(
+            Modules.class.getName().replace( '.', '/' ), java.util.Locale.getDefault() ).
+            getString( key ) ).format( args );
+
     }
 ]]>
       </ci:code>

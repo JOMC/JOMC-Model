@@ -34,12 +34,9 @@ package org.jomc.model;
 
 import java.io.IOException;
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
 import javax.xml.validation.Schema;
 import org.w3c.dom.ls.LSResourceResolver;
 import org.xml.sax.EntityResolver;
@@ -48,33 +45,19 @@ import org.xml.sax.SAXException;
 /**
  * Manages the object management and configuration model.
  *
- * <p><b>Entity resolution</b><ul>
- * <li>{@link #getEntityResolver() }</li>
- * <li>{@link #getLSResourceResolver() }</li>
+ * <p><b>Resource management</b><ul>
+ * <li>{@link #getEntityResolver(java.lang.ClassLoader) }</li>
+ * <li>{@link #getResourceResolver(java.lang.ClassLoader) }</li>
  * </ul></p>
  *
- * <p><b>JAXB</b><ul>
- * <li>{@link #getContext() }</li>
- * <li>{@link #getMarshaller(boolean, boolean) }</li>
- * <li>{@link #getObjectFactory() }</li>
- * <li>{@link #getUnmarshaller(boolean) }</li>
+ * <p><b>Binding management</b><ul>
+ * <li>{@link #getContext(java.lang.ClassLoader) }</li>
+ * <li>{@link #getMarshaller(java.lang.ClassLoader) }</li>
+ * <li>{@link #getUnmarshaller(java.lang.ClassLoader) }</li>
  * </ul></p>
  *
- * <p><b>Validation</b><ul>
- * <li>{@link #getSchema() }</li>
- * <li>{@link #validateModelObject(javax.xml.bind.JAXBElement) }</li>
- * <li>{@link #validateModules(org.jomc.model.Modules) }</li>
- * </ul></p>
- *
- * <p><b>Transformation</b><ul>
- * <li>{@link #transformModelObject(javax.xml.bind.JAXBElement, javax.xml.transform.Transformer) }</li>
- * </ul></p>
- *
- * <p><b>Queries</b><ul>
- * <li>{@link #getInstance(org.jomc.model.Modules, org.jomc.model.Implementation, java.lang.ClassLoader) }</li>
- * <li>{@link #getInstance(org.jomc.model.Modules, org.jomc.model.Implementation, org.jomc.model.Dependency, java.lang.ClassLoader) }</li>
- * <li>{@link #getInstance(org.jomc.model.Modules, java.lang.Object) }</li>
- * <li>{@link #getObject(org.jomc.model.Modules, org.jomc.model.Specification, org.jomc.model.Instance) }</li>
+ * <p><b>Validation management</b><ul>
+ * <li>{@link #getSchema(java.lang.ClassLoader) }</li>
  * </ul></p>
  *
  * @author <a href="mailto:cs@jomc.org">Christian Schulte</a>
@@ -84,182 +67,86 @@ public interface ModelManager
 {
 
     /**
-     * Gets the object management and configuration entity resolver.
+     * Gets a new object management and configuration entity resolver instance.
      *
-     * @return The object management and configuration entity resolver.
+     * @param classLoader The class loader to use for resolving entities.
+     *
+     * @return A new object management and configuration entity resolver instance resolving entities using the given
+     * class loader.
+     *
+     * @throws NullPointerException if {@code classLoader} is {@code null}.
      */
-    EntityResolver getEntityResolver();
+    EntityResolver getEntityResolver( ClassLoader classLoader ) throws NullPointerException;
 
     /**
-     * Gets the object management and configuration L/S resolver.
+     * Gets a new object management and configuration L/S resource resolver instance.
      *
-     * @return The object management and configuration L/S resolver.
+     * @param classLoader The class loader to use for resolving entities.
+     *
+     * @return A new object management and configuration L/S resource resolver instance resolving entities using the
+     * given class loader.
+     *
+     * @throws NullPointerException if {@code classLoader} is {@code null}.
      */
-    LSResourceResolver getLSResourceResolver();
+    LSResourceResolver getResourceResolver( ClassLoader classLoader ) throws NullPointerException;
 
     /**
-     * Gets the object management and configuration {@code ObjectFactory}.
+     * Gets a new object management and configuration JAXP schema instance.
      *
-     * @return The object management and configuration {@code ObjectFactory}.
-     */
-    ObjectFactory getObjectFactory();
-
-    /**
-     * Gets the object management and configuration schema.
+     * @param classLoader The class loader to use for loading schema resources.
      *
-     * @return The object management and configuration schema.
+     * @return A new object management and configuration JAXP schema instance loaded using the given class loader.
      *
+     * @throws NullPointerException if {@code classLoader} is {@code null}.
      * @throws IOException if reading schema resources fails.
      * @throws SAXException if parsing schema resources fails.
-     * @throws JAXBException if unmarshalling schema resources fails.
+     * @throws JAXBException if unmarshalling schema resources or creating a context fails.
      */
-    Schema getSchema() throws IOException, SAXException, JAXBException;
+    Schema getSchema( ClassLoader classLoader ) throws NullPointerException, IOException, SAXException, JAXBException;
 
     /**
-     * Gets the object management and configuration {@code JAXBContext}.
+     * Gets a new object management and configuration JAXB context instance.
      *
-     * @return The object management and configuration {@code JAXBContext}.
+     * @param classLoader The class loader to create the context with.
      *
+     * @return A new object management and configuration JAXB context instance created using the given class loader.
+     *
+     * @throws NullPointerException if {@code classLoader} is {@code null}.
      * @throws IOException if reading schema resources fails.
      * @throws SAXException if parsing schema resources fails.
-     * @throws JAXBException if unmarshalling schema resources fails.
+     * @throws JAXBException if unmarshalling schema resources or creating a context fails.
      */
-    JAXBContext getContext() throws IOException, SAXException, JAXBException;
+    JAXBContext getContext( ClassLoader classLoader )
+        throws NullPointerException, IOException, SAXException, JAXBException;
 
     /**
-     * Gets an object management and configuration {@code Marshaller}.
+     * Gets a new object management and configuration JAXB marshaller instance.
      *
-     * @param validating {@code true} for a marshaller with additional schema validation support enabled; {@code false}
-     * for a marshaller without additional schema validation support enabled.
-     * @param formattedOutput {@code true} for the marshaller to produce formatted output; {@code false} for the
-     * marshaller to not apply any formatting when marshalling.
+     * @param classLoader The class loader to create the marshaller with.
      *
-     * @return An object management and configuration {@code Marshaller}.
+     * @return A new object management and configuration JAXB marshaller instance created using the given class loader.
      *
+     * @throws NullPointerException if {@code classLoader} is {@code null}.
      * @throws IOException if reading schema resources fails.
      * @throws SAXException if parsing schema resources fails.
-     * @throws JAXBException if unmarshalling schema resources fails.
+     * @throws JAXBException if unmarshalling schema resources or creating a marshaller fails.
      */
-    Marshaller getMarshaller( boolean validating, boolean formattedOutput )
-        throws IOException, SAXException, JAXBException;
+    Marshaller getMarshaller( ClassLoader classLoader )
+        throws NullPointerException, IOException, SAXException, JAXBException;
 
     /**
-     * Gets an object management and configuration {@code Unmarshaller}.
+     * Gets a new object management and configuration JAXB unmarshaller instance.
      *
-     * @param validating {@code true} for an unmarshaller with additional schema validation support enabled;
-     * {@code false} for an unmarshaller without additional schema validation support enabled.
+     * @param classLoader The class loader to create the unmarshaller with.
      *
-     * @return An object management and configuration {@code Unmarshaller}.
+     * @return A new object management and configuration JAXB unmarshaller instance created using the given class loader.
      *
+     * @throws NullPointerException if {@code classLoader} is {@code null}.
      * @throws IOException if reading schema resources fails.
      * @throws SAXException if parsing schema resources fails.
-     * @throws JAXBException if unmarshalling schema resources fails.
+     * @throws JAXBException if unmarshalling schema resources or creating an unmarshaller fails.
      */
-    Unmarshaller getUnmarshaller( boolean validating ) throws IOException, SAXException, JAXBException;
-
-    /**
-     * Validates a given model object.
-     *
-     * @param modelObject The object to validate.
-     *
-     * @throws NullPointerException if {@code modelObject} is {@code null}.
-     * @throws ModelException if {@code modelObject} is invalid.
-     * @throws IOException if reading schema resources fails.
-     * @throws SAXException if parsing schema resources fails.
-     * @throws JAXBException if unmarshalling schema resources fails.
-     */
-    void validateModelObject( JAXBElement<? extends ModelObject> modelObject )
-        throws NullPointerException, ModelException, IOException, SAXException, JAXBException;
-
-    /**
-     * Validates modules.
-     *
-     * @param modules The modules to validate.
-     *
-     * @throws NullPointerException if {@code modules} is {@code null}.
-     * @throws ModelException if {@code modules} is invalid.
-     * @throws IOException if reading schema resources fails.
-     * @throws SAXException if parsing schema resources fails.
-     * @throws JAXBException if unmarshalling schema resources fails.
-     */
-    void validateModules( Modules modules )
-        throws NullPointerException, ModelException, IOException, SAXException, JAXBException;
-
-    /**
-     * Transforms a given {@code ModelObject} with a given {@code Transformer}.
-     *
-     * @param modelObject The {@code ModelObject} to transform.
-     * @param transformer The {@code Transformer} to transform {@code modelObject} with.
-     * @param <T> The type of {@code modelObject}.
-     *
-     * @return {@code modelObject} transformed with {@code transformer}.
-     *
-     * @throws NullPointerException if {@code modelObject} or {@code transformer} is {@code null}.
-     * @throws IOException if reading schema resources fails.
-     * @throws SAXException if parsing schema resources fails.
-     * @throws JAXBException if binding fails.
-     * @throws TransformerException if the transformation fails.
-     */
-    <T extends ModelObject> T transformModelObject( JAXBElement<T> modelObject, Transformer transformer )
-        throws NullPointerException, IOException, SAXException, JAXBException, TransformerException;
-
-    /**
-     * Gets an instance of an implementation.
-     *
-     * @param modules The modules declaring the instance to get.
-     * @param implementation The implementation to get an instance of.
-     * @param classLoader The class loader of the instance to get.
-     *
-     * @return An instance of {@code implementation} or {@code null} if no instance is available.
-     *
-     * @throws NullPointerException if {@code modules}, {@code implementation} or {@code classLoader} is {@code null}.
-     */
-    Instance getInstance( Modules modules, Implementation implementation, ClassLoader classLoader )
-        throws NullPointerException;
-
-    /**
-     * Gets an instance of an implementation for a dependency.
-     *
-     * @param modules The modules declaring the instance to get.
-     * @param implementation The implementation to get an instance of.
-     * @param dependency The dependency declaring the instance to get.
-     * @param classLoader The class loader of the instance to get.
-     *
-     * @return An instance of {@code implementation} or {@code null} if no instance is available.
-     *
-     * @throws NullPointerException if {@code modules}, {@code implementation}, {@code dependency} or
-     * {@code classLoader} is {@code null}.
-     */
-    Instance getInstance( Modules modules, Implementation implementation, Dependency dependency,
-                          ClassLoader classLoader )
-        throws NullPointerException;
-
-    /**
-     * Gets the instance of an object.
-     *
-     * @param modules The modules declaring the instance to get.
-     * @param object The object to get the instance of.
-     *
-     * @return The instance of {@code object} or {@code null} of nothing is known about {@code object}.
-     *
-     * @throws NullPointerException if {@code modules} or {@code object} is {@code null},
-     */
-    Instance getInstance( Modules modules, Object object )
-        throws NullPointerException;
-
-    /**
-     * Gets the object of an instance.
-     *
-     * @param modules The modules declaring the object to get.
-     * @param specification The specification specifying the object to get.
-     * @param instance The instance of the object to get.
-     *
-     * @return The object of {@code instance} or {@code null} if nothing is known about {@code instance}.
-     *
-     * @throws NullPointerException if {@code modules}, {@code specification} or {@code instance} is {@code null}.
-     * @throws InstantiationException if instantiating the object fails.
-     */
-    Object getObject( Modules modules, Specification specification, Instance instance )
-        throws NullPointerException, InstantiationException;
+    Unmarshaller getUnmarshaller( ClassLoader classLoader )
+        throws NullPointerException, IOException, SAXException, JAXBException;
 
 }

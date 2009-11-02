@@ -34,26 +34,26 @@ package org.jomc.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import javax.xml.bind.JAXBElement;
 
 /**
- * Gets thrown for invalid model objects.
+ * Validation report about a model object.
  *
  * @author <a href="mailto:cs@jomc.org">Christian Schulte</a>
  * @version $Id$
  */
-public class ModelException extends Exception
+public class ModelObjectValidationReport implements Serializable
 {
 
-    /** {@code ModelException} detail. */
+    /** Report detail. */
     public static class Detail implements Serializable
     {
 
-        /** Serial version UID for compatibility with 1.0.x object streams. */
-        private static final long serialVersionUID = 5383378257214671678L;
+        /** Serial version UID for backwards compatibility with 1.0.x object streams. */
+        private static final long serialVersionUID = 3602078739148823287L;
 
         /**
          * The detail identifier.
@@ -74,13 +74,13 @@ public class ModelException extends Exception
         private String message;
 
         /**
-         * The element this detail is associated with.
+         * The JAXB element this detail is associated with.
          * @serial
          */
-        private JAXBElement<? extends ModelObject> element;
+        private JAXBElement element;
 
         /**
-         * Creates a new {@code Detail} taking a detail level and message.
+         * Creates a new {@code Detail} taking an identifier, a level and a message.
          *
          * @param identifier The detail identifier.
          * @param level The detail level.
@@ -124,21 +124,21 @@ public class ModelException extends Exception
         }
 
         /**
-         * Gets the element of this detail.
+         * Gets the JAXB element of this detail.
          *
-         * @return The element of this detail or {@code null}.
+         * @return The JAXB element of this detail or {@code null}.
          */
-        public JAXBElement<? extends ModelObject> getElement()
+        public JAXBElement getElement()
         {
             return this.element;
         }
 
         /**
-         * Sets the element of this detail.
+         * Sets the JAXB element of this detail.
          *
-         * @param value The new element of this detail or {@code null}.
+         * @param value The new JAXB element of this detail or {@code null}.
          */
-        public void setElement( final JAXBElement<? extends ModelObject> value )
+        public void setElement( final JAXBElement value )
         {
             this.element = value;
         }
@@ -171,59 +171,57 @@ public class ModelException extends Exception
 
     }
 
-    /** Serial version UID for compatibility with 1.0.x object streams. */
-    private static final long serialVersionUID = 6078527305669819171L;
+    /** Serial version UID for backwards compatibility with 1.0.x object streams. */
+    private static final long serialVersionUID = 5347328444554122366L;
+
+    /**
+     * The model object of the instance.
+     * @serial
+     */
+    private JAXBElement modelObject;
 
     /**
      * Details of the instance.
      * @serial
      */
-    private final List<Detail> details = new LinkedList<Detail>();
+    private List<Detail> details;
 
-    /** Creates a new {@code ModelException} instance. */
-    public ModelException()
+    /**
+     * Creates a new {@code ModelObjectValidationReport} instance taking a model object.
+     *
+     * @param modelObject The model object of the report.
+     */
+    public ModelObjectValidationReport( final JAXBElement modelObject )
     {
-        super();
+        this.modelObject = modelObject;
     }
 
     /**
-     * Creates a new {@code ModelException} instance taking a message.
+     * Gets the model object of the instance.
      *
-     * @param message The message of the exception.
+     * @return The model object of the instance.
      */
-    public ModelException( final String message )
+    public JAXBElement getModelObject()
     {
-        super( message );
-    }
-
-    /**
-     * Creates a new {@code ModelException} instance taking a causing exception.
-     *
-     * @param t The causing exception.
-     */
-    public ModelException( final Throwable t )
-    {
-        super( t );
-    }
-
-    /**
-     * Creates a new {@code ModelException} instance taking a message and a causing exception.
-     *
-     * @param message The message of the exception.
-     * @param t The causing exception.
-     */
-    public ModelException( final String message, final Throwable t )
-    {
-        super( message, t );
+        return this.modelObject;
     }
 
     /**
      * Gets all details of the instance.
+     * <p>This accessor method returns a reference to the live list, not a snapshot. Therefore any modification you make
+     * to the returned list will be present inside the object. This is why there is no {@code set} method for the
+     * details property.</p>
+     *
      *
      * @return All details of the instance.
      */
     public List<Detail> getDetails()
     {
+        if ( this.details == null )
+        {
+            this.details = new ArrayList<Detail>();
+        }
+
         return this.details;
     }
 
@@ -232,7 +230,7 @@ public class ModelException extends Exception
      *
      * @param identifier The identifier of the details to return or {@code null}.
      *
-     * @return All details of the instance matching {@code identifier}.
+     * @return An unmodifiable list containing all details of the instance matching {@code identifier}.
      */
     public List<Detail> getDetails( final String identifier )
     {
@@ -250,7 +248,26 @@ public class ModelException extends Exception
             }
         }
 
-        return list;
+        return Collections.unmodifiableList( list );
+    }
+
+    /**
+     * Gets a flag indicating if the model object of the instance is considered valid.
+     *
+     * @return {@code true} if the model object of the instance is considered valid; {@code false} if the model object
+     * of the instance is considered invalid.
+     */
+    public boolean isModelObjectValid()
+    {
+        for ( Detail d : this.getDetails() )
+        {
+            if ( d.getLevel() != null && d.getLevel().intValue() > Level.WARNING.intValue() )
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
 }

@@ -276,24 +276,6 @@ corresponding language.]]></jaxb:javadoc>
       <xsd:appinfo>
         <jaxb:class>
           <jaxb:javadoc><![CDATA[List of modules.
-<p><b>Queries</b><ul>
-<li>{@link #getMergedModule() }</li>
-<li>{@link #getSpecifications() }</li>
-<li>{@link #getSpecification(java.lang.String) }</li>
-<li>{@link #getSpecification(java.lang.Class) }</li>
-<li>{@link #getModuleOfSpecification(java.lang.String) }</li>
-<li>{@link #getImplementations() }</li>
-<li>{@link #getImplementation(java.lang.String) }</li>
-<li>{@link #getImplementation(java.lang.Class) }</li>
-<li>{@link #getModuleOfImplementation(java.lang.String) }</li>
-<li>{@link #getImplementation(java.lang.String, java.lang.String) }</li>
-<li>{@link #getImplementations(java.lang.String) }</li>
-<li>{@link #getDependencies(java.lang.String) }</li>
-<li>{@link #getMessages(java.lang.String) }</li>
-<li>{@link #getProperties(java.lang.String) }</li>
-<li>{@link #getSpecifiedProperties(java.lang.String) }</li>
-</ul></p>
-
 @see Module]]></jaxb:javadoc>
         </jaxb:class>
       </xsd:appinfo>
@@ -339,7 +321,8 @@ corresponding language.]]></jaxb:javadoc>
 {@code version}. Property {@code name} holds the name of the module uniquely
 identifying the module in a set of modules. Property {@code description}
 holds a textual description, and property {@code version} a textual version of
-the module. A module defines specifications, implementations and properties.</p>]]></jaxb:javadoc>
+the module. A module defines implementations, messages, properties and
+specifications.</p>]]></jaxb:javadoc>
         </jaxb:class>
       </xsd:appinfo>
     </xsd:annotation>
@@ -681,9 +664,9 @@ URI of the location of instances of the implementation. Property
 vendor information for the vendor providing the implementation. Property
 {@code version} holds a textual version of the implementation.</p>
 
-<p>Dependencies, messages, properties and specifications may be inherited from a
-{@code parent}. Property {@code final} flags an implementation as the final node
-in an inheritance hierarchy.</p>
+<p>Dependencies, messages, properties and specifications may be inherited from
+multiple parent implementations. Property {@code final} flags an implementation
+the final node in an inheritance hierarchy.</p>
 
 <p>The {@code stateless} flag indicates that instances of the implementation
 do not retain state across operations.</p>]]></jaxb:javadoc>
@@ -860,6 +843,26 @@ do not retain state across operations.</p>]]></jaxb:javadoc>
             </xsd:appinfo>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="final" type="xsd:boolean" use="optional"
+                       default="false">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                <jaxb:javadoc><![CDATA[Flags this implementation reference final.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="override" type="xsd:boolean" use="optional"
+                       default="false">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                <jaxb:javadoc><![CDATA[True, if this implementation reference is intended to override a super implementation reference.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -905,7 +908,7 @@ do not retain state across operations.</p>]]></jaxb:javadoc>
 <p>A dependency consists of a name uniquely identifying the dependency in a set
 of dependencies and pairs a specification with corresponding implementations
 from a set of available implementations. Properties set with a dependency
-overwrite properties of the dependencies specification. The {@code bound} flag
+override properties of the dependencies specification. The {@code bound} flag
 indicates if the instance of the dependency is bound to the declaring
 implementation. The {@code optional} flag indicates an optional dependency.</p>]]></jaxb:javadoc>
         </jaxb:class>
@@ -953,7 +956,7 @@ the dependency.]]></jaxb:javadoc>
           <xsd:annotation>
             <xsd:appinfo>
               <jaxb:property>
-                <jaxb:javadoc><![CDATA[True, if this dependency is bound to its object; false, if not.]]></jaxb:javadoc>
+                <jaxb:javadoc><![CDATA[True, if this dependency is bound to its declaring instance; false, if not.]]></jaxb:javadoc>
               </jaxb:property>
             </xsd:appinfo>
           </xsd:annotation>
@@ -1188,8 +1191,8 @@ the property. Property {@code value} holds the properties value which is of type
 <p>A message consists of the properties {@code name}, {@code template} and
 {@code arguments}. Property {@code name} holds a name uniquely identifying the
 message in a set of messages. Property {@code template} holds the template of
-the message. Property {@code arguments} holds meta-data describing arguments to
-format the message with.</p>]]></jaxb:javadoc>
+the message. Property {@code arguments} holds the arguments to format the
+message with.</p>]]></jaxb:javadoc>
         </jaxb:class>
       </xsd:appinfo>
     </xsd:annotation>
@@ -1430,14 +1433,13 @@ argument.</p>]]></jaxb:javadoc>
 {@code identifier} holds an identifier uniquely identifying the instance in a
 set of instances. Property {@code implementationName} holds a name uniquely
 identifying the instance for its specifications. Property {@code class} holds
-the class of an instance. The {@code stateless} flag indicates that the instance
-does not retain state across operations.</p>
+the class of the instance. The {@code stateless} flag indicates that the
+instance does not retain state across operations.</p>
 
 <p>An instance is build from implementations. An implementation declaring a
 location declares its instance to be located outside the scope of the model.
 An implementation without a class is only available during implementation
-inheritance processing. No instance is build for such implementations. Instances
-have no relationship to the modules theire implementations are declared in.</p>]]></jaxb:javadoc>
+inheritance processing. No instance is build for such implementations.</p>]]></jaxb:javadoc>
         </jaxb:class>
       </xsd:appinfo>
     </xsd:annotation>

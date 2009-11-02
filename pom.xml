@@ -82,40 +82,7 @@
     <plugins>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>add-test-source</goal>
-            </goals>
-            <configuration>
-              <sources>
-                <source>${project.build.directory}/generated-test-sources/jaxb</source>
-              </sources>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
         <artifactId>jaxb2-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>xjc-test</id>
-            <phase>generate-test-sources</phase>
-            <goals>
-              <goal>xjc</goal>
-            </goals>
-            <configuration>
-              <arguments>-copy-constructor -cc-visibility private -cc-target 1.5 -mark-generated -Xinject-code</arguments>
-              <bindingDirectory>sec/test/schemas</bindingDirectory>
-              <schemaDirectory>src/test/schemas</schemaDirectory>
-              <outputDirectory>${project.build.directory}/generated-test-sources/jaxb</outputDirectory>
-              <staleFile>${project.build.directory}/generated-test-sources/jaxb/.staleFlag</staleFile>
-              <extension>true</extension>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>

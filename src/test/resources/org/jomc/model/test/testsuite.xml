@@ -257,18 +257,18 @@
   <modules-constraints-test identifier="MODULE_SPECIFICATION_REFERENCE_DECLARATION_CONSTRAINT">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <specifications>
-            <specification identifier="TEST 1" class="java.lang.Object"/>
-            <specification identifier="TEST 2" class="java.lang.Object"/>
-            <specification identifier="TEST 3" class="java.lang.Object"/>
-            <specification identifier="TEST 4" class="java.lang.Object"/>
-            <specification identifier="TEST 5" class="java.lang.Object"/>
-            <reference identifier="TEST 1"/>
-            <reference identifier="TEST 2"/>
-            <reference identifier="TEST 3"/>
-            <reference identifier="TEST 4"/>
-            <reference identifier="TEST 5"/>
+            <specification identifier="Specification 1" class="java.lang.Object"/>
+            <specification identifier="Specification 2" class="java.lang.Object"/>
+            <specification identifier="Specification 3" class="java.lang.Object"/>
+            <specification identifier="Specification 4" class="java.lang.Object"/>
+            <specification identifier="Specification 5" class="java.lang.Object"/>
+            <reference identifier="Specification 1"/>
+            <reference identifier="Specification 2"/>
+            <reference identifier="Specification 3"/>
+            <reference identifier="Specification 4"/>
+            <reference identifier="Specification 5"/>
           </specifications>
         </module>
       </modules>
@@ -280,18 +280,18 @@
   <modules-constraints-test identifier="MODULE_IMPLEMENTATION_REFERENCE_DECLARATION_CONSTRAINT">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <implementations>
-            <implementation identifier="TEST 1" name="TEST 1"/>
-            <implementation identifier="TEST 2" name="TEST 2"/>
-            <implementation identifier="TEST 3" name="TEST 3"/>
-            <implementation identifier="TEST 4" name="TEST 4"/>
-            <implementation identifier="TEST 5" name="TEST 5"/>
-            <reference identifier="TEST 1"/>
-            <reference identifier="TEST 2"/>
-            <reference identifier="TEST 3"/>
-            <reference identifier="TEST 4"/>
-            <reference identifier="TEST 5"/>
+            <implementation identifier="Implementation 1" name="Implementation-Name 1"/>
+            <implementation identifier="Implementation 2" name="Implementation-Name 2"/>
+            <implementation identifier="Implementation 3" name="Implementation-Name 3"/>
+            <implementation identifier="Implementation 4" name="Implementation-Name 4"/>
+            <implementation identifier="Implementation 5" name="Implementation-Name 5"/>
+            <reference identifier="Implementation 1"/>
+            <reference identifier="Implementation 2"/>
+            <reference identifier="Implementation 3"/>
+            <reference identifier="Implementation 4"/>
+            <reference identifier="Implementation 5"/>
           </implementations>
         </module>
       </modules>
@@ -303,54 +303,54 @@
   <modules-constraints-test identifier="FINAL_MODULE_MESSAGE_CONSTRAINT">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <messages>
-            <message name="TEST 1" final="true"/>
-            <message name="TEST 2" final="true"/>
-            <message name="TEST 3" final="true"/>
-            <message name="TEST 4" final="true"/>
-            <message name="TEST 5" final="true"/>
+            <message name="Message 1" final="true"/>
+            <message name="Message 2" final="true"/>
+            <message name="Message 3" final="true"/>
+            <message name="Message 4" final="true"/>
+            <message name="Message 5" final="true"/>
           </messages>
         </module>
       </modules>
     </modules>
-    <detail identifier="FINAL_MODULE_MESSAGE_CONSTRAINT" count="5"/>
+    <detail identifier="MODULE_FINAL_MESSAGE_DECLARATION_CONSTRAINT" count="5"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
   <modules-constraints-test identifier="OVERRIDE_MODULE_MESSAGE_CONSTRAINT">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <messages>
-            <message name="TEST 1" override="true"/>
-            <message name="TEST 2" override="true"/>
-            <message name="TEST 3" override="true"/>
-            <message name="TEST 4" override="true"/>
-            <message name="TEST 5" override="true"/>
+            <message name="Message 1" override="true"/>
+            <message name="Message 2" override="true"/>
+            <message name="Message 3" override="true"/>
+            <message name="Message 4" override="true"/>
+            <message name="Message 5" override="true"/>
           </messages>
         </module>
       </modules>
     </modules>
-    <detail identifier="OVERRIDE_MODULE_MESSAGE_CONSTRAINT" count="5"/>
+    <detail identifier="MODULE_OVERRIDE_MESSAGE_DECLARATION_CONSTRAINT" count="5"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
   <modules-constraints-test identifier="MODULE_MESSAGE_REFERENCE_DECLARATION_CONSTRAINT">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <messages>
-            <message name="TEST 1"/>
-            <message name="TEST 2"/>
-            <message name="TEST 3"/>
-            <message name="TEST 4"/>
-            <message name="TEST 5"/>
-            <reference name="TEST 1"/>
-            <reference name="TEST 2"/>
-            <reference name="TEST 3"/>
-            <reference name="TEST 4"/>
-            <reference name="TEST 5"/>
+            <message name="Message 1"/>
+            <message name="Message 2"/>
+            <message name="Message 3"/>
+            <message name="Message 4"/>
+            <message name="Message 5"/>
+            <reference name="Message 1"/>
+            <reference name="Message 2"/>
+            <reference name="Message 3"/>
+            <reference name="Message 4"/>
+            <reference name="Message 5"/>
           </messages>
         </module>
       </modules>
@@ -362,54 +362,54 @@
   <modules-constraints-test identifier="FINAL_MODULE_PROPERTY_CONSTRAINT">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <properties>
-            <property name="TEST 1" final="true"/>
-            <property name="TEST 2" final="true"/>
-            <property name="TEST 3" final="true"/>
-            <property name="TEST 4" final="true"/>
-            <property name="TEST 5" final="true"/>
+            <property name="Property 1" final="true"/>
+            <property name="Property 2" final="true"/>
+            <property name="Property 3" final="true"/>
+            <property name="Property 4" final="true"/>
+            <property name="Property 5" final="true"/>
           </properties>
         </module>
       </modules>
     </modules>
-    <detail identifier="FINAL_MODULE_PROPERTY_CONSTRAINT" count="5"/>
+    <detail identifier="MODULE_FINAL_PROPERTY_DECLARATION_CONSTRAINT" count="5"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
   <modules-constraints-test identifier="OVERRIDE_MODULE_PROPERTY_CONSTRAINT">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <properties>
-            <property name="TEST 1" override="true"/>
-            <property name="TEST 2" override="true"/>
-            <property name="TEST 3" override="true"/>
-            <property name="TEST 4" override="true"/>
-            <property name="TEST 5" override="true"/>
+            <property name="Property 1" override="true"/>
+            <property name="Property 2" override="true"/>
+            <property name="Property 3" override="true"/>
+            <property name="Property 4" override="true"/>
+            <property name="Property 5" override="true"/>
           </properties>
         </module>
       </modules>
     </modules>
-    <detail identifier="OVERRIDE_MODULE_PROPERTY_CONSTRAINT" count="5"/>
+    <detail identifier="MODULE_OVERRIDE_PROPERTY_DECLARATION_CONSTRAINT" count="5"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
   <modules-constraints-test identifier="MODULE_PROPERTY_REFERENCE_DECLARATION_CONSTRAINT">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <properties>
-            <property name="TEST 1"/>
-            <property name="TEST 2"/>
-            <property name="TEST 3"/>
-            <property name="TEST 4"/>
-            <property name="TEST 5"/>
-            <reference name="TEST 1"/>
-            <reference name="TEST 2"/>
-            <reference name="TEST 3"/>
-            <reference name="TEST 4"/>
-            <reference name="TEST 5"/>
+            <property name="Property 1"/>
+            <property name="Property 2"/>
+            <property name="Property 3"/>
+            <property name="Property 4"/>
+            <property name="Property 5"/>
+            <reference name="Property 1"/>
+            <reference name="Property 2"/>
+            <reference name="Property 3"/>
+            <reference name="Property 4"/>
+            <reference name="Property 5"/>
           </properties>
         </module>
       </modules>
@@ -421,15 +421,15 @@
   <modules-constraints-test identifier="IMPLEMENTATION_IMPLEMENTATION_DECLARATION_CONSTRAINT">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <implementations>
-            <implementation identifier="TEST" name="TEST">
+            <implementation identifier="Implementation" name="Implementation Name">
               <implementations>
-                <implementation identifier="TEST 1" name="TEST 1"/>
-                <implementation identifier="TEST 2" name="TEST 2"/>
-                <implementation identifier="TEST 3" name="TEST 3"/>
-                <implementation identifier="TEST 4" name="TEST 4"/>
-                <implementation identifier="TEST 5" name="TEST 5"/>
+                <implementation identifier="Implementation 1" name="Implementation Name 1"/>
+                <implementation identifier="Implementation 2" name="Implementation Name 2"/>
+                <implementation identifier="Implementation 3" name="Implementation Name 3"/>
+                <implementation identifier="Implementation 4" name="Implementation Name 4"/>
+                <implementation identifier="Implementation 5" name="Implementation Name 5"/>
               </implementations>
             </implementation>
           </implementations>
@@ -443,29 +443,29 @@
   <modules-constraints-test identifier="IMPLEMENTATION_MESSAGES_UNIQUENESS_CONSTRAINT">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <implementations>
-            <implementation identifier="TEST" name="TEST">
+            <implementation identifier="Implementation" name="Implementation Name">
               <messages>
-                <message name="TEST 1"/>
-                <message name="TEST 2"/>
-                <message name="TEST 3"/>
-                <message name="TEST 4"/>
-                <message name="TEST 5"/>
-                <reference name="TEST 1"/>
-                <reference name="TEST 2"/>
-                <reference name="TEST 3"/>
-                <reference name="TEST 4"/>
-                <reference name="TEST 5"/>
+                <message name="Message 1"/>
+                <message name="Message 2"/>
+                <message name="Message 3"/>
+                <message name="Message 4"/>
+                <message name="Message 5"/>
+                <reference name="Message 1"/>
+                <reference name="Message 2"/>
+                <reference name="Message 3"/>
+                <reference name="Message 4"/>
+                <reference name="Message 5"/>
               </messages>
             </implementation>
           </implementations>
           <messages>
-            <message name="TEST 1"/>
-            <message name="TEST 2"/>
-            <message name="TEST 3"/>
-            <message name="TEST 4"/>
-            <message name="TEST 5"/>
+            <message name="Message 1"/>
+            <message name="Message 2"/>
+            <message name="Message 3"/>
+            <message name="Message 4"/>
+            <message name="Message 5"/>
           </messages>
         </module>
       </modules>
@@ -477,29 +477,29 @@
   <modules-constraints-test identifier="IMPLEMENTATION_PROPERTIES_UNIQUENESS_CONSTRAINT">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <implementations>
-            <implementation identifier="TEST" name="TEST">
+            <implementation identifier="Implementation" name="Implementation Name">
               <properties>
-                <property name="TEST 1"/>
-                <property name="TEST 2"/>
-                <property name="TEST 3"/>
-                <property name="TEST 4"/>
-                <property name="TEST 5"/>
-                <reference name="TEST 1"/>
-                <reference name="TEST 2"/>
-                <reference name="TEST 3"/>
-                <reference name="TEST 4"/>
-                <reference name="TEST 5"/>
+                <property name="Property 1"/>
+                <property name="Property 2"/>
+                <property name="Property 3"/>
+                <property name="Property 4"/>
+                <property name="Property 5"/>
+                <reference name="Property 1"/>
+                <reference name="Property 2"/>
+                <reference name="Property 3"/>
+                <reference name="Property 4"/>
+                <reference name="Property 5"/>
               </properties>
             </implementation>
           </implementations>
           <properties>
-            <property name="TEST 1"/>
-            <property name="TEST 2"/>
-            <property name="TEST 3"/>
-            <property name="TEST 4"/>
-            <property name="TEST 5"/>
+            <property name="Property 1"/>
+            <property name="Property 2"/>
+            <property name="Property 3"/>
+            <property name="Property 4"/>
+            <property name="Property 5"/>
           </properties>
         </module>
       </modules>
@@ -511,15 +511,15 @@
   <modules-constraints-test identifier="IMPLEMENTATION_SPECIFICATION_DECLARATION_CONSTRAINT">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <implementations>
-            <implementation identifier="TEST" name="TEST">
+            <implementation identifier="Implementation" name="Implementation Name">
               <specifications>
-                <specification identifier="TEST 1" class="java.lang.Object"/>
-                <specification identifier="TEST 2" class="java.lang.Object"/>
-                <specification identifier="TEST 3" class="java.lang.Object"/>
-                <specification identifier="TEST 4" class="java.lang.Object"/>
-                <specification identifier="TEST 5" class="java.lang.Object"/>
+                <specification identifier="Specification 1" class="java.lang.Object"/>
+                <specification identifier="Specification 2" class="java.lang.Object"/>
+                <specification identifier="Specification 3" class="java.lang.Object"/>
+                <specification identifier="Specification 4" class="java.lang.Object"/>
+                <specification identifier="Specification 5" class="java.lang.Object"/>
               </specifications>
             </implementation>
           </implementations>
@@ -533,28 +533,28 @@
   <modules-constraints-test identifier="ABSTRACT_IMPLEMENTATION_LOCATION_CONSTRAINT">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <implementations>
-            <implementation identifier="TEST 1" name="TEST 1" abstract="true" location="URI"/>
-            <implementation identifier="TEST 2" name="TEST 2" abstract="true" location="URI"/>
-            <implementation identifier="TEST 3" name="TEST 3" abstract="true" location="URI"/>
-            <implementation identifier="TEST 4" name="TEST 4" abstract="true" location="URI"/>
-            <implementation identifier="TEST 5" name="TEST 5" abstract="true" location="URI"/>
+            <implementation identifier="Implementation 1" name="Implementation Name 1" abstract="true" location="URI"/>
+            <implementation identifier="Implementation 2" name="Implementation Name 2" abstract="true" location="URI"/>
+            <implementation identifier="Implementation 3" name="Implementation Name 3" abstract="true" location="URI"/>
+            <implementation identifier="Implementation 4" name="Implementation Name 4" abstract="true" location="URI"/>
+            <implementation identifier="Implementation 5" name="Implementation Name 5" abstract="true" location="URI"/>
           </implementations>
         </module>
       </modules>
     </modules>
-    <detail identifier="ABSTRACT_IMPLEMENTATION_LOCATION_CONSTRAINT" count="5"/>
+    <detail identifier="IMPLEMENTATION_ABSTRACT_LOCATION_DECLARATION_CONSTRAINT" count="5"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
   <modules-constraints-test identifier="IMPLEMENTATION_VERSIONING_CONSTRAINT">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <implementations>
-            <implementation identifier="Parent" name="Parent"/>
-            <implementation identifier="Child" name="Child">
+            <implementation identifier="Parent" name="Parent Name"/>
+            <implementation identifier="Child" name="Child Name">
               <implementations>
                 <reference identifier="Parent" version="1.0"/>
               </implementations>
@@ -563,87 +563,88 @@
         </module>
       </modules>
     </modules>
-    <detail identifier="IMPLEMENTATION_VERSIONING_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_IMPLEMENTATION_VERSIONING_CONSTRAINT" count="1"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
   <modules-constraints-test identifier="SPECIFICATION_VERSIONING_CONSTRAINT">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <specifications>
-            <specification identifier="TEST" class="java.lang.Object"/>
+            <specification identifier="Specification" class="java.lang.Object"/>
           </specifications>
           <implementations>
-            <implementation identifier="TEST" name="TEST">
+            <implementation identifier="Implementation" name="Implementation Name">
               <specifications>
-                <reference identifier="TEST" version="1.0"/>
+                <reference identifier="Specification" version="1.0"/>
               </specifications>
               <dependencies>
-                <dependency name="TEST" identifier="TEST" version="1.0"/>
+                <dependency name="Dependency Name" identifier="Specification" version="1.0"/>
               </dependencies>
             </implementation>
           </implementations>
         </module>
       </modules>
     </modules>
-    <detail identifier="SPECIFICATION_VERSIONING_CONSTRAINT" count="2"/>
+    <detail identifier="IMPLEMENTATION_SPECIFICATION_VERSIONING_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_SPECIFICATION_VERSIONING_CONSTRAINT" count="1"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
   <modules-constraints-test identifier="IMPLEMENTATION_COMPATIBILITY_CONSTRAINT_1">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <specifications>
-            <specification identifier="TEST" class="java.lang.Object" version="1.0"/>
+            <specification identifier="Specification" class="java.lang.Object" version="1.0"/>
           </specifications>
           <implementations>
-            <implementation identifier="TEST 1" name="TEST 1">
+            <implementation identifier="Implementation" name="Implementation Name">
               <specifications>
-                <reference identifier="TEST" version="1.1"/>
+                <reference identifier="Specification" version="1.1"/>
               </specifications>
             </implementation>
           </implementations>
         </module>
       </modules>
     </modules>
-    <detail identifier="IMPLEMENTATION_COMPATIBILITY_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_SPECIFICATION_COMPATIBILITY_CONSTRAINT" count="1"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
   <modules-constraints-test identifier="IMPLEMENTATION_COMPATIBILITY_CONSTRAINT_2">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <specifications>
-            <specification identifier="TEST" class="java.lang.Object" version="1.0"/>
+            <specification identifier="Specification" class="java.lang.Object" version="1.0"/>
           </specifications>
           <implementations>
-            <implementation identifier="TEST 1" name="TEST 1">
+            <implementation identifier="Implementation" name="Implementation Name">
               <specifications>
-                <reference identifier="TEST" version="0.9"/>
+                <reference identifier="Specification" version="0.9"/>
               </specifications>
             </implementation>
           </implementations>
         </module>
       </modules>
     </modules>
-    <detail identifier="IMPLEMENTATION_COMPATIBILITY_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_SPECIFICATION_COMPATIBILITY_CONSTRAINT" count="1"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
   <modules-constraints-test identifier="IMPLEMENTATION_COMPATIBILITY_CONSTRAINT_VALID">
     <modules valid="true">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <specifications>
-            <specification identifier="TEST" class="java.lang.Object" version="1.0"/>
+            <specification identifier="Specification" class="java.lang.Object" version="1.0"/>
           </specifications>
           <implementations>
-            <implementation identifier="TEST 1" name="TEST 1">
+            <implementation identifier="Implementation" name="Implementation Name">
               <specifications>
-                <reference identifier="TEST" version="1.0"/>
+                <reference identifier="Specification" version="1.0"/>
               </specifications>
             </implementation>
           </implementations>
@@ -656,35 +657,35 @@
   <modules-constraints-test identifier="DEPENDENCY_COMPATIBILITY_CONSTRAINT_1">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <specifications>
-            <specification identifier="TEST" class="java.lang.Object" version="1.0"/>
+            <specification identifier="Specification" class="java.lang.Object" version="1.0"/>
           </specifications>
           <implementations>
-            <implementation identifier="TEST 1" name="TEST 1">
+            <implementation identifier="Implementation" name="Implementation Name">
               <dependencies>
-                <dependency name="TEST" identifier="TEST" version="1.1" optional="true"/>
+                <dependency name="Dependency" identifier="Specification" version="1.1" optional="true"/>
               </dependencies>
             </implementation>
           </implementations>
         </module>
       </modules>
     </modules>
-    <detail identifier="DEPENDENCY_COMPATIBILITY_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_SPECIFICATION_COMPATIBILITY_CONSTRAINT" count="1"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
   <modules-constraints-test identifier="DEPENDENCY_COMPATIBILITY_CONSTRAINT_VALID_1">
     <modules valid="true">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <specifications>
-            <specification identifier="TEST" class="java.lang.Object" version="1.0"/>
+            <specification identifier="Specification" class="java.lang.Object" version="1.0"/>
           </specifications>
           <implementations>
-            <implementation identifier="TEST 1" name="TEST 1">
+            <implementation identifier="Implementation" name="Implementation Name">
               <dependencies>
-                <dependency name="TEST" identifier="TEST" version="0.9" optional="true"/>
+                <dependency name="Dependency" identifier="Specification" version="0.9" optional="true"/>
               </dependencies>
             </implementation>
           </implementations>
@@ -697,14 +698,14 @@
   <modules-constraints-test identifier="DEPENDENCY_COMPATIBILITY_CONSTRAINT_VALID_2">
     <modules valid="true">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <specifications>
-            <specification identifier="TEST" class="java.lang.Object" version="1.0"/>
+            <specification identifier="Specification" class="java.lang.Object" version="1.0"/>
           </specifications>
           <implementations>
-            <implementation identifier="TEST 1" name="TEST 1">
+            <implementation identifier="Implementation" name="Implementation Name">
               <dependencies>
-                <dependency name="TEST" identifier="TEST" version="1.0" optional="true"/>
+                <dependency name="Dependency" identifier="Specification" version="1.0" optional="true"/>
               </dependencies>
             </implementation>
           </implementations>
@@ -717,56 +718,56 @@
   <modules-constraints-test identifier="DEPENDENCY_PROPERTY_REFERENCE_DECLARATION_CONSTRAINT">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <specifications>
-            <specification identifier="TEST" class="java.lang.Object" scope="TEST" version="1.0"/>
+            <specification identifier="Specification" class="java.lang.Object" scope="TEST" version="1.0"/>
           </specifications>
           <implementations>
-            <implementation identifier="TEST 1" name="TEST 1">
+            <implementation identifier="Implementation" name="Implementation Name">
               <dependencies>
-                <dependency name="TEST" identifier="TEST" version="1.0" optional="true">
+                <dependency name="Dependency" identifier="Specification" version="1.0" optional="true">
                   <properties>
-                    <reference name="TEST 1"/>
-                    <reference name="TEST 2"/>
-                    <reference name="TEST 3"/>
-                    <reference name="TEST 4"/>
-                    <reference name="TEST 5"/>
+                    <reference name="Property 1"/>
+                    <reference name="Property 2"/>
+                    <reference name="Property 3"/>
+                    <reference name="Property 4"/>
+                    <reference name="Property 5"/>
                   </properties>
                 </dependency>
               </dependencies>
             </implementation>
           </implementations>
           <properties>
-            <property name="TEST 1"/>
-            <property name="TEST 2"/>
-            <property name="TEST 3"/>
-            <property name="TEST 4"/>
-            <property name="TEST 5"/>
+            <property name="Property 1"/>
+            <property name="Property 2"/>
+            <property name="Property 3"/>
+            <property name="Property 4"/>
+            <property name="Property 5"/>
           </properties>
         </module>
       </modules>
     </modules>
-    <detail identifier="DEPENDENCY_PROPERTY_REFERENCE_DECLARATION_CONSTRAINT" count="5"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_PROPERTY_REFERENCE_DECLARATION_CONSTRAINT" count="5"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
   <modules-constraints-test identifier="DEPENDENCY_PROPERTIES_OVERRIDE_CONSTRAINT">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <specifications>
-            <specification identifier="TEST" class="java.lang.Object" scope="TEST" version="1.0"/>
+            <specification identifier="Specification" class="java.lang.Object" scope="TEST" version="1.0"/>
           </specifications>
           <implementations>
-            <implementation identifier="TEST 1" name="TEST 1">
+            <implementation identifier="Implementation" name="Implementation Name">
               <dependencies>
-                <dependency name="TEST" identifier="TEST" version="1.0" optional="true">
+                <dependency name="Dependency" identifier="Specification" version="1.0" optional="true">
                   <properties>
-                    <property name="TEST 1"/>
-                    <property name="TEST 2"/>
-                    <property name="TEST 3"/>
-                    <property name="TEST 4"/>
-                    <property name="TEST 5"/>
+                    <property name="Property 1"/>
+                    <property name="Property 2"/>
+                    <property name="Property 3"/>
+                    <property name="Property 4"/>
+                    <property name="Property 5"/>
                   </properties>
                 </dependency>
               </dependencies>
@@ -775,50 +776,50 @@
         </module>
       </modules>
     </modules>
-    <detail identifier="DEPENDENCY_PROPERTIES_OVERRIDE_CONSTRAINT" count="5"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_PROPERTIES_OVERRIDE_CONSTRAINT" count="5"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
   <modules-constraints-test identifier="MANDATORY_DEPENDENCY_CONSTRAINT">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <specifications>
-            <specification identifier="TEST 1" class="java.lang.Object" scope="TEST"/>
-            <specification identifier="TEST 2" class="java.lang.Object" scope="TEST"/>
-            <specification identifier="TEST 3" class="java.lang.Object" scope="TEST"/>
-            <specification identifier="TEST 4" class="java.lang.Object" scope="TEST"/>
-            <specification identifier="TEST 5" class="java.lang.Object" scope="TEST"/>
+            <specification identifier="Specification 1" class="java.lang.Object" scope="TEST"/>
+            <specification identifier="Specification 2" class="java.lang.Object" scope="TEST"/>
+            <specification identifier="Specification 3" class="java.lang.Object" scope="TEST"/>
+            <specification identifier="Specification 4" class="java.lang.Object" scope="TEST"/>
+            <specification identifier="Specification 5" class="java.lang.Object" scope="TEST"/>
           </specifications>
           <implementations>
-            <implementation identifier="TEST 1" name="TEST 1">
+            <implementation identifier="Implementation" name="Implementation Name">
               <dependencies>
-                <dependency name="TEST 1" identifier="TEST 1" optional="false"/>
-                <dependency name="TEST 2" identifier="TEST 2" optional="false"/>
-                <dependency name="TEST 3" identifier="TEST 3" optional="false"/>
-                <dependency name="TEST 4" identifier="TEST 4" optional="false"/>
-                <dependency name="TEST 5" identifier="TEST 5" optional="false"/>
+                <dependency name="Dependency 1" identifier="Specification 1" optional="false"/>
+                <dependency name="Dependency 2" identifier="Specification 2" optional="false"/>
+                <dependency name="Dependency 3" identifier="Specification 3" optional="false"/>
+                <dependency name="Dependency 4" identifier="Specification 4" optional="false"/>
+                <dependency name="Dependency 5" identifier="Specification 5" optional="false"/>
               </dependencies>
             </implementation>
           </implementations>
         </module>
       </modules>
     </modules>
-    <detail identifier="MANDATORY_DEPENDENCY_CONSTRAINT" count="5"/>
+    <detail identifier="IMPLEMENTATION_MANDATORY_DEPENDENCY_CONSTRAINT" count="5"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
   <modules-constraints-test identifier="IMPLEMENTATION_INHERITANCE_CONSTRAINT">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Moule">
           <implementations>
-            <implementation identifier="Final 1" name="Final 1" final="true"/>
-            <implementation identifier="Final 2" name="Final 2" final="true"/>
-            <implementation identifier="Final 3" name="Final 3" final="true"/>
-            <implementation identifier="Final 4" name="Final 4" final="true"/>
-            <implementation identifier="Final 5" name="Final 5" final="true"/>
-            <implementation identifier="TEST 1" name="TEST 1" final="true">
+            <implementation identifier="Final 1" name="Final Name 1" final="true"/>
+            <implementation identifier="Final 2" name="Final Name 2" final="true"/>
+            <implementation identifier="Final 3" name="Final Name 3" final="true"/>
+            <implementation identifier="Final 4" name="Final Name 4" final="true"/>
+            <implementation identifier="Final 5" name="Final Name 5" final="true"/>
+            <implementation identifier="Implementation" name="Implementation Name" final="true">
               <implementations>
                 <reference identifier="Final 1"/>
                 <reference identifier="Final 2"/>
@@ -831,44 +832,69 @@
         </module>
       </modules>
     </modules>
-    <detail identifier="IMPLEMENTATION_INHERITANCE_CONSTRAINT" count="5"/>
+    <detail identifier="IMPLEMENTATION_IMPLEMENTATION_INHERITANCE_CONSTRAINT" count="5"/>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="IMPLEMENTATION_REFERENCE_INHERITANCE_CONSTRAINT">
+    <modules valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Moule">
+          <implementations>
+            <implementation identifier="Parent Implementation" name="Parent Implementation Name"/>
+            <implementation identifier="Child Implementation" name="Child Implementation Name">
+              <implementations>
+                <reference identifier="Parent Implementation" final="true"/>
+              </implementations>
+            </implementation>
+            <implementation identifier="Implementation" name="Implementation Name">
+              <implementations>
+                <reference identifier="Child Implementation" final="true"/>
+                <reference identifier="Parent Implementation" final="true"/>
+              </implementations>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="IMPLEMENTATION_IMPLEMENTATION_REFERENCE_INHERITANCE_CONSTRAINT" count="1"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
   <modules-constraints-test identifier="SPECIFICATION_INHERITANCE_CONSTRANT">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <specifications>
-            <specification identifier="TEST" class="java.lang.Object"/>
+            <specification identifier="Specification" class="java.lang.Object"/>
           </specifications>
           <implementations>
-            <implementation identifier="Final 1" name="Final 1">
+            <implementation identifier="Final 1" name="Final Name 1">
               <specifications>
-                <reference identifier="TEST" final="true"/>
+                <reference identifier="Specification" final="true"/>
               </specifications>
             </implementation>
-            <implementation identifier="Final 2" name="Final 2">
+            <implementation identifier="Final 2" name="Final Name 2">
               <specifications>
-                <reference identifier="TEST" final="true"/>
+                <reference identifier="Specification" final="true"/>
               </specifications>
             </implementation>
-            <implementation identifier="Final 3" name="Final 3">
+            <implementation identifier="Final 3" name="Final Name 3">
               <specifications>
-                <reference identifier="TEST" final="true"/>
+                <reference identifier="Specification" final="true"/>
               </specifications>
             </implementation>
-            <implementation identifier="Final 4" name="Final 4">
+            <implementation identifier="Final 4" name="Final Name 4">
               <specifications>
-                <reference identifier="TEST" final="true"/>
+                <reference identifier="Specification" final="true"/>
               </specifications>
             </implementation>
-            <implementation identifier="Final 5" name="Final 5">
+            <implementation identifier="Final 5" name="Final Name 5">
               <specifications>
-                <reference identifier="TEST" final="true"/>
+                <reference identifier="Specification" final="true"/>
               </specifications>
             </implementation>
-            <implementation identifier="TEST 1" name="TEST 1" final="true">
+            <implementation identifier="Implementation" name="Implementation Name" final="true">
               <implementations>
                 <reference identifier="Final 1"/>
                 <reference identifier="Final 2"/>
@@ -877,51 +903,51 @@
                 <reference identifier="Final 5"/>
               </implementations>
               <specifications>
-                <reference identifier="TEST" final="true"/>
+                <reference identifier="Specification" final="true"/>
               </specifications>
             </implementation>
           </implementations>
         </module>
       </modules>
     </modules>
-    <detail identifier="SPECIFICATION_INHERITANCE_CONSTRANT" count="5"/>
+    <detail identifier="IMPLEMENTATION_SPECIFICATION_INHERITANCE_CONSTRAINT" count="1"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
   <modules-constraints-test identifier="DEPENDENCY_INHERITANCE_CONSTRAINT">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <specifications>
-            <specification identifier="TEST" class="java.lang.Object"/>
+            <specification identifier="Specification" class="java.lang.Object"/>
           </specifications>
           <implementations>
             <implementation identifier="Final 1" name="Final 1">
               <dependencies>
-                <dependency name="Final" identifier="TEST" final="true" optional="true"/>
+                <dependency name="Final Dependency" identifier="Specification" final="true" optional="true"/>
               </dependencies>
             </implementation>
             <implementation identifier="Final 2" name="Final 2">
               <dependencies>
-                <dependency name="Final" identifier="TEST" final="true" optional="true"/>
+                <dependency name="Final Dependency" identifier="Specification" final="true" optional="true"/>
               </dependencies>
             </implementation>
             <implementation identifier="Final 3" name="Final 3">
               <dependencies>
-                <dependency name="Final" identifier="TEST" final="true" optional="true"/>
+                <dependency name="Final Dependency" identifier="Specification" final="true" optional="true"/>
               </dependencies>
             </implementation>
             <implementation identifier="Final 4" name="Final 4">
               <dependencies>
-                <dependency name="Final" identifier="TEST" final="true" optional="true"/>
+                <dependency name="Final Dependency" identifier="Specification" final="true" optional="true"/>
               </dependencies>
             </implementation>
             <implementation identifier="Final 5" name="Final 5">
               <dependencies>
-                <dependency name="Final" identifier="TEST" final="true" optional="true"/>
+                <dependency name="Final Dependency" identifier="Specification" final="true" optional="true"/>
               </dependencies>
             </implementation>
-            <implementation identifier="TEST 1" name="TEST 1" final="true">
+            <implementation identifier="Implementation" name="Implementation Name" final="true">
               <implementations>
                 <reference identifier="Final 1"/>
                 <reference identifier="Final 2"/>
@@ -930,53 +956,53 @@
                 <reference identifier="Final 5"/>
               </implementations>
               <dependencies>
-                <dependency name="Final" identifier="TEST" final="true" optional="true"/>
+                <dependency name="Final Dependency" identifier="Specification" final="true" optional="true"/>
               </dependencies>
             </implementation>
           </implementations>
         </module>
       </modules>
     </modules>
-    <detail identifier="DEPENDENCY_INHERITANCE_CONSTRAINT" count="5"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_INHERITANCE_CONSTRAINT" count="1"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
   <modules-constraints-test identifier="PROPERTY_INHERITANCE_CONSTRAINT">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <implementations>
-            <implementation identifier="Final 1" name="Final 1">
+            <implementation identifier="Final 1" name="Final Name 1">
               <properties>
-                <property name="Final 1" final="true"/>
-                <reference name="REF 1" final="true"/>
+                <property name="Final Property 1" final="true"/>
+                <reference name="Final Property Reference 1" final="true"/>
               </properties>
             </implementation>
-            <implementation identifier="Final 2" name="Final 2">
+            <implementation identifier="Final 2" name="Final Name 2">
               <properties>
-                <property name="Final 2" final="true"/>
-                <reference name="REF 2" final="true"/>
+                <property name="Final Property 2" final="true"/>
+                <reference name="Final Property Reference 2" final="true"/>
               </properties>
             </implementation>
-            <implementation identifier="Final 3" name="Final 3">
+            <implementation identifier="Final 3" name="Final Name 3">
               <properties>
-                <property name="Final 3" final="true"/>
-                <reference name="REF 3" final="true"/>
+                <property name="Final Property 3" final="true"/>
+                <reference name="Final Property Reference 3" final="true"/>
               </properties>
             </implementation>
-            <implementation identifier="Final 4" name="Final 4">
+            <implementation identifier="Final 4" name="Final Name 4">
               <properties>
-                <property name="Final 4" final="true"/>
-                <reference name="REF 4" final="true"/>
+                <property name="Final Property 4" final="true"/>
+                <reference name="Final Property Reference 4" final="true"/>
               </properties>
             </implementation>
-            <implementation identifier="Final 5" name="Final 5">
+            <implementation identifier="Final 5" name="Final Name 5">
               <properties>
-                <property name="Final 5" final="true"/>
-                <reference name="REF 5" final="true"/>
+                <property name="Final Property 5" final="true"/>
+                <reference name="Final Property Reference 5" final="true"/>
               </properties>
             </implementation>
-            <implementation identifier="TEST 1" name="TEST 1" final="true">
+            <implementation identifier="Implementation" name="Implementation Name" final="true">
               <implementations>
                 <reference identifier="Final 1"/>
                 <reference identifier="Final 2"/>
@@ -985,69 +1011,69 @@
                 <reference identifier="Final 5"/>
               </implementations>
               <properties>
-                <property name="Final 1" final="true"/>
-                <property name="Final 2" final="true"/>
-                <property name="Final 3" final="true"/>
-                <property name="Final 4" final="true"/>
-                <property name="Final 5" final="true"/>
-                <property name="REF 1" final="true"/>
-                <property name="REF 2" final="true"/>
-                <property name="REF 3" final="true"/>
-                <property name="REF 4" final="true"/>
-                <property name="REF 5" final="true"/>
+                <property name="Final Property 1" final="true"/>
+                <property name="Final Property 2" final="true"/>
+                <property name="Final Property 3" final="true"/>
+                <property name="Final Property 4" final="true"/>
+                <property name="Final Property 5" final="true"/>
+                <property name="Final Property Reference 1" final="true"/>
+                <property name="Final Property Reference 2" final="true"/>
+                <property name="Final Property Reference 3" final="true"/>
+                <property name="Final Property Reference 4" final="true"/>
+                <property name="Final Property Reference 5" final="true"/>
               </properties>
             </implementation>
           </implementations>
           <properties>
-            <property name="REF 1"/>
-            <property name="REF 2"/>
-            <property name="REF 3"/>
-            <property name="REF 4"/>
-            <property name="REF 5"/>
+            <property name="Final Property Reference 1"/>
+            <property name="Final Property Reference 2"/>
+            <property name="Final Property Reference 3"/>
+            <property name="Final Property Reference 4"/>
+            <property name="Final Property Reference 5"/>
           </properties>
         </module>
       </modules>
     </modules>
-    <detail identifier="PROPERTY_INHERITANCE_CONSTRAINT" count="10"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_INHERITANCE_CONSTRAINT" count="10"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
   <modules-constraints-test identifier="PROPERTY_INHERITANCE_CONSTRAINT_2">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <implementations>
-            <implementation identifier="Final 1" name="Final 1">
+            <implementation identifier="Final 1" name="Final Name 1">
               <properties>
-                <property name="Final 1" final="true"/>
-                <reference name="REF 1" final="true"/>
+                <property name="Final Property 1" final="true"/>
+                <reference name="Final Property Reference 1" final="true"/>
               </properties>
             </implementation>
-            <implementation identifier="Final 2" name="Final 2">
+            <implementation identifier="Final 2" name="Final Name 2">
               <properties>
-                <property name="Final 2" final="true"/>
-                <reference name="REF 2" final="true"/>
+                <property name="Final Property 2" final="true"/>
+                <reference name="Final Property Reference 2" final="true"/>
               </properties>
             </implementation>
-            <implementation identifier="Final 3" name="Final 3">
+            <implementation identifier="Final 3" name="Final Name 3">
               <properties>
-                <property name="Final 3" final="true"/>
-                <reference name="REF 3" final="true"/>
+                <property name="Final Property 3" final="true"/>
+                <reference name="Final Property Reference 3" final="true"/>
               </properties>
             </implementation>
-            <implementation identifier="Final 4" name="Final 4">
+            <implementation identifier="Final 4" name="Final Name 4">
               <properties>
-                <property name="Final 4" final="true"/>
-                <reference name="REF 4" final="true"/>
+                <property name="Final Property 4" final="true"/>
+                <reference name="Final Property Reference 4" final="true"/>
               </properties>
             </implementation>
-            <implementation identifier="Final 5" name="Final 5">
+            <implementation identifier="Final 5" name="Final Name 5">
               <properties>
-                <property name="Final 5" final="true"/>
-                <reference name="REF 5" final="true"/>
+                <property name="Final Property 5" final="true"/>
+                <reference name="Final Property Reference 5" final="true"/>
               </properties>
             </implementation>
-            <implementation identifier="TEST 1" name="TEST 1" final="true">
+            <implementation identifier="Implementation" name="Implementation Name" final="true">
               <implementations>
                 <reference identifier="Final 1"/>
                 <reference identifier="Final 2"/>
@@ -1056,69 +1082,69 @@
                 <reference identifier="Final 5"/>
               </implementations>
               <properties>
-                <property name="Final 1" final="true"/>
-                <property name="Final 2" final="true"/>
-                <property name="Final 3" final="true"/>
-                <property name="Final 4" final="true"/>
-                <property name="Final 5" final="true"/>
-                <reference name="REF 1" final="true"/>
-                <reference name="REF 2" final="true"/>
-                <reference name="REF 3" final="true"/>
-                <reference name="REF 4" final="true"/>
-                <reference name="REF 5" final="true"/>
+                <property name="Final Property 1" final="true"/>
+                <property name="Final Property 2" final="true"/>
+                <property name="Final Property 3" final="true"/>
+                <property name="Final Property 4" final="true"/>
+                <property name="Final Property 5" final="true"/>
+                <reference name="Final Property Reference 1" final="true"/>
+                <reference name="Final Property Reference 2" final="true"/>
+                <reference name="Final Property Reference 3" final="true"/>
+                <reference name="Final Property Reference 4" final="true"/>
+                <reference name="Final Property Reference 5" final="true"/>
               </properties>
             </implementation>
           </implementations>
           <properties>
-            <property name="REF 1"/>
-            <property name="REF 2"/>
-            <property name="REF 3"/>
-            <property name="REF 4"/>
-            <property name="REF 5"/>
+            <property name="Final Property Reference 1"/>
+            <property name="Final Property Reference 2"/>
+            <property name="Final Property Reference 3"/>
+            <property name="Final Property Reference 4"/>
+            <property name="Final Property Reference 5"/>
           </properties>
         </module>
       </modules>
     </modules>
-    <detail identifier="PROPERTY_INHERITANCE_CONSTRAINT" count="10"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_INHERITANCE_CONSTRAINT" count="10"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
   <modules-constraints-test identifier="MESSAGE_INHERITANCE_CONSTRAINT">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <implementations>
-            <implementation identifier="Final 1" name="Final 1">
+            <implementation identifier="Final 1" name="Final Name 1">
               <messages>
-                <message name="Final 1" final="true"/>
-                <reference name="REF 1" final="true"/>
+                <message name="Final Message 1" final="true"/>
+                <reference name="Final Message Reference 1" final="true"/>
               </messages>
             </implementation>
-            <implementation identifier="Final 2" name="Final 2">
+            <implementation identifier="Final 2" name="Final Name 2">
               <messages>
-                <message name="Final 2" final="true"/>
-                <reference name="REF 2" final="true"/>
+                <message name="Final Message 2" final="true"/>
+                <reference name="Final Message Reference 2" final="true"/>
               </messages>
             </implementation>
-            <implementation identifier="Final 3" name="Final 3">
+            <implementation identifier="Final 3" name="Final Name 3">
               <messages>
-                <message name="Final 3" final="true"/>
-                <reference name="REF 3" final="true"/>
+                <message name="Final Message 3" final="true"/>
+                <reference name="Final Message Reference 3" final="true"/>
               </messages>
             </implementation>
-            <implementation identifier="Final 4" name="Final 4">
+            <implementation identifier="Final 4" name="Final Name 4">
               <messages>
-                <message name="Final 4" final="true"/>
-                <reference name="REF 4" final="true"/>
+                <message name="Final Message 4" final="true"/>
+                <reference name="Final Message Reference 4" final="true"/>
               </messages>
             </implementation>
-            <implementation identifier="Final 5" name="Final 5">
+            <implementation identifier="Final 5" name="Final Name 5">
               <messages>
-                <message name="Final 5" final="true"/>
-                <reference name="REF 5" final="true"/>
+                <message name="Final Message 5" final="true"/>
+                <reference name="Final Message Reference 5" final="true"/>
               </messages>
             </implementation>
-            <implementation identifier="TEST 1" name="TEST 1" final="true">
+            <implementation identifier="Implementation" name="Implementation Name" final="true">
               <implementations>
                 <reference identifier="Final 1"/>
                 <reference identifier="Final 2"/>
@@ -1127,69 +1153,69 @@
                 <reference identifier="Final 5"/>
               </implementations>
               <messages>
-                <message name="Final 1" final="true"/>
-                <message name="Final 2" final="true"/>
-                <message name="Final 3" final="true"/>
-                <message name="Final 4" final="true"/>
-                <message name="Final 5" final="true"/>
-                <message name="REF 1" final="true"/>
-                <message name="REF 2" final="true"/>
-                <message name="REF 3" final="true"/>
-                <message name="REF 4" final="true"/>
-                <message name="REF 5" final="true"/>
+                <message name="Final Message 1" final="true"/>
+                <message name="Final Message 2" final="true"/>
+                <message name="Final Message 3" final="true"/>
+                <message name="Final Message 4" final="true"/>
+                <message name="Final Message 5" final="true"/>
+                <message name="Final Message Reference 1" final="true"/>
+                <message name="Final Message Reference 2" final="true"/>
+                <message name="Final Message Reference 3" final="true"/>
+                <message name="Final Message Reference 4" final="true"/>
+                <message name="Final Message Reference 5" final="true"/>
               </messages>
             </implementation>
           </implementations>
           <messages>
-            <message name="REF 1"/>
-            <message name="REF 2"/>
-            <message name="REF 3"/>
-            <message name="REF 4"/>
-            <message name="REF 5"/>
+            <message name="Final Message Reference 1"/>
+            <message name="Final Message Reference 2"/>
+            <message name="Final Message Reference 3"/>
+            <message name="Final Message Reference 4"/>
+            <message name="Final Message Reference 5"/>
           </messages>
         </module>
       </modules>
     </modules>
-    <detail identifier="MESSAGE_INHERITANCE_CONSTRAINT" count="10"/>
+    <detail identifier="IMPLEMENTATION_MESSAGE_INHERITANCE_CONSTRAINT" count="10"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
   <modules-constraints-test identifier="MESSAGE_INHERITANCE_CONSTRAINT_2">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <implementations>
-            <implementation identifier="Final 1" name="Final 1">
+            <implementation identifier="Final 1" name="Final Name 1">
               <messages>
-                <message name="Final 1" final="true"/>
-                <reference name="REF 1" final="true"/>
+                <message name="Final Message 1" final="true"/>
+                <reference name="Final Message Reference 1" final="true"/>
               </messages>
             </implementation>
-            <implementation identifier="Final 2" name="Final 2">
+            <implementation identifier="Final 2" name="Final Name 2">
               <messages>
-                <message name="Final 2" final="true"/>
-                <reference name="REF 2" final="true"/>
+                <message name="Final Message 2" final="true"/>
+                <reference name="Final Message Reference 2" final="true"/>
               </messages>
             </implementation>
-            <implementation identifier="Final 3" name="Final 3">
+            <implementation identifier="Final 3" name="Final Name 3">
               <messages>
-                <message name="Final 3" final="true"/>
-                <reference name="REF 3" final="true"/>
+                <message name="Final Message 3" final="true"/>
+                <reference name="Final Message Reference 3" final="true"/>
               </messages>
             </implementation>
-            <implementation identifier="Final 4" name="Final 4">
+            <implementation identifier="Final 4" name="Final Name 4">
               <messages>
-                <message name="Final 4" final="true"/>
-                <reference name="REF 4" final="true"/>
+                <message name="Final Message 4" final="true"/>
+                <reference name="Final Message Reference 4" final="true"/>
               </messages>
             </implementation>
-            <implementation identifier="Final 5" name="Final 5">
+            <implementation identifier="Final 5" name="Final Name 5">
               <messages>
-                <message name="Final 5" final="true"/>
-                <reference name="REF 5" final="true"/>
+                <message name="Final Message 5" final="true"/>
+                <reference name="Final Message Reference 5" final="true"/>
               </messages>
             </implementation>
-            <implementation identifier="TEST 1" name="TEST 1" final="true">
+            <implementation identifier="Implementation" name="Implementation Name" final="true">
               <implementations>
                 <reference identifier="Final 1"/>
                 <reference identifier="Final 2"/>
@@ -1198,54 +1224,54 @@
                 <reference identifier="Final 5"/>
               </implementations>
               <messages>
-                <message name="Final 1" final="true"/>
-                <message name="Final 2" final="true"/>
-                <message name="Final 3" final="true"/>
-                <message name="Final 4" final="true"/>
-                <message name="Final 5" final="true"/>
-                <reference name="REF 1" final="true"/>
-                <reference name="REF 2" final="true"/>
-                <reference name="REF 3" final="true"/>
-                <reference name="REF 4" final="true"/>
-                <reference name="REF 5" final="true"/>
+                <message name="Final Message 1" final="true"/>
+                <message name="Final Message 2" final="true"/>
+                <message name="Final Message 3" final="true"/>
+                <message name="Final Message 4" final="true"/>
+                <message name="Final Message 5" final="true"/>
+                <reference name="Final Message Reference 1" final="true"/>
+                <reference name="Final Message Reference 2" final="true"/>
+                <reference name="Final Message Reference 3" final="true"/>
+                <reference name="Final Message Reference 4" final="true"/>
+                <reference name="Final Message Reference 5" final="true"/>
               </messages>
             </implementation>
           </implementations>
           <messages>
-            <message name="REF 1"/>
-            <message name="REF 2"/>
-            <message name="REF 3"/>
-            <message name="REF 4"/>
-            <message name="REF 5"/>
+            <message name="Final Message Reference 1"/>
+            <message name="Final Message Reference 2"/>
+            <message name="Final Message Reference 3"/>
+            <message name="Final Message Reference 4"/>
+            <message name="Final Message Reference 5"/>
           </messages>
         </module>
       </modules>
     </modules>
-    <detail identifier="MESSAGE_INHERITANCE_CONSTRAINT" count="10"/>
+    <detail identifier="IMPLEMENTATION_MESSAGE_INHERITANCE_CONSTRAINT" count="10"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
   <modules-constraints-test identifier="SPECIFICATION_PROPERTY_REFERENCE_DECLARATION_CONSTRAINT">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <specifications>
-            <specification identifier="TEST" class="java.lang.Object">
+            <specification identifier="Specification" class="java.lang.Object">
               <properties>
-                <reference name="TEST 1"/>
-                <reference name="TEST 2"/>
-                <reference name="TEST 3"/>
-                <reference name="TEST 4"/>
-                <reference name="TEST 5"/>
+                <reference name="Property Reference 1"/>
+                <reference name="Property Reference 2"/>
+                <reference name="Property Reference 3"/>
+                <reference name="Property Reference 4"/>
+                <reference name="Property Reference 5"/>
               </properties>
             </specification>
           </specifications>
           <properties>
-            <property name="TEST 1"/>
-            <property name="TEST 2"/>
-            <property name="TEST 3"/>
-            <property name="TEST 4"/>
-            <property name="TEST 5"/>
+            <property name="Property Reference 1"/>
+            <property name="Property Reference 2"/>
+            <property name="Property Reference 3"/>
+            <property name="Property Reference 4"/>
+            <property name="Property Reference 5"/>
           </properties>
         </module>
       </modules>
@@ -1257,227 +1283,227 @@
   <modules-constraints-test identifier="IMPLEMENTATION_NAME_CONSTRAINT">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <specifications>
-            <specification identifier="TEST" class="java.lang.Object"/>
+            <specification identifier="Specification" class="java.lang.Object"/>
           </specifications>
           <implementations>
-            <implementation identifier="TEST 1" name="REDUNDANT">
+            <implementation identifier="Implementation 1" name="Redundant Implementation Name">
               <specifications>
-                <reference identifier="TEST"/>
+                <reference identifier="Specification"/>
               </specifications>
             </implementation>
-            <implementation identifier="TEST 2" name="REDUNDANT">
+            <implementation identifier="Implementation 2" name="Redundant Implementation Name">
               <specifications>
-                <reference identifier="TEST"/>
+                <reference identifier="Specification"/>
               </specifications>
             </implementation>
-            <implementation identifier="TEST 3" name="REDUNDANT">
+            <implementation identifier="Implementation 3" name="Redundant Implementation Name">
               <specifications>
-                <reference identifier="TEST"/>
+                <reference identifier="Specification"/>
               </specifications>
             </implementation>
-            <implementation identifier="TEST 4" name="REDUNDANT">
+            <implementation identifier="Implementation 4" name="Redundant Implementation Name">
               <specifications>
-                <reference identifier="TEST"/>
+                <reference identifier="Specification"/>
               </specifications>
             </implementation>
-            <implementation identifier="TEST 5" name="REDUNDANT">
+            <implementation identifier="Implementation 5" name="Redundant Implementation Name">
               <specifications>
-                <reference identifier="TEST"/>
+                <reference identifier="Specification"/>
               </specifications>
             </implementation>
           </implementations>
         </module>
       </modules>
     </modules>
-    <detail identifier="IMPLEMENTATION_NAME_CONSTRAINT" count="5"/>
+    <detail identifier="SPECIFICATION_IMPLEMENTATION_NAME_UNIQUENESS_CONSTRAINT" count="5"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
   <modules-constraints-test identifier="MULTIPLICITY_CONSTRAINT">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <specifications>
-            <specification identifier="TEST" class="java.lang.Object"
+            <specification identifier="Specification" class="java.lang.Object"
                            multiplicity="One"/>
           </specifications>
           <implementations>
-            <implementation identifier="TEST 1" name="TEST 1">
+            <implementation identifier="Implementation 1" name="Implementation Name 1">
               <specifications>
-                <reference identifier="TEST"/>
+                <reference identifier="Specification"/>
               </specifications>
             </implementation>
-            <implementation identifier="TEST 2" name="TEST 2">
+            <implementation identifier="Implementation 2" name="Implementation Name 2">
               <specifications>
-                <reference identifier="TEST"/>
+                <reference identifier="Specification"/>
               </specifications>
             </implementation>
-            <implementation identifier="TEST 3" name="TEST 3">
+            <implementation identifier="Implementation 3" name="Implementation Name 3">
               <specifications>
-                <reference identifier="TEST"/>
+                <reference identifier="Specification"/>
               </specifications>
             </implementation>
-            <implementation identifier="TEST 4" name="TEST 4">
+            <implementation identifier="Implementation 4" name="Implementation Name 4">
               <specifications>
-                <reference identifier="TEST"/>
+                <reference identifier="Specification"/>
               </specifications>
             </implementation>
-            <implementation identifier="TEST 5" name="TEST 5">
+            <implementation identifier="Implementation 5" name="Implementation Name 5">
               <specifications>
-                <reference identifier="TEST"/>
+                <reference identifier="Specification"/>
               </specifications>
             </implementation>
           </implementations>
         </module>
       </modules>
     </modules>
-    <detail identifier="MULTIPLICITY_CONSTRAINT" count="5"/>
+    <detail identifier="SPECIFICATION_IMPLEMENTATION_MULTIPLICITY_CONSTRAINT" count="5"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
   <modules-constraints-test identifier="SPECIFICATION_OVERRIDE_CONSTRAINT">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <specifications>
-            <specification identifier="TEST 1" class="java.lang.Object"/>
-            <specification identifier="TEST 2" class="java.lang.Object"/>
-            <specification identifier="TEST 3" class="java.lang.Object"/>
-            <specification identifier="TEST 4" class="java.lang.Object"/>
-            <specification identifier="TEST 5" class="java.lang.Object"/>
+            <specification identifier="Specification 1" class="java.lang.Object"/>
+            <specification identifier="Specification 2" class="java.lang.Object"/>
+            <specification identifier="Specification 3" class="java.lang.Object"/>
+            <specification identifier="Specification 4" class="java.lang.Object"/>
+            <specification identifier="Specification 5" class="java.lang.Object"/>
           </specifications>
           <implementations>
-            <implementation identifier="TEST 1" name="REDUNDANT">
+            <implementation identifier="Implementation 1" name="Implementation Name">
               <specifications>
-                <reference identifier="TEST 1" override="true"/>
-                <reference identifier="TEST 2" override="true"/>
-                <reference identifier="TEST 3" override="true"/>
-                <reference identifier="TEST 4" override="true"/>
-                <reference identifier="TEST 5" override="true"/>
+                <reference identifier="Specification 1" override="true"/>
+                <reference identifier="Specification 2" override="true"/>
+                <reference identifier="Specification 3" override="true"/>
+                <reference identifier="Specification 4" override="true"/>
+                <reference identifier="Specification 5" override="true"/>
               </specifications>
             </implementation>
           </implementations>
         </module>
       </modules>
     </modules>
-    <detail identifier="SPECIFICATION_OVERRIDE_CONSTRAINT" count="5"/>
+    <detail identifier="IMPLEMENTATION_SPECIFICATION_OVERRIDE_CONSTRAINT" count="5"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
   <modules-constraints-test identifier="DEPENDENCY_OVERRIDE_CONSTRAINT">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <specifications>
-            <specification identifier="TEST" class="java.lang.Object"/>
+            <specification identifier="Specification" class="java.lang.Object"/>
           </specifications>
           <implementations>
-            <implementation identifier="TEST 1" name="REDUNDANT">
+            <implementation identifier="Implementation" name="Implementation Name">
               <dependencies>
-                <dependency name="TEST 1" identifier="TEST" override="true" optional="true"/>
-                <dependency name="TEST 2" identifier="TEST" override="true" optional="true"/>
-                <dependency name="TEST 3" identifier="TEST" override="true" optional="true"/>
-                <dependency name="TEST 4" identifier="TEST" override="true" optional="true"/>
-                <dependency name="TEST 5" identifier="TEST" override="true" optional="true"/>
+                <dependency name="Dependency 1" identifier="Specification" override="true" optional="true"/>
+                <dependency name="Dependency 2" identifier="Specification" override="true" optional="true"/>
+                <dependency name="Dependency 3" identifier="Specification" override="true" optional="true"/>
+                <dependency name="Dependency 4" identifier="Specification" override="true" optional="true"/>
+                <dependency name="Dependency 5" identifier="Specification" override="true" optional="true"/>
               </dependencies>
             </implementation>
           </implementations>
         </module>
       </modules>
     </modules>
-    <detail identifier="DEPENDENCY_OVERRIDE_CONSTRAINT" count="5"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_OVERRIDE_CONSTRAINT" count="5"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
   <modules-constraints-test identifier="PROPERTY_OVERRIDE_CONSTRAINT">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <implementations>
-            <implementation identifier="TEST 1" name="REDUNDANT">
+            <implementation identifier="Implementation" name="Implementation Name">
               <properties>
-                <property name="TEST 1" override="true"/>
-                <property name="TEST 2" override="true"/>
-                <property name="TEST 3" override="true"/>
-                <property name="TEST 4" override="true"/>
-                <property name="TEST 5" override="true"/>
-                <reference name="REF 1" override="true"/>
-                <reference name="REF 2" override="true"/>
-                <reference name="REF 3" override="true"/>
-                <reference name="REF 4" override="true"/>
-                <reference name="REF 5" override="true"/>
+                <property name="Property 1" override="true"/>
+                <property name="Property 2" override="true"/>
+                <property name="Property 3" override="true"/>
+                <property name="Property 4" override="true"/>
+                <property name="Property 5" override="true"/>
+                <reference name="Property Reference 1" override="true"/>
+                <reference name="Property Reference 2" override="true"/>
+                <reference name="Property Reference 3" override="true"/>
+                <reference name="Property Reference 4" override="true"/>
+                <reference name="Property Reference 5" override="true"/>
               </properties>
             </implementation>
           </implementations>
           <properties>
-            <property name="REF 1"/>
-            <property name="REF 2"/>
-            <property name="REF 3"/>
-            <property name="REF 4"/>
-            <property name="REF 5"/>
+            <property name="Property Reference 1"/>
+            <property name="Property Reference 2"/>
+            <property name="Property Reference 3"/>
+            <property name="Property Reference 4"/>
+            <property name="Property Reference 5"/>
           </properties>
         </module>
       </modules>
     </modules>
-    <detail identifier="PROPERTY_OVERRIDE_CONSTRAINT" count="10"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_OVERRIDE_CONSTRAINT" count="10"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
   <modules-constraints-test identifier="MESSAGE_OVERRIDE_CONSTRAINT">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <implementations>
-            <implementation identifier="TEST 1" name="REDUNDANT">
+            <implementation identifier="Implementation" name="Implementation Name">
               <messages>
-                <message name="TEST 1" override="true"/>
-                <message name="TEST 2" override="true"/>
-                <message name="TEST 3" override="true"/>
-                <message name="TEST 4" override="true"/>
-                <message name="TEST 5" override="true"/>
-                <reference name="REF 1" override="true"/>
-                <reference name="REF 2" override="true"/>
-                <reference name="REF 3" override="true"/>
-                <reference name="REF 4" override="true"/>
-                <reference name="REF 5" override="true"/>
+                <message name="Message 1" override="true"/>
+                <message name="Message 2" override="true"/>
+                <message name="Message 3" override="true"/>
+                <message name="Message 4" override="true"/>
+                <message name="Message 5" override="true"/>
+                <reference name="Message Reference 1" override="true"/>
+                <reference name="Message Reference 2" override="true"/>
+                <reference name="Message Reference 3" override="true"/>
+                <reference name="Message Reference 4" override="true"/>
+                <reference name="Message Reference 5" override="true"/>
               </messages>
             </implementation>
           </implementations>
           <messages>
-            <message name="REF 1"/>
-            <message name="REF 2"/>
-            <message name="REF 3"/>
-            <message name="REF 4"/>
-            <message name="REF 5"/>
+            <message name="Message Reference 1"/>
+            <message name="Message Reference 2"/>
+            <message name="Message Reference 3"/>
+            <message name="Message Reference 4"/>
+            <message name="Message Reference 5"/>
           </messages>
         </module>
       </modules>
     </modules>
-    <detail identifier="MESSAGE_OVERRIDE_CONSTRAINT" count="10"/>
+    <detail identifier="IMPLEMENTATION_MESSAGE_OVERRIDE_CONSTRAINT" count="10"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
   <modules-constraints-test identifier="SPECIFICATION_MULTIPLE_INHERITANCE_CONSTRAINT_INVALID_1">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <specifications>
-            <specification identifier="TEST" class="java.lang.Object"/>
+            <specification identifier="Specification" class="java.lang.Object"/>
           </specifications>
           <implementations>
-            <implementation identifier="Parent 1" name="Parent 1">
+            <implementation identifier="Parent 1" name="Parent Name 1">
               <specifications>
-                <reference identifier="TEST"/>
+                <reference identifier="Specification"/>
               </specifications>
             </implementation>
-            <implementation identifier="Parent 2" name="Parent 2">
+            <implementation identifier="Parent 2" name="Parent Name 2">
               <specifications>
-                <reference identifier="TEST"/>
+                <reference identifier="Specification"/>
               </specifications>
             </implementation>
-            <implementation identifier="TEST" name="TEST">
+            <implementation identifier="Implementation" name="Implementation Name">
               <implementations>
                 <reference identifier="Parent 1"/>
                 <reference identifier="Parent 2"/>
@@ -1487,38 +1513,38 @@
         </module>
       </modules>
     </modules>
-    <detail identifier="SPECIFICATION_MULTIPLE_INHERITANCE_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_SPECIFICATION_MULTIPLE_INHERITANCE_CONSTRAINT" count="1"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
   <modules-constraints-test identifier="SPECIFICATION_MULTIPLE_INHERITANCE_CONSTRAINT_INVALID_2">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <specifications>
-            <specification identifier="TEST" class="java.lang.Object"/>
+            <specification identifier="Specification" class="java.lang.Object"/>
           </specifications>
           <implementations>
-            <implementation identifier="Parent 1" name="Parent 1">
+            <implementation identifier="Parent 1" name="Parent Name 1">
               <specifications>
-                <reference identifier="TEST"/>
+                <reference identifier="Specification"/>
               </specifications>
             </implementation>
-            <implementation identifier="Parent 2" name="Parent 2">
+            <implementation identifier="Parent 2" name="Parent Name  2">
               <specifications>
-                <reference identifier="TEST"/>
+                <reference identifier="Specification"/>
               </specifications>
             </implementation>
-            <implementation identifier="Parent 3" name="Parent 3">
+            <implementation identifier="Parent 3" name="Parent Name  3">
               <implementations>
                 <reference identifier="Parent 1"/>
                 <reference identifier="Parent 2"/>
               </implementations>
               <specifications>
-                <reference identifier="TEST"/>
+                <reference identifier="Specification"/>
               </specifications>
             </implementation>
-            <implementation identifier="TEST" name="TEST">
+            <implementation identifier="Implementation" name="Implementation Name">
               <implementations>
                 <reference identifier="Parent 1"/>
                 <reference identifier="Parent 3"/>
@@ -1528,38 +1554,38 @@
         </module>
       </modules>
     </modules>
-    <detail identifier="SPECIFICATION_MULTIPLE_INHERITANCE_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_SPECIFICATION_MULTIPLE_INHERITANCE_CONSTRAINT" count="1"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
   <modules-constraints-test identifier="SPECIFICATION_MULTIPLE_INHERITANCE_CONSTRAINT_VALID">
     <modules valid="true">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <specifications>
-            <specification identifier="TEST" class="java.lang.Object"/>
+            <specification identifier="Specification" class="java.lang.Object"/>
           </specifications>
           <implementations>
-            <implementation identifier="Parent 1" name="Parent 1">
+            <implementation identifier="Parent 1" name="Parent Name 1">
               <specifications>
-                <reference identifier="TEST"/>
+                <reference identifier="Specification"/>
               </specifications>
             </implementation>
-            <implementation identifier="Parent 2" name="Parent 2">
+            <implementation identifier="Parent 2" name="Parent Name  2">
               <specifications>
-                <reference identifier="TEST"/>
+                <reference identifier="Specification"/>
               </specifications>
             </implementation>
-            <implementation identifier="Parent 3" name="Parent 3">
+            <implementation identifier="Parent 3" name="Parent Name  3">
               <implementations>
                 <reference identifier="Parent 1"/>
                 <reference identifier="Parent 2"/>
               </implementations>
               <specifications>
-                <reference identifier="TEST"/>
+                <reference identifier="Specification"/>
               </specifications>
             </implementation>
-            <implementation identifier="TEST" name="TEST">
+            <implementation identifier="Implementation" name="Implementation Name">
               <implementations>
                 <reference identifier="Parent 3"/>
               </implementations>
@@ -1574,22 +1600,22 @@
   <modules-constraints-test identifier="DEPENDENCY_MULTIPLE_INHERITANCE_CONSTRAINT_INVALID_1">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <specifications>
-            <specification identifier="TEST" class="java.lang.Object"/>
+            <specification identifier="Specification" class="java.lang.Object"/>
           </specifications>
           <implementations>
-            <implementation identifier="Parent 1" name="Parent 1">
+            <implementation identifier="Parent 1" name="Parent Name 1">
               <dependencies>
-                <dependency name="TEST" identifier="TEST" optional="true"/>
+                <dependency name="Dependency" identifier="Specification" optional="true"/>
               </dependencies>
             </implementation>
-            <implementation identifier="Parent 2" name="Parent 2">
+            <implementation identifier="Parent 2" name="Parent Name 2">
               <dependencies>
-                <dependency name="TEST" identifier="TEST" optional="true"/>
+                <dependency name="Dependency" identifier="Specification" optional="true"/>
               </dependencies>
             </implementation>
-            <implementation identifier="TEST" name="TEST">
+            <implementation identifier="Implementation" name="Implementation Name">
               <implementations>
                 <reference identifier="Parent 1"/>
                 <reference identifier="Parent 2"/>
@@ -1599,38 +1625,38 @@
         </module>
       </modules>
     </modules>
-    <detail identifier="DEPENDENCY_MULTIPLE_INHERITANCE_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_MULTIPLE_INHERITANCE_CONSTRAINT" count="1"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
   <modules-constraints-test identifier="DEPENDENCY_MULTIPLE_INHERITANCE_CONSTRAINT_INVALID_2">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <specifications>
-            <specification identifier="TEST" class="java.lang.Object"/>
+            <specification identifier="Specification" class="java.lang.Object"/>
           </specifications>
           <implementations>
-            <implementation identifier="Parent 1" name="Parent 1">
+            <implementation identifier="Parent 1" name="Parent Name 1">
               <dependencies>
-                <dependency name="TEST" identifier="TEST" optional="true"/>
+                <dependency name="Dependency" identifier="Specification" optional="true"/>
               </dependencies>
             </implementation>
-            <implementation identifier="Parent 2" name="Parent 2">
+            <implementation identifier="Parent 2" name="Parent Name  2">
               <dependencies>
-                <dependency name="TEST" identifier="TEST" optional="true"/>
+                <dependency name="Dependency" identifier="Specification" optional="true"/>
               </dependencies>
             </implementation>
-            <implementation identifier="Parent 3" name="Parent 3">
+            <implementation identifier="Parent 3" name="Parent Name 3">
               <implementations>
                 <reference identifier="Parent 1"/>
                 <reference identifier="Parent 2"/>
               </implementations>
               <dependencies>
-                <dependency name="TEST" identifier="TEST" optional="true"/>
+                <dependency name="Dependency" identifier="Specification" optional="true"/>
               </dependencies>
             </implementation>
-            <implementation identifier="TEST" name="TEST">
+            <implementation identifier="Implementation" name="Implementation Name">
               <implementations>
                 <reference identifier="Parent 1"/>
                 <reference identifier="Parent 3"/>
@@ -1640,38 +1666,38 @@
         </module>
       </modules>
     </modules>
-    <detail identifier="DEPENDENCY_MULTIPLE_INHERITANCE_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_MULTIPLE_INHERITANCE_CONSTRAINT" count="1"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
   <modules-constraints-test identifier="DEPENDENCY_MULTIPLE_INHERITANCE_CONSTRAINT_VALID">
     <modules valid="true">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <specifications>
-            <specification identifier="TEST" class="java.lang.Object"/>
+            <specification identifier="Specification" class="java.lang.Object"/>
           </specifications>
           <implementations>
-            <implementation identifier="Parent 1" name="Parent 1">
+            <implementation identifier="Parent 1" name="Parent Name 1">
               <dependencies>
-                <dependency name="TEST" identifier="TEST" optional="true"/>
+                <dependency name="Dependency" identifier="Specification" optional="true"/>
               </dependencies>
             </implementation>
-            <implementation identifier="Parent 2" name="Parent 2">
+            <implementation identifier="Parent 2" name="Parent Name 2">
               <dependencies>
-                <dependency name="TEST" identifier="TEST" optional="true"/>
+                <dependency name="Dependency" identifier="Specification" optional="true"/>
               </dependencies>
             </implementation>
-            <implementation identifier="Parent 3" name="Parent 3">
+            <implementation identifier="Parent 3" name="Parent Name 3">
               <implementations>
                 <reference identifier="Parent 1"/>
                 <reference identifier="Parent 2"/>
               </implementations>
               <dependencies>
-                <dependency name="TEST" identifier="TEST" optional="true"/>
+                <dependency name="Dependency" identifier="Specification" optional="true"/>
               </dependencies>
             </implementation>
-            <implementation identifier="TEST" name="TEST">
+            <implementation identifier="Implementation" name="Implementation Name">
               <implementations>
                 <reference identifier="Parent 3"/>
               </implementations>
@@ -1686,19 +1712,19 @@
   <modules-constraints-test identifier="MESSAGE_MULTIPLE_INHERITANCE_CONSTRAINT_INVALID_1">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <implementations>
-            <implementation identifier="Parent 1" name="Parent 1">
+            <implementation identifier="Parent 1" name="Parent Name 1">
               <messages>
-                <message name="TEST"/>
+                <message name="Message"/>
               </messages>
             </implementation>
-            <implementation identifier="Parent 2" name="Parent 2">
+            <implementation identifier="Parent 2" name="Parent Name 2">
               <messages>
-                <message name="TEST"/>
+                <message name="Message"/>
               </messages>
             </implementation>
-            <implementation identifier="TEST" name="TEST">
+            <implementation identifier="Implementation" name="Implementation Name">
               <implementations>
                 <reference identifier="Parent 1"/>
                 <reference identifier="Parent 2"/>
@@ -1708,35 +1734,35 @@
         </module>
       </modules>
     </modules>
-    <detail identifier="MESSAGE_MULTIPLE_INHERITANCE_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_MESSAGE_MULTIPLE_INHERITANCE_CONSTRAINT" count="1"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
   <modules-constraints-test identifier="MESSAGE_MULTIPLE_INHERITANCE_CONSTRAINT_INVALID_2">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <implementations>
-            <implementation identifier="Parent 1" name="Parent 1">
+            <implementation identifier="Parent 1" name="Parent Name 1">
               <messages>
-                <message name="TEST"/>
+                <message name="Message"/>
               </messages>
             </implementation>
-            <implementation identifier="Parent 2" name="Parent 2">
+            <implementation identifier="Parent 2" name="Parent Name 2">
               <messages>
-                <message name="TEST"/>
+                <message name="Message"/>
               </messages>
             </implementation>
-            <implementation identifier="Parent 3" name="Parent 3">
+            <implementation identifier="Parent 3" name="Parent Name 3">
               <implementations>
                 <reference identifier="Parent 1"/>
                 <reference identifier="Parent 2"/>
               </implementations>
               <messages>
-                <message name="TEST"/>
+                <message name="Message"/>
               </messages>
             </implementation>
-            <implementation identifier="TEST" name="TEST">
+            <implementation identifier="Implementation" name="Implementation Name">
               <implementations>
                 <reference identifier="Parent 1"/>
                 <reference identifier="Parent 3"/>
@@ -1746,35 +1772,35 @@
         </module>
       </modules>
     </modules>
-    <detail identifier="MESSAGE_MULTIPLE_INHERITANCE_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_MESSAGE_MULTIPLE_INHERITANCE_CONSTRAINT" count="1"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
   <modules-constraints-test identifier="MESSAGE_MULTIPLE_INHERITANCE_CONSTRAINT_VALID">
     <modules valid="true">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <implementations>
-            <implementation identifier="Parent 1" name="Parent 1">
+            <implementation identifier="Parent 1" name="Parent Name 1">
               <messages>
-                <message name="TEST"/>
+                <message name="Message"/>
               </messages>
             </implementation>
-            <implementation identifier="Parent 2" name="Parent 2">
+            <implementation identifier="Parent 2" name="Parent Name 2">
               <messages>
-                <message name="TEST"/>
+                <message name="Message"/>
               </messages>
             </implementation>
-            <implementation identifier="Parent 3" name="Parent 3">
+            <implementation identifier="Parent 3" name="Parent Name 3">
               <implementations>
                 <reference identifier="Parent 1"/>
                 <reference identifier="Parent 2"/>
               </implementations>
               <messages>
-                <message name="TEST"/>
+                <message name="Message"/>
               </messages>
             </implementation>
-            <implementation identifier="TEST" name="TEST">
+            <implementation identifier="Implementation" name="Implementation Name">
               <implementations>
                 <reference identifier="Parent 3"/>
               </implementations>
@@ -1789,19 +1815,19 @@
   <modules-constraints-test identifier="PROPERTY_MULTIPLE_INHERITANCE_CONSTRAINT_INVALID_1">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <implementations>
-            <implementation identifier="Parent 1" name="Parent 1">
+            <implementation identifier="Parent 1" name="Parent Name 1">
               <properties>
-                <property name="TEST"/>
+                <property name="Property"/>
               </properties>
             </implementation>
-            <implementation identifier="Parent 2" name="Parent 2">
+            <implementation identifier="Parent 2" name="Parent Name 2">
               <properties>
-                <property name="TEST"/>
+                <property name="Property"/>
               </properties>
             </implementation>
-            <implementation identifier="TEST" name="TEST">
+            <implementation identifier="Implementation" name="Implementation Name">
               <implementations>
                 <reference identifier="Parent 1"/>
                 <reference identifier="Parent 2"/>
@@ -1811,35 +1837,35 @@
         </module>
       </modules>
     </modules>
-    <detail identifier="PROPERTY_MULTIPLE_INHERITANCE_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_MULTIPLE_INHERITANCE_CONSTRAINT" count="1"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
   <modules-constraints-test identifier="PROPERTY_MULTIPLE_INHERITANCE_CONSTRAINT_INVALID_2">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <implementations>
-            <implementation identifier="Parent 1" name="Parent 1">
+            <implementation identifier="Parent 1" name="Parent Name 1">
               <properties>
-                <property name="TEST"/>
+                <property name="Property"/>
               </properties>
             </implementation>
-            <implementation identifier="Parent 2" name="Parent 2">
+            <implementation identifier="Parent 2" name="Parent Name 2">
               <properties>
-                <property name="TEST"/>
+                <property name="Property"/>
               </properties>
             </implementation>
-            <implementation identifier="Parent 3" name="Parent 3">
+            <implementation identifier="Parent 3" name="Parent Name 3">
               <implementations>
                 <reference identifier="Parent 1"/>
                 <reference identifier="Parent 2"/>
               </implementations>
               <properties>
-                <property name="TEST"/>
+                <property name="Property"/>
               </properties>
             </implementation>
-            <implementation identifier="TEST" name="TEST">
+            <implementation identifier="Implementation" name="Implementation Name">
               <implementations>
                 <reference identifier="Parent 1"/>
                 <reference identifier="Parent 3"/>
@@ -1849,35 +1875,35 @@
         </module>
       </modules>
     </modules>
-    <detail identifier="PROPERTY_MULTIPLE_INHERITANCE_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_MULTIPLE_INHERITANCE_CONSTRAINT" count="1"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
   <modules-constraints-test identifier="PROPERTY_MULTIPLE_INHERITANCE_CONSTRAINT_VALID">
     <modules valid="true">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <implementations>
-            <implementation identifier="Parent 1" name="Parent 1">
+            <implementation identifier="Parent 1" name="Parent Name 1">
               <properties>
-                <property name="TEST"/>
+                <property name="Property"/>
               </properties>
             </implementation>
-            <implementation identifier="Parent 2" name="Parent 2">
+            <implementation identifier="Parent 2" name="Parent Name 2">
               <properties>
-                <property name="TEST"/>
+                <property name="Property"/>
               </properties>
             </implementation>
-            <implementation identifier="Parent 3" name="Parent 3">
+            <implementation identifier="Parent 3" name="Parent Name 3">
               <implementations>
                 <reference identifier="Parent 1"/>
                 <reference identifier="Parent 2"/>
               </implementations>
               <properties>
-                <property name="TEST"/>
+                <property name="Property"/>
               </properties>
             </implementation>
-            <implementation identifier="TEST" name="TEST">
+            <implementation identifier="Implementation" name="Implementation Name">
               <implementations>
                 <reference identifier="Parent 3"/>
               </implementations>
@@ -1892,11 +1918,11 @@
   <modules-constraints-test identifier="IMPLEMENTATION_INHERITANCE_CYCLE_CONSTRAINT_1">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <implementations>
-            <implementation identifier="TEST" name="TEST">
+            <implementation identifier="Implementation" name="Implementation Name">
               <implementations>
-                <reference identifier="TEST"/>
+                <reference identifier="Implementation"/>
               </implementations>
             </implementation>
           </implementations>
@@ -1910,19 +1936,19 @@
   <modules-constraints-test identifier="IMPLEMENTATION_INHERITANCE_CYCLE_CONSTRAINT_2">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <implementations>
-            <implementation identifier="Parent 1" name="Parent 1">
+            <implementation identifier="Parent 1" name="Parent Name 1">
               <implementations>
                 <reference identifier="Cycle"/>
               </implementations>
             </implementation>
-            <implementation identifier="Parent 2" name="Parent 2">
+            <implementation identifier="Parent 2" name="Parent Name 2">
               <implementations>
                 <reference identifier="Parent 1"/>
               </implementations>
             </implementation>
-            <implementation identifier="Cycle" name="Cycle">
+            <implementation identifier="Cycle" name="Cycle Name">
               <implementations>
                 <reference identifier="Parent 1"/>
               </implementations>
@@ -1938,10 +1964,10 @@
   <modules-constraints-test identifier="IMPLEMENTATION_INHERITANCE_COMPATIBILITY_CONSTRAINT_VALID_1">
     <modules valid="true">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <implementations>
-            <implementation identifier="Parent" name="Parent" version="1.0"/>
-            <implementation identifier="Child" name="Child">
+            <implementation identifier="Parent" name="Parent Name" version="1.0"/>
+            <implementation identifier="Child" name="Child Name">
               <implementations>
                 <reference identifier="Parent" version="1.0"/>
               </implementations>
@@ -1956,10 +1982,10 @@
   <modules-constraints-test identifier="IMPLEMENTATION_INHERITANCE_COMPATIBILITY_CONSTRAINT_VALID_2">
     <modules valid="true">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <implementations>
-            <implementation identifier="Parent" name="Parent" version="1.0"/>
-            <implementation identifier="Child" name="Child">
+            <implementation identifier="Parent" name="Parent Name" version="1.0"/>
+            <implementation identifier="Child" name="Child Name">
               <implementations>
                 <reference identifier="Parent" version="0.9"/>
               </implementations>
@@ -1974,10 +2000,10 @@
   <modules-constraints-test identifier="IMPLEMENTATION_INHERITANCE_COMPATIBILITY_CONSTRAINT_INVALID">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <implementations>
-            <implementation identifier="Parent" name="Parent" version="1.0"/>
-            <implementation identifier="Child" name="Child">
+            <implementation identifier="Parent" name="Parent Name" version="1.0"/>
+            <implementation identifier="Child" name="Child Name">
               <implementations>
                 <reference identifier="Parent" version="1.0.1"/>
               </implementations>
@@ -1993,7 +2019,7 @@
   <implementation-test identifier="MULTIPLE_INHERITANCE">
     <modules>
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <specifications>
             <specification identifier="Specification 1" class="java.lang.Object"/>
             <specification identifier="Specification 2" class="java.lang.Object"/>
@@ -2003,7 +2029,7 @@
             <specification identifier="Specification 6" class="java.lang.Object"/>
           </specifications>
           <implementations>
-            <implementation identifier="Implementation 1" name="Implementation 1">
+            <implementation identifier="Implementation 1" name="Implementation Name 1">
               <specifications>
                 <reference identifier="Specification 1"/>
               </specifications>
@@ -2017,7 +2043,7 @@
                 <message name="Message 1"/>
               </messages>
             </implementation>
-            <implementation identifier="Implementation 2" name="Implementation 3">
+            <implementation identifier="Implementation 2" name="Implementation Name 2">
               <specifications>
                 <reference identifier="Specification 2"/>
               </specifications>
@@ -2031,7 +2057,7 @@
                 <message name="Message 2"/>
               </messages>
             </implementation>
-            <implementation identifier="Implementation 3" name="Implementation 3">
+            <implementation identifier="Implementation 3" name="Implementation Name 3">
               <specifications>
                 <reference identifier="Specification 3"/>
               </specifications>
@@ -2045,7 +2071,7 @@
                 <message name="Message 3"/>
               </messages>
             </implementation>
-            <implementation identifier="Implementation 4" name="Implementation 4">
+            <implementation identifier="Implementation 4" name="Implementation Name 4">
               <specifications>
                 <reference identifier="Specification 4"/>
               </specifications>
@@ -2059,7 +2085,7 @@
                 <message name="Message 4"/>
               </messages>
             </implementation>
-            <implementation identifier="Implementation 5" name="Implementation 5">
+            <implementation identifier="Implementation 5" name="Implementation Name 5">
               <specifications>
                 <reference identifier="Specification 5"/>
               </specifications>
@@ -2073,7 +2099,7 @@
                 <message name="Message 5"/>
               </messages>
             </implementation>
-            <implementation identifier="TEST" name="TEST">
+            <implementation identifier="Implementation" name="Implementation Name">
               <specifications>
                 <reference identifier="Specification 6"/>
               </specifications>
@@ -2099,7 +2125,7 @@
       </modules>
     </modules>
     <implementation>
-      <implementation xmlns="http://jomc.org/model" identifier="TEST" name="TEST">
+      <implementation xmlns="http://jomc.org/model" identifier="Implementation" name="Implementation Name">
         <specifications>
           <reference identifier="Specification 1"/>
           <reference identifier="Specification 2"/>
@@ -2140,7 +2166,7 @@
   <implementation-test identifier="MULTIPLE_INHERITANCE_OVERRIDEN">
     <modules>
       <modules xmlns="http://jomc.org/model">
-        <module name="TEST">
+        <module name="Module">
           <specifications>
             <specification identifier="Specification 1" class="java.lang.Object" version="1.0"/>
             <specification identifier="Specification 2" class="java.lang.Object" version="1.0"/>
@@ -2150,7 +2176,7 @@
             <specification identifier="Specification 6" class="java.lang.Object" version="1.0"/>
           </specifications>
           <implementations>
-            <implementation identifier="Implementation 1" name="Implementation 1">
+            <implementation identifier="Implementation 1" name="Implementation Name 1">
               <specifications>
                 <reference identifier="Specification 1" version="1.0"/>
               </specifications>
@@ -2164,7 +2190,7 @@
                 <message name="Message 1"/>
               </messages>
             </implementation>
-            <implementation identifier="Implementation 2" name="Implementation 3">
+            <implementation identifier="Implementation 2" name="Implementation Name 2">
               <specifications>
                 <reference identifier="Specification 2" version="1.0"/>
               </specifications>
@@ -2178,7 +2204,7 @@
                 <message name="Message 2"/>
               </messages>
             </implementation>
-            <implementation identifier="Implementation 3" name="Implementation 3">
+            <implementation identifier="Implementation 3" name="Implementation Name 3">
               <specifications>
                 <reference identifier="Specification 3" version="1.0"/>
               </specifications>
@@ -2192,7 +2218,7 @@
                 <message name="Message 3"/>
               </messages>
             </implementation>
-            <implementation identifier="Implementation 4" name="Implementation 4">
+            <implementation identifier="Implementation 4" name="Implementation Name 4">
               <specifications>
                 <reference identifier="Specification 4" version="1.0"/>
               </specifications>
@@ -2206,7 +2232,7 @@
                 <message name="Message 4"/>
               </messages>
             </implementation>
-            <implementation identifier="Implementation 5" name="Implementation 5">
+            <implementation identifier="Implementation 5" name="Implementation Name 5">
               <specifications>
                 <reference identifier="Specification 5" version="1.0"/>
               </specifications>
@@ -2220,7 +2246,7 @@
                 <message name="Message 5"/>
               </messages>
             </implementation>
-            <implementation identifier="TEST" name="TEST">
+            <implementation identifier="Implementation" name="Implementation Name">
               <specifications>
                 <reference identifier="Specification 1" version="1.0" override="true" final="true"/>
                 <reference identifier="Specification 2" version="1.0" override="true" final="true"/>
@@ -2266,7 +2292,7 @@
       </modules>
     </modules>
     <implementation>
-      <implementation xmlns="http://jomc.org/model" identifier="TEST" name="TEST">
+      <implementation xmlns="http://jomc.org/model" identifier="Implementation" name="Implementation Name">
         <specifications>
           <reference identifier="Specification 1" version="1.0" override="true" final="true"/>
           <reference identifier="Specification 2" version="1.0" override="true" final="true"/>

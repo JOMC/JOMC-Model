@@ -95,8 +95,15 @@
         <xsd:documentation xml:lang="en"><![CDATA[Key of a schema.]]></xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath="bootstrap:schema"/>
-      <xsd:field xpath="@public-id"/>
+      <xsd:field xpath="@system-id"/>
     </xsd:key>
+    <xsd:unique name="schema-public-id-uniqueness">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en"><![CDATA[Checks uniqueness of schema public-id.]]></xsd:documentation>
+      </xsd:annotation>
+      <xsd:selector xpath="bootstrap:schema"/>
+      <xsd:field xpath="@public-id"/>
+    </xsd:unique>
   </xsd:element>
   <xsd:complexType name="Schemas">
     <xsd:annotation>
@@ -157,7 +164,7 @@ Property {@code classpathId} holds the classpath location of the schema.]]></jax
           <xsd:annotation>
             <xsd:appinfo>
               <jaxb:property>
-                <jaxb:javadoc><![CDATA[The context id of the schema.]]></jaxb:javadoc>
+                <jaxb:javadoc><![CDATA[The context id of the schema or {@code null}.]]></jaxb:javadoc>
               </jaxb:property>
             </xsd:appinfo>
           </xsd:annotation>
@@ -166,7 +173,7 @@ Property {@code classpathId} holds the classpath location of the schema.]]></jax
           <xsd:annotation>
             <xsd:appinfo>
               <jaxb:property>
-                <jaxb:javadoc><![CDATA[The classpath id of the schema.]]></jaxb:javadoc>
+                <jaxb:javadoc><![CDATA[The classpath id of the schema or {@code null}.]]></jaxb:javadoc>
               </jaxb:property>
             </xsd:appinfo>
           </xsd:annotation>
