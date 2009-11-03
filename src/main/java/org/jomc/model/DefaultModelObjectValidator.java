@@ -1434,7 +1434,7 @@ public class DefaultModelObjectValidator implements ModelObjectValidator
 }
 
 /**
- * {@code ValidationEventHandler} collection {@code ModelObjectValidationReport} details.
+ * {@code ValidationEventHandler} collecting {@code ModelObjectValidationReport} details.
  *
  * @author <a href="mailto:cs@jomc.org">Christian Schulte</a>
  * @version $Id$
