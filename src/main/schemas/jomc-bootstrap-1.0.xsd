@@ -36,7 +36,7 @@
             targetNamespace="http://jomc.org/model/bootstrap"
             xmlns:bootstrap="http://jomc.org/model/bootstrap"
             xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-            jaxb:version="2.0"
+            jaxb:version="1.0"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified">
   <xsd:annotation>
