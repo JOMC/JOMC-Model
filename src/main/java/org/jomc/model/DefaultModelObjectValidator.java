@@ -154,6 +154,7 @@ public class DefaultModelObjectValidator implements ModelObjectValidator
                     this.assertImplementationInheritanceCompatibility( modules.getValue(), i, report );
                     this.assertImplementationSpecificationCompatibility( modules.getValue(), i, report );
                     this.assertNoMissingMandatoryDependencies( modules.getValue(), i, report );
+                    this.assertNoDependenciesWithoutSpecificationClass( modules.getValue(), i, report );
                     this.assertNoInheritanceCycle( modules.getValue(), i, report );
                     this.assertNoInheritanceClashes( modules.getValue(), i, report );
                     this.assertNoOverridenDependencyPropertiesWhenNotMultiton( modules.getValue(), i, report );
@@ -634,6 +635,30 @@ public class DefaultModelObjectValidator implements ModelObjectValidator
                             }, new ObjectFactory().createImplementation( implementation ) ) );
 
                     }
+                }
+            }
+        }
+    }
+
+    private void assertNoDependenciesWithoutSpecificationClass( final Modules modules,
+                                                                final Implementation implementation,
+                                                                final ModelObjectValidationReport report )
+    {
+        if ( implementation.getDependencies() != null )
+        {
+            for ( Dependency d : implementation.getDependencies().getDependency() )
+            {
+                final Specification s = modules.getSpecification( d.getIdentifier() );
+
+                if ( s != null && s.getClazz() == null )
+                {
+                    report.getDetails().add( this.createDetail(
+                        "IMPLEMENTATION_DEPENDENCY_SPECIFICATION_CLASS_CONSTRAINT", Level.SEVERE,
+                        "implementationDependencySpecificationClassConstraint", new Object[]
+                        {
+                            implementation.getIdentifier(), d.getName(), d.getIdentifier()
+                        }, new ObjectFactory().createImplementation( implementation ) ) );
+
                 }
             }
         }

@@ -1944,11 +1944,14 @@
                 {
                     for ( Specification s : instance.getSpecifications().getSpecification() )
                     {
-                        final Class specClass = Class.forName( s.getClazz(), true, classLoader );
-                        if ( !specClass.isAssignableFrom( clazz ) )
+                        if ( s.getClazz() != null )
                         {
-                            assignable = false;
-                            break;
+                            final Class specClass = Class.forName( s.getClazz(), true, classLoader );
+                            if ( !specClass.isAssignableFrom( clazz ) )
+                            {
+                                assignable = false;
+                                break;
+                            }
                         }
                     }
                 }

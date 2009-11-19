@@ -494,11 +494,11 @@ instance store.</p>]]></jaxb:javadoc>
             </xsd:appinfo>
           </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="class" type="jomc:Identifier" use="required">
+        <xsd:attribute name="class" type="jomc:Identifier" use="optional">
           <xsd:annotation>
             <xsd:appinfo>
               <jaxb:property name="clazz">
-                <jaxb:javadoc><![CDATA[The name of the class providing the programming interface of this specification.]]></jaxb:javadoc>
+                <jaxb:javadoc><![CDATA[The name of the class providing the programming interface of this specification or {@code null}.]]></jaxb:javadoc>
               </jaxb:property>
             </xsd:appinfo>
           </xsd:annotation>

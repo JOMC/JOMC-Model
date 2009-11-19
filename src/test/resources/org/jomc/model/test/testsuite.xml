@@ -2016,6 +2016,46 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="IMPLEMENTATION_DEPENDENCY_SPECIFICATION_CLASS_CONSTRAINT_INVALID">
+    <modules valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <specifications>
+            <specification identifier="Specification"/>
+          </specifications>
+          <implementations>
+            <implementation identifier="Parent 1" name="Parent Name 1">
+              <dependencies>
+                <dependency name="Dependency" identifier="Specification" optional="true"/>
+              </dependencies>
+            </implementation>
+            <implementation identifier="Parent 2" name="Parent Name 2">
+              <dependencies>
+                <dependency name="Dependency" identifier="Specification" optional="true"/>
+              </dependencies>
+            </implementation>
+            <implementation identifier="Parent 3" name="Parent Name 3">
+              <implementations>
+                <reference identifier="Parent 1"/>
+                <reference identifier="Parent 2"/>
+              </implementations>
+              <dependencies>
+                <dependency name="Dependency" identifier="Specification" optional="true"/>
+              </dependencies>
+            </implementation>
+            <implementation identifier="Implementation" name="Implementation Name">
+              <implementations>
+                <reference identifier="Parent 3"/>
+              </implementations>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_SPECIFICATION_CLASS_CONSTRAINT" count="3"/>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
   <implementation-test identifier="MULTIPLE_INHERITANCE">
     <modules>
       <modules xmlns="http://jomc.org/model">
