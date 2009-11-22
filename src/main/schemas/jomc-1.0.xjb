@@ -1820,7 +1820,7 @@
 
         final Implementation i = this.getImplementation( implementation );
 
-        if ( i != null )
+        if ( i != null && i.getClazz() != null )
         {
             final Instance instance = new Instance();
             instance.setIdentifier( i.getIdentifier() );
