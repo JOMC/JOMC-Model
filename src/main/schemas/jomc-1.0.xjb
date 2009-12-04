@@ -541,15 +541,15 @@
                     } );
 
             }
-            catch ( IllegalAccessException e )
+            catch ( final IllegalAccessException e )
             {
                 throw (InstantiationException) new InstantiationException( e.getMessage() ).initCause( e );
             }
-            catch ( java.lang.reflect.InvocationTargetException e )
+            catch ( final java.lang.reflect.InvocationTargetException e )
             {
                 throw (InstantiationException) new InstantiationException( e.getMessage() ).initCause( e );
             }
-            catch ( NoSuchMethodException e )
+            catch ( final NoSuchMethodException e )
             {
                 throw (InstantiationException) new InstantiationException( e.getMessage() ).initCause( e );
             }
@@ -1831,11 +1831,7 @@
             instance.setProperties( this.getProperties( implementation ) );
             instance.setMessages( this.getMessages( implementation ) );
             instance.setSpecifications( this.getSpecifications( implementation ) );
-
-            final java.util.Map<javax.xml.namespace.QName, javax.xml.bind.JAXBElement> elements =
-                new java.util.HashMap<javax.xml.namespace.QName, javax.xml.bind.JAXBElement>();
-
-            this.collectAnyInstanceObjects( i, new Implementations(), instance.getAny(), elements );
+            this.collectAny( i, instance.getAny(), new Implementations(), true );
             return instance;
         }
 
@@ -2267,38 +2263,49 @@
         }
     }
 
-    private void collectAnyInstanceObjects(
-        final Implementation current, final Implementations seen, final java.util.List<Object> any,
-        final java.util.Map<javax.xml.namespace.QName, javax.xml.bind.JAXBElement> elements )
+    void collectAny( final Implementation implementation, final List<Object> any, final Implementations seen,
+                     final boolean includeDeclared )
     {
-        if ( current != null && seen.getImplementation( current.getIdentifier() ) == null )
+        if ( implementation != null )
         {
-            seen.getImplementation().add( current );
-
-            for ( Object o : current.getAny() )
+            if ( seen.getImplementation( implementation.getIdentifier() ) == null )
             {
-                if ( o instanceof javax.xml.bind.JAXBElement )
+                seen.getImplementation().add( implementation );
+
+                if ( includeDeclared && !implementation.getAny().isEmpty() )
                 {
-                    final javax.xml.bind.JAXBElement e = (javax.xml.bind.JAXBElement) o;
-                    if ( !elements.containsKey( e.getName() ) )
+                    for ( Object o : implementation.getAny() )
                     {
-                        elements.put( e.getName(), e );
+                        if ( o instanceof org.w3c.dom.Element )
+                        {
+                            if ( this.getElement( any, (org.w3c.dom.Element) o ) == null )
+                            {
+                                any.add( o );
+                            }
+
+                            continue;
+                        }
+
+                        if ( o instanceof javax.xml.bind.JAXBElement )
+                        {
+                            if ( this.getElement( any, (javax.xml.bind.JAXBElement) o ) == null )
+                            {
+                                any.add( o );
+                            }
+
+                            continue;
+                        }
+
                         any.add( o );
                     }
                 }
-                else
-                {
-                    any.add( o );
-                }
-            }
 
-            if ( current.getImplementations() != null )
-            {
-                for ( ImplementationReference r : current.getImplementations().getReference() )
+                if ( implementation.getImplementations() != null )
                 {
-                    this.collectAnyInstanceObjects(
-                        this.getImplementation( r.getIdentifier() ), seen, any, elements );
-
+                    for ( ImplementationReference r : implementation.getImplementations().getReference() )
+                    {
+                        this.collectAny( this.getImplementation( r.getIdentifier() ), any, seen, true );
+                    }
                 }
             }
         }
@@ -2313,6 +2320,45 @@
         }
 
         return i;
+    }
+
+    private org.w3c.dom.Element getElement( final List<Object> list, final org.w3c.dom.Element e )
+    {
+        for ( Object o : list )
+        {
+            if ( o instanceof org.w3c.dom.Element )
+            {
+                final org.w3c.dom.Element current = (org.w3c.dom.Element) o;
+                if ( ( e.getNamespaceURI() == null
+                       ? current.getNamespaceURI() == null
+                       : e.getNamespaceURI().equals( current.getNamespaceURI() ) ) &&
+                     ( e.getLocalName() == null
+                       ? current.getLocalName() == null
+                       : e.getLocalName().equals( current.getLocalName() ) ) )
+                {
+                    return current;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private javax.xml.bind.JAXBElement getElement( final List<Object> list, final javax.xml.bind.JAXBElement e )
+    {
+        for ( Object o : list )
+        {
+            if ( o instanceof javax.xml.bind.JAXBElement )
+            {
+                final javax.xml.bind.JAXBElement current = (javax.xml.bind.JAXBElement) o;
+                if ( e.getName().equals( current.getName() ) )
+                {
+                    return current;
+                }
+            }
+        }
+
+        return null;
     }
 
     private void resolveClasspath( final Module cpModule, final ClassLoader classLoader )
