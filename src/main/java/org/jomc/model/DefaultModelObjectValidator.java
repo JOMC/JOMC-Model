@@ -163,6 +163,7 @@ public class DefaultModelObjectValidator implements ModelObjectValidator
                     this.assertDependencyOverrideConstraints( modules.getValue(), i, report );
                     this.assertMessageOverrideConstraints( modules.getValue(), i, report );
                     this.assertPropertyOverrideConstraints( modules.getValue(), i, report );
+                    this.assertDependencyPropertiesOverrideConstraints( modules.getValue(), i, report );
                 }
             }
 
@@ -590,6 +591,68 @@ public class DefaultModelObjectValidator implements ModelObjectValidator
                             {
                                 implementation.getIdentifier(), d.getName(), s.getIdentifier(), s.getScope(),
                                 p.getName()
+                            }, new ObjectFactory().createImplementation( implementation ) ) );
+
+                    }
+                }
+            }
+        }
+    }
+
+    private void assertDependencyPropertiesOverrideConstraints( final Modules modules,
+                                                                final Implementation implementation,
+                                                                final ModelObjectValidationReport report )
+    {
+        if ( implementation.getDependencies() != null )
+        {
+            for ( Dependency d : implementation.getDependencies().getDependency() )
+            {
+                final Implementations available = modules.getImplementations( d.getIdentifier() );
+                if ( available != null )
+                {
+                    for ( Implementation i : available.getImplementation() )
+                    {
+                        this.assertDependencyDoesNotOverrideFinalPropertyAndDoesNotFlagNonOverridenPropertyOverride(
+                            modules, implementation, d, i, report );
+
+                    }
+                }
+            }
+        }
+    }
+
+    private void assertDependencyDoesNotOverrideFinalPropertyAndDoesNotFlagNonOverridenPropertyOverride(
+        final Modules modules, final Implementation implementation, final Dependency dependency,
+        final Implementation dependencyImplementation, final ModelObjectValidationReport report )
+    {
+        if ( dependency.getProperties() != null )
+        {
+            final Properties properties = modules.getProperties( dependencyImplementation.getIdentifier() );
+
+            if ( properties != null )
+            {
+                for ( Property override : dependency.getProperties().getProperty() )
+                {
+                    final Property overriden = properties.getProperty( override.getName() );
+                    if ( overriden != null && overriden.isFinal() )
+                    {
+                        report.getDetails().add( this.createDetail(
+                            "IMPLEMENTATION_DEPENDENCY_FINAL_PROPERTY_CONSTRAINT", Level.SEVERE,
+                            "implementationDependencyFinalPropertyConstraint", new Object[]
+                            {
+                                implementation.getIdentifier(), dependency.getName(),
+                                dependencyImplementation.getIdentifier(), override.getName()
+                            }, new ObjectFactory().createImplementation( implementation ) ) );
+
+                    }
+                    if ( overriden == null && override.isOverride() )
+                    {
+                        report.getDetails().add( this.createDetail(
+                            "IMPLEMENTATION_DEPENDENCY_OVERRIDE_PROPERTY_CONSTRAINT", Level.SEVERE,
+                            "implementationDependencyOverridePropertyConstraint", new Object[]
+                            {
+                                implementation.getIdentifier(), dependency.getName(),
+                                dependencyImplementation.getIdentifier(), override.getName()
                             }, new ObjectFactory().createImplementation( implementation ) ) );
 
                     }

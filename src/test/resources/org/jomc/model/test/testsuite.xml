@@ -1979,6 +1979,73 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="DEPENDENCY_OVERRIDES_PROPERTIES_VALID">
+    <modules valid="true">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <specifications>
+            <specification identifier="Specification" class="java.lang.Object"/>
+          </specifications>
+          <implementations>
+            <implementation identifier="Implementation" name="Implementation Name">
+              <specifications>
+                <reference identifier="Specification"/>
+              </specifications>
+              <properties>
+                <property name="Property"/>
+              </properties>
+            </implementation>
+            <implementation identifier="Test Implementation" name="Test Implementation Name">
+              <dependencies>
+                <dependency name="Dependency" identifier="Specification">
+                  <properties>
+                    <property name="Property"/>
+                  </properties>
+                </dependency>
+              </dependencies>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="DEPENDENCY_OVERRIDES_PROPERTIES_INVALID">
+    <modules valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <specifications>
+            <specification identifier="Specification" class="java.lang.Object"/>
+          </specifications>
+          <implementations>
+            <implementation identifier="Implementation" name="Implementation Name">
+              <specifications>
+                <reference identifier="Specification"/>
+              </specifications>
+              <properties>
+                <property name="Final Property" final="true"/>
+              </properties>
+            </implementation>
+            <implementation identifier="Test Implementation" name="Test Implementation Name">
+              <dependencies>
+                <dependency name="Dependency" identifier="Specification">
+                  <properties>
+                    <property name="Final Property"/>
+                    <property name="Not Overridden" override="true"/>
+                  </properties>
+                </dependency>
+              </dependencies>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_FINAL_PROPERTY_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_OVERRIDE_PROPERTY_CONSTRAINT" count="1"/>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
   <modules-constraints-test identifier="IMPLEMENTATION_INHERITANCE_COMPATIBILITY_CONSTRAINT_VALID_2">
     <modules valid="true">
       <modules xmlns="http://jomc.org/model">
