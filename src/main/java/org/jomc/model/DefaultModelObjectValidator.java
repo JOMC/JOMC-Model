@@ -610,11 +610,24 @@ public class DefaultModelObjectValidator implements ModelObjectValidator
                 final Implementations available = modules.getImplementations( d.getIdentifier() );
                 if ( available != null )
                 {
-                    for ( Implementation i : available.getImplementation() )
+                    if ( d.getImplementationName() != null )
                     {
-                        this.assertDependencyDoesNotOverrideFinalPropertyAndDoesNotFlagNonOverridenPropertyOverride(
-                            modules, implementation, d, i, report );
+                        final Implementation i = available.getImplementationByName( d.getImplementationName() );
+                        if ( i != null )
+                        {
+                            this.assertDependencyDoesNotOverrideFinalPropertyAndDoesNotFlagNonOverridenPropertyOverride(
+                                modules, implementation, d, i, report );
 
+                        }
+                    }
+                    else
+                    {
+                        for ( Implementation i : available.getImplementation() )
+                        {
+                            this.assertDependencyDoesNotOverrideFinalPropertyAndDoesNotFlagNonOverridenPropertyOverride(
+                                modules, implementation, d, i, report );
+
+                        }
                     }
                 }
             }
