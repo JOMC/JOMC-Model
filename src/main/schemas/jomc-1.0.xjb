@@ -40,6 +40,13 @@
                jaxb:version="2.0">
 
   <jaxb:bindings schemaLocation="jomc-1.0.xsd">
+    <!-- *********************************************************************************************************** -->
+    <jaxb:bindings node="xs:complexType[@name='Text']/xs:simpleContent/xs:extension/xs:attribute[@name='language']">
+      <jaxb:property>
+        <jaxb:javadoc>The language key of this text.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <!-- *********************************************************************************************************** -->
     <jaxb:bindings node="xs:complexType[@name='Texts']">
       <ci:code><![CDATA[
     /**
@@ -78,6 +85,74 @@
 ]]>
       </ci:code>
     </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Texts']/xs:attribute[@name='defaultLanguage']">
+      <jaxb:property>
+        <jaxb:javadoc>Default text of this list.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <!-- *********************************************************************************************************** -->
+    <jaxb:bindings node="xs:complexType[@name='ModelObject']/xs:sequence/xs:element[@ref='jomc:documentation']">
+      <jaxb:property>
+        <jaxb:javadoc>Documentation of this object or {@code null}.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='ModelObject']/xs:sequence/xs:element[@ref='jomc:authors']">
+      <jaxb:property>
+        <jaxb:javadoc>Authors of this object or {@code null}.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='ModelObject']/xs:attribute[@name='modelVersion']">
+      <jaxb:property>
+        <jaxb:javadoc>Model version of this object.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='ModelObject']/xs:attribute[@name='createDate']">
+      <jaxb:property>
+        <jaxb:javadoc>The date this object got created or {@code null}.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='ModelObject']/xs:attribute[@name='deprecated']">
+      <jaxb:property>
+        <jaxb:javadoc>{@code true} if this object is deprecated.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <!-- *********************************************************************************************************** -->
+    <jaxb:bindings node="xs:complexType[@name='Module']/xs:complexContent/xs:extension/xs:sequence/xs:element[@ref='jomc:specifications']">
+      <jaxb:property>
+        <jaxb:javadoc>Specifications of this module or {@code null}.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Module']/xs:complexContent/xs:extension/xs:sequence/xs:element[@ref='jomc:implementations']">
+      <jaxb:property>
+        <jaxb:javadoc>Implementations of this module or {@code null}.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Module']/xs:complexContent/xs:extension/xs:sequence/xs:element[@ref='jomc:properties']">
+      <jaxb:property>
+        <jaxb:javadoc>Properties of this module or {@code null}.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Module']/xs:complexContent/xs:extension/xs:sequence/xs:element[@ref='jomc:messages']">
+      <jaxb:property>
+        <jaxb:javadoc>Messages of this module or {@code null}.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Module']/xs:complexContent/xs:extension/xs:attribute[@name='name']">
+      <jaxb:property>
+        <jaxb:javadoc>Name of this module.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Module']/xs:complexContent/xs:extension/xs:attribute[@name='version']">
+      <jaxb:property>
+        <jaxb:javadoc>Version of this module or {@code null}.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Module']/xs:complexContent/xs:extension/xs:attribute[@name='vendor']">
+      <jaxb:property>
+        <jaxb:javadoc>Vendor of this module or {@code null}.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <!-- *********************************************************************************************************** -->
     <jaxb:bindings node="xs:complexType[@name='Specifications']">
       <ci:code><![CDATA[
     /**
@@ -177,37 +252,64 @@
 ]]>
       </ci:code>
     </jaxb:bindings>
-    <jaxb:bindings node="xs:complexType[@name='Implementation']">
-      <ci:code><![CDATA[
-    /**
-     * Gets the location URI used for locating instances of this implementation.
-     *
-     * @return The location URI used for locating instances of this implementation or {@code null}, if instances of this
-     * implementation do not need to be located.
-     *
-     * @see #getLocation()
-     */
-    public java.net.URI getLocationUri()
-    {
-        try
-        {
-            java.net.URI javaLocation = null;
-
-            if ( this.getLocation() != null )
-            {
-                javaLocation = new java.net.URI( this.getLocation() );
-            }
-
-            return javaLocation;
-        }
-        catch ( java.net.URISyntaxException e )
-        {
-            throw new AssertionError( e );
-        }
-    }
-]]>
-      </ci:code>
+    <!-- *********************************************************************************************************** -->
+    <jaxb:bindings node="xs:complexType[@name='Specification']/xs:complexContent/xs:extension/xs:sequence/xs:element[@ref='jomc:properties']">
+      <jaxb:property>
+        <jaxb:javadoc>Properties of this specification or {@code null}.</jaxb:javadoc>
+      </jaxb:property>
     </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Specification']/xs:complexContent/xs:extension/xs:attribute[@name='identifier']">
+      <jaxb:property>
+        <jaxb:javadoc>The identifier of this specification.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Specification']/xs:complexContent/xs:extension/xs:attribute[@name='class']">
+      <jaxb:property>
+        <jaxb:javadoc>The identifier of the class providing the programming interface of this specification or {@code null}.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Specification']/xs:complexContent/xs:extension/xs:attribute[@name='vendor']">
+      <jaxb:property>
+        <jaxb:javadoc>The vendor of this specification or {@code null}.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Specification']/xs:complexContent/xs:extension/xs:attribute[@name='version']">
+      <jaxb:property>
+        <jaxb:javadoc>The version of this specification or {@code null}.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Specification']/xs:complexContent/xs:extension/xs:attribute[@name='multiplicity']">
+      <jaxb:property>
+        <jaxb:javadoc>The implementation multiplicity of this specification. A multiplicity equal to {@link Multiplicity#ONE} specifies that no more than one implementation of the specification is allowed to exist among a set of modules (including none). A multiplicity equal to {@link Multiplicity#MANY} specifies that many implementations are allowed to exist among a set of modules (including none).</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Specification']/xs:complexContent/xs:extension/xs:attribute[@name='scope']">
+      <jaxb:property>
+        <jaxb:javadoc>Scope instances of implementations of this specification apply to or {@code null} if instances of implementations of this specification are not bound to any scope (multiton).</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <!-- *********************************************************************************************************** -->
+    <jaxb:bindings node="xs:complexType[@name='SpecificationReference']/xs:complexContent/xs:extension/xs:attribute[@name='identifier']">
+      <jaxb:property>
+        <jaxb:javadoc>The identifier of the referenced specification.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='SpecificationReference']/xs:complexContent/xs:extension/xs:attribute[@name='version']">
+      <jaxb:property>
+        <jaxb:javadoc>The version of the referenced specification or {@code null}.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='SpecificationReference']/xs:complexContent/xs:extension/xs:attribute[@name='final']">
+      <jaxb:property>
+        <jaxb:javadoc>{@code true} if this specification reference is the final node in an inheritance hierarchy.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='SpecificationReference']/xs:complexContent/xs:extension/xs:attribute[@name='override']">
+      <jaxb:property>
+        <jaxb:javadoc>{@code true} if this specification reference is intended to override a super specification reference.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <!-- *********************************************************************************************************** -->
     <jaxb:bindings node="xs:complexType[@name='Implementations']">
       <ci:code><![CDATA[
     /**
@@ -337,6 +439,130 @@
 ]]>
       </ci:code>
     </jaxb:bindings>
+    <!-- *********************************************************************************************************** -->
+    <jaxb:bindings node="xs:complexType[@name='Implementation']/xs:complexContent/xs:extension/xs:sequence/xs:element[@ref='jomc:specifications']">
+      <jaxb:property>
+        <jaxb:javadoc>References to specifications implemented by this implementation or {@code null}.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Implementation']/xs:complexContent/xs:extension/xs:sequence/xs:element[@ref='jomc:implementations']">
+      <jaxb:property>
+        <jaxb:javadoc>References to implementations this implementation inherits from or {@code null}.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Implementation']/xs:complexContent/xs:extension/xs:sequence/xs:element[@ref='jomc:dependencies']">
+      <jaxb:property>
+        <jaxb:javadoc>Dependencies of this implementation or {@code null}.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Implementation']/xs:complexContent/xs:extension/xs:sequence/xs:element[@ref='jomc:properties']">
+      <jaxb:property>
+        <jaxb:javadoc>Properties of this implementation or {@code null}.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Implementation']/xs:complexContent/xs:extension/xs:sequence/xs:element[@ref='jomc:messages']">
+      <jaxb:property>
+        <jaxb:javadoc>Messages of this implementation or {@code null}.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Implementation']/xs:complexContent/xs:extension/xs:attribute[@name='identifier']">
+      <jaxb:property>
+        <jaxb:javadoc>The identifier of this implementation.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Implementation']/xs:complexContent/xs:extension/xs:attribute[@name='name']">
+      <jaxb:property>
+        <jaxb:javadoc>The name of this implementation.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Implementation']/xs:complexContent/xs:extension/xs:attribute[@name='class']">
+      <jaxb:property>
+        <jaxb:javadoc>The identifier of the class providing instances of this implementation or {@code null}.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Implementation']/xs:complexContent/xs:extension/xs:attribute[@name='location']">
+      <jaxb:property>
+        <jaxb:javadoc>An URI of the location providing instances of this implementation or {@code null}.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Implementation']/xs:complexContent/xs:extension/xs:attribute[@name='vendor']">
+      <jaxb:property>
+        <jaxb:javadoc>The vendor of this implementation or {@code null}.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Implementation']/xs:complexContent/xs:extension/xs:attribute[@name='version']">
+      <jaxb:property>
+        <jaxb:javadoc>The version of this implementation or {@code null}.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Implementation']/xs:complexContent/xs:extension/xs:attribute[@name='final']">
+      <jaxb:property>
+        <jaxb:javadoc>{@code true} if this implementation is the final node in an inheritance hierarchy.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Implementation']/xs:complexContent/xs:extension/xs:attribute[@name='stateless']">
+      <jaxb:property>
+        <jaxb:javadoc>{@code true} if instances of this implementation do not retain state across operations.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Implementation']/xs:complexContent/xs:extension/xs:attribute[@name='abstract']">
+      <jaxb:property>
+        <jaxb:javadoc>{@code true} if this implementation is abstract.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Implementation']">
+      <ci:code><![CDATA[
+    /**
+     * Gets the location URI used for locating instances of this implementation.
+     *
+     * @return The location URI used for locating instances of this implementation or {@code null}, if instances of this
+     * implementation do not need to be located.
+     *
+     * @see #getLocation()
+     */
+    public java.net.URI getLocationUri()
+    {
+        try
+        {
+            java.net.URI javaLocation = null;
+
+            if ( this.getLocation() != null )
+            {
+                javaLocation = new java.net.URI( this.getLocation() );
+            }
+
+            return javaLocation;
+        }
+        catch ( java.net.URISyntaxException e )
+        {
+            throw new AssertionError( e );
+        }
+    }
+]]>
+      </ci:code>
+    </jaxb:bindings>
+    <!-- *********************************************************************************************************** -->
+    <jaxb:bindings node="xs:complexType[@name='ImplementationReference']/xs:complexContent/xs:extension/xs:attribute[@name='identifier']">
+      <jaxb:property>
+        <jaxb:javadoc>The identifier of the referenced implementation.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='ImplementationReference']/xs:complexContent/xs:extension/xs:attribute[@name='version']">
+      <jaxb:property>
+        <jaxb:javadoc>The version of the referenced implementation or {@code null}.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='ImplementationReference']/xs:complexContent/xs:extension/xs:attribute[@name='final']">
+      <jaxb:property>
+        <jaxb:javadoc>{@code true} if this implementation reference is the final node in an inheritance hierarchy.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='ImplementationReference']/xs:complexContent/xs:extension/xs:attribute[@name='override']">
+      <jaxb:property>
+        <jaxb:javadoc>{@code true} if this implementation reference is intended to override a super implementation reference.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <!-- *********************************************************************************************************** -->
     <jaxb:bindings node="xs:complexType[@name='Dependencies']">
       <ci:code><![CDATA[
     /**
@@ -371,6 +597,33 @@
 ]]>
       </ci:code>
     </jaxb:bindings>
+    <!-- *********************************************************************************************************** -->
+    <jaxb:bindings node="xs:complexType[@name='Dependency']/xs:complexContent/xs:extension/xs:sequence/xs:element[@ref='jomc:properties']">
+      <jaxb:property>
+        <jaxb:javadoc>Properties of this dependency or {@code null}.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Dependency']/xs:complexContent/xs:extension/xs:attribute[@name='implementationName']">
+      <jaxb:property>
+        <jaxb:javadoc>Name of the selected implementation of the specification of this dependency or {@code null}.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Dependency']/xs:complexContent/xs:extension/xs:attribute[@name='name']">
+      <jaxb:property>
+        <jaxb:javadoc>Name of this dependency.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Dependency']/xs:complexContent/xs:extension/xs:attribute[@name='bound']">
+      <jaxb:property>
+        <jaxb:javadoc>{@code true} if instances of this dependency are bound to the declaring implementation.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Dependency']/xs:complexContent/xs:extension/xs:attribute[@name='optional']">
+      <jaxb:property>
+        <jaxb:javadoc>{@code true} if this dependency is optional.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <!-- *********************************************************************************************************** -->
     <jaxb:bindings node="xs:complexType[@name='Properties']">
       <ci:code><![CDATA[
     /**
@@ -434,6 +687,37 @@
     }
 ]]>
       </ci:code>
+    </jaxb:bindings>
+    <!-- *********************************************************************************************************** -->
+    <jaxb:bindings node="xs:complexType[@name='Property']/xs:complexContent/xs:extension/xs:sequence/xs:any">
+      <jaxb:property>
+        <jaxb:javadoc>Object value of this property or {@code null}.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Property']/xs:complexContent/xs:extension/xs:attribute[@name='name']">
+      <jaxb:property>
+        <jaxb:javadoc>Name of this property.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Property']/xs:complexContent/xs:extension/xs:attribute[@name='type']">
+      <jaxb:property>
+        <jaxb:javadoc>Type of this property or {@code null}.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Property']/xs:complexContent/xs:extension/xs:attribute[@name='value']">
+      <jaxb:property>
+        <jaxb:javadoc>String value of this property or {@code null}.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Property']/xs:complexContent/xs:extension/xs:attribute[@name='final']">
+      <jaxb:property>
+        <jaxb:javadoc>{@code true} if this property is the final node in an inheritance hierarchy.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Property']/xs:complexContent/xs:extension/xs:attribute[@name='override']">
+      <jaxb:property>
+        <jaxb:javadoc>{@code true} if this property is intended to override a super property.</jaxb:javadoc>
+      </jaxb:property>
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Property']">
       <ci:code><![CDATA[
@@ -560,6 +844,23 @@
 ]]>
       </ci:code>
     </jaxb:bindings>
+    <!-- *********************************************************************************************************** -->
+    <jaxb:bindings node="xs:complexType[@name='PropertyReference']/xs:complexContent/xs:extension/xs:attribute[@name='name']">
+      <jaxb:property>
+        <jaxb:javadoc>The name of the referenced property.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='PropertyReference']/xs:complexContent/xs:extension/xs:attribute[@name='final']">
+      <jaxb:property>
+        <jaxb:javadoc>{@code true} if this property reference is the final node in an inheritance hierarchy.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='PropertyReference']/xs:complexContent/xs:extension/xs:attribute[@name='override']">
+      <jaxb:property>
+        <jaxb:javadoc>{@code true} if this property reference is intended to override a super property reference.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <!-- *********************************************************************************************************** -->
     <jaxb:bindings node="xs:complexType[@name='Messages']">
       <ci:code><![CDATA[
     /**
@@ -624,6 +925,49 @@
 ]]>
       </ci:code>
     </jaxb:bindings>
+    <!-- *********************************************************************************************************** -->
+    <jaxb:bindings node="xs:complexType[@name='Message']/xs:complexContent/xs:extension/xs:sequence/xs:element[@ref='jomc:template']">
+      <jaxb:property>
+        <jaxb:javadoc>The localizable template of this message.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Message']/xs:complexContent/xs:extension/xs:sequence/xs:element[@ref='jomc:arguments']">
+      <jaxb:property>
+        <jaxb:javadoc>The format arguments of this message or {@code null}.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Message']/xs:complexContent/xs:extension/xs:attribute[@name='name']">
+      <jaxb:property>
+        <jaxb:javadoc>The name of this message.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Message']/xs:complexContent/xs:extension/xs:attribute[@name='final']">
+      <jaxb:property>
+        <jaxb:javadoc>{@code true} if this message is the final node in an inheritance hierarchy.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Message']/xs:complexContent/xs:extension/xs:attribute[@name='override']">
+      <jaxb:property>
+        <jaxb:javadoc>{@code true} if this message is intended to override a super message.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <!-- *********************************************************************************************************** -->
+    <jaxb:bindings node="xs:complexType[@name='MessageReference']/xs:complexContent/xs:extension/xs:attribute[@name='name']">
+      <jaxb:property>
+        <jaxb:javadoc>The name of the referenced message.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='MessageReference']/xs:complexContent/xs:extension/xs:attribute[@name='final']">
+      <jaxb:property>
+        <jaxb:javadoc>{@code true} if this message reference is the final node in an inheritance hierarchy.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='MessageReference']/xs:complexContent/xs:extension/xs:attribute[@name='override']">
+      <jaxb:property>
+        <jaxb:javadoc>{@code true} if this message reference is intended to override a super message reference.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <!-- *********************************************************************************************************** -->
     <jaxb:bindings node="xs:complexType[@name='Arguments']">
       <ci:code><![CDATA[
     /**
@@ -688,6 +1032,23 @@
 ]]>
       </ci:code>
     </jaxb:bindings>
+    <!-- *********************************************************************************************************** -->
+    <jaxb:bindings node="xs:complexType[@name='Argument']/xs:complexContent/xs:extension/xs:attribute[@name='index']">
+      <jaxb:property>
+        <jaxb:javadoc>Index of this argument.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Argument']/xs:complexContent/xs:extension/xs:attribute[@name='name']">
+      <jaxb:property>
+        <jaxb:javadoc>Name of this argument.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Argument']/xs:complexContent/xs:extension/xs:attribute[@name='type']">
+      <jaxb:property>
+        <jaxb:javadoc>Type of this argument.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <!-- *********************************************************************************************************** -->
     <jaxb:bindings node="xs:complexType[@name='Instances']">
       <ci:code><![CDATA[
     /**
@@ -721,6 +1082,47 @@
     }
 ]]>
       </ci:code>
+    </jaxb:bindings>
+    <!-- *********************************************************************************************************** -->
+    <jaxb:bindings node="xs:complexType[@name='Instance']/xs:complexContent/xs:extension/xs:sequence/xs:element[@ref='jomc:specifications']">
+      <jaxb:property>
+        <jaxb:javadoc>Specifications implemented by this instance or {@code null}.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Instance']/xs:complexContent/xs:extension/xs:sequence/xs:element[@ref='jomc:dependencies']">
+      <jaxb:property>
+        <jaxb:javadoc>Dependencies of this instance or {@code null}.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Instance']/xs:complexContent/xs:extension/xs:sequence/xs:element[@ref='jomc:properties']">
+      <jaxb:property>
+        <jaxb:javadoc>Properties of this instance or {@code null}.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Instance']/xs:complexContent/xs:extension/xs:sequence/xs:element[@ref='jomc:messages']">
+      <jaxb:property>
+        <jaxb:javadoc>Messages of this instance or {@code null}.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Instance']/xs:complexContent/xs:extension/xs:attribute[@name='identifier']">
+      <jaxb:property>
+        <jaxb:javadoc>The identifier of this instance.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Instance']/xs:complexContent/xs:extension/xs:attribute[@name='name']">
+      <jaxb:property>
+        <jaxb:javadoc>The name of the implementation of the specifications implemented by this instance.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Instance']/xs:complexContent/xs:extension/xs:attribute[@name='class']">
+      <jaxb:property>
+        <jaxb:javadoc>The identifier of the class of this instance.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Instance']/xs:complexContent/xs:extension/xs:attribute[@name='stateless']">
+      <jaxb:property>
+        <jaxb:javadoc>{@code true} if this instance does not retain state across operations.</jaxb:javadoc>
+      </jaxb:property>
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Instance']">
       <ci:code><![CDATA[
@@ -762,6 +1164,56 @@
 ]]>
       </ci:code>
     </jaxb:bindings>
+    <!-- *********************************************************************************************************** -->
+    <jaxb:bindings node="xs:complexType[@name='Person']/xs:complexContent/xs:extension/xs:attribute[@name='name']">
+      <jaxb:property>
+        <jaxb:javadoc>Name of this person.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Person']/xs:complexContent/xs:extension/xs:attribute[@name='mail']">
+      <jaxb:property>
+        <jaxb:javadoc>Mail address of this person or {@code null}.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <!-- *********************************************************************************************************** -->
+    <jaxb:bindings node="xs:complexType[@name='Author']/xs:complexContent/xs:extension/xs:attribute[@name='version']">
+      <jaxb:property>
+        <jaxb:javadoc>The version created by this author or {@code null}.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <!-- *********************************************************************************************************** -->
+    <jaxb:bindings node="xs:simpleType[@name='ArgumentType']/xs:restriction/xs:enumeration[@value='Number']">
+      <jaxb:typesafeEnumMember name="NUMBER">
+        <jaxb:javadoc>Argument of type {@code java.lang.Number}.</jaxb:javadoc>
+      </jaxb:typesafeEnumMember>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:simpleType[@name='ArgumentType']/xs:restriction/xs:enumeration[@value='Date']">
+      <jaxb:typesafeEnumMember name="DATE">
+        <jaxb:javadoc>Argument of type {@code java.util.Date}.</jaxb:javadoc>
+      </jaxb:typesafeEnumMember>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:simpleType[@name='ArgumentType']/xs:restriction/xs:enumeration[@value='Time']">
+      <jaxb:typesafeEnumMember name="TIME">
+        <jaxb:javadoc>Argument of type {@code java.util.Date}.</jaxb:javadoc>
+      </jaxb:typesafeEnumMember>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:simpleType[@name='ArgumentType']/xs:restriction/xs:enumeration[@value='Text']">
+      <jaxb:typesafeEnumMember name="TEXT">
+        <jaxb:javadoc>Argument of type {@code java.lang.String}.</jaxb:javadoc>
+      </jaxb:typesafeEnumMember>
+    </jaxb:bindings>
+    <!-- *********************************************************************************************************** -->
+    <jaxb:bindings node="xs:simpleType[@name='Multiplicity']/xs:restriction/xs:enumeration[@value='One']">
+      <jaxb:typesafeEnumMember name="ONE">
+        <jaxb:javadoc>A multiplicity equal to {@code ONE} specifies that no more than one implementation of the specification is allowed to exist among a set of modules (including none).</jaxb:javadoc>
+      </jaxb:typesafeEnumMember>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:simpleType[@name='Multiplicity']/xs:restriction/xs:enumeration[@value='Many']">
+      <jaxb:typesafeEnumMember name="MANY">
+        <jaxb:javadoc>A multiplicity equal to {@code MANY} specifies that many implementations of the specification are allowed to exist among a set of modules (including none).</jaxb:javadoc>
+      </jaxb:typesafeEnumMember>
+    </jaxb:bindings>
+    <!-- *********************************************************************************************************** -->
     <jaxb:bindings node="xs:complexType[@name='Modules']">
       <ci:code><![CDATA[
 
@@ -1824,7 +2276,7 @@
         {
             final Instance instance = new Instance();
             instance.setIdentifier( i.getIdentifier() );
-            instance.setImplementationName( i.getName() );
+            instance.setName( i.getName() );
             instance.setClazz( i.getClazz() );
             instance.setStateless( i.isStateless() );
             instance.setDependencies( this.getDependencies( implementation ) );
@@ -1965,7 +2417,7 @@
                     java.lang.reflect.Method factoryMethod = null;
                     String methodName = null;
 
-                    char[] c = instance.getImplementationName().toCharArray();
+                    char[] c = instance.getName().toCharArray();
                     c[0] = Character.toUpperCase( c[0] );
                     methodName = "get" + String.valueOf( c );
 

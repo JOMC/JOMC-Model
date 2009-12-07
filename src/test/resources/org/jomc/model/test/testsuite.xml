@@ -305,11 +305,31 @@
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
           <messages>
-            <message name="Message 1" final="true"/>
-            <message name="Message 2" final="true"/>
-            <message name="Message 3" final="true"/>
-            <message name="Message 4" final="true"/>
-            <message name="Message 5" final="true"/>
+            <message name="Message 1" final="true">
+              <template defaultLanguage="en">
+                <text language="en">Text 1</text>
+              </template>
+            </message>
+            <message name="Message 2" final="true">
+              <template defaultLanguage="en">
+                <text language="en">Text 2</text>
+              </template>
+            </message>
+            <message name="Message 3" final="true">
+              <template defaultLanguage="en">
+                <text language="en">Text 3</text>
+              </template>
+            </message>
+            <message name="Message 4" final="true">
+              <template defaultLanguage="en">
+                <text language="en">Text 4</text>
+              </template>
+            </message>
+            <message name="Message 5" final="true">
+              <template defaultLanguage="en">
+                <text language="en">Text 5</text>
+              </template>
+            </message>
           </messages>
         </module>
       </modules>
@@ -323,11 +343,31 @@
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
           <messages>
-            <message name="Message 1" override="true"/>
-            <message name="Message 2" override="true"/>
-            <message name="Message 3" override="true"/>
-            <message name="Message 4" override="true"/>
-            <message name="Message 5" override="true"/>
+            <message name="Message 1" override="true">
+              <template defaultLanguage="en">
+                <text language="en">Text 1</text>
+              </template>
+            </message>
+            <message name="Message 2" override="true">
+              <template defaultLanguage="en">
+                <text language="en">Text 2</text>
+              </template>
+            </message>
+            <message name="Message 3" override="true">
+              <template defaultLanguage="en">
+                <text language="en">Text 3</text>
+              </template>
+            </message>
+            <message name="Message 4" override="true">
+              <template defaultLanguage="en">
+                <text language="en">Text 4</text>
+              </template>
+            </message>
+            <message name="Message 5" override="true">
+              <template defaultLanguage="en">
+                <text language="en">Text 5</text>
+              </template>
+            </message>
           </messages>
         </module>
       </modules>
@@ -341,11 +381,31 @@
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
           <messages>
-            <message name="Message 1"/>
-            <message name="Message 2"/>
-            <message name="Message 3"/>
-            <message name="Message 4"/>
-            <message name="Message 5"/>
+            <message name="Message 1">
+              <template defaultLanguage="en">
+                <text language="en">Text 1</text>
+              </template>
+            </message>
+            <message name="Message 2">
+              <template defaultLanguage="en">
+                <text language="en">Text 2</text>
+              </template>
+            </message>
+            <message name="Message 3">
+              <template defaultLanguage="en">
+                <text language="en">Text 3</text>
+              </template>
+            </message>
+            <message name="Message 4">
+              <template defaultLanguage="en">
+                <text language="en">Text 4</text>
+              </template>
+            </message>
+            <message name="Message 5">
+              <template defaultLanguage="en">
+                <text language="en">Text 5</text>
+              </template>
+            </message>
             <reference name="Message 1"/>
             <reference name="Message 2"/>
             <reference name="Message 3"/>
@@ -447,11 +507,31 @@
           <implementations>
             <implementation identifier="Implementation" name="Implementation Name">
               <messages>
-                <message name="Message 1"/>
-                <message name="Message 2"/>
-                <message name="Message 3"/>
-                <message name="Message 4"/>
-                <message name="Message 5"/>
+                <message name="Message 1">
+                  <template defaultLanguage="en">
+                    <text language="en">Text 1</text>
+                  </template>
+                </message>
+                <message name="Message 2">
+                  <template defaultLanguage="en">
+                    <text language="en">Text 2</text>
+                  </template>
+                </message>
+                <message name="Message 3">
+                  <template defaultLanguage="en">
+                    <text language="en">Text 3</text>
+                  </template>
+                </message>
+                <message name="Message 4">
+                  <template defaultLanguage="en">
+                    <text language="en">Text 4</text>
+                  </template>
+                </message>
+                <message name="Message 5">
+                  <template defaultLanguage="en">
+                    <text language="en">Text 5</text>
+                  </template>
+                </message>
                 <reference name="Message 1"/>
                 <reference name="Message 2"/>
                 <reference name="Message 3"/>
@@ -461,11 +541,31 @@
             </implementation>
           </implementations>
           <messages>
-            <message name="Message 1"/>
-            <message name="Message 2"/>
-            <message name="Message 3"/>
-            <message name="Message 4"/>
-            <message name="Message 5"/>
+            <message name="Message 1">
+              <template defaultLanguage="en">
+                <text language="en">Text 1</text>
+              </template>
+            </message>
+            <message name="Message 2">
+              <template defaultLanguage="en">
+                <text language="en">Text 2</text>
+              </template>
+            </message>
+            <message name="Message 3">
+              <template defaultLanguage="en">
+                <text language="en">Text 3</text>
+              </template>
+            </message>
+            <message name="Message 4">
+              <template defaultLanguage="en">
+                <text language="en">Text 4</text>
+              </template>
+            </message>
+            <message name="Message 5">
+              <template defaultLanguage="en">
+                <text language="en">Text 5</text>
+              </template>
+            </message>
           </messages>
         </module>
       </modules>
@@ -1116,31 +1216,51 @@
           <implementations>
             <implementation identifier="Final 1" name="Final Name 1">
               <messages>
-                <message name="Final Message 1" final="true"/>
+                <message name="Final Message 1" final="true">
+                  <template defaultLanguage="en">
+                    <text language="en">Text 1</text>
+                  </template>
+                </message>
                 <reference name="Final Message Reference 1" final="true"/>
               </messages>
             </implementation>
             <implementation identifier="Final 2" name="Final Name 2">
               <messages>
-                <message name="Final Message 2" final="true"/>
+                <message name="Final Message 2" final="true">
+                  <template defaultLanguage="en">
+                    <text language="en">Text 2</text>
+                  </template>
+                </message>
                 <reference name="Final Message Reference 2" final="true"/>
               </messages>
             </implementation>
             <implementation identifier="Final 3" name="Final Name 3">
               <messages>
-                <message name="Final Message 3" final="true"/>
+                <message name="Final Message 3" final="true">
+                  <template defaultLanguage="en">
+                    <text language="en">Text 3</text>
+                  </template>
+                </message>
                 <reference name="Final Message Reference 3" final="true"/>
               </messages>
             </implementation>
             <implementation identifier="Final 4" name="Final Name 4">
               <messages>
-                <message name="Final Message 4" final="true"/>
+                <message name="Final Message 4" final="true">
+                  <template defaultLanguage="en">
+                    <text language="en">Text 4</text>
+                  </template>
+                </message>
                 <reference name="Final Message Reference 4" final="true"/>
               </messages>
             </implementation>
             <implementation identifier="Final 5" name="Final Name 5">
               <messages>
-                <message name="Final Message 5" final="true"/>
+                <message name="Final Message 5" final="true">
+                  <template defaultLanguage="en">
+                    <text language="en">Text 5</text>
+                  </template>
+                </message>
                 <reference name="Final Message Reference 5" final="true"/>
               </messages>
             </implementation>
@@ -1153,25 +1273,85 @@
                 <reference identifier="Final 5"/>
               </implementations>
               <messages>
-                <message name="Final Message 1" final="true"/>
-                <message name="Final Message 2" final="true"/>
-                <message name="Final Message 3" final="true"/>
-                <message name="Final Message 4" final="true"/>
-                <message name="Final Message 5" final="true"/>
-                <message name="Final Message Reference 1" final="true"/>
-                <message name="Final Message Reference 2" final="true"/>
-                <message name="Final Message Reference 3" final="true"/>
-                <message name="Final Message Reference 4" final="true"/>
-                <message name="Final Message Reference 5" final="true"/>
+                <message name="Final Message 1" final="true">
+                  <template defaultLanguage="en">
+                    <text language="en">Text 1</text>
+                  </template>
+                </message>
+                <message name="Final Message 2" final="true">
+                  <template defaultLanguage="en">
+                    <text language="en">Text 2</text>
+                  </template>
+                </message>
+                <message name="Final Message 3" final="true">
+                  <template defaultLanguage="en">
+                    <text language="en">Text 3</text>
+                  </template>
+                </message>
+                <message name="Final Message 4" final="true">
+                  <template defaultLanguage="en">
+                    <text language="en">Text 4</text>
+                  </template>
+                </message>
+                <message name="Final Message 5" final="true">
+                  <template defaultLanguage="en">
+                    <text language="en">Text 5</text>
+                  </template>
+                </message>
+                <message name="Final Message Reference 1" final="true">
+                  <template defaultLanguage="en">
+                    <text language="en">Reference Text 1</text>
+                  </template>
+                </message>
+                <message name="Final Message Reference 2" final="true">
+                  <template defaultLanguage="en">
+                    <text language="en">Reference Text 2</text>
+                  </template>
+                </message>
+                <message name="Final Message Reference 3" final="true">
+                  <template defaultLanguage="en">
+                    <text language="en">Reference Text 3</text>
+                  </template>
+                </message>
+                <message name="Final Message Reference 4" final="true">
+                  <template defaultLanguage="en">
+                    <text language="en">Reference Text 4</text>
+                  </template>
+                </message>
+                <message name="Final Message Reference 5" final="true">
+                  <template defaultLanguage="en">
+                    <text language="en">Reference Text 5</text>
+                  </template>
+                </message>
               </messages>
             </implementation>
           </implementations>
           <messages>
-            <message name="Final Message Reference 1"/>
-            <message name="Final Message Reference 2"/>
-            <message name="Final Message Reference 3"/>
-            <message name="Final Message Reference 4"/>
-            <message name="Final Message Reference 5"/>
+            <message name="Final Message Reference 1">
+              <template defaultLanguage="en">
+                <text language="en">Final Reference Text 1</text>
+              </template>
+            </message>
+            <message name="Final Message Reference 2">
+              <template defaultLanguage="en">
+                <text language="en">Final Reference Text 2</text>
+              </template>
+            </message>
+            <message name="Final Message Reference 3">
+              <template defaultLanguage="en">
+                <text language="en">Final Reference Text 3</text>
+              </template>
+            </message>
+            <message name="Final Message Reference 4">
+              <template defaultLanguage="en">
+                <text language="en">Final Reference Text 4</text>
+              </template>
+            </message>
+            <message name="Final Message Reference 5">
+              <template defaultLanguage="en">
+                <text language="en">Final Reference Text 5</text>
+              </template>
+            </message>
           </messages>
         </module>
       </modules>
@@ -1187,31 +1367,51 @@
           <implementations>
             <implementation identifier="Final 1" name="Final Name 1">
               <messages>
-                <message name="Final Message 1" final="true"/>
+                <message name="Final Message 1" final="true">
+                  <template defaultLanguage="en">
+                    <text language="en">Final Text 1</text>
+                  </template>
+                </message>
                 <reference name="Final Message Reference 1" final="true"/>
               </messages>
             </implementation>
             <implementation identifier="Final 2" name="Final Name 2">
               <messages>
-                <message name="Final Message 2" final="true"/>
+                <message name="Final Message 2" final="true">
+                  <template defaultLanguage="en">
+                    <text language="en">Final Text 2</text>
+                  </template>
+                </message>
                 <reference name="Final Message Reference 2" final="true"/>
               </messages>
             </implementation>
             <implementation identifier="Final 3" name="Final Name 3">
               <messages>
-                <message name="Final Message 3" final="true"/>
+                <message name="Final Message 3" final="true">
+                  <template defaultLanguage="en">
+                    <text language="en">Final Text 3</text>
+                  </template>
+                </message>
                 <reference name="Final Message Reference 3" final="true"/>
               </messages>
             </implementation>
             <implementation identifier="Final 4" name="Final Name 4">
               <messages>
-                <message name="Final Message 4" final="true"/>
+                <message name="Final Message 4" final="true">
+                  <template defaultLanguage="en">
+                    <text language="en">Final Text 4</text>
+                  </template>
+                </message>
                 <reference name="Final Message Reference 4" final="true"/>
               </messages>
             </implementation>
             <implementation identifier="Final 5" name="Final Name 5">
               <messages>
-                <message name="Final Message 5" final="true"/>
+                <message name="Final Message 5" final="true">
+                  <template defaultLanguage="en">
+                    <text language="en">Final Text 5</text>
+                  </template>
+                </message>
                 <reference name="Final Message Reference 5" final="true"/>
               </messages>
             </implementation>
@@ -1224,11 +1424,31 @@
                 <reference identifier="Final 5"/>
               </implementations>
               <messages>
-                <message name="Final Message 1" final="true"/>
-                <message name="Final Message 2" final="true"/>
-                <message name="Final Message 3" final="true"/>
-                <message name="Final Message 4" final="true"/>
-                <message name="Final Message 5" final="true"/>
+                <message name="Final Message 1" final="true">
+                  <template defaultLanguage="en">
+                    <text language="en">Final Text 1</text>
+                  </template>
+                </message>
+                <message name="Final Message 2" final="true">
+                  <template defaultLanguage="en">
+                    <text language="en">Final Text 2</text>
+                  </template>
+                </message>
+                <message name="Final Message 3" final="true">
+                  <template defaultLanguage="en">
+                    <text language="en">Final Text 3</text>
+                  </template>
+                </message>
+                <message name="Final Message 4" final="true">
+                  <template defaultLanguage="en">
+                    <text language="en">Final Text 4</text>
+                  </template>
+                </message>
+                <message name="Final Message 5" final="true">
+                  <template defaultLanguage="en">
+                    <text language="en">Final Text 5</text>
+                  </template>
+                </message>
                 <reference name="Final Message Reference 1" final="true"/>
                 <reference name="Final Message Reference 2" final="true"/>
                 <reference name="Final Message Reference 3" final="true"/>
@@ -1238,11 +1458,31 @@
             </implementation>
           </implementations>
           <messages>
-            <message name="Final Message Reference 1"/>
-            <message name="Final Message Reference 2"/>
-            <message name="Final Message Reference 3"/>
-            <message name="Final Message Reference 4"/>
-            <message name="Final Message Reference 5"/>
+            <message name="Final Message Reference 1">
+              <template defaultLanguage="en">
+                <text language="en">Final Reference Text 1</text>
+              </template>
+            </message>
+            <message name="Final Message Reference 2">
+              <template defaultLanguage="en">
+                <text language="en">Final Reference Text 2</text>
+              </template>
+            </message>
+            <message name="Final Message Reference 3">
+              <template defaultLanguage="en">
+                <text language="en">Final Reference Text 3</text>
+              </template>
+            </message>
+            <message name="Final Message Reference 4">
+              <template defaultLanguage="en">
+                <text language="en">Final Reference Text 4</text>
+              </template>
+            </message>
+            <message name="Final Message Reference 5">
+              <template defaultLanguage="en">
+                <text language="en">Final Reference Text 5</text>
+              </template>
+            </message>
           </messages>
         </module>
       </modules>
@@ -1458,11 +1698,31 @@
           <implementations>
             <implementation identifier="Implementation" name="Implementation Name">
               <messages>
-                <message name="Message 1" override="true"/>
-                <message name="Message 2" override="true"/>
-                <message name="Message 3" override="true"/>
-                <message name="Message 4" override="true"/>
-                <message name="Message 5" override="true"/>
+                <message name="Message 1" override="true">
+                  <template defaultLanguage="en">
+                    <text language="en">Text 1</text>
+                  </template>
+                </message>
+                <message name="Message 2" override="true">
+                  <template defaultLanguage="en">
+                    <text language="en">Text 2</text>
+                  </template>
+                </message>
+                <message name="Message 3" override="true">
+                  <template defaultLanguage="en">
+                    <text language="en">Text 3</text>
+                  </template>
+                </message>
+                <message name="Message 4" override="true">
+                  <template defaultLanguage="en">
+                    <text language="en">Text 4</text>
+                  </template>
+                </message>
+                <message name="Message 5" override="true">
+                  <template defaultLanguage="en">
+                    <text language="en">Text 5</text>
+                  </template>
+                </message>
                 <reference name="Message Reference 1" override="true"/>
                 <reference name="Message Reference 2" override="true"/>
                 <reference name="Message Reference 3" override="true"/>
@@ -1472,11 +1732,31 @@
             </implementation>
           </implementations>
           <messages>
-            <message name="Message Reference 1"/>
-            <message name="Message Reference 2"/>
-            <message name="Message Reference 3"/>
-            <message name="Message Reference 4"/>
-            <message name="Message Reference 5"/>
+            <message name="Message Reference 1">
+              <template defaultLanguage="en">
+                <text language="en">Reference Text 1</text>
+              </template>
+            </message>
+            <message name="Message Reference 2">
+              <template defaultLanguage="en">
+                <text language="en">Reference Text 2</text>
+              </template>
+            </message>
+            <message name="Message Reference 3">
+              <template defaultLanguage="en">
+                <text language="en">Reference Text 3</text>
+              </template>
+            </message>
+            <message name="Message Reference 4">
+              <template defaultLanguage="en">
+                <text language="en">Reference Text 4</text>
+              </template>
+            </message>
+            <message name="Message Reference 5">
+              <template defaultLanguage="en">
+                <text language="en">Reference Text 5</text>
+              </template>
+            </message>
           </messages>
         </module>
       </modules>
@@ -1716,12 +1996,20 @@
           <implementations>
             <implementation identifier="Parent 1" name="Parent Name 1">
               <messages>
-                <message name="Message"/>
+                <message name="Message">
+                  <template defaultLanguage="en">
+                    <text language="en">Text</text>
+                  </template>
+                </message>
               </messages>
             </implementation>
             <implementation identifier="Parent 2" name="Parent Name 2">
               <messages>
-                <message name="Message"/>
+                <message name="Message">
+                  <template defaultLanguage="en">
+                    <text language="en">Text</text>
+                  </template>
+                </message>
               </messages>
             </implementation>
             <implementation identifier="Implementation" name="Implementation Name">
@@ -1745,12 +2033,20 @@
           <implementations>
             <implementation identifier="Parent 1" name="Parent Name 1">
               <messages>
-                <message name="Message"/>
+                <message name="Message">
+                  <template defaultLanguage="en">
+                    <text language="en">Text</text>
+                  </template>
+                </message>
               </messages>
             </implementation>
             <implementation identifier="Parent 2" name="Parent Name 2">
               <messages>
-                <message name="Message"/>
+                <message name="Message">
+                  <template defaultLanguage="en">
+                    <text language="en">Text</text>
+                  </template>
+                </message>
               </messages>
             </implementation>
             <implementation identifier="Parent 3" name="Parent Name 3">
@@ -1759,7 +2055,11 @@
                 <reference identifier="Parent 2"/>
               </implementations>
               <messages>
-                <message name="Message"/>
+                <message name="Message">
+                  <template defaultLanguage="en">
+                    <text language="en">Text</text>
+                  </template>
+                </message>
               </messages>
             </implementation>
             <implementation identifier="Implementation" name="Implementation Name">
@@ -1783,12 +2083,20 @@
           <implementations>
             <implementation identifier="Parent 1" name="Parent Name 1">
               <messages>
-                <message name="Message"/>
+                <message name="Message">
+                  <template defaultLanguage="en">
+                    <text language="en">Text</text>
+                  </template>
+                </message>
               </messages>
             </implementation>
             <implementation identifier="Parent 2" name="Parent Name 2">
               <messages>
-                <message name="Message"/>
+                <message name="Message">
+                  <template defaultLanguage="en">
+                    <text language="en">Text</text>
+                  </template>
+                </message>
               </messages>
             </implementation>
             <implementation identifier="Parent 3" name="Parent Name 3">
@@ -1797,7 +2105,11 @@
                 <reference identifier="Parent 2"/>
               </implementations>
               <messages>
-                <message name="Message"/>
+                <message name="Message">
+                  <template defaultLanguage="en">
+                    <text language="en">Text</text>
+                  </template>
+                </message>
               </messages>
             </implementation>
             <implementation identifier="Implementation" name="Implementation Name">
@@ -2230,7 +2542,11 @@
                 <property name="Property 1"/>
               </properties>
               <messages>
-                <message name="Message 1"/>
+                <message name="Message 1">
+                  <template defaultLanguage="en">
+                    <text language="en">Text 1</text>
+                  </template>
+                </message>
               </messages>
             </implementation>
             <implementation identifier="Implementation 2" name="Implementation Name 2">
@@ -2244,7 +2560,11 @@
                 <property name="Property 2"/>
               </properties>
               <messages>
-                <message name="Message 2"/>
+                <message name="Message 2">
+                  <template defaultLanguage="en">
+                    <text language="en">Text 2</text>
+                  </template>
+                </message>
               </messages>
             </implementation>
             <implementation identifier="Implementation 3" name="Implementation Name 3">
@@ -2258,7 +2578,11 @@
                 <property name="Property 3"/>
               </properties>
               <messages>
-                <message name="Message 3"/>
+                <message name="Message 3">
+                  <template defaultLanguage="en">
+                    <text language="en">Text 3</text>
+                  </template>
+                </message>
               </messages>
             </implementation>
             <implementation identifier="Implementation 4" name="Implementation Name 4">
@@ -2272,7 +2596,11 @@
                 <property name="Property 4"/>
               </properties>
               <messages>
-                <message name="Message 4"/>
+                <message name="Message 4">
+                  <template defaultLanguage="en">
+                    <text language="en">Text 4</text>
+                  </template>
+                </message>
               </messages>
             </implementation>
             <implementation identifier="Implementation 5" name="Implementation Name 5">
@@ -2286,7 +2614,11 @@
                 <property name="Property 5"/>
               </properties>
               <messages>
-                <message name="Message 5"/>
+                <message name="Message 5">
+                  <template defaultLanguage="en">
+                    <text language="en">Text 5</text>
+                  </template>
+                </message>
               </messages>
             </implementation>
             <implementation identifier="Implementation" name="Implementation Name">
@@ -2307,7 +2639,11 @@
                 <property name="Property 6"/>
               </properties>
               <messages>
-                <message name="Message 6"/>
+                <message name="Message 6">
+                  <template defaultLanguage="en">
+                    <text language="en">Text 6</text>
+                  </template>
+                </message>
               </messages>
             </implementation>
           </implementations>
@@ -2341,12 +2677,36 @@
           <property name="Property 6"/>
         </properties>
         <messages>
-          <message name="Message 1"/>
-          <message name="Message 2"/>
-          <message name="Message 3"/>
-          <message name="Message 4"/>
-          <message name="Message 5"/>
-          <message name="Message 6"/>
+          <message name="Message 1">
+            <template defaultLanguage="en">
+              <text language="en">Text 1</text>
+            </template>
+          </message>
+          <message name="Message 2">
+            <template defaultLanguage="en">
+              <text language="en">Text 2</text>
+            </template>
+          </message>
+          <message name="Message 3">
+            <template defaultLanguage="en">
+              <text language="en">Text 3</text>
+            </template>
+          </message>
+          <message name="Message 4">
+            <template defaultLanguage="en">
+              <text language="en">Text 4</text>
+            </template>
+          </message>
+          <message name="Message 5">
+            <template defaultLanguage="en">
+              <text language="en">Text 5</text>
+            </template>
+          </message>
+          <message name="Message 6">
+            <template defaultLanguage="en">
+              <text language="en">Text 6</text>
+            </template>
+          </message>
         </messages>
       </implementation>
     </implementation>
@@ -2377,7 +2737,11 @@
                 <property name="Property 1"/>
               </properties>
               <messages>
-                <message name="Message 1"/>
+                <message name="Message 1">
+                  <template defaultLanguage="en">
+                    <text language="en">Text 1</text>
+                  </template>
+                </message>
               </messages>
             </implementation>
             <implementation identifier="Implementation 2" name="Implementation Name 2">
@@ -2391,7 +2755,11 @@
                 <property name="Property 2"/>
               </properties>
               <messages>
-                <message name="Message 2"/>
+                <message name="Message 2">
+                  <template defaultLanguage="en">
+                    <text language="en">Text 2</text>
+                  </template>
+                </message>
               </messages>
             </implementation>
             <implementation identifier="Implementation 3" name="Implementation Name 3">
@@ -2405,7 +2773,11 @@
                 <property name="Property 3"/>
               </properties>
               <messages>
-                <message name="Message 3"/>
+                <message name="Message 3">
+                  <template defaultLanguage="en">
+                    <text language="en">Text 3</text>
+                  </template>
+                </message>
               </messages>
             </implementation>
             <implementation identifier="Implementation 4" name="Implementation Name 4">
@@ -2419,7 +2791,11 @@
                 <property name="Property 4"/>
               </properties>
               <messages>
-                <message name="Message 4"/>
+                <message name="Message 4">
+                  <template defaultLanguage="en">
+                    <text language="en">Text 4</text>
+                  </template>
+                </message>
               </messages>
             </implementation>
             <implementation identifier="Implementation 5" name="Implementation Name 5">
@@ -2433,7 +2809,11 @@
                 <property name="Property 5"/>
               </properties>
               <messages>
-                <message name="Message 5"/>
+                <message name="Message 5">
+                  <template defaultLanguage="en">
+                    <text language="en">Text 5</text>
+                  </template>
+                </message>
               </messages>
             </implementation>
             <implementation identifier="Implementation" name="Implementation Name">
@@ -2469,12 +2849,36 @@
                 <property name="Property 6" final="true"/>
               </properties>
               <messages>
-                <message name="Message 1" override="true" final="true"/>
-                <message name="Message 2" override="true" final="true"/>
-                <message name="Message 3" override="true" final="true"/>
-                <message name="Message 4" override="true" final="true"/>
-                <message name="Message 5" override="true" final="true"/>
-                <message name="Message 6" final="true"/>
+                <message name="Message 1" override="true" final="true">
+                  <template defaultLanguage="en">
+                    <text language="en">Message 1</text>
+                  </template>
+                </message>
+                <message name="Message 2" override="true" final="true">
+                  <template defaultLanguage="en">
+                    <text language="en">Message 2</text>
+                  </template>
+                </message>
+                <message name="Message 3" override="true" final="true">
+                  <template defaultLanguage="en">
+                    <text language="en">Message 3</text>
+                  </template>
+                </message>
+                <message name="Message 4" override="true" final="true">
+                  <template defaultLanguage="en">
+                    <text language="en">Message 4</text>
+                  </template>
+                </message>
+                <message name="Message 5" override="true" final="true">
+                  <template defaultLanguage="en">
+                    <text language="en">Message 5</text>
+                  </template>
+                </message>
+                <message name="Message 6" final="true">
+                  <template defaultLanguage="en">
+                    <text language="en">Message 6</text>
+                  </template>
+                </message>
               </messages>
             </implementation>
           </implementations>
@@ -2508,12 +2912,36 @@
           <property name="Property 6" final="true"/>
         </properties>
         <messages>
-          <message name="Message 1" override="true" final="true"/>
-          <message name="Message 2" override="true" final="true"/>
-          <message name="Message 3" override="true" final="true"/>
-          <message name="Message 4" override="true" final="true"/>
-          <message name="Message 5" override="true" final="true"/>
-          <message name="Message 6" final="true"/>
+          <message name="Message 1" override="true" final="true">
+            <template defaultLanguage="en">
+              <text language="en">Text 1</text>
+            </template>
+          </message>
+          <message name="Message 2" override="true" final="true">
+            <template defaultLanguage="en">
+              <text language="en">Text 2</text>
+            </template>
+          </message>
+          <message name="Message 3" override="true" final="true">
+            <template defaultLanguage="en">
+              <text language="en">Text 3</text>
+            </template>
+          </message>
+          <message name="Message 4" override="true" final="true">
+            <template defaultLanguage="en">
+              <text language="en">Text 4</text>
+            </template>
+          </message>
+          <message name="Message 5" override="true" final="true">
+            <template defaultLanguage="en">
+              <text language="en">Text 5</text>
+            </template>
+          </message>
+          <message name="Message 6" final="true">
+            <template defaultLanguage="en">
+              <text language="en">Text 6</text>
+            </template>
+          </message>
         </messages>
       </implementation>
     </implementation>

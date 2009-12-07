@@ -40,15 +40,16 @@
                jaxb:version="2.0">
 
   <jaxb:bindings schemaLocation="jomc-bootstrap-1.0.xsd">
+    <!-- *********************************************************************************************************** -->
     <jaxb:bindings node="xs:complexType[@name='Schemas']">
       <ci:code><![CDATA[
     /**
-     * Gets a schema for a given public id from this list of schemas.
+     * Gets a schema for a given public identifier from this list of schemas.
      *
-     * @param publicId The public id of the schema to return.
+     * @param publicId The public identifier of the schema to return.
      *
-     * @return The schema with public id {@code publicId} from the list or {@code null}
-     * if no schema matching {@code publicId} is found.
+     * @return The schema with public identifier {@code publicId} from the list or {@code null} if no schema matching
+     * {@code publicId} is found.
      *
      * @throws NullPointerException if {@code publicId} is {@code null}.
      *
@@ -73,12 +74,12 @@
     }
 
     /**
-     * Gets a schema for a given system id from this list of schemas.
+     * Gets a schema for a given system identifier from this list of schemas.
      *
-     * @param systemId The system id of the schema to return.
+     * @param systemId The system identifier of the schema to return.
      *
-     * @return The schema with system id {@code systemId} from the list or {@code null}
-     * if no schema matching {@code systemId} is found.
+     * @return The schema with system identifier {@code systemId} from the list or {@code null} if no schema matching
+     * {@code systemId} is found.
      *
      * @throws NullPointerException if {@code systemId} is {@code null}.
      *
@@ -101,7 +102,29 @@
 
         return null;
     }
-]]></ci:code>
+]]>
+      </ci:code>
+    </jaxb:bindings>
+    <!-- *********************************************************************************************************** -->
+    <jaxb:bindings node="xs:complexType[@name='Schema']/xs:complexContent/xs:extension/xs:attribute[@name='public-id']">
+      <jaxb:property>
+        <jaxb:javadoc>The public identifier of the referenced schema.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Schema']/xs:complexContent/xs:extension/xs:attribute[@name='system-id']">
+      <jaxb:property>
+        <jaxb:javadoc>The system identifier of the referenced schema.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Schema']/xs:complexContent/xs:extension/xs:attribute[@name='context-id']">
+      <jaxb:property>
+        <jaxb:javadoc>The name of the Java package containing JAXB classes of the referenced schema or {@code null}.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Schema']/xs:complexContent/xs:extension/xs:attribute[@name='classpath-id']">
+      <jaxb:property>
+        <jaxb:javadoc>The Java classpath location of the referenced schema or {@code null}.</jaxb:javadoc>
+      </jaxb:property>
     </jaxb:bindings>
   </jaxb:bindings>
 </jaxb:bindings>
