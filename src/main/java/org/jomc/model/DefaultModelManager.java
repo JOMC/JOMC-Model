@@ -187,13 +187,13 @@ public class DefaultModelManager implements ModelManager
                                 schemaName = schemaName.substring( lastIndexOfSlash + 1 );
                             }
 
-                            for ( URL url : getSchemaResources( classLoader ) )
+                            for ( URI uri : getSchemaResources( classLoader ) )
                             {
-                                if ( url.getPath().endsWith( schemaName ) )
+                                if ( uri.getPath().endsWith( schemaName ) )
                                 {
                                     schemaSource = new InputSource();
                                     schemaSource.setPublicId( publicId );
-                                    schemaSource.setSystemId( url.toExternalForm() );
+                                    schemaSource.setSystemId( uri.toASCIIString() );
 
                                     if ( isLoggable( Level.FINE ) )
                                     {
@@ -1247,77 +1247,84 @@ public class DefaultModelManager implements ModelManager
 
     /**
      * Searches all available {@code META-INF/MANIFEST.MF} resources from a given class loader and returns a set
-     * containing URLs of entries whose name end with a known schema extension.
+     * of URIs of entries whose name end with a known schema extension.
      *
      * @param classLoader The class loader to search for resources.
      *
-     * @return URLs of any matching entries.
+     * @return Set of URIs of any matching entries.
      *
      * @throws NullPointerException if {@code classLoader} is {@code null}.
      * @throws IOException if reading or parsing fails.
      */
-    private Set<URL> getSchemaResources( final ClassLoader classLoader ) throws IOException
+    private Set<URI> getSchemaResources( final ClassLoader classLoader ) throws IOException
     {
         if ( classLoader == null )
         {
             throw new NullPointerException( "classLoader" );
         }
 
-        final Set<URL> resources = new HashSet<URL>();
-        final long t0 = System.currentTimeMillis();
-        int count = 0;
-
-        for ( final Enumeration<URL> e = classLoader.getResources( "META-INF/MANIFEST.MF" ); e.hasMoreElements(); )
+        try
         {
-            count++;
-            final URL manifestUrl = e.nextElement();
-            final String externalForm = manifestUrl.toExternalForm();
-            final String baseUrl = externalForm.substring( 0, externalForm.indexOf( "META-INF" ) );
-            final InputStream manifestStream = manifestUrl.openStream();
-            final Manifest mf = new Manifest( manifestStream );
-            manifestStream.close();
+            final Set<URI> resources = new HashSet<URI>();
+            final long t0 = System.currentTimeMillis();
+            int count = 0;
 
-            if ( this.isLoggable( Level.FINE ) )
+            for ( final Enumeration<URL> e = classLoader.getResources( "META-INF/MANIFEST.MF" ); e.hasMoreElements(); )
             {
-                this.log( Level.FINE, this.getMessage( "processing", new Object[]
-                    {
-                        externalForm
-                    } ), null );
+                count++;
+                final URL manifestUrl = e.nextElement();
+                final String externalForm = manifestUrl.toExternalForm();
+                final String baseUrl = externalForm.substring( 0, externalForm.indexOf( "META-INF" ) );
+                final InputStream manifestStream = manifestUrl.openStream();
+                final Manifest mf = new Manifest( manifestStream );
+                manifestStream.close();
 
-            }
-
-            for ( Map.Entry<String, Attributes> entry : mf.getEntries().entrySet() )
-            {
-                for ( int i = SCHEMA_EXTENSIONS.length - 1; i >= 0; i-- )
+                if ( this.isLoggable( Level.FINE ) )
                 {
-                    if ( entry.getKey().toLowerCase().endsWith( '.' + SCHEMA_EXTENSIONS[i].toLowerCase() ) )
-                    {
-                        final URL schemaUrl = new URL( baseUrl + entry.getKey() );
-                        resources.add( schemaUrl );
-
-                        if ( this.isLoggable( Level.FINE ) )
+                    this.log( Level.FINE, this.getMessage( "processing", new Object[]
                         {
-                            this.log( Level.FINE, this.getMessage( "addingSchemaCandidate", new Object[]
-                                {
-                                    schemaUrl.toExternalForm()
-                                } ), null );
+                            externalForm
+                        } ), null );
 
+                }
+
+                for ( Map.Entry<String, Attributes> entry : mf.getEntries().entrySet() )
+                {
+                    for ( int i = SCHEMA_EXTENSIONS.length - 1; i >= 0; i-- )
+                    {
+                        if ( entry.getKey().toLowerCase().endsWith( '.' + SCHEMA_EXTENSIONS[i].toLowerCase() ) )
+                        {
+                            final URL schemaUrl = new URL( baseUrl + entry.getKey() );
+                            resources.add( schemaUrl.toURI() );
+
+                            if ( this.isLoggable( Level.FINE ) )
+                            {
+                                this.log( Level.FINE, this.getMessage( "addingSchemaCandidate", new Object[]
+                                    {
+                                        schemaUrl.toExternalForm()
+                                    } ), null );
+
+                            }
                         }
                     }
                 }
             }
-        }
 
-        if ( this.isLoggable( Level.FINE ) )
+            if ( this.isLoggable( Level.FINE ) )
+            {
+                this.log( Level.FINE, this.getMessage( "classpathReport", new Object[]
+                    {
+                        count, "META-INF/MANIFEST.MF", Long.valueOf( System.currentTimeMillis() - t0 )
+                    } ), null );
+
+            }
+
+            return resources;
+        }
+        catch ( final URISyntaxException e )
         {
-            this.log( Level.FINE, this.getMessage( "classpathReport", new Object[]
-                {
-                    count, "META-INF/MANIFEST.MF", Long.valueOf( System.currentTimeMillis() - t0 )
-                } ), null );
-
+            throw (IOException) new IOException( e.getMessage() ).initCause( e );
         }
-
-        return resources;
     }
 
     private String getMessage( final String key, final Object args )
