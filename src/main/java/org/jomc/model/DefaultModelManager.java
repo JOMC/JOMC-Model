@@ -168,8 +168,8 @@ public class DefaultModelManager implements ModelManager
                         {
                             log( Level.FINE, getMessage( "resolutionInfo", new Object[]
                                 {
-                                    publicId + ":" + systemId,
-                                    schemaSource.getPublicId() + ":" + schemaSource.getSystemId()
+                                    publicId + ", " + systemId,
+                                    schemaSource.getPublicId() + ", " + schemaSource.getSystemId()
                                 } ), null );
 
                         }
