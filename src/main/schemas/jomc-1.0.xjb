@@ -807,7 +807,7 @@
                             char.class
                         } );
 
-                    arg = new Character( this.getValue().charAt( 0 ) );
+                    arg = Character.valueOf( this.getValue().charAt( 0 ) );
                 }
                 else
                 {
