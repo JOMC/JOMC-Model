@@ -2472,7 +2472,10 @@
                         synchronized ( this.objects )
                         {
                             object = factoryMethod.invoke( null, (Object[]) null );
-                            this.objects.put( object, instance );
+                            if ( object != null )
+                            {
+                                this.objects.put( object, instance );
+                            }
                         }
                     }
                     else if ( ctor != null )
@@ -2482,8 +2485,11 @@
                             final Object o = ctor.newInstance();
                             this.objects.put( o, instance );
                             object = factoryMethod.invoke( o, (Object[]) null );
-                            this.objects.put( object, instance );
                             this.objects.remove( o );
+                            if ( object != null )
+                            {
+                                this.objects.put( object, instance );
+                            }
                         }
                     }
                     else
