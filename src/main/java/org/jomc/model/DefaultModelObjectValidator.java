@@ -129,6 +129,8 @@ public class DefaultModelObjectValidator implements ModelObjectValidator
 
         final ModelObjectValidationReport report = this.validateModelObject( modules, context, schema );
 
+        this.assertClassDeclarationUniqueness( modules.getValue(), report );
+
         for ( Module m : modules.getValue().getModule() )
         {
             this.assertNoSpecificationReferenceDeclarations( m, report );
@@ -179,6 +181,91 @@ public class DefaultModelObjectValidator implements ModelObjectValidator
         }
 
         return report;
+    }
+
+    private void assertClassDeclarationUniqueness( final Modules modules, final ModelObjectValidationReport report )
+    {
+        final Map<String, Specification> specificationClassDeclarations = new HashMap<String, Specification>();
+        final Map<String, Implementation> implementationClassDeclarations = new HashMap<String, Implementation>();
+
+        for ( Module m : modules.getModule() )
+        {
+            if ( m.getSpecifications() != null )
+            {
+                for ( Specification s : m.getSpecifications().getSpecification() )
+                {
+                    if ( s.isClassDeclaration() )
+                    {
+                        if ( s.getClazz() == null )
+                        {
+                            report.getDetails().add( this.createDetail(
+                                "SPECIFICATION_CLASS_CONSTRAINT", Level.SEVERE, "specificationClassConstraint",
+                                new Object[]
+                                {
+                                    s.getIdentifier()
+                                }, new ObjectFactory().createSpecification( s ) ) );
+
+                        }
+                        else
+                        {
+                            Specification prev = specificationClassDeclarations.get( s.getClazz() );
+                            if ( prev != null )
+                            {
+                                report.getDetails().add( this.createDetail(
+                                    "SPECIFICATION_CLASS_DECLARATION_CONSTRAINT", Level.SEVERE,
+                                    "specificationClassDeclarationConstraint", new Object[]
+                                    {
+                                        s.getIdentifier(), s.getClazz(), prev.getIdentifier()
+                                    }, new ObjectFactory().createSpecification( s ) ) );
+
+                            }
+                            else
+                            {
+                                specificationClassDeclarations.put( s.getClazz(), s );
+                            }
+                        }
+                    }
+                }
+            }
+
+            if ( m.getImplementations() != null )
+            {
+                for ( Implementation i : m.getImplementations().getImplementation() )
+                {
+                    if ( i.isClassDeclaration() )
+                    {
+                        if ( i.getClazz() == null )
+                        {
+                            report.getDetails().add( this.createDetail(
+                                "IMPLEMENTATION_CLASS_CONSTRAINT", Level.SEVERE, "implementationClassConstraint",
+                                new Object[]
+                                {
+                                    i.getIdentifier()
+                                }, new ObjectFactory().createImplementation( i ) ) );
+
+                        }
+                        else
+                        {
+                            Implementation prev = implementationClassDeclarations.get( i.getClazz() );
+                            if ( prev != null )
+                            {
+                                report.getDetails().add( this.createDetail(
+                                    "IMPLEMENTATION_CLASS_DECLARATION_CONSTRAINT", Level.SEVERE,
+                                    "implementationClassDeclarationConstraint", new Object[]
+                                    {
+                                        i.getIdentifier(), i.getClazz(), prev.getIdentifier()
+                                    }, new ObjectFactory().createImplementation( i ) ) );
+
+                            }
+                            else
+                            {
+                                implementationClassDeclarations.put( i.getClazz(), i );
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private void assertNoSpecificationReferenceDeclarations( final Module module,
@@ -1283,8 +1370,8 @@ public class DefaultModelObjectValidator implements ModelObjectValidator
     {
         final Implementations impls = modules.getImplementations( specification.getIdentifier() );
 
-        if ( specification.getMultiplicity() == Multiplicity.ONE &&
-             impls != null && impls.getImplementation().size() > 1 )
+        if ( specification.getMultiplicity() == Multiplicity.ONE && impls != null &&
+             impls.getImplementation().size() > 1 )
         {
             for ( Implementation i : impls.getImplementation() )
             {
@@ -1352,8 +1439,7 @@ public class DefaultModelObjectValidator implements ModelObjectValidator
         {
             seen.getImplementation().add( implementation );
 
-            if ( includeImplementation &&
-                 implementations.getImplementation( implementation.getIdentifier() ) == null )
+            if ( includeImplementation && implementations.getImplementation( implementation.getIdentifier() ) == null )
             {
                 implementations.getImplementation().add( implementation );
             }

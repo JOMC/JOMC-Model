@@ -299,6 +299,7 @@ store.
         <xsd:attribute name="version" type="jomc:Version" use="optional"/>
         <xsd:attribute name="multiplicity" type="jomc:Multiplicity" use="optional" default="Many"/>
         <xsd:attribute name="scope" type="jomc:Identifier" use="optional"/>
+        <xsd:attribute name="classDeclaration" type="jomc:Flag" use="optional" default="false"/>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -383,6 +384,7 @@ of the implementation do not retain state across operations. The 'abstract' attr
         <xsd:attribute name="final" type="jomc:Flag" use="optional" default="false"/>
         <xsd:attribute name="stateless" type="jomc:Flag" use="optional" default="false"/>
         <xsd:attribute name="abstract" type="jomc:Flag" use="optional" default="false"/>
+        <xsd:attribute name="classDeclaration" type="jomc:Flag" use="optional" default="false"/>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>

@@ -208,8 +208,7 @@
 
         for ( Specification s : this.getSpecification() )
         {
-            if ( specification.getName().equals( s.getIdentifier() ) &&
-                 s.getIdentifier().equals( s.getClazz() ) )
+            if ( s.isClassDeclaration() && specification.getName().equals( s.getClazz() ) )
             {
                 return s;
             }
@@ -286,6 +285,11 @@
     <jaxb:bindings node="xs:complexType[@name='Specification']/xs:complexContent/xs:extension/xs:attribute[@name='scope']">
       <jaxb:property>
         <jaxb:javadoc>Scope instances of implementations of this specification apply to or {@code null} if instances of implementations of this specification are not bound to any scope (multiton).</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Specification']/xs:complexContent/xs:extension/xs:attribute[@name='classDeclaration']">
+      <jaxb:property>
+        <jaxb:javadoc>{@code true} if this specification declares the class given by property {@code clazz}.</jaxb:javadoc>
       </jaxb:property>
     </jaxb:bindings>
     <!-- *********************************************************************************************************** -->
@@ -365,8 +369,7 @@
 
         for ( Implementation i : this.getImplementation() )
         {
-            if ( implementation.getName().equals( i.getIdentifier() ) &&
-                 i.getIdentifier().equals( i.getClazz() ) )
+            if ( i.isClassDeclaration() && implementation.getName().equals( i.getClazz() ) )
             {
                 return i;
             }
@@ -510,6 +513,11 @@
         <jaxb:javadoc>{@code true} if this implementation is abstract.</jaxb:javadoc>
       </jaxb:property>
     </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Implementation']/xs:complexContent/xs:extension/xs:attribute[@name='classDeclaration']">
+      <jaxb:property>
+        <jaxb:javadoc>{@code true} if this implementation declares the class given by property {@code clazz}.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Implementation']">
       <ci:code><![CDATA[
     /**
@@ -533,7 +541,7 @@
 
             return javaLocation;
         }
-        catch ( java.net.URISyntaxException e )
+        catch ( final java.net.URISyntaxException e )
         {
             throw new AssertionError( e );
         }
@@ -1439,15 +1447,9 @@
 
         for ( Module m : this.getModule() )
         {
-            if ( m.getSpecifications() != null )
+            if ( m.getSpecifications() != null && m.getSpecifications().getSpecification( specification ) != null )
             {
-                for ( Specification s : m.getSpecifications().getSpecification() )
-                {
-                    if ( specification.equals( s.getIdentifier() ) )
-                    {
-                        return m;
-                    }
-                }
+                return m;
             }
         }
 
@@ -1475,15 +1477,9 @@
 
         for ( Module m : this.getModule() )
         {
-            if ( m.getImplementations() != null )
+            if ( m.getImplementations() != null && m.getImplementations().getImplementation( implementation ) != null )
             {
-                for ( Implementation i : m.getImplementations().getImplementation() )
-                {
-                    if ( implementation.equals( i.getIdentifier() ) )
-                    {
-                        return m;
-                    }
-                }
+                return m;
             }
         }
 

@@ -2518,6 +2518,78 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="SPECIFICATION_CLASS_CONSTRAINT">
+    <modules valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <specifications>
+            <specification identifier="Specification 1" classDeclaration="true"/>
+            <specification identifier="Specification 2" classDeclaration="true"/>
+            <specification identifier="Specification 3" classDeclaration="true"/>
+            <specification identifier="Specification 4" classDeclaration="true"/>
+            <specification identifier="Specification 5" classDeclaration="true"/>
+          </specifications>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="SPECIFICATION_CLASS_CONSTRAINT" count="5"/>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="SPECIFICATION_CLASS_DECLARATION_CONSTRAINT">
+    <modules valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <specifications>
+            <specification identifier="Specification 1" class="java.lang.Object" classDeclaration="true"/>
+            <specification identifier="Specification 2" class="java.lang.Object" classDeclaration="true"/>
+            <specification identifier="Specification 3" class="java.lang.Object" classDeclaration="true"/>
+            <specification identifier="Specification 4" class="java.lang.Object" classDeclaration="true"/>
+            <specification identifier="Specification 5" class="java.lang.Object" classDeclaration="true"/>
+          </specifications>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="SPECIFICATION_CLASS_DECLARATION_CONSTRAINT" count="4"/>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="IMPLEMENTATION_CLASS_CONSTRAINT">
+    <modules valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <implementations>
+            <implementation identifier="Implementation 1" name="Implementation Name 1" classDeclaration="true" />
+            <implementation identifier="Implementation 2" name="Implementation Name 2" classDeclaration="true" />
+            <implementation identifier="Implementation 3" name="Implementation Name 3" classDeclaration="true" />
+            <implementation identifier="Implementation 4" name="Implementation Name 4" classDeclaration="true" />
+            <implementation identifier="Implementation 5" name="Implementation Name 5" classDeclaration="true" />
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="IMPLEMENTATION_CLASS_CONSTRAINT" count="5"/>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="IMPLEMENTATION_CLASS_DECLARATION_CONSTRAINT">
+    <modules valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <implementations>
+            <implementation identifier="Implementation 1" name="Implementation Name 1" class="java.lang.Object" classDeclaration="true" />
+            <implementation identifier="Implementation 2" name="Implementation Name 2" class="java.lang.Object" classDeclaration="true" />
+            <implementation identifier="Implementation 3" name="Implementation Name 3" class="java.lang.Object" classDeclaration="true" />
+            <implementation identifier="Implementation 4" name="Implementation Name 4" class="java.lang.Object" classDeclaration="true" />
+            <implementation identifier="Implementation 5" name="Implementation Name 5" class="java.lang.Object" classDeclaration="true" />
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="IMPLEMENTATION_CLASS_DECLARATION_CONSTRAINT" count="4"/>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
   <implementation-test identifier="MULTIPLE_INHERITANCE">
     <modules>
       <modules xmlns="http://jomc.org/model">
