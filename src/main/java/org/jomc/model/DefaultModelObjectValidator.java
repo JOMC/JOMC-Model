@@ -141,6 +141,8 @@ public class DefaultModelObjectValidator implements ModelObjectValidator
             this.assertNoPropertyReferenceDeclarations( m, report );
             this.assertNoFinalPropertyDeclarations( m, report );
             this.assertNoOverridePropertyDeclarations( m, report );
+            this.assertNoPropertyValueAndAnyObject( m, report );
+            this.assertPropertyTypeWithAnyObject( m, report );
 
             if ( m.getImplementations() != null )
             {
@@ -167,6 +169,8 @@ public class DefaultModelObjectValidator implements ModelObjectValidator
                     this.assertPropertyOverrideConstraints( modules.getValue(), i, report );
                     this.assertDependencyPropertiesOverrideConstraints( modules.getValue(), i, report );
                     this.assertValidMessageTemplates( modules.getValue(), i, report );
+                    this.assertNoPropertyValueAndAnyObject( i, report );
+                    this.assertPropertyTypeWithAnyObject( i, report );
                 }
             }
 
@@ -296,6 +300,88 @@ public class DefaultModelObjectValidator implements ModelObjectValidator
                             }
                         }
                     }
+                }
+            }
+        }
+    }
+
+    private void assertNoPropertyValueAndAnyObject( final Module module, final ModelObjectValidationReport report )
+    {
+        if ( module.getProperties() != null )
+        {
+            for ( Property p : module.getProperties().getProperty() )
+            {
+                if ( p.getValue() != null && p.getAny() != null )
+                {
+                    report.getDetails().add( this.createDetail(
+                        "MODULE_PROPERTY_VALUE_CONSTRAINT", Level.SEVERE,
+                        "modulePropertyValueConstraint", new Object[]
+                        {
+                            module.getName(), p.getName()
+                        }, new ObjectFactory().createModule( module ) ) );
+
+                }
+            }
+        }
+    }
+
+    private void assertNoPropertyValueAndAnyObject( final Implementation implementation,
+                                                    final ModelObjectValidationReport report )
+    {
+        if ( implementation.getProperties() != null )
+        {
+            for ( Property p : implementation.getProperties().getProperty() )
+            {
+                if ( p.getValue() != null && p.getAny() != null )
+                {
+                    report.getDetails().add( this.createDetail(
+                        "IMPLEMENTATION_PROPERTY_VALUE_CONSTRAINT", Level.SEVERE,
+                        "implementationPropertyValueConstraint", new Object[]
+                        {
+                            implementation.getIdentifier(), p.getName()
+                        }, new ObjectFactory().createImplementation( implementation ) ) );
+
+                }
+            }
+        }
+    }
+
+    private void assertPropertyTypeWithAnyObject( final Module module, final ModelObjectValidationReport report )
+    {
+        if ( module.getProperties() != null )
+        {
+            for ( Property p : module.getProperties().getProperty() )
+            {
+                if ( p.getAny() != null && p.getType() == null )
+                {
+                    report.getDetails().add( this.createDetail(
+                        "MODULE_PROPERTY_TYPE_CONSTRAINT", Level.SEVERE,
+                        "modulePropertyTypeConstraint", new Object[]
+                        {
+                            module.getName(), p.getName()
+                        }, new ObjectFactory().createModule( module ) ) );
+
+                }
+            }
+        }
+    }
+
+    private void assertPropertyTypeWithAnyObject( final Implementation implementation,
+                                                  final ModelObjectValidationReport report )
+    {
+        if ( implementation.getProperties() != null )
+        {
+            for ( Property p : implementation.getProperties().getProperty() )
+            {
+                if ( p.getAny() != null && p.getType() == null )
+                {
+                    report.getDetails().add( this.createDetail(
+                        "IMPLEMENTATION_PROPERTY_TYPE_CONSTRAINT", Level.SEVERE,
+                        "implementationPropertyTypeConstraint", new Object[]
+                        {
+                            implementation.getIdentifier(), p.getName()
+                        }, new ObjectFactory().createImplementation( implementation ) ) );
+
                 }
             }
         }
