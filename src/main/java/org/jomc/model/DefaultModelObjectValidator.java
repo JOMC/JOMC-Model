@@ -166,6 +166,7 @@ public class DefaultModelObjectValidator implements ModelObjectValidator
                     this.assertMessageOverrideConstraints( modules.getValue(), i, report );
                     this.assertPropertyOverrideConstraints( modules.getValue(), i, report );
                     this.assertDependencyPropertiesOverrideConstraints( modules.getValue(), i, report );
+                    this.assertValidMessageTemplates( modules.getValue(), i, report );
                 }
             }
 
@@ -181,6 +182,38 @@ public class DefaultModelObjectValidator implements ModelObjectValidator
         }
 
         return report;
+    }
+
+    private void assertValidMessageTemplates( final Modules modules, final Implementation implementation,
+                                              final ModelObjectValidationReport report )
+    {
+        final Messages messages = modules.getMessages( implementation.getIdentifier() );
+        if ( messages != null )
+        {
+            for ( Message message : messages.getMessage() )
+            {
+                if ( message.getTemplate() != null )
+                {
+                    for ( Text t : message.getTemplate().getText() )
+                    {
+                        try
+                        {
+                            new MessageFormat( t.getValue(), new Locale( t.getLanguage() ) );
+                        }
+                        catch ( final IllegalArgumentException e )
+                        {
+                            report.getDetails().add( this.createDetail(
+                                "IMPLEMENTATION_MESSAGE_TEMPLATE_CONSTRAINT", Level.SEVERE,
+                                "implementationMessageTemplateConstraint", new Object[]
+                                {
+                                    implementation.getIdentifier(), message.getName(), t.getValue(), e.getMessage()
+                                }, new ObjectFactory().createImplementation( implementation ) ) );
+
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private void assertClassDeclarationUniqueness( final Modules modules, final ModelObjectValidationReport report )

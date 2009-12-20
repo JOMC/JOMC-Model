@@ -2572,6 +2572,36 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="IMPLEMENTATION_MESSAGE_TEMPLATE_CONSTRAINT_1">
+    <modules valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <implementations>
+            <implementation identifier="Implementation" name="Implementation Name">
+              <messages>
+                <message name="Message">
+                  <template defaultLanguage="en">
+                    <text language="en">{illegal pattern}</text>
+                  </template>
+                </message>
+                <reference name="Message Reference"/>
+              </messages>
+            </implementation>
+          </implementations>
+          <messages>
+            <message name="Message Reference">
+              <template defaultLanguage="en">
+                <text language="en">{illegal pattern}</text>
+              </template>
+            </message>
+          </messages>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="IMPLEMENTATION_MESSAGE_TEMPLATE_CONSTRAINT" count="2"/>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
   <modules-constraints-test identifier="IMPLEMENTATION_CLASS_DECLARATION_CONSTRAINT">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
