@@ -85,12 +85,14 @@ public class ModelObjectValidationReport implements Serializable
          * @param identifier The detail identifier.
          * @param level The detail level.
          * @param message The detail message.
+         * @param element The detail element.
          */
-        public Detail( final String identifier, final Level level, final String message )
+        public Detail( final String identifier, final Level level, final String message, final JAXBElement element )
         {
             this.identifier = identifier;
             this.level = level;
             this.message = message;
+            this.element = element;
         }
 
         /**
@@ -131,16 +133,6 @@ public class ModelObjectValidationReport implements Serializable
         public JAXBElement getElement()
         {
             return this.element;
-        }
-
-        /**
-         * Sets the JAXB element of this detail.
-         *
-         * @param value The new JAXB element of this detail or {@code null}.
-         */
-        public void setElement( final JAXBElement value )
-        {
-            this.element = value;
         }
 
         /**

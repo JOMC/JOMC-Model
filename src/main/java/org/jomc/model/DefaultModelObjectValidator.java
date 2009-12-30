@@ -665,17 +665,19 @@ public class DefaultModelObjectValidator implements ModelObjectValidator
                         catch ( final ParseException e )
                         {
                             final ModelObjectValidationReport.Detail d = new ModelObjectValidationReport.Detail(
-                                e.getClass().getSimpleName(), Level.SEVERE, e.getMessage() );
+                                "IMPLEMENTATION_SPECIFICATION_COMPATIBILITY_VERSIONING_PARSE_EXCEPTION",
+                                Level.SEVERE, e.getMessage(),
+                                new ObjectFactory().createImplementation( implementation ) );
 
-                            d.setElement( new ObjectFactory().createImplementation( implementation ) );
                             report.getDetails().add( d );
                         }
                         catch ( final TokenMgrError e )
                         {
                             final ModelObjectValidationReport.Detail d = new ModelObjectValidationReport.Detail(
-                                e.getClass().getSimpleName(), Level.SEVERE, e.getMessage() );
+                                "IMPLEMENTATION_SPECIFICATION_COMPATIBILITY_VERSIONING_TOKEN_MANAGER_ERROR",
+                                Level.SEVERE, e.getMessage(),
+                                new ObjectFactory().createImplementation( implementation ) );
 
-                            d.setElement( new ObjectFactory().createImplementation( implementation ) );
                             report.getDetails().add( d );
                         }
                     }
@@ -734,17 +736,19 @@ public class DefaultModelObjectValidator implements ModelObjectValidator
                         catch ( final ParseException e )
                         {
                             final ModelObjectValidationReport.Detail detail = new ModelObjectValidationReport.Detail(
-                                e.getClass().getSimpleName(), Level.SEVERE, e.getMessage() );
+                                "IMPLEMENTATION_DEPENDENCY_SPECIFICATION_COMPATIBILITY_VERSIONING_PARSE_EXCEPTION",
+                                Level.SEVERE, e.getMessage(),
+                                new ObjectFactory().createImplementation( implementation ) );
 
-                            detail.setElement( new ObjectFactory().createImplementation( implementation ) );
                             report.getDetails().add( detail );
                         }
                         catch ( final TokenMgrError e )
                         {
                             final ModelObjectValidationReport.Detail detail = new ModelObjectValidationReport.Detail(
-                                e.getClass().getSimpleName(), Level.SEVERE, e.getMessage() );
+                                "IMPLEMENTATION_DEPENDENCY_SPECIFICATION_COMPATIBILITY_VERSIONING_TOKEN_MANAGER_ERROR",
+                                Level.SEVERE, e.getMessage(),
+                                new ObjectFactory().createImplementation( implementation ) );
 
-                            detail.setElement( new ObjectFactory().createImplementation( implementation ) );
                             report.getDetails().add( detail );
                         }
                     }
@@ -986,17 +990,19 @@ public class DefaultModelObjectValidator implements ModelObjectValidator
                         catch ( final ParseException e )
                         {
                             final ModelObjectValidationReport.Detail detail = new ModelObjectValidationReport.Detail(
-                                e.getClass().getSimpleName(), Level.SEVERE, e.getMessage() );
+                                "IMPLEMENTATION_INHERITANCE_COMPATIBILITY_VERSIONING_PARSE_EXCEPTION",
+                                Level.SEVERE, e.getMessage(),
+                                new ObjectFactory().createImplementation( implementation ) );
 
-                            detail.setElement( new ObjectFactory().createImplementation( implementation ) );
                             report.getDetails().add( detail );
                         }
                         catch ( final TokenMgrError e )
                         {
                             final ModelObjectValidationReport.Detail detail = new ModelObjectValidationReport.Detail(
-                                e.getClass().getSimpleName(), Level.SEVERE, e.getMessage() );
+                                "IMPLEMENTATION_INHERITANCE_COMPATIBILITY_VERSIONING_TOKEN_MANAGER_ERROR",
+                                Level.SEVERE, e.getMessage(),
+                                new ObjectFactory().createImplementation( implementation ) );
 
-                            detail.setElement( new ObjectFactory().createImplementation( implementation ) );
                             report.getDetails().add( detail );
                         }
                     }
@@ -1722,11 +1728,9 @@ public class DefaultModelObjectValidator implements ModelObjectValidator
                                                              final String messageKey, final Object messageArguments,
                                                              final JAXBElement<? extends ModelObject> element )
     {
-        final ModelObjectValidationReport.Detail detail = new ModelObjectValidationReport.Detail(
-            identifier, level, this.getMessage( messageKey, messageArguments ) );
+        return new ModelObjectValidationReport.Detail(
+            identifier, level, this.getMessage( messageKey, messageArguments ), element );
 
-        detail.setElement( element );
-        return detail;
     }
 
     private String getMessage( final String key, final Object args )
@@ -1773,19 +1777,19 @@ class ModelObjectValidationEventHandler implements ValidationEventHandler
         {
             case ValidationEvent.WARNING:
                 this.report.getDetails().add( new ModelObjectValidationReport.Detail(
-                    "W3C XML 1.0 Recommendation - Warning condition", Level.WARNING, event.getMessage() ) );
+                    "W3C XML 1.0 Recommendation - Warning condition", Level.WARNING, event.getMessage(), null ) );
 
                 return true;
 
             case ValidationEvent.ERROR:
                 this.report.getDetails().add( new ModelObjectValidationReport.Detail(
-                    "W3C XML 1.0 Recommendation - Section 1.2 - Error", Level.SEVERE, event.getMessage() ) );
+                    "W3C XML 1.0 Recommendation - Section 1.2 - Error", Level.SEVERE, event.getMessage(), null ) );
 
                 return false;
 
             case ValidationEvent.FATAL_ERROR:
                 this.report.getDetails().add( new ModelObjectValidationReport.Detail(
-                    "W3C XML 1.0 Recommendation - Section 1.2 - Fatal Error", Level.SEVERE, event.getMessage() ) );
+                    "W3C XML 1.0 Recommendation - Section 1.2 - Fatal Error", Level.SEVERE, event.getMessage(), null ) );
 
                 return false;
 

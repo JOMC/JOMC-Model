@@ -734,6 +734,48 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="IMPLEMENTATION_SPECIFICATION_COMPATIBILITY_VERSIONING_PARSE_EXCEPTION_1">
+    <modules valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <specifications>
+            <specification identifier="Specification" class="java.lang.Object" version="1.identifier.1"/>
+          </specifications>
+          <implementations>
+            <implementation identifier="Implementation" name="Implementation Name">
+              <specifications>
+                <reference identifier="Specification" version="identifer.1.identifier"/>
+              </specifications>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="IMPLEMENTATION_SPECIFICATION_COMPATIBILITY_VERSIONING_PARSE_EXCEPTION" count="1"/>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="IMPLEMENTATION_SPECIFICATION_COMPATIBILITY_VERSIONING_PARSE_EXCEPTION_2">
+    <modules valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <specifications>
+            <specification identifier="Specification" class="java.lang.Object" version="..."/>
+          </specifications>
+          <implementations>
+            <implementation identifier="Implementation" name="Implementation Name">
+              <specifications>
+                <reference identifier="Specification" version="..."/>
+              </specifications>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="IMPLEMENTATION_SPECIFICATION_COMPATIBILITY_VERSIONING_PARSE_EXCEPTION" count="1"/>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
   <modules-constraints-test identifier="IMPLEMENTATION_COMPATIBILITY_CONSTRAINT_VALID">
     <modules valid="true">
       <modules xmlns="http://jomc.org/model">
@@ -772,6 +814,48 @@
       </modules>
     </modules>
     <detail identifier="IMPLEMENTATION_DEPENDENCY_SPECIFICATION_COMPATIBILITY_CONSTRAINT" count="1"/>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="IMPLEMENTATION_DEPENDENCY_SPECIFICATION_COMPATIBILITY_VERSIONING_PARSE_EXCEPTION_1">
+    <modules valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <specifications>
+            <specification identifier="Specification" class="java.lang.Object" version="1.identifier.1"/>
+          </specifications>
+          <implementations>
+            <implementation identifier="Implementation" name="Implementation Name">
+              <dependencies>
+                <dependency name="Dependency" identifier="Specification" version="identifier.1.identifier" optional="true"/>
+              </dependencies>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_SPECIFICATION_COMPATIBILITY_VERSIONING_PARSE_EXCEPTION" count="1"/>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="IMPLEMENTATION_DEPENDENCY_SPECIFICATION_COMPATIBILITY_VERSIONING_PARSE_EXCEPTION_2">
+    <modules valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <specifications>
+            <specification identifier="Specification" class="java.lang.Object" version="..."/>
+          </specifications>
+          <implementations>
+            <implementation identifier="Implementation" name="Implementation Name">
+              <dependencies>
+                <dependency name="Dependency" identifier="Specification" version="..." optional="true"/>
+              </dependencies>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_SPECIFICATION_COMPATIBILITY_VERSIONING_PARSE_EXCEPTION" count="1"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
@@ -2291,6 +2375,81 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="IMPLEMENTATION_INHERITANCE_COMPATIBILITY_CONSTRAINT_VALID_2">
+    <modules valid="true">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <implementations>
+            <implementation identifier="Parent" name="Parent Name" version="1.0"/>
+            <implementation identifier="Child" name="Child Name">
+              <implementations>
+                <reference identifier="Parent" version="0.9"/>
+              </implementations>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="IMPLEMENTATION_INHERITANCE_COMPATIBILITY_CONSTRAINT_INVALID">
+    <modules valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <implementations>
+            <implementation identifier="Parent" name="Parent Name" version="1.0"/>
+            <implementation identifier="Child" name="Child Name">
+              <implementations>
+                <reference identifier="Parent" version="1.0.1"/>
+              </implementations>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="IMPLEMENTATION_INHERITANCE_COMPATIBILITY_CONSTRAINT" count="1"/>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="IMPLEMENTATION_INHERITANCE_COMPATIBILITY_VERSIONING_PARSE_EXCEPTION_1">
+    <modules valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <implementations>
+            <implementation identifier="Parent" name="Parent Name" version="1.identifier.1"/>
+            <implementation identifier="Child" name="Child Name">
+              <implementations>
+                <reference identifier="Parent" version="identifier.1.identifier"/>
+              </implementations>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="IMPLEMENTATION_INHERITANCE_COMPATIBILITY_VERSIONING_PARSE_EXCEPTION" count="1"/>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="IMPLEMENTATION_INHERITANCE_COMPATIBILITY_VERSIONING_PARSE_EXCEPTION_2">
+    <modules valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <implementations>
+            <implementation identifier="Parent" name="Parent Name" version="..."/>
+            <implementation identifier="Child" name="Child Name">
+              <implementations>
+                <reference identifier="Parent" version="..."/>
+              </implementations>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="IMPLEMENTATION_INHERITANCE_COMPATIBILITY_VERSIONING_PARSE_EXCEPTION" count="1"/>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
   <modules-constraints-test identifier="DEPENDENCY_OVERRIDES_PROPERTIES_VALID">
     <modules valid="true">
       <modules xmlns="http://jomc.org/model">
@@ -2438,43 +2597,6 @@
     </modules>
     <detail identifier="IMPLEMENTATION_DEPENDENCY_FINAL_PROPERTY_CONSTRAINT" count="1"/>
     <detail identifier="IMPLEMENTATION_DEPENDENCY_OVERRIDE_PROPERTY_CONSTRAINT" count="1"/>
-  </modules-constraints-test>
-
-  <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="IMPLEMENTATION_INHERITANCE_COMPATIBILITY_CONSTRAINT_VALID_2">
-    <modules valid="true">
-      <modules xmlns="http://jomc.org/model">
-        <module name="Module">
-          <implementations>
-            <implementation identifier="Parent" name="Parent Name" version="1.0"/>
-            <implementation identifier="Child" name="Child Name">
-              <implementations>
-                <reference identifier="Parent" version="0.9"/>
-              </implementations>
-            </implementation>
-          </implementations>
-        </module>
-      </modules>
-    </modules>
-  </modules-constraints-test>
-
-  <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="IMPLEMENTATION_INHERITANCE_COMPATIBILITY_CONSTRAINT_INVALID">
-    <modules valid="false">
-      <modules xmlns="http://jomc.org/model">
-        <module name="Module">
-          <implementations>
-            <implementation identifier="Parent" name="Parent Name" version="1.0"/>
-            <implementation identifier="Child" name="Child Name">
-              <implementations>
-                <reference identifier="Parent" version="1.0.1"/>
-              </implementations>
-            </implementation>
-          </implementations>
-        </module>
-      </modules>
-    </modules>
-    <detail identifier="IMPLEMENTATION_INHERITANCE_COMPATIBILITY_CONSTRAINT" count="1"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
