@@ -59,7 +59,7 @@ import javax.xml.transform.stream.StreamSource;
  *
  * @author <a href="mailto:cs@jomc.org">Christian Schulte</a>
  * @version $Id$
- * @see #processModules(org.jomc.model.ModelContext, org.jomc.model.Modules)
+ * @see ModelContext#processModules(org.jomc.model.Modules)
  */
 public class DefaultModelProcessor implements ModelProcessor
 {

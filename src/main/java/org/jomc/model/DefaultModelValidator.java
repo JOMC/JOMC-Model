@@ -57,6 +57,8 @@ import org.jomc.util.VersionParser;
  *
  * @author <a href="mailto:cs@jomc.org">Christian Schulte</a>
  * @version $Id$
+ * @see ModelContext#validateModelObject(org.jomc.model.ModelObject)
+ * @see ModelContext#validateModules(org.jomc.model.Modules)
  */
 public class DefaultModelValidator implements ModelValidator
 {

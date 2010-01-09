@@ -47,7 +47,7 @@ import javax.xml.bind.Unmarshaller;
  *
  * @author <a href="mailto:cs@jomc.org">Christian Schulte</a>
  * @version $Id$
- * @see #findModules(org.jomc.model.ModelContext)
+ * @see ModelContext#findModules()
  */
 public class DefaultModelProvider implements ModelProvider
 {
