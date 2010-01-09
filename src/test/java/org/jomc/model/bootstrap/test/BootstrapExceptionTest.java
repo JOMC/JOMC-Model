@@ -30,27 +30,36 @@
  *   $Id$
  *
  */
-package org.jomc.model;
+package org.jomc.model.bootstrap.test;
+
+import java.io.ObjectInputStream;
+import junit.framework.Assert;
+import org.jomc.model.bootstrap.BootstrapException;
 
 /**
- * Object management and configuration model provider interface.
+ * Test cases for class {@code org.jomc.model.bootstrap.BootstrapException}.
  *
- * @author <a href="mailto:cs@jomc.org">Christian Schulte</a>
+ * @author <a href="mailto:cs@jomc.org">Christian Schulte</a> 1.0
  * @version $Id$
  */
-public interface ModelProvider
+public class BootstrapExceptionTest
 {
 
-    /**
-     * Searches a given context for modules.
-     *
-     * @param context The context to search for modules.
-     *
-     * @return The modules found in the context or {@code null} if no modules are found.
-     *
-     * @throws NullPointerException if {@code context} is {@code null}.
-     * @throws ModelException if searching the context fails.
-     */
-    Modules findModules( ModelContext context ) throws NullPointerException, ModelException;
+    public BootstrapExceptionTest()
+    {
+        super();
+    }
+
+    public void testSerializabe() throws Exception
+    {
+        final ObjectInputStream objectStream =
+            new ObjectInputStream( this.getClass().getResourceAsStream( "BootstrapException.ser" ) );
+
+        final BootstrapException e = (BootstrapException) objectStream.readObject();
+        objectStream.close();
+
+        Assert.assertEquals( "BootstrapException", e.getMessage() );
+        System.out.println( e );
+    }
 
 }

@@ -33,24 +33,52 @@
 package org.jomc.model;
 
 /**
- * Object management and configuration model provider interface.
+ * Object management and configuration model exception.
  *
  * @author <a href="mailto:cs@jomc.org">Christian Schulte</a>
  * @version $Id$
  */
-public interface ModelProvider
+public class ModelException extends Exception
 {
 
+    /** Serial version UID for backwards compatibility with 1.0.x object streams. */
+    private static final long serialVersionUID = -811692637198244449L;
+
+    /** Creates a new {@code ModelException} instance. */
+    public ModelException()
+    {
+        super();
+    }
+
     /**
-     * Searches a given context for modules.
+     * Creates a new {@code ModelException} instance taking a message.
      *
-     * @param context The context to search for modules.
-     *
-     * @return The modules found in the context or {@code null} if no modules are found.
-     *
-     * @throws NullPointerException if {@code context} is {@code null}.
-     * @throws ModelException if searching the context fails.
+     * @param message The message of the exception.
      */
-    Modules findModules( ModelContext context ) throws NullPointerException, ModelException;
+    public ModelException( final String message )
+    {
+        super( message );
+    }
+
+    /**
+     * Creates a new {@code ModelException} instance taking a cause.
+     *
+     * @param cause The cause of the exception.
+     */
+    public ModelException( final Throwable cause )
+    {
+        super( cause );
+    }
+
+    /**
+     * Creates a new {@code ModelException} instance taking a message and a cause.
+     *
+     * @param message The message of the exception.
+     * @param cause The cause of the exception.
+     */
+    public ModelException( final String message, final Throwable cause )
+    {
+        super( message, cause );
+    }
 
 }

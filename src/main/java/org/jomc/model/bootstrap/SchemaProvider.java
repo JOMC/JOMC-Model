@@ -30,27 +30,27 @@
  *   $Id$
  *
  */
-package org.jomc.model;
+package org.jomc.model.bootstrap;
 
 /**
- * Object management and configuration model provider interface.
+ * Object management and configuration model bootstrap provider interface.
  *
  * @author <a href="mailto:cs@jomc.org">Christian Schulte</a>
  * @version $Id$
  */
-public interface ModelProvider
+public interface SchemaProvider
 {
 
     /**
-     * Searches a given context for modules.
+     * Searches a given context for schemas.
      *
-     * @param context The context to search for modules.
+     * @param context The context to search for schemas.
      *
-     * @return The modules found in the context or {@code null} if no modules are found.
+     * @return The schemas found in the context or {@code null} if no schemas are found.
      *
      * @throws NullPointerException if {@code context} is {@code null}.
-     * @throws ModelException if searching the context fails.
+     * @throws BootstrapException if searching the context fails.
      */
-    Modules findModules( ModelContext context ) throws NullPointerException, ModelException;
+    Schemas findSchemas( BootstrapContext context ) throws NullPointerException, BootstrapException;
 
 }

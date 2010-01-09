@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 
   Copyright (c) 2009 The JOMC Project
@@ -32,12 +32,12 @@
   $Id$
 
 -->
-<html>
-  <body>
-    Object management and configuration model.
-    @see org.jomc.model.ModelContext
-    @see org.jomc.model.Modules
-    @see org.jomc.model.ModelObject
-    @see <a href="http://jomc.org/model/jomc-1.0.xsd">jomc-1.0.xsd</a>
-  </body>
-</html>
+<module xmlns="http://jomc.org/model"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://jomc.org/model http://jomc.org/model/jomc-1.0.xsd"
+        name="${project.name}" version="${project.version}" vendor="${project.organization.name}" modelVersion="1.0">
+
+  <documentation defaultLanguage="en">
+    <text language="en">${project.description}</text>
+  </documentation>
+</module>

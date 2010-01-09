@@ -30,27 +30,40 @@
  *   $Id$
  *
  */
-package org.jomc.model;
+package org.jomc.model.test;
+
+import org.jomc.model.ModelContext;
+import org.jomc.model.ModelException;
+import org.jomc.model.ModelProcessor;
+import org.jomc.model.Module;
+import org.jomc.model.Modules;
 
 /**
- * Object management and configuration model provider interface.
+ * {@code ModelProcessor} test implementation.
  *
- * @author <a href="mailto:cs@jomc.org">Christian Schulte</a>
+ * @author <a href="mailto:cs@jomc.org">Christian Schulte</a> 1.0
  * @version $Id$
  */
-public interface ModelProvider
+public class TestModelProcessor implements ModelProcessor
 {
 
-    /**
-     * Searches a given context for modules.
-     *
-     * @param context The context to search for modules.
-     *
-     * @return The modules found in the context or {@code null} if no modules are found.
-     *
-     * @throws NullPointerException if {@code context} is {@code null}.
-     * @throws ModelException if searching the context fails.
-     */
-    Modules findModules( ModelContext context ) throws NullPointerException, ModelException;
+    public TestModelProcessor()
+    {
+        super();
+    }
+
+    public Modules processModules( final ModelContext context, final Modules modules ) throws ModelException
+    {
+        if ( context == null )
+        {
+            throw new NullPointerException( "context" );
+        }
+
+        final Modules processed = modules != null ? new Modules( modules ) : new Modules();
+        final Module module = new Module();
+        module.setName( "TestModelProcessor" );
+        processed.getModule().add( module );
+        return processed;
+    }
 
 }

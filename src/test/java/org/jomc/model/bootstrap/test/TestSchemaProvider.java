@@ -30,27 +30,37 @@
  *   $Id$
  *
  */
-package org.jomc.model;
+package org.jomc.model.bootstrap.test;
+
+import org.jomc.model.bootstrap.BootstrapContext;
+import org.jomc.model.bootstrap.BootstrapException;
+import org.jomc.model.bootstrap.Schema;
+import org.jomc.model.bootstrap.SchemaProvider;
+import org.jomc.model.bootstrap.Schemas;
 
 /**
- * Object management and configuration model provider interface.
+ * {@code SchemaProvider} test implementation.
  *
- * @author <a href="mailto:cs@jomc.org">Christian Schulte</a>
+ * @author <a href="mailto:cs@jomc.org">Christian Schulte</a> 1.0
  * @version $Id$
  */
-public interface ModelProvider
+public class TestSchemaProvider implements SchemaProvider
 {
 
-    /**
-     * Searches a given context for modules.
-     *
-     * @param context The context to search for modules.
-     *
-     * @return The modules found in the context or {@code null} if no modules are found.
-     *
-     * @throws NullPointerException if {@code context} is {@code null}.
-     * @throws ModelException if searching the context fails.
-     */
-    Modules findModules( ModelContext context ) throws NullPointerException, ModelException;
+    public TestSchemaProvider()
+    {
+        super();
+    }
+
+    public Schemas findSchemas( final BootstrapContext context ) throws BootstrapException
+    {
+        final Schemas schemas = new Schemas();
+        final Schema schema = new Schema();
+        schemas.getSchema().add( schema );
+        schema.setPublicId( "http://jomc.org/model/empty" );
+        schema.setSystemId( "http://jomc.org/model/empty/empty.xsd" );
+        schema.setClasspathId( "org/jomc/model/bootstrap/test/empty.xsd" );
+        return schemas;
+    }
 
 }

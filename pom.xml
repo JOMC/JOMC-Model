@@ -71,6 +71,13 @@
         <directory>src/test/resources</directory>
       </testResource>
       <testResource>
+        <filtering>true</filtering>
+        <directory>src/test/resources</directory>
+        <includes>
+          <include>**/jomc.xml</include>
+        </includes>
+      </testResource>
+      <testResource>
         <filtering>false</filtering>
         <directory>src/test/schemas</directory>
         <targetPath>org/jomc/model/test</targetPath>

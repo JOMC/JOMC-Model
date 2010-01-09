@@ -30,27 +30,37 @@
  *   $Id$
  *
  */
-package org.jomc.model;
+package org.jomc.model.test;
+
+import java.io.ObjectInputStream;
+import junit.framework.Assert;
+import org.jomc.model.ModelException;
 
 /**
- * Object management and configuration model provider interface.
+ * Test cases for class {@code org.jomc.model.ModelException}.
  *
- * @author <a href="mailto:cs@jomc.org">Christian Schulte</a>
+ * @author <a href="mailto:cs@jomc.org">Christian Schulte</a> 1.0
  * @version $Id$
  */
-public interface ModelProvider
+public class ModelExceptionTest
 {
 
-    /**
-     * Searches a given context for modules.
-     *
-     * @param context The context to search for modules.
-     *
-     * @return The modules found in the context or {@code null} if no modules are found.
-     *
-     * @throws NullPointerException if {@code context} is {@code null}.
-     * @throws ModelException if searching the context fails.
-     */
-    Modules findModules( ModelContext context ) throws NullPointerException, ModelException;
+    public ModelExceptionTest()
+    {
+        super();
+    }
+
+    public void testSerializabe() throws Exception
+    {
+        final ObjectInputStream objectStream =
+            new ObjectInputStream( this.getClass().getResourceAsStream( "ModelException.ser" ) );
+
+        final ModelException e = (ModelException) objectStream.readObject();
+
+        objectStream.close();
+
+        Assert.assertEquals( "ModelException", e.getMessage() );
+        System.out.println( e );
+    }
 
 }

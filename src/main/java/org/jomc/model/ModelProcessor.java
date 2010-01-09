@@ -33,24 +33,25 @@
 package org.jomc.model;
 
 /**
- * Object management and configuration model provider interface.
+ * Object management and configuration model processor interface.
  *
  * @author <a href="mailto:cs@jomc.org">Christian Schulte</a>
  * @version $Id$
  */
-public interface ModelProvider
+public interface ModelProcessor
 {
 
     /**
-     * Searches a given context for modules.
+     * Processes modules.
      *
-     * @param context The context to search for modules.
+     * @param context The context to use for processing modules.
+     * @param modules The modules to process.
      *
-     * @return The modules found in the context or {@code null} if no modules are found.
+     * @return The processed modules.
      *
-     * @throws NullPointerException if {@code context} is {@code null}.
-     * @throws ModelException if searching the context fails.
+     * @throws NullPointerException if {@code context} or {@code modules} is {@code null}.
+     * @throws ModelException if processing fails.
      */
-    Modules findModules( ModelContext context ) throws NullPointerException, ModelException;
+    Modules processModules( ModelContext context, Modules modules ) throws NullPointerException, ModelException;
 
 }

@@ -75,9 +75,9 @@
 ]]>
     </xsd:documentation>
   </xsd:annotation>
-  <!--                                                                       -->
-  <!-- TestSuite                                                             -->
-  <!--                                                                       -->
+  <!--                                                                                                               -->
+  <!-- TestSuite                                                                                                     -->
+  <!--                                                                                                               -->
   <xsd:element name="testsuite" type="test:TestSuite">
     <xsd:unique name="schema-constraints-test-uniqueness">
       <xsd:annotation>
@@ -117,20 +117,14 @@
       </xsd:appinfo>
     </xsd:annotation>
     <xsd:sequence>
-      <xsd:element name="schema-constraints-test"
-                   type="test:SchemaConstraintsTest"
-                   minOccurs="0" maxOccurs="unbounded"/>
-      <xsd:element name="modules-constraints-test"
-                   type="test:ModulesConstraintsTest"
-                   minOccurs="0" maxOccurs="unbounded"/>
-      <xsd:element name="implementation-test"
-                   type="test:ImplementationTest"
-                   minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="schema-constraints-test" type="test:SchemaConstraintsTest" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="modules-constraints-test" type="test:ModulesConstraintsTest" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="implementation-test" type="test:ImplementationTest" minOccurs="0" maxOccurs="unbounded"/>
     </xsd:sequence>
   </xsd:complexType>
-  <!--                                                                       -->
-  <!-- SchemaConstraintTest                                                  -->
-  <!--                                                                       -->
+  <!--                                                                                                               -->
+  <!-- SchemaConstraintTest                                                                                          -->
+  <!--                                                                                                               -->
   <xsd:complexType name="SchemaConstraintsTest">
     <xsd:annotation>
       <xsd:appinfo>
@@ -153,9 +147,9 @@
       </xsd:annotation>
     </xsd:attribute>
   </xsd:complexType>
-  <!--                                                                       -->
-  <!-- ModulesConstraintsTest                                                -->
-  <!--                                                                       -->
+  <!--                                                                                                               -->
+  <!-- ModulesConstraintsTest                                                                                        -->
+  <!--                                                                                                               -->
   <xsd:complexType name="ModulesConstraintsTest">
     <xsd:annotation>
       <xsd:appinfo>
@@ -167,7 +161,7 @@
     <xsd:sequence>
       <xsd:element name="modules" type="test:AnyModelObject" minOccurs="0"
                    maxOccurs="1"/>
-      <xsd:element name="detail" type="test:ModelObjectValidationReportDetail" minOccurs="0"
+      <xsd:element name="detail" type="test:ModelValidationReportDetail" minOccurs="0"
                    maxOccurs="unbounded"/>
     </xsd:sequence>
     <xsd:attribute name="identifier" type="xsd:string" use="required">
@@ -180,9 +174,9 @@
       </xsd:annotation>
     </xsd:attribute>
   </xsd:complexType>
-  <!--                                                                       -->
-  <!-- ImplementationTest                                                    -->
-  <!--                                                                       -->
+  <!--                                                                                                               -->
+  <!-- ImplementationTest                                                                                            -->
+  <!--                                                                                                               -->
   <xsd:complexType name="ImplementationTest">
     <xsd:annotation>
       <xsd:appinfo>
@@ -207,9 +201,9 @@
       </xsd:annotation>
     </xsd:attribute>
   </xsd:complexType>
-  <!--                                                                       -->
-  <!-- AnyModelObject                                                        -->
-  <!--                                                                       -->
+  <!--                                                                                                               -->
+  <!-- AnyModelObject                                                                                                -->
+  <!--                                                                                                               -->
   <xsd:complexType name="AnyModelObject">
     <xsd:sequence>
       <xsd:any namespace="http://jomc.org/model" minOccurs="0" maxOccurs="1"
@@ -225,10 +219,10 @@
       </xsd:annotation>
     </xsd:attribute>
   </xsd:complexType>
-  <!--                                                                       -->
-  <!-- ModelObjectValidationReportDetail                                     -->
-  <!--                                                                       -->
-  <xsd:complexType name="ModelObjectValidationReportDetail">
+  <!--                                                                                                               -->
+  <!-- ModelValidationReportDetail                                                                                   -->
+  <!--                                                                                                               -->
+  <xsd:complexType name="ModelValidationReportDetail">
     <xsd:attribute name="identifier" type="xsd:string" use="required">
       <xsd:annotation>
         <xsd:appinfo>

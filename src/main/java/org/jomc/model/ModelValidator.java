@@ -33,24 +33,44 @@
 package org.jomc.model;
 
 /**
- * Object management and configuration model provider interface.
+ * Object management and configuration model validator interface.
  *
  * @author <a href="mailto:cs@jomc.org">Christian Schulte</a>
  * @version $Id$
  */
-public interface ModelProvider
+public interface ModelValidator
 {
 
     /**
-     * Searches a given context for modules.
+     * Validates a given model object.
      *
-     * @param context The context to search for modules.
+     * @param context The context to use for validating {@code modelObject}.
+     * @param modelObject The model object to validate.
      *
-     * @return The modules found in the context or {@code null} if no modules are found.
+     * @return Validation report.
      *
-     * @throws NullPointerException if {@code context} is {@code null}.
-     * @throws ModelException if searching the context fails.
+     * @throws NullPointerException if {@code context} or {@code modelObject} is {@code null}.
+     * @throws ModelException if validation fails.
+     *
+     * @see ModelValidationReport#isModelValid()
      */
-    Modules findModules( ModelContext context ) throws NullPointerException, ModelException;
+    ModelValidationReport validateModelObject( ModelContext context, ModelObject modelObject )
+        throws NullPointerException, ModelException;
+
+    /**
+     * Validates a given list of modules.
+     *
+     * @param context The context to use for validating {@code modules}.
+     * @param modules The list of modules to validate.
+     *
+     * @return Validation report.
+     *
+     * @throws NullPointerException if {@code context} or {@code modules} is {@code null}.
+     * @throws ModelException if validation fails.
+     *
+     * @see ModelValidationReport#isModelValid()
+     */
+    ModelValidationReport validateModules( ModelContext context, Modules modules )
+        throws NullPointerException, ModelException;
 
 }
