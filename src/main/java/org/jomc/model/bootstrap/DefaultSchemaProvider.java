@@ -44,7 +44,7 @@ import javax.xml.bind.Unmarshaller;
  *
  * @author <a href="mailto:cs@jomc.org">Christian Schulte</a>
  * @version $Id$
- * @see #findSchemas(org.jomc.model.bootstrap.BootstrapContext)
+ * @see BootstrapContext#findSchemas()
  */
 public class DefaultSchemaProvider implements SchemaProvider
 {

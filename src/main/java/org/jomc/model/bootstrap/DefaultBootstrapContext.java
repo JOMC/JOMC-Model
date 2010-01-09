@@ -45,6 +45,7 @@ import org.xml.sax.SAXException;
  *
  * @author <a href="mailto:cs@jomc.org">Christian Schulte</a>
  * @version $Id$
+ * @see BootstrapContext#createBootstrapContext(java.lang.ClassLoader)
  */
 public class DefaultBootstrapContext extends BootstrapContext
 {
