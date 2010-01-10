@@ -558,7 +558,7 @@ public class DefaultModelContext extends ModelContext
      *
      * @throws BootstrapException if getting the schemas fails.
      */
-    protected Schemas getSchemas() throws BootstrapException
+    private Schemas getSchemas() throws BootstrapException
     {
         Schemas schemas = this.cachedSchemas.get();
 
@@ -593,7 +593,7 @@ public class DefaultModelContext extends ModelContext
      * @throws IOException if reading fails.
      * @throws URISyntaxException if parsing fails.
      */
-    protected Set<URI> getSchemaResources() throws IOException, URISyntaxException
+    private Set<URI> getSchemaResources() throws IOException, URISyntaxException
     {
         Set<URI> resources = this.cachedSchemaResources.get();
 
