@@ -129,6 +129,13 @@ public abstract class ModelContext
         {
             this.classLoader = new ClassLoader( null )
             {
+
+                @Override
+                public String toString()
+                {
+                    return ModelContext.class.getName() + ".BootstrapClassLoader@" + System.identityHashCode( this );
+                }
+
             };
 
         }

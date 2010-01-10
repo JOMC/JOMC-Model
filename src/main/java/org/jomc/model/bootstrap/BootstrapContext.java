@@ -88,6 +88,15 @@ public abstract class BootstrapContext
         {
             this.classLoader = new ClassLoader( null )
             {
+
+                @Override
+                public String toString()
+                {
+                    return BootstrapContext.class.getName() + ".BootstrapClassLoader@" +
+                           System.identityHashCode( this );
+
+                }
+
             };
 
         }
