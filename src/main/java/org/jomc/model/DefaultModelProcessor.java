@@ -73,6 +73,9 @@ public class DefaultModelProcessor implements ModelProcessor
     /** Default transformer location. */
     private static volatile String defaultTransformerLocation;
 
+    /** Transformer location of the instance. */
+    private String transformerLocation;
+
     /** Creates a new {@code DefaultModelProcessor} instance. */
     public DefaultModelProcessor()
     {
@@ -115,6 +118,36 @@ public class DefaultModelProcessor implements ModelProcessor
     }
 
     /**
+     * Gets the location searched for transformer resources.
+     *
+     * @return The location searched for transformer resources.
+     *
+     * @see #getDefaultTransformerLocation()
+     * @see #setTransformerLocation(java.lang.String)
+     */
+    public String getTransformerLocation()
+    {
+        if ( this.transformerLocation == null )
+        {
+            this.transformerLocation = getDefaultTransformerLocation();
+        }
+
+        return this.transformerLocation;
+    }
+
+    /**
+     * Sets the location searched for transformer resources.
+     *
+     * @param value The new location to search for transformer resources or {@code null}.
+     *
+     * @see #getTransformerLocation()
+     */
+    public void setTransformerLocation( final String value )
+    {
+        this.transformerLocation = value;
+    }
+
+    /**
      * Searches a given context for transformers.
      *
      * @param context The context to search for transformers.
@@ -125,8 +158,6 @@ public class DefaultModelProcessor implements ModelProcessor
      *
      * @throws NullPointerException if {@code context} or {@code location} is {@code null}.
      * @throws ModelException if getting the transformers fails.
-     *
-     * @see #getDefaultTransformerLocation()
      */
     public List<Transformer> findTransformers( final ModelContext context, final String location ) throws ModelException
     {
@@ -227,6 +258,7 @@ public class DefaultModelProcessor implements ModelProcessor
     /**
      * {@inheritDoc}
      *
+     * @see #getTransformerLocation()
      * @see #findTransformers(org.jomc.model.ModelContext, java.lang.String)
      */
     public Modules processModules( final ModelContext context, final Modules modules ) throws ModelException
@@ -244,7 +276,7 @@ public class DefaultModelProcessor implements ModelProcessor
         {
             final ObjectFactory objectFactory = new ObjectFactory();
             final JAXBContext jaxbContext = context.createContext();
-            final List<Transformer> transformers = this.findTransformers( context, getDefaultTransformerLocation() );
+            final List<Transformer> transformers = this.findTransformers( context, this.getTransformerLocation() );
             Modules processed = new Modules( modules );
 
             if ( transformers != null )

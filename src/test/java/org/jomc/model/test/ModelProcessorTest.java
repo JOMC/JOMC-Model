@@ -136,15 +136,26 @@ public class ModelProcessorTest
                 System.out.println( e );
             }
 
+            DefaultModelProcessor.setDefaultTransformerLocation( "DEFAULT_LOCATION" );
+            defaultModelProcessor.setTransformerLocation( null );
+            Assert.assertEquals( "DEFAULT_LOCATION", defaultModelProcessor.getTransformerLocation() );
+
             DefaultModelProcessor.setDefaultTransformerLocation( null );
+            defaultModelProcessor.setTransformerLocation( null );
             Assert.assertEquals( 1, defaultModelProcessor.findTransformers(
                 context, DefaultModelProcessor.getDefaultTransformerLocation() ).size() );
 
             DefaultModelProcessor.setDefaultTransformerLocation( "DOES_NOT_EXIST" );
+            defaultModelProcessor.setTransformerLocation( "DOES_NOT_EXIST" );
+
             Assert.assertNull( defaultModelProcessor.findTransformers(
                 context, DefaultModelProcessor.getDefaultTransformerLocation() ) );
 
+            Assert.assertNull( defaultModelProcessor.findTransformers(
+                context, defaultModelProcessor.getTransformerLocation() ) );
+
             DefaultModelProcessor.setDefaultTransformerLocation( null );
+            defaultModelProcessor.setTransformerLocation( null );
         }
     }
 

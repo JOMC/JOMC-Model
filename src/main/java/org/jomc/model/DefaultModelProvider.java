@@ -61,6 +61,9 @@ public class DefaultModelProvider implements ModelProvider
     /** Default module location. */
     private static volatile String defaultModuleLocation;
 
+    /** Module location of the instance. */
+    private String moduleLocation;
+
     /** Creates a new {@code DefaultModelProvider} instance. */
     public DefaultModelProvider()
     {
@@ -102,6 +105,36 @@ public class DefaultModelProvider implements ModelProvider
     }
 
     /**
+     * Gets the location searched for module resources.
+     *
+     * @return The location searched for module resources.
+     *
+     * @see #getDefaultModuleLocation()
+     * @see #setModuleLocation(java.lang.String)
+     */
+    public String getModuleLocation()
+    {
+        if ( this.moduleLocation == null )
+        {
+            this.moduleLocation = getDefaultModuleLocation();
+        }
+
+        return this.moduleLocation;
+    }
+
+    /**
+     * Sets the location searched for module resources.
+     *
+     * @param value The new location to search for module resources or {@code null}.
+     *
+     * @see #getModuleLocation()
+     */
+    public void setModuleLocation( final String value )
+    {
+        this.moduleLocation = value;
+    }
+
+    /**
      * Searches a given context for modules.
      *
      * @param context The context to search for modules.
@@ -111,8 +144,6 @@ public class DefaultModelProvider implements ModelProvider
      *
      * @throws NullPointerException if {@code context} or {@code location} is {@code null}.
      * @throws ModelException if searching the context fails.
-     *
-     * @see #getDefaultModuleLocation()
      */
     public Modules findModules( final ModelContext context, final String location ) throws ModelException
     {
@@ -208,6 +239,7 @@ public class DefaultModelProvider implements ModelProvider
     /**
      * {@inheritDoc}
      *
+     * @see #getModuleLocation()
      * @see #findModules(org.jomc.model.ModelContext, java.lang.String)
      */
     public Modules findModules( final ModelContext context ) throws ModelException
@@ -217,7 +249,7 @@ public class DefaultModelProvider implements ModelProvider
             throw new NullPointerException( "context" );
         }
 
-        return this.findModules( context, getDefaultModuleLocation() );
+        return this.findModules( context, this.getModuleLocation() );
     }
 
     private String getMessage( final String key, final Object args )

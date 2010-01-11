@@ -111,17 +111,29 @@ public class ModelProviderTest
                 System.out.println( e );
             }
 
+            DefaultModelProvider.setDefaultModuleLocation( "DEFAULT_LOCATION" );
+            defaultModelProvider.setModuleLocation( null );
+            Assert.assertEquals( "DEFAULT_LOCATION", defaultModelProvider.getModuleLocation() );
+
             DefaultModelProvider.setDefaultModuleLocation( null );
+            defaultModelProvider.setModuleLocation( null );
             Assert.assertEquals( 1, defaultModelProvider.findModules( context ).getModule().size() );
             Assert.assertEquals( 1, defaultModelProvider.findModules(
                 context, DefaultModelProvider.getDefaultModuleLocation() ).getModule().size() );
 
+            Assert.assertEquals( 1, defaultModelProvider.findModules(
+                context, defaultModelProvider.getModuleLocation() ).getModule().size() );
+
             DefaultModelProvider.setDefaultModuleLocation( "DOES_NOT_EXIST" );
+            defaultModelProvider.setModuleLocation( "DOES_NOT_EXIST" );
+
             Assert.assertNull( defaultModelProvider.findModules( context ) );
             Assert.assertNull( defaultModelProvider.findModules(
                 context, DefaultModelProvider.getDefaultModuleLocation() ) );
 
+            Assert.assertNull( defaultModelProvider.findModules( context, defaultModelProvider.getModuleLocation() ) );
             DefaultModelProvider.setDefaultModuleLocation( null );
+            defaultModelProvider.setModuleLocation( null );
         }
     }
 

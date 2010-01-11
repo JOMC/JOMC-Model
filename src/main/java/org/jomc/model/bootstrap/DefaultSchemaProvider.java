@@ -58,6 +58,9 @@ public class DefaultSchemaProvider implements SchemaProvider
     /** Default schema location. */
     private static volatile String defaultSchemaLocation;
 
+    /** Schema location of the instance. */
+    private String schemaLocation;
+
     /** Creates a new {@code DefaultSchemaProvider} instance. */
     public DefaultSchemaProvider()
     {
@@ -73,7 +76,7 @@ public class DefaultSchemaProvider implements SchemaProvider
      *
      * @return The location searched for schema resources by default.
      *
-     * @see #findSchemas(org.jomc.model.bootstrap.BootstrapContext, java.lang.String)
+     * @see #setDefaultSchemaLocation(java.lang.String)
      */
     public static String getDefaultSchemaLocation()
     {
@@ -100,6 +103,36 @@ public class DefaultSchemaProvider implements SchemaProvider
     }
 
     /**
+     * Gets the location searched for schema resources.
+     *
+     * @return The location searched for schema resources.
+     *
+     * @see #getDefaultSchemaLocation()
+     * @see #setSchemaLocation(java.lang.String)
+     */
+    public String getSchemaLocation()
+    {
+        if ( this.schemaLocation == null )
+        {
+            this.schemaLocation = getDefaultSchemaLocation();
+        }
+
+        return this.schemaLocation;
+    }
+
+    /**
+     * Sets the location searched for schema resources.
+     *
+     * @param value The new location to search for schema resources or {@code null}.
+     *
+     * @see #getSchemaLocation()
+     */
+    public void setSchemaLocation( final String value )
+    {
+        this.schemaLocation = value;
+    }
+
+    /**
      * Searches a given context for schemas.
      *
      * @param context The context to search for schemas.
@@ -109,8 +142,6 @@ public class DefaultSchemaProvider implements SchemaProvider
      *
      * @throws NullPointerException if {@code context} or {@code location} is {@code null}.
      * @throws BootstrapException if searching the context fails.
-     *
-     * @see #getDefaultSchemaLocation()
      */
     public Schemas findSchemas( final BootstrapContext context, final String location ) throws BootstrapException
     {
@@ -164,6 +195,7 @@ public class DefaultSchemaProvider implements SchemaProvider
     /**
      * {@inheritDoc}
      *
+     * @see #getSchemaLocation()
      * @see #findSchemas(org.jomc.model.bootstrap.BootstrapContext, java.lang.String)
      */
     public Schemas findSchemas( final BootstrapContext context ) throws BootstrapException
@@ -173,7 +205,7 @@ public class DefaultSchemaProvider implements SchemaProvider
             throw new NullPointerException( "context" );
         }
 
-        return this.findSchemas( context, getDefaultSchemaLocation() );
+        return this.findSchemas( context, this.getSchemaLocation() );
     }
 
 }
