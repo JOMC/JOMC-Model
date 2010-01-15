@@ -130,7 +130,7 @@ public class ModelValidatorTest
     {
         try
         {
-            this.getModelValidator().validateModelObject(
+            this.getModelValidator().validateModel(
                 ModelContext.createModelContext( this.getClass().getClassLoader() ), null );
 
             Assert.fail( "Expected NullPointerException not thrown." );
@@ -143,31 +143,7 @@ public class ModelValidatorTest
 
         try
         {
-            this.getModelValidator().validateModelObject( null, new ModelObject() );
-            Assert.fail( "Expected NullPointerException not thrown." );
-        }
-        catch ( final NullPointerException e )
-        {
-            Assert.assertNotNull( e.getMessage() );
-            System.out.println( e.toString() );
-        }
-
-        try
-        {
-            this.getModelValidator().validateModules(
-                ModelContext.createModelContext( this.getClass().getClassLoader() ), null );
-
-            Assert.fail( "Expected NullPointerException not thrown." );
-        }
-        catch ( final NullPointerException e )
-        {
-            Assert.assertNotNull( e.getMessage() );
-            System.out.println( e.toString() );
-        }
-
-        try
-        {
-            this.getModelValidator().validateModules( null, new Modules() );
+            this.getModelValidator().validateModel( null, new Modules() );
             Assert.fail( "Expected NullPointerException not thrown." );
         }
         catch ( final NullPointerException e )
@@ -180,27 +156,7 @@ public class ModelValidatorTest
     public void testLegalArguments() throws Exception
     {
         final ModelContext context = ModelContext.createModelContext( this.getClass().getClassLoader() );
-        Assert.assertNotNull( this.getModelValidator().validateModelObject( context, new Module() ) );
-        Assert.assertNotNull( this.getModelValidator().validateModules( context, new Modules() ) );
-    }
-
-    public void testUnsupportedModelObjects() throws Exception
-    {
-        final ModelContext context = ModelContext.createModelContext( this.getClass().getClassLoader() );
-
-        try
-        {
-            this.getModelValidator().validateModelObject( context, new ModelObject()
-            {
-            } );
-
-            Assert.fail( "Expected ModelException not thrown." );
-        }
-        catch ( final ModelException e )
-        {
-            Assert.assertNotNull( e.getMessage() );
-            System.out.println( e );
-        }
+        Assert.assertNotNull( this.getModelValidator().validateModel( context, new Modules() ) );
     }
 
     public void testSchemaConstraints() throws Exception
@@ -218,21 +174,13 @@ public class ModelValidatorTest
                 (JAXBElement<? extends ModelObject>) test.getModelObject().getAny();
 
             final JAXBSource source = new JAXBSource( jaxbContext, modelObject );
+            final ModelValidationReport report = context.validateModel( source );
 
-            try
-            {
-                validator.validate( source );
-                Assert.assertTrue( "[" + test.getIdentifier() + "] Unexpected valid model object.",
-                                   test.getModelObject().isValid() );
+            log( report );
 
-            }
-            catch ( final SAXException e )
-            {
-                Assert.assertFalse( "[" + test.getIdentifier() + "] Unexpected invalid model object.",
-                                    test.getModelObject().isValid() );
+            Assert.assertEquals( "[" + test.getIdentifier() + "]",
+                                 test.getModelObject().isValid(), report.isModelValid() );
 
-                System.out.println( e );
-            }
         }
     }
 
@@ -245,8 +193,7 @@ public class ModelValidatorTest
             System.out.println( "ModulesConstraintsTest: " + test.getIdentifier() );
 
             final JAXBElement<Modules> modules = (JAXBElement<Modules>) test.getModules().getAny();
-            final ModelValidationReport report =
-                this.getModelValidator().validateModules( context, modules.getValue() );
+            final ModelValidationReport report = this.getModelValidator().validateModel( context, modules.getValue() );
 
             log( report );
 
@@ -290,6 +237,7 @@ public class ModelValidatorTest
     public void testImplementations() throws Exception
     {
         final ModelContext context = ModelContext.createModelContext( this.getClass().getClassLoader() );
+        final JAXBContext jaxbContext = context.createContext();
 
         for ( ImplementationTest test : this.getTestSuite().getImplementationTest() )
         {
@@ -297,7 +245,7 @@ public class ModelValidatorTest
 
             final JAXBElement<Modules> modules = (JAXBElement<Modules>) test.getModules().getAny();
             final ModelValidationReport modulesReport =
-                this.getModelValidator().validateModules( context, modules.getValue() );
+                this.getModelValidator().validateModel( context, modules.getValue() );
 
             Assert.assertTrue( "[" + test.getIdentifier() + "] Unexpected invalid modules.",
                                modulesReport.isModelValid() );
@@ -306,7 +254,7 @@ public class ModelValidatorTest
                 (JAXBElement<Implementation>) test.getImplementation().getAny();
 
             final ModelValidationReport implementationReport =
-                this.getModelValidator().validateModelObject( context, expected.getValue() );
+                context.validateModel( new JAXBSource( jaxbContext, expected ) );
 
             Assert.assertTrue( "[" + test.getIdentifier() + "] Unexpected invalid implementation.",
                                implementationReport.isModelValid() );

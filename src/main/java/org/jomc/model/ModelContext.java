@@ -55,9 +55,14 @@ import java.util.logging.Level;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.transform.Source;
 import javax.xml.validation.Schema;
+import javax.xml.validation.Validator;
 import org.w3c.dom.ls.LSResourceResolver;
 import org.xml.sax.EntityResolver;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * Object management and configuration model context interface.
@@ -519,77 +524,61 @@ public abstract class ModelContext
     }
 
     /**
-     * Validates a given model object.
-     * <p>This method loads {@code ModelValidator} classes setup via
-     * {@code META-INF/services/org.jomc.model.ModelValidator} resources and returns a validation report.</p>
+     * Validates a given model.
      *
-     * @param modelObject The model object to validate.
+     * @param model A source providing the model to validate.
      *
      * @return Validation report.
      *
-     * @throws NullPointerException if {@code modelObject} is {@code null}.
-     * @throws ModelException if validation fails.
-     *
-     * @see ModelValidator#validateModelObject(org.jomc.model.ModelContext, org.jomc.model.ModelObject)
+     * @throws NullPointerException if {@code model} is {@code null}.
+     * @throws ModelException if validating the model fails.
      */
-    public ModelValidationReport validateModelObject( final ModelObject modelObject ) throws ModelException
+    public ModelValidationReport validateModel( final Source model ) throws ModelException
     {
-        if ( modelObject == null )
+        if ( model == null )
         {
-            throw new NullPointerException( "modelObject" );
+            throw new NullPointerException( "model" );
         }
+
+        final Schema schema = this.createSchema();
+        final Validator validator = schema.newValidator();
+        final ModelErrorHandler modelErrorHandler = new ModelErrorHandler();
+        validator.setErrorHandler( modelErrorHandler );
 
         try
         {
-            final Collection<Class<ModelValidator>> validators = this.loadProviders( ModelValidator.class );
-            final ModelValidationReport report = new ModelValidationReport();
-
-            for ( Class<ModelValidator> validator : validators )
+            validator.validate( model );
+        }
+        catch ( final SAXException e )
+        {
+            if ( modelErrorHandler.getReport().isModelValid() )
             {
-                if ( this.isLoggable( Level.CONFIG ) )
-                {
-                    this.log( Level.CONFIG, this.getMessage( "modelValidatorInfo", new Object[]
-                        {
-                            validator.getName()
-                        } ), null );
-
-                }
-
-                final ModelValidator modelValidator = validator.newInstance();
-                final ModelValidationReport current = modelValidator.validateModelObject( this, modelObject );
-                if ( current != null )
-                {
-                    report.getDetails().addAll( current.getDetails() );
-                }
+                throw new ModelException( e );
             }
+        }
+        catch ( final IOException e )
+        {
+            throw new ModelException( e );
+        }
 
-            return report;
-        }
-        catch ( final InstantiationException e )
-        {
-            throw new ModelException( e );
-        }
-        catch ( final IllegalAccessException e )
-        {
-            throw new ModelException( e );
-        }
+        return modelErrorHandler.getReport();
     }
 
     /**
      * Validates a given list of modules.
      * <p>This method loads {@code ModelValidator} classes setup via
-     * {@code META-INF/services/org.jomc.model.ModelValidator} resources and returns a validation report.</p>
+     * {@code META-INF/services/org.jomc.model.ModelValidator} resources and returns an aggregated validation report.</p>
      *
      * @param modules The list of modules to validate.
      *
      * @return Validation report.
      *
      * @throws NullPointerException if {@code modules} is {@code null}.
-     * @throws ModelException if validation fails.
+     * @throws ModelException if validating the modules fails.
      *
-     * @see ModelValidator#validateModules(org.jomc.model.ModelContext, org.jomc.model.Modules)
+     * @see ModelValidator#validateModel(org.jomc.model.ModelContext, org.jomc.model.Modules)
      */
-    public ModelValidationReport validateModules( final Modules modules ) throws ModelException
+    public ModelValidationReport validateModel( final Modules modules ) throws ModelException
     {
         if ( modules == null )
         {
@@ -613,7 +602,7 @@ public abstract class ModelContext
                 }
 
                 final ModelValidator modelValidator = validator.newInstance();
-                final ModelValidationReport current = modelValidator.validateModules( this, modules );
+                final ModelValidationReport current = modelValidator.validateModel( this, modules );
                 if ( current != null )
                 {
                     report.getDetails().addAll( current.getDetails() );
@@ -838,6 +827,76 @@ public abstract class ModelContext
     {
         return new MessageFormat( ResourceBundle.getBundle( ModelContext.class.getName().replace( '.', '/' ),
                                                             Locale.getDefault() ).getString( key ) ).format( args );
+
+    }
+
+}
+
+/**
+ * {@code ErrorHandler} collecting {@code ModelValidationReport} details.
+ *
+ * @author <a href="mailto:cs@jomc.org">Christian Schulte</a>
+ * @version $Id$
+ */
+class ModelErrorHandler extends DefaultHandler
+{
+
+    /** The report of the instance. */
+    private ModelValidationReport report;
+
+    /** Creates a new {@code ModelErrorHandler} instance. */
+    public ModelErrorHandler()
+    {
+        this( null );
+    }
+
+    /**
+     * Creates a new {@code ModelErrorHandler} instance taking a report to use for collecting validation events.
+     *
+     * @param report A report to use for collecting validation events.
+     */
+    public ModelErrorHandler( final ModelValidationReport report )
+    {
+        super();
+        this.report = report;
+    }
+
+    /**
+     * Gets the report of the instance.
+     *
+     * @return The report of the instance.
+     */
+    public ModelValidationReport getReport()
+    {
+        if ( this.report == null )
+        {
+            this.report = new ModelValidationReport();
+        }
+
+        return this.report;
+    }
+
+    @Override
+    public void warning( final SAXParseException exception ) throws SAXException
+    {
+        this.getReport().getDetails().add( new ModelValidationReport.Detail(
+            "W3C XML 1.0 Recommendation - Warning condition", Level.WARNING, exception.getMessage(), null ) );
+
+    }
+
+    @Override
+    public void error( final SAXParseException exception ) throws SAXException
+    {
+        this.getReport().getDetails().add( new ModelValidationReport.Detail(
+            "W3C XML 1.0 Recommendation - Section 1.2 - Error", Level.SEVERE, exception.getMessage(), null ) );
+
+    }
+
+    @Override
+    public void fatalError( final SAXParseException exception ) throws SAXException
+    {
+        this.getReport().getDetails().add( new ModelValidationReport.Detail(
+            "W3C XML 1.0 Recommendation - Section 1.2 - Fatal Error", Level.SEVERE, exception.getMessage(), null ) );
 
     }
 

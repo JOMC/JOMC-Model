@@ -42,22 +42,6 @@ public interface ModelValidator
 {
 
     /**
-     * Validates a given model object.
-     *
-     * @param context The context to use for validating {@code modelObject}.
-     * @param modelObject The model object to validate.
-     *
-     * @return Validation report.
-     *
-     * @throws NullPointerException if {@code context} or {@code modelObject} is {@code null}.
-     * @throws ModelException if validation fails.
-     *
-     * @see ModelValidationReport#isModelValid()
-     */
-    ModelValidationReport validateModelObject( ModelContext context, ModelObject modelObject )
-        throws NullPointerException, ModelException;
-
-    /**
      * Validates a given list of modules.
      *
      * @param context The context to use for validating {@code modules}.
@@ -70,7 +54,7 @@ public interface ModelValidator
      *
      * @see ModelValidationReport#isModelValid()
      */
-    ModelValidationReport validateModules( ModelContext context, Modules modules )
+    ModelValidationReport validateModel( ModelContext context, Modules modules )
         throws NullPointerException, ModelException;
 
 }

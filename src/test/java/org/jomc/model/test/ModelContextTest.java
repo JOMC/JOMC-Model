@@ -33,12 +33,15 @@
 package org.jomc.model.test;
 
 import javax.xml.XMLConstants;
+import javax.xml.bind.util.JAXBSource;
+import javax.xml.transform.Source;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 import org.jomc.model.ModelContext;
 import org.jomc.model.ModelException;
 import org.jomc.model.ModelValidationReport;
 import org.jomc.model.Modules;
+import org.jomc.model.ObjectFactory;
 
 /**
  * Test cases for {@code org.jomc.model.ModelContext} implementations.
@@ -136,18 +139,39 @@ public class ModelContextTest extends TestCase
         Assert.assertNotNull( processed.getModule( "TestModelProcessor" ) );
     }
 
-    public void testValidateModelObject() throws Exception
+    public void testValidateModel() throws Exception
     {
-        final ModelValidationReport report = this.getModelContext().validateModelObject( new Modules() );
-        Assert.assertNotNull( report );
-        Assert.assertEquals( 1, report.getDetails( "TestModelValidator" ).size() );
-    }
+        try
+        {
+            this.getModelContext().validateModel( (Modules) null );
+            Assert.fail( "Expected NullPointerException not thrown." );
+        }
+        catch ( final NullPointerException e )
+        {
+            Assert.assertNotNull( e.getMessage() );
+            System.out.println( e.toString() );
+        }
 
-    public void testValidateModules() throws Exception
-    {
-        final ModelValidationReport report = this.getModelContext().validateModules( new Modules() );
+        try
+        {
+            this.getModelContext().validateModel( (Source) null );
+            Assert.fail( "Expected NullPointerException not thrown." );
+        }
+        catch ( final NullPointerException e )
+        {
+            Assert.assertNotNull( e.getMessage() );
+            System.out.println( e.toString() );
+        }
+
+        ModelValidationReport report = this.getModelContext().validateModel( new Modules() );
         Assert.assertNotNull( report );
         Assert.assertEquals( 1, report.getDetails( "TestModelValidator" ).size() );
+
+        report = this.getModelContext().validateModel( new JAXBSource(
+            this.getModelContext().createContext(), new ObjectFactory().createModules( new Modules() ) ) );
+
+        Assert.assertNotNull( report );
+        Assert.assertTrue( report.isModelValid() );
     }
 
     public void testCreateContext() throws Exception

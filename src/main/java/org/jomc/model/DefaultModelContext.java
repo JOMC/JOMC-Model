@@ -70,6 +70,7 @@ import org.w3c.dom.ls.LSResourceResolver;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * Default {@code ModelContext} implementation.
@@ -106,9 +107,10 @@ public class DefaultModelContext extends ModelContext
     @Override
     public EntityResolver createEntityResolver() throws ModelException
     {
-        return new EntityResolver()
+        return new DefaultHandler()
         {
 
+            @Override
             public InputSource resolveEntity( final String publicId, final String systemId )
                 throws SAXException, IOException
             {

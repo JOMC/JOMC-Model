@@ -35,7 +35,6 @@ package org.jomc.model.test;
 import java.util.logging.Level;
 import org.jomc.model.ModelContext;
 import org.jomc.model.ModelException;
-import org.jomc.model.ModelObject;
 import org.jomc.model.ModelValidationReport;
 import org.jomc.model.ModelValidator;
 import org.jomc.model.Modules;
@@ -54,24 +53,7 @@ public class TestModelValidator implements ModelValidator
         super();
     }
 
-    public ModelValidationReport validateModelObject( final ModelContext context, final ModelObject modelObject )
-        throws ModelException
-    {
-        if ( context == null )
-        {
-            throw new NullPointerException( "context" );
-        }
-        if ( modelObject == null )
-        {
-            throw new NullPointerException( "modelObject" );
-        }
-
-        final ModelValidationReport report = new ModelValidationReport();
-        report.getDetails().add( new ModelValidationReport.Detail( "TestModelValidator", Level.OFF, "Message", null ) );
-        return report;
-    }
-
-    public ModelValidationReport validateModules( final ModelContext context, final Modules modules )
+    public ModelValidationReport validateModel( final ModelContext context, final Modules modules )
         throws ModelException
     {
         if ( context == null )

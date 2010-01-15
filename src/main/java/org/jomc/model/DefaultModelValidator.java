@@ -32,9 +32,6 @@
  */
 package org.jomc.model;
 
-import java.io.StringWriter;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -45,9 +42,7 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.ValidationEvent;
-import javax.xml.bind.ValidationEventHandler;
+import javax.xml.bind.util.JAXBSource;
 import org.jomc.util.ParseException;
 import org.jomc.util.TokenMgrError;
 import org.jomc.util.VersionParser;
@@ -57,8 +52,7 @@ import org.jomc.util.VersionParser;
  *
  * @author <a href="mailto:cs@jomc.org">Christian Schulte</a>
  * @version $Id$
- * @see ModelContext#validateModelObject(org.jomc.model.ModelObject)
- * @see ModelContext#validateModules(org.jomc.model.Modules)
+ * @see ModelContext#validateModel(org.jomc.model.Modules)
  */
 public class DefaultModelValidator implements ModelValidator
 {
@@ -69,57 +63,7 @@ public class DefaultModelValidator implements ModelValidator
         super();
     }
 
-    public ModelValidationReport validateModelObject(
-        final ModelContext context, final ModelObject modelObject ) throws ModelException
-    {
-        if ( context == null )
-        {
-            throw new NullPointerException( "context" );
-        }
-        if ( modelObject == null )
-        {
-            throw new NullPointerException( "modelObject" );
-        }
-
-        final ModelValidationReport report = new ModelValidationReport();
-
-        try
-        {
-            final JAXBElement element = this.createElement( modelObject );
-            if ( element == null )
-            {
-                throw new ModelException( this.getMessage( "failedCreatingElement", new Object[]
-                    {
-                        modelObject.getClass().getName()
-                    } ) );
-
-            }
-
-            final Marshaller marshaller = context.createMarshaller();
-            marshaller.setSchema( context.createSchema() );
-            marshaller.setEventHandler( new ModelValidationEventHandler( report ) );
-            marshaller.marshal( element, new StringWriter() );
-        }
-        catch ( final IllegalAccessException e )
-        {
-            throw new ModelException( e );
-        }
-        catch ( final InvocationTargetException e )
-        {
-            throw new ModelException( e );
-        }
-        catch ( final JAXBException e )
-        {
-            if ( report.getDetails().isEmpty() )
-            {
-                throw new ModelException( e );
-            }
-        }
-
-        return report;
-    }
-
-    public ModelValidationReport validateModules(
+    public ModelValidationReport validateModel(
         final ModelContext context, final Modules modules ) throws ModelException
     {
         if ( context == null )
@@ -131,93 +75,73 @@ public class DefaultModelValidator implements ModelValidator
             throw new NullPointerException( "modules" );
         }
 
-        final ModelValidationReport report = this.validateModelObject( context, modules );
-
-        this.assertClassDeclarationUniqueness( modules, report );
-
-        for ( Module m : modules.getModule() )
+        try
         {
-            this.assertNoSpecificationReferenceDeclarations( m, report );
-            this.assertNoImplementationReferenceDeclarations( m, report );
-            this.assertNoMessageReferenceDeclarations( m, report );
-            this.assertNoFinalMessageDeclarations( m, report );
-            this.assertNoOverrideMessageDeclarations( m, report );
-            this.assertNoPropertyReferenceDeclarations( m, report );
-            this.assertNoFinalPropertyDeclarations( m, report );
-            this.assertNoOverridePropertyDeclarations( m, report );
-            this.assertNoPropertyValueAndAnyObject( m, report );
-            this.assertPropertyTypeWithAnyObject( m, report );
+            final ModelValidationReport report = context.validateModel(
+                new JAXBSource( context.createContext(), new ObjectFactory().createModules( modules ) ) );
 
-            if ( m.getImplementations() != null )
+            this.assertClassDeclarationUniqueness( modules, report );
+
+            for ( Module m : modules.getModule() )
             {
-                for ( Implementation i : m.getImplementations().getImplementation() )
+                this.assertNoSpecificationReferenceDeclarations( m, report );
+                this.assertNoImplementationReferenceDeclarations( m, report );
+                this.assertNoMessageReferenceDeclarations( m, report );
+                this.assertNoFinalMessageDeclarations( m, report );
+                this.assertNoOverrideMessageDeclarations( m, report );
+                this.assertNoPropertyReferenceDeclarations( m, report );
+                this.assertNoFinalPropertyDeclarations( m, report );
+                this.assertNoOverridePropertyDeclarations( m, report );
+                this.assertNoPropertyValueAndAnyObject( m, report );
+                this.assertPropertyTypeWithAnyObject( m, report );
+
+                if ( m.getImplementations() != null )
                 {
-                    this.assertNoDependencyPropertyReferenceDeclarations( i, report );
-                    this.assertNoImplementationDeclarations( i, report );
-                    this.assertNoLocationWhenAbstract( i, report );
-                    this.assertNoSpecificationDeclarations( i, report );
-                    this.assertImplementationMessagesUniqueness( i, report );
-                    this.assertImplementationPropertiesUniqueness( i, report );
-                    this.assertImplementationDependencyCompatibility( modules, i, report );
-                    this.assertImplementationInheritanceCompatibility( modules, i, report );
-                    this.assertImplementationSpecificationCompatibility( modules, i, report );
-                    this.assertNoMissingMandatoryDependencies( modules, i, report );
-                    this.assertNoDependenciesWithoutSpecificationClass( modules, i, report );
-                    this.assertNoInheritanceCycle( modules, i, report );
-                    this.assertNoInheritanceClashes( modules, i, report );
-                    this.assertNoOverridenDependencyPropertiesWhenNotMultiton( modules, i, report );
-                    this.assertImplementationOverrideConstraints( modules, i, report );
-                    this.assertSpecificationOverrideConstraints( modules, i, report );
-                    this.assertDependencyOverrideConstraints( modules, i, report );
-                    this.assertMessageOverrideConstraints( modules, i, report );
-                    this.assertPropertyOverrideConstraints( modules, i, report );
-                    this.assertDependencyPropertiesOverrideConstraints( modules, i, report );
-                    this.assertValidMessageTemplates( modules, i, report );
-                    this.assertNoPropertyValueAndAnyObject( i, report );
-                    this.assertPropertyTypeWithAnyObject( i, report );
+                    for ( Implementation i : m.getImplementations().getImplementation() )
+                    {
+                        this.assertNoDependencyPropertyReferenceDeclarations( i, report );
+                        this.assertNoImplementationDeclarations( i, report );
+                        this.assertNoLocationWhenAbstract( i, report );
+                        this.assertNoSpecificationDeclarations( i, report );
+                        this.assertImplementationMessagesUniqueness( i, report );
+                        this.assertImplementationPropertiesUniqueness( i, report );
+                        this.assertImplementationDependencyCompatibility( modules, i, report );
+                        this.assertImplementationInheritanceCompatibility( modules, i, report );
+                        this.assertImplementationSpecificationCompatibility( modules, i, report );
+                        this.assertNoMissingMandatoryDependencies( modules, i, report );
+                        this.assertNoDependenciesWithoutSpecificationClass( modules, i, report );
+                        this.assertNoInheritanceCycle( modules, i, report );
+                        this.assertNoInheritanceClashes( modules, i, report );
+                        this.assertNoOverridenDependencyPropertiesWhenNotMultiton( modules, i, report );
+                        this.assertImplementationOverrideConstraints( modules, i, report );
+                        this.assertSpecificationOverrideConstraints( modules, i, report );
+                        this.assertDependencyOverrideConstraints( modules, i, report );
+                        this.assertMessageOverrideConstraints( modules, i, report );
+                        this.assertPropertyOverrideConstraints( modules, i, report );
+                        this.assertDependencyPropertiesOverrideConstraints( modules, i, report );
+                        this.assertValidMessageTemplates( modules, i, report );
+                        this.assertNoPropertyValueAndAnyObject( i, report );
+                        this.assertPropertyTypeWithAnyObject( i, report );
+                    }
+                }
+
+                if ( m.getSpecifications() != null )
+                {
+                    for ( Specification s : m.getSpecifications().getSpecification() )
+                    {
+                        this.assertNoSpecificationPropertyReferenceDeclarations( s, report );
+                        this.assertSpecificationImplementationNameUniqueness( modules, s, report );
+                        this.assertSpecificationMultiplicityConstraint( modules, s, report );
+                    }
                 }
             }
 
-            if ( m.getSpecifications() != null )
-            {
-                for ( Specification s : m.getSpecifications().getSpecification() )
-                {
-                    this.assertNoSpecificationPropertyReferenceDeclarations( s, report );
-                    this.assertSpecificationImplementationNameUniqueness( modules, s, report );
-                    this.assertSpecificationMultiplicityConstraint( modules, s, report );
-                }
-            }
+            return report;
         }
-
-        return report;
-    }
-
-    private JAXBElement createElement( final ModelObject modelObject )
-        throws IllegalAccessException, InvocationTargetException
-    {
-        JAXBElement element = null;
-        Method factoryMethod = null;
-
-        for ( Method m : ObjectFactory.class.getMethods() )
+        catch ( final JAXBException e )
         {
-            if ( m.getReturnType().equals( JAXBElement.class ) && m.getParameterTypes().length == 1 &&
-                 m.getParameterTypes()[0].equals( modelObject.getClass() ) )
-            {
-                factoryMethod = m;
-                break;
-            }
+            throw new ModelException( e );
         }
-
-        if ( factoryMethod != null )
-        {
-            element = (JAXBElement) factoryMethod.invoke( new ObjectFactory(), new Object[]
-                {
-                    modelObject
-                } );
-
-        }
-
-        return element;
     }
 
     private void assertValidMessageTemplates( final Modules modules, final Implementation implementation,
@@ -1770,64 +1694,6 @@ public class DefaultModelValidator implements ModelValidator
             DefaultModelValidator.class.getName().replace( '.', '/' ),
             Locale.getDefault() ).getString( key ) ).format( args );
 
-    }
-
-}
-
-/**
- * {@code ValidationEventHandler} collecting {@code ModelValidationReport} details.
- *
- * @author <a href="mailto:cs@jomc.org">Christian Schulte</a>
- * @version $Id$
- */
-class ModelValidationEventHandler implements ValidationEventHandler
-{
-
-    /** The report events are collected with. */
-    private final ModelValidationReport report;
-
-    /**
-     * Creates a new {@code ModelValidationEventHandler} taking a {@code ModelValidationReport} instance to collect
-     * events with.
-     *
-     * @param report The report to use for collecting events.
-     */
-    ModelValidationEventHandler( final ModelValidationReport report )
-    {
-        this.report = report;
-    }
-
-    public boolean handleEvent( final ValidationEvent event )
-    {
-        if ( event == null )
-        {
-            throw new IllegalArgumentException( "event" );
-        }
-
-        switch ( event.getSeverity() )
-        {
-            case ValidationEvent.WARNING:
-                this.report.getDetails().add( new ModelValidationReport.Detail(
-                    "W3C XML 1.0 Recommendation - Warning condition", Level.WARNING, event.getMessage(), null ) );
-
-                return true;
-
-            case ValidationEvent.ERROR:
-                this.report.getDetails().add( new ModelValidationReport.Detail(
-                    "W3C XML 1.0 Recommendation - Section 1.2 - Error", Level.SEVERE, event.getMessage(), null ) );
-
-                return false;
-
-            case ValidationEvent.FATAL_ERROR:
-                this.report.getDetails().add( new ModelValidationReport.Detail(
-                    "W3C XML 1.0 Recommendation - Section 1.2 - Fatal Error", Level.SEVERE, event.getMessage(), null ) );
-
-                return false;
-
-            default:
-                throw new AssertionError( event.getSeverity() );
-
-        }
     }
 
 }
