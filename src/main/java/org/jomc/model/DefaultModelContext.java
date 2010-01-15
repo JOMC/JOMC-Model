@@ -432,6 +432,11 @@ public class DefaultModelContext extends ModelContext
                 }
             }
 
+            if ( sources.isEmpty() )
+            {
+                throw new ModelException( this.getMessage( "missingSchemas", null ) );
+            }
+
             return f.newSchema( sources.toArray( new Source[ sources.size() ] ) );
         }
         catch ( final BootstrapException e )
