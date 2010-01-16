@@ -765,23 +765,18 @@
                     throw new ModelException( this.getMessage( "mandatoryType", this.getName() ) );
                 }
 
-                final Class javaType = Class.forName( this.getType() );
+                String typeName = this.getType();
+                final int idx = typeName.indexOf( "<" );
+                if ( idx != -1 )
+                {
+                    typeName = typeName.substring( 0, idx );
+                }
+
+                final Class javaType = Class.forName( typeName );
                 final Object anyObject = this.getAny() instanceof JAXBElement
                                          ? ( (JAXBElement) this.getAny() ).getValue() : this.getAny();
 
-                if ( anyObject != null )
-                {
-                    try
-                    {
-                        return this.invoke( "getJavaValue", anyObject, javaType );
-                    }
-                    catch ( final NoSuchMethodException e )
-                    {
-                        // Optional method not provided.
-                    }
-                }
-
-                return anyObject;
+                return this.getJavaValue( anyObject, javaType );
             }
 
             Class javaType = String.class;
@@ -831,7 +826,14 @@
                 }
                 else
                 {
-                    javaType = Class.forName( this.getType() );
+                    String typeName = this.getType();
+                    final int idx = typeName.indexOf( "<" );
+                    if ( idx != -1 )
+                    {
+                        typeName = typeName.substring( 0, idx );
+                    }
+
+                    javaType = Class.forName( typeName );
                 }
             }
 
@@ -842,12 +844,7 @@
 
             }
 
-            if ( this.getValue() != null )
-            {
-                return this.instantiate( javaType, this.getValue() );
-            }
-
-            return null;
+            return this.getJavaValue( javaType, this.getValue() );
         }
         catch ( final ClassNotFoundException e )
         {
@@ -855,101 +852,116 @@
         }
     }
 
-    private <T> T invoke( final String methodName, final Object any, final Class<T> returnType )
-        throws NoSuchMethodException, ModelException
+    private Object getJavaValue( final Object any, final Class returnType ) throws ModelException
     {
-        try
+        if ( any != null )
         {
-            final java.lang.reflect.Method m = any.getClass().getMethod( methodName, new Class[ 0 ] );
-            final Object result = m.invoke( any, (Object[]) null );
+            final String methodName = "getJavaValue";
 
-            if ( result != null && !returnType.isAssignableFrom( result.getClass() ) )
+            try
             {
-                throw new ModelException( this.getMessage(
-                    "illegalMethodInvocationResult", methodName, any.getClass().getName(), result.getClass().getName(),
-                    returnType.getName() ) );
+                final java.lang.reflect.Method m = any.getClass().getMethod( methodName, new Class[ 0 ] );
+                final Object result = m.invoke( any, (Object[]) null );
 
-            }
-
-            return (T) result;
-        }
-        catch ( final IllegalAccessException e )
-        {
-            throw new ModelException( this.getMessage(
-                "methodAccessDenied", methodName, any.getClass().getName() ), e );
-
-        }
-        catch ( final IllegalArgumentException e )
-        {
-            throw new AssertionError( e );
-        }
-        catch ( final InvocationTargetException e )
-        {
-            throw new ModelException( this.getMessage(
-                "methodInvocationFailure", methodName, any.getClass().getName() ), e );
-
-        }
-        catch ( final SecurityException e )
-        {
-            throw new ModelException( this.getMessage(
-                "methodAccessDenied", methodName, any.getClass().getName() ), e );
-
-        }
-    }
-
-    private <T> T instantiate( final Class<T> clazz, final String value ) throws ModelException
-    {
-        try
-        {
-            if ( clazz == Character.class )
-            {
-                if ( value.length() != 1 )
+                if ( result != null && !returnType.isAssignableFrom( result.getClass() ) )
                 {
-                    throw new ModelException( this.getMessage( "illegalValue", value, Character.class.getName() ) );
+                    throw new ModelException( this.getMessage(
+                        "illegalMethodInvocationResult", methodName, any.getClass().getName(),
+                        result.getClass().getName(), returnType.getName() ) );
+
                 }
 
-                return clazz.getConstructor( new Class[]
-                    {
-                        char.class
-                    } ).newInstance( new Object[]
-                    {
-                        value.charAt( 0 )
-                    } );
+                return result;
+            }
+            catch ( final IllegalAccessException e )
+            {
+                throw new ModelException( this.getMessage(
+                    "methodAccessDenied", methodName, any.getClass().getName() ), e );
 
             }
-            else if ( clazz == String.class )
+            catch ( final IllegalArgumentException e )
             {
-                return (T) value;
+                throw new AssertionError( e );
             }
-            else
+            catch ( final InvocationTargetException e )
             {
-                return clazz.getConstructor( new Class[]
-                    {
-                        String.class
-                    } ).newInstance( value );
+                throw new ModelException( this.getMessage(
+                    "methodInvocationFailure", methodName, any.getClass().getName() ), e );
 
             }
+            catch ( final SecurityException e )
+            {
+                throw new ModelException( this.getMessage(
+                    "methodAccessDenied", methodName, any.getClass().getName() ), e );
+
+            }
+            catch ( final NoSuchMethodException e )
+            {
+                // Optional method not provided.
+            }
         }
-        catch ( final InstantiationException e )
+
+        return any;
+    }
+
+    private Object getJavaValue( final Class type, final String value ) throws ModelException
+    {
+        if ( value != null )
         {
-            throw new ModelException( this.getMessage( "instantiationException", clazz.getName() ), e );
+            try
+            {
+                if ( type == Character.class )
+                {
+                    if ( value.length() != 1 )
+                    {
+                        throw new ModelException( this.getMessage( "illegalValue", value, Character.class.getName() ) );
+                    }
+
+                    return type.getConstructor( new Class[]
+                        {
+                            char.class
+                        } ).newInstance( new Object[]
+                        {
+                            value.charAt( 0 )
+                        } );
+
+                }
+                else if ( type == String.class )
+                {
+                    return value;
+                }
+                else
+                {
+                    return type.getConstructor( new Class[]
+                        {
+                            String.class
+                        } ).newInstance( value );
+
+                }
+            }
+            catch ( final InstantiationException e )
+            {
+                throw new ModelException( this.getMessage( "instantiationException", type.getName() ), e );
+            }
+            catch ( final IllegalAccessException e )
+            {
+                throw new ModelException( this.getMessage( "constructorAccessDenied", type.getName() ), e );
+            }
+            catch ( final IllegalArgumentException e )
+            {
+                throw new AssertionError( e );
+            }
+            catch ( final InvocationTargetException e )
+            {
+                throw new ModelException( this.getMessage( "constructorInvocationFailure", type.getName() ), e );
+            }
+            catch ( final NoSuchMethodException e )
+            {
+                throw new ModelException( this.getMessage( "constructorNotFound", type.getName() ), e );
+            }
         }
-        catch ( final IllegalAccessException e )
-        {
-            throw new ModelException( this.getMessage( "constructorAccessDenied", clazz.getName() ), e );
-        }
-        catch ( final IllegalArgumentException e )
-        {
-            throw new AssertionError( e );
-        }
-        catch ( final InvocationTargetException e )
-        {
-            throw new ModelException( this.getMessage( "constructorInvocationFailure", clazz.getName() ), e );
-        }
-        catch ( final NoSuchMethodException e )
-        {
-            throw new ModelException( this.getMessage( "constructorNotFound", clazz.getName() ), e );
-        }
+
+        return value;
     }
 
     private String getMessage( final String key, final Object... arguments )
