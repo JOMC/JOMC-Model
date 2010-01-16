@@ -37,6 +37,7 @@ package org.jomc.model;
  *
  * @author <a href="mailto:cs@jomc.org">Christian Schulte</a>
  * @version $Id$
+ * @see ModelContext#findModules()
  */
 public interface ModelProvider
 {

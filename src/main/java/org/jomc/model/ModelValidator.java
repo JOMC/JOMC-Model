@@ -37,6 +37,7 @@ package org.jomc.model;
  *
  * @author <a href="mailto:cs@jomc.org">Christian Schulte</a>
  * @version $Id$
+ * @see ModelContext#validateModel(org.jomc.model.Modules)
  */
 public interface ModelValidator
 {
