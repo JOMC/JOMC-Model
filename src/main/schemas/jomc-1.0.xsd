@@ -752,7 +752,7 @@ holds the mail address of a person.
       <xsd:documentation xml:lang="en">
 Model of an author.
 
-The 'Author' type  extends the 'Person' type adding attribute 'version' holding a version created by the author.
+The 'Author' type extends the 'Person' type adding attribute 'version' holding a version created by the author.
       </xsd:documentation>
     </xsd:annotation>
     <xsd:complexContent>

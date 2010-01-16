@@ -730,124 +730,233 @@
     <jaxb:bindings node="xs:complexType[@name='Property']">
       <ci:code><![CDATA[
     /**
-     * Gets the Java value of this property.
+     * Gets the Java value of the property.
+     * <p>The Java value of the property is computed based on the following rules:
+     * <ol>
+     * <li>If property {@code any} is set, the Java value is computed based on the object returned by method
+     * {@code getAny()} by possibly unwrapping any {@code JAXBElement} instances. If that object declares a
+     * <blockquote><pre>public Object getJavaValue()</pre></blockquote> method, the value returned by this method
+     * is the object returned by a call to that method using reflection. If that object does not declare such a method,
+     * the value returned by this method is that (possibly unwrapped) object.</li>
+     * <li>If property {@code value} is set, the Java value is computed based on the values of properties {@code type}
+     * and {@code value}. If property {@code type} is not set or equals {@code java.lang.String}, the value returned
+     * by this method is the string value returned by method {@code getValue()}. If property {@code type} equals a name
+     * of a Java primitive type, an instance of the wrapper class corresponding to that primitive type name is returned
+     * instantiated by passing the value of property {@code value} to the public constructor taking a single
+     * {@code java.lang.String} argument of that wrapper class. For all other values of property {@code type} an
+     * instance of a class with a name equal to the value of property {@code type} is returned instantiated by passing
+     * the value of property {@code value} to the public constructor taking a single {@code java.lang.String} argument
+     * of that class.</li>
+     * <li>If properties {@code any} and {@code value} are both {@code null}, this method returns {@code null}.</li>
+     * </ol></p>
      *
-     * @param classLoader The class loader to use for loading the Java class corresponding to the type of this property.
+     * @return The Java value of the property or {@code null}.
      *
-     * @return The Java value of this property.
-     *
-     * @throws NullPointerException if {@code classLoader} is {@code null}.
-     * @throws ClassNotFoundException if the Java class corresponding to the type of this property is not found.
-     * @throws InstantiationException if instantiation of the value fails.
+     * @throws ModelException if getting the Java value of the property fails.
      */
-    public Object getJavaValue( final ClassLoader classLoader ) throws ClassNotFoundException, InstantiationException
+    public Object getJavaValue() throws ModelException
     {
-        if ( classLoader == null )
+        try
         {
-            throw new NullPointerException( "classLoader" );
-        }
-
-        if ( this.getAny() != null )
-        {
-            Object javaValue = this.getAny();
-            if ( javaValue instanceof javax.xml.bind.JAXBElement )
+            if ( this.getAny() != null )
             {
-                javaValue = ( (javax.xml.bind.JAXBElement) javaValue ).getValue();
-            }
-
-            return javaValue;
-        }
-
-        Class javaType = String.class;
-        if ( this.getType() != null )
-        {
-            if ( Boolean.TYPE.getName().equals( this.getType() ) )
-            {
-                javaType = Boolean.class;
-            }
-            else if ( Byte.TYPE.getName().equals( this.getType() ) )
-            {
-                javaType = Byte.class;
-            }
-            else if ( Character.TYPE.getName().equals( this.getType() ) )
-            {
-                javaType = Character.class;
-            }
-            else if ( Double.TYPE.getName().equals( this.getType() ) )
-            {
-                javaType = Double.class;
-            }
-            else if ( Float.TYPE.getName().equals( this.getType() ) )
-            {
-                javaType = Float.class;
-            }
-            else if ( Integer.TYPE.getName().equals( this.getType() ) )
-            {
-                javaType = Integer.class;
-            }
-            else if ( Long.TYPE.getName().equals( this.getType() ) )
-            {
-                javaType = Long.class;
-            }
-            else if ( Short.TYPE.getName().equals( this.getType() ) )
-            {
-                javaType = Short.class;
-            }
-            else
-            {
-                javaType = Class.forName( this.getType(), true, classLoader );
-            }
-        }
-
-        Object javaValue = null;
-
-        if ( this.getValue() != null )
-        {
-            try
-            {
-                final Object arg;
-                final java.lang.reflect.Constructor ctor;
-
-                if ( javaType == Character.class )
+                if ( this.getType() == null )
                 {
-                    ctor = javaType.getConstructor( new Class[]
-                        {
-                            char.class
-                        } );
+                    throw new ModelException( this.getMessage( "mandatoryType", this.getName() ) );
+                }
 
-                    arg = Character.valueOf( this.getValue().charAt( 0 ) );
+                final Class javaType = Class.forName( this.getType() );
+                final Object anyObject = this.getAny() instanceof JAXBElement
+                                         ? ( (JAXBElement) this.getAny() ).getValue() : this.getAny();
+
+                if ( anyObject != null )
+                {
+                    try
+                    {
+                        return this.invoke( "getJavaValue", anyObject, javaType );
+                    }
+                    catch ( final NoSuchMethodException e )
+                    {
+                        // Optional method not provided.
+                    }
+                }
+
+                return anyObject;
+            }
+
+            Class javaType = String.class;
+            boolean primitive = false;
+
+            if ( this.getType() != null )
+            {
+                if ( Boolean.TYPE.getName().equals( this.getType() ) )
+                {
+                    javaType = Boolean.class;
+                    primitive = true;
+                }
+                else if ( Byte.TYPE.getName().equals( this.getType() ) )
+                {
+                    javaType = Byte.class;
+                    primitive = true;
+                }
+                else if ( Character.TYPE.getName().equals( this.getType() ) )
+                {
+                    javaType = Character.class;
+                    primitive = true;
+                }
+                else if ( Double.TYPE.getName().equals( this.getType() ) )
+                {
+                    javaType = Double.class;
+                    primitive = true;
+                }
+                else if ( Float.TYPE.getName().equals( this.getType() ) )
+                {
+                    javaType = Float.class;
+                    primitive = true;
+                }
+                else if ( Integer.TYPE.getName().equals( this.getType() ) )
+                {
+                    javaType = Integer.class;
+                    primitive = true;
+                }
+                else if ( Long.TYPE.getName().equals( this.getType() ) )
+                {
+                    javaType = Long.class;
+                    primitive = true;
+                }
+                else if ( Short.TYPE.getName().equals( this.getType() ) )
+                {
+                    javaType = Short.class;
+                    primitive = true;
                 }
                 else
                 {
-                    ctor = javaType.getConstructor( new Class[]
-                        {
-                            String.class
-                        } );
+                    javaType = Class.forName( this.getType() );
+                }
+            }
 
-                    arg = this.getValue();
+            if ( this.getValue() == null && primitive )
+            {
+                throw new ModelException( this.getMessage(
+                    "mandatoryPrimitiveValue", this.getName(), this.getType() ) );
+
+            }
+
+            if ( this.getValue() != null )
+            {
+                return this.instantiate( javaType, this.getValue() );
+            }
+
+            return null;
+        }
+        catch ( final ClassNotFoundException e )
+        {
+            throw new ModelException( this.getMessage( "classNotFound", this.getName(), this.getType() ), e );
+        }
+    }
+
+    private <T> T invoke( final String methodName, final Object any, final Class<T> returnType )
+        throws NoSuchMethodException, ModelException
+    {
+        try
+        {
+            final java.lang.reflect.Method m = any.getClass().getMethod( methodName, new Class[ 0 ] );
+            final Object result = m.invoke( any, (Object[]) null );
+
+            if ( result != null && !returnType.isAssignableFrom( result.getClass() ) )
+            {
+                throw new ModelException( this.getMessage(
+                    "illegalMethodInvocationResult", methodName, any.getClass().getName(), result.getClass().getName(),
+                    returnType.getName() ) );
+
+            }
+
+            return (T) result;
+        }
+        catch ( final IllegalAccessException e )
+        {
+            throw new ModelException( this.getMessage(
+                "methodAccessDenied", methodName, any.getClass().getName() ), e );
+
+        }
+        catch ( final IllegalArgumentException e )
+        {
+            throw new AssertionError( e );
+        }
+        catch ( final InvocationTargetException e )
+        {
+            throw new ModelException( this.getMessage(
+                "methodInvocationFailure", methodName, any.getClass().getName() ), e );
+
+        }
+        catch ( final SecurityException e )
+        {
+            throw new ModelException( this.getMessage(
+                "methodAccessDenied", methodName, any.getClass().getName() ), e );
+
+        }
+    }
+
+    private <T> T instantiate( final Class<T> clazz, final String value ) throws ModelException
+    {
+        try
+        {
+            if ( clazz == Character.class )
+            {
+                if ( value.length() != 1 )
+                {
+                    throw new ModelException( this.getMessage( "illegalValue", value, Character.class.getName() ) );
                 }
 
-                javaValue = ctor.newInstance( new Object[]
+                return clazz.getConstructor( new Class[]
                     {
-                        arg
+                        char.class
+                    } ).newInstance( new Object[]
+                    {
+                        value.charAt( 0 )
                     } );
 
             }
-            catch ( final IllegalAccessException e )
+            else if ( clazz == String.class )
             {
-                throw (InstantiationException) new InstantiationException( e.getMessage() ).initCause( e );
+                return (T) value;
             }
-            catch ( final java.lang.reflect.InvocationTargetException e )
+            else
             {
-                throw (InstantiationException) new InstantiationException( e.getMessage() ).initCause( e );
-            }
-            catch ( final NoSuchMethodException e )
-            {
-                throw (InstantiationException) new InstantiationException( e.getMessage() ).initCause( e );
+                return clazz.getConstructor( new Class[]
+                    {
+                        String.class
+                    } ).newInstance( value );
+
             }
         }
+        catch ( final InstantiationException e )
+        {
+            throw new ModelException( this.getMessage( "instantiationException", clazz.getName() ), e );
+        }
+        catch ( final IllegalAccessException e )
+        {
+            throw new ModelException( this.getMessage( "constructorAccessDenied", clazz.getName() ), e );
+        }
+        catch ( final IllegalArgumentException e )
+        {
+            throw new AssertionError( e );
+        }
+        catch ( final InvocationTargetException e )
+        {
+            throw new ModelException( this.getMessage( "constructorInvocationFailure", clazz.getName() ), e );
+        }
+        catch ( final NoSuchMethodException e )
+        {
+            throw new ModelException( this.getMessage( "constructorNotFound", clazz.getName() ), e );
+        }
+    }
 
-        return javaValue;
+    private String getMessage( final String key, final Object... arguments )
+    {
+        return java.text.MessageFormat.format( java.util.ResourceBundle.getBundle(
+            Property.class.getName().replace( '.', '/' ), java.util.Locale.getDefault() ).getString( key ), arguments );
+
     }
 ]]>
       </ci:code>

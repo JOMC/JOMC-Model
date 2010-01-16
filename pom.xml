@@ -130,6 +130,21 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>emma-maven-plugin</artifactId>
+        <version>${emma-maven-plugin.version}</version>
+        <configuration>
+          <sourcePaths>
+            <sourcePath>${project.build.sourceDirectory}</sourcePath>
+            <sourcePath>${xjcOutputDirectory}</sourcePath>
+          </sourcePaths>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
   <profiles>
     <profile>
       <id>jdk15</id>

@@ -94,6 +94,7 @@ public class DefaultModelValidator implements ModelValidator
                 this.assertNoOverridePropertyDeclarations( m, report );
                 this.assertNoPropertyValueAndAnyObject( m, report );
                 this.assertPropertyTypeWithAnyObject( m, report );
+                this.assertValidPropertyJavaValues( m, report );
 
                 if ( m.getImplementations() != null )
                 {
@@ -122,6 +123,7 @@ public class DefaultModelValidator implements ModelValidator
                         this.assertValidMessageTemplates( modules, i, report );
                         this.assertNoPropertyValueAndAnyObject( i, report );
                         this.assertPropertyTypeWithAnyObject( i, report );
+                        this.assertValidPropertyJavaValues( i, report );
                     }
                 }
 
@@ -132,6 +134,9 @@ public class DefaultModelValidator implements ModelValidator
                         this.assertNoSpecificationPropertyReferenceDeclarations( s, report );
                         this.assertSpecificationImplementationNameUniqueness( modules, s, report );
                         this.assertSpecificationMultiplicityConstraint( modules, s, report );
+                        this.assertNoPropertyValueAndAnyObject( s, report );
+                        this.assertPropertyTypeWithAnyObject( s, report );
+                        this.assertValidPropertyJavaValues( s, report );
                     }
                 }
             }
@@ -141,6 +146,78 @@ public class DefaultModelValidator implements ModelValidator
         catch ( final JAXBException e )
         {
             throw new ModelException( e );
+        }
+    }
+
+    private void assertValidPropertyJavaValues( final Module module, final ModelValidationReport report )
+    {
+        if ( module.getProperties() != null )
+        {
+            for ( Property p : module.getProperties().getProperty() )
+            {
+                try
+                {
+                    p.getJavaValue();
+                }
+                catch ( final ModelException e )
+                {
+                    report.getDetails().add( this.createDetail(
+                        "MODULE_PROPERTY_JAVA_VALUE_CONSTRAINT", Level.SEVERE,
+                        "modulePropertyJavaValueConstraint", new Object[]
+                        {
+                            module.getName(), p.getName(), e.getMessage()
+                        }, new ObjectFactory().createModule( module ) ) );
+
+                }
+            }
+        }
+    }
+
+    private void assertValidPropertyJavaValues( final Specification specification, final ModelValidationReport report )
+    {
+        if ( specification.getProperties() != null )
+        {
+            for ( Property p : specification.getProperties().getProperty() )
+            {
+                try
+                {
+                    p.getJavaValue();
+                }
+                catch ( final ModelException e )
+                {
+                    report.getDetails().add( this.createDetail(
+                        "SPECIFICATION_PROPERTY_JAVA_VALUE_CONSTRAINT", Level.SEVERE,
+                        "specificationPropertyJavaValueConstraint", new Object[]
+                        {
+                            specification.getIdentifier(), p.getName(), e.getMessage()
+                        }, new ObjectFactory().createSpecification( specification ) ) );
+
+                }
+            }
+        }
+    }
+
+    private void assertValidPropertyJavaValues( final Implementation implementation, final ModelValidationReport report )
+    {
+        if ( implementation.getProperties() != null )
+        {
+            for ( Property p : implementation.getProperties().getProperty() )
+            {
+                try
+                {
+                    p.getJavaValue();
+                }
+                catch ( final ModelException e )
+                {
+                    report.getDetails().add( this.createDetail(
+                        "IMPLEMENTATION_PROPERTY_JAVA_VALUE_CONSTRAINT", Level.SEVERE,
+                        "implementationPropertyJavaValueConstraint", new Object[]
+                        {
+                            implementation.getIdentifier(), p.getName(), e.getMessage()
+                        }, new ObjectFactory().createImplementation( implementation ) ) );
+
+                }
+            }
         }
     }
 
@@ -301,6 +378,27 @@ public class DefaultModelValidator implements ModelValidator
         }
     }
 
+    private void assertNoPropertyValueAndAnyObject( final Specification specification,
+                                                    final ModelValidationReport report )
+    {
+        if ( specification.getProperties() != null )
+        {
+            for ( Property p : specification.getProperties().getProperty() )
+            {
+                if ( p.getValue() != null && p.getAny() != null )
+                {
+                    report.getDetails().add( this.createDetail(
+                        "SPECIFICATION_PROPERTY_VALUE_CONSTRAINT", Level.SEVERE,
+                        "specificationPropertyValueConstraint", new Object[]
+                        {
+                            specification.getIdentifier(), p.getName()
+                        }, new ObjectFactory().createSpecification( specification ) ) );
+
+                }
+            }
+        }
+    }
+
     private void assertPropertyTypeWithAnyObject( final Module module, final ModelValidationReport report )
     {
         if ( module.getProperties() != null )
@@ -336,6 +434,27 @@ public class DefaultModelValidator implements ModelValidator
                         {
                             implementation.getIdentifier(), p.getName()
                         }, new ObjectFactory().createImplementation( implementation ) ) );
+
+                }
+            }
+        }
+    }
+
+    private void assertPropertyTypeWithAnyObject( final Specification specification,
+                                                  final ModelValidationReport report )
+    {
+        if ( specification.getProperties() != null )
+        {
+            for ( Property p : specification.getProperties().getProperty() )
+            {
+                if ( p.getAny() != null && p.getType() == null )
+                {
+                    report.getDetails().add( this.createDetail(
+                        "SPECIFICATION_PROPERTY_TYPE_CONSTRAINT", Level.SEVERE,
+                        "specificationPropertyTypeConstraint", new Object[]
+                        {
+                            specification.getIdentifier(), p.getName()
+                        }, new ObjectFactory().createSpecification( specification ) ) );
 
                 }
             }
