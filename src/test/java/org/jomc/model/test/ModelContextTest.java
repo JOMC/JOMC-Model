@@ -42,6 +42,7 @@ import org.jomc.model.ModelException;
 import org.jomc.model.ModelValidationReport;
 import org.jomc.model.Modules;
 import org.jomc.model.ObjectFactory;
+import org.w3c.dom.ls.LSInput;
 
 /**
  * Test cases for {@code org.jomc.model.ModelContext} implementations.
@@ -221,6 +222,29 @@ public class ModelContextTest extends TestCase
         Assert.assertNull( this.getModelContext().createResourceResolver().
             resolveResource( "UNSUPPORTED", null, null, null, null ) );
 
+        final LSInput input = this.getModelContext().createResourceResolver().
+            resolveResource( XMLConstants.W3C_XML_SCHEMA_NS_URI, null, "http://jomc.org/model",
+                             "http://jomc.org/model/jomc-1.0.xsd", null );
+
+        Assert.assertNotNull( input );
+
+        input.getBaseURI();
+        input.getByteStream();
+        input.getCertifiedText();
+        input.getCharacterStream();
+        input.getEncoding();
+        input.getPublicId();
+        input.getStringData();
+        input.getSystemId();
+
+        input.setBaseURI( null );
+        input.setByteStream( null );
+        input.setCertifiedText( false );
+        input.setCharacterStream( null );
+        input.setEncoding( null );
+        input.setPublicId( null );
+        input.setStringData( null );
+        input.setSystemId( null );
     }
 
 }

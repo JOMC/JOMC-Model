@@ -198,9 +198,9 @@ public class DefaultModelProvider implements ModelProvider
                 if ( content instanceof Module )
                 {
                     final Module m = (Module) content;
-                    if ( context.isLoggable( Level.FINE ) )
+                    if ( context.isLoggable( Level.CONFIG ) )
                     {
-                        context.log( Level.FINE, this.getMessage( "foundModule", new Object[]
+                        context.log( Level.CONFIG, this.getMessage( "foundModule", new Object[]
                             {
                                 m.getName(), m.getVersion() == null ? "" : m.getVersion()
                             } ), null );

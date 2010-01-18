@@ -285,7 +285,12 @@ public class DefaultModelContext extends ModelContext
 
                                 public void setCharacterStream( final Reader characterStream )
                                 {
-                                    throw new UnsupportedOperationException();
+                                    log( Level.WARNING, getMessage( "unsupportedOperation", new Object[]
+                                        {
+                                            "setCharacterStream",
+                                            DefaultModelContext.class.getName() + ".LSResourceResolver"
+                                        } ), null );
+
                                 }
 
                                 public InputStream getByteStream()
@@ -295,7 +300,12 @@ public class DefaultModelContext extends ModelContext
 
                                 public void setByteStream( final InputStream byteStream )
                                 {
-                                    throw new UnsupportedOperationException();
+                                    log( Level.WARNING, getMessage( "unsupportedOperation", new Object[]
+                                        {
+                                            "setByteStream",
+                                            DefaultModelContext.class.getName() + ".LSResourceResolver"
+                                        } ), null );
+
                                 }
 
                                 public String getStringData()
@@ -305,7 +315,12 @@ public class DefaultModelContext extends ModelContext
 
                                 public void setStringData( final String stringData )
                                 {
-                                    throw new UnsupportedOperationException();
+                                    log( Level.WARNING, getMessage( "unsupportedOperation", new Object[]
+                                        {
+                                            "setStringData",
+                                            DefaultModelContext.class.getName() + ".LSResourceResolver"
+                                        } ), null );
+
                                 }
 
                                 public String getSystemId()
@@ -315,7 +330,12 @@ public class DefaultModelContext extends ModelContext
 
                                 public void setSystemId( final String systemId )
                                 {
-                                    throw new UnsupportedOperationException();
+                                    log( Level.WARNING, getMessage( "unsupportedOperation", new Object[]
+                                        {
+                                            "setSystemId",
+                                            DefaultModelContext.class.getName() + ".LSResourceResolver"
+                                        } ), null );
+
                                 }
 
                                 public String getPublicId()
@@ -325,7 +345,12 @@ public class DefaultModelContext extends ModelContext
 
                                 public void setPublicId( final String publicId )
                                 {
-                                    throw new UnsupportedOperationException();
+                                    log( Level.WARNING, getMessage( "unsupportedOperation", new Object[]
+                                        {
+                                            "setPublicId",
+                                            DefaultModelContext.class.getName() + ".LSResourceResolver"
+                                        } ), null );
+
                                 }
 
                                 public String getBaseURI()
@@ -335,7 +360,12 @@ public class DefaultModelContext extends ModelContext
 
                                 public void setBaseURI( final String baseURI )
                                 {
-                                    throw new UnsupportedOperationException();
+                                    log( Level.WARNING, getMessage( "unsupportedOperation", new Object[]
+                                        {
+                                            "setBaseURI",
+                                            DefaultModelContext.class.getName() + ".LSResourceResolver"
+                                        } ), null );
+
                                 }
 
                                 public String getEncoding()
@@ -345,7 +375,12 @@ public class DefaultModelContext extends ModelContext
 
                                 public void setEncoding( final String encoding )
                                 {
-                                    throw new UnsupportedOperationException();
+                                    log( Level.WARNING, getMessage( "unsupportedOperation", new Object[]
+                                        {
+                                            "setEncoding",
+                                            DefaultModelContext.class.getName() + ".LSResourceResolver"
+                                        } ), null );
+
                                 }
 
                                 public boolean getCertifiedText()
@@ -355,7 +390,12 @@ public class DefaultModelContext extends ModelContext
 
                                 public void setCertifiedText( final boolean certifiedText )
                                 {
-                                    throw new UnsupportedOperationException();
+                                    log( Level.WARNING, getMessage( "unsupportedOperation", new Object[]
+                                        {
+                                            "setCertifiedText",
+                                            DefaultModelContext.class.getName() + ".LSResourceResolver"
+                                        } ), null );
+
                                 }
 
                             };
@@ -437,6 +477,7 @@ public class DefaultModelContext extends ModelContext
                 throw new ModelException( this.getMessage( "missingSchemas", null ) );
             }
 
+            f.setResourceResolver( this.createResourceResolver() );
             return f.newSchema( sources.toArray( new Source[ sources.size() ] ) );
         }
         catch ( final BootstrapException e )
@@ -467,9 +508,9 @@ public class DefaultModelContext extends ModelContext
                 if ( schema.getContextId() != null )
                 {
                     packageNames.append( ':' ).append( schema.getContextId() );
-                    if ( this.isLoggable( Level.FINE ) )
+                    if ( this.isLoggable( Level.CONFIG ) )
                     {
-                        this.log( Level.FINE, this.getMessage( "foundContext", new Object[]
+                        this.log( Level.CONFIG, this.getMessage( "foundContext", new Object[]
                             {
                                 schema.getContextId()
                             } ), null );

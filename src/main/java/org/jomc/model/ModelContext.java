@@ -38,6 +38,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
@@ -53,6 +55,7 @@ import java.util.ResourceBundle;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.Source;
@@ -454,6 +457,27 @@ public abstract class ModelContext
                 }
             }
 
+            if ( this.isLoggable( Level.FINEST ) )
+            {
+                final StringWriter stringWriter = new StringWriter();
+                final Marshaller m = this.createMarshaller();
+                m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
+                m.marshal( new ObjectFactory().createModules( modules ), stringWriter );
+                stringWriter.close();
+
+                this.log( Level.FINEST, this.getMessage( "foundModules", null ), null );
+
+                final BufferedReader reader = new BufferedReader( new StringReader( stringWriter.toString() ) );
+                String line;
+
+                while ( ( line = reader.readLine() ) != null )
+                {
+                    this.log( Level.FINEST, "\t" + line, null );
+                }
+
+                reader.close();
+            }
+
             return modules;
         }
         catch ( final InstantiationException e )
@@ -461,6 +485,14 @@ public abstract class ModelContext
             throw new ModelException( e );
         }
         catch ( final IllegalAccessException e )
+        {
+            throw new ModelException( e );
+        }
+        catch ( final IOException e )
+        {
+            throw new ModelException( e );
+        }
+        catch ( final JAXBException e )
         {
             throw new ModelException( e );
         }
@@ -511,6 +543,27 @@ public abstract class ModelContext
                 }
             }
 
+            if ( this.isLoggable( Level.FINEST ) )
+            {
+                final StringWriter stringWriter = new StringWriter();
+                final Marshaller m = this.createMarshaller();
+                m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
+                m.marshal( new ObjectFactory().createModules( processed ), stringWriter );
+                stringWriter.close();
+
+                this.log( Level.FINEST, this.getMessage( "processedModules", null ), null );
+
+                final BufferedReader reader = new BufferedReader( new StringReader( stringWriter.toString() ) );
+                String line;
+
+                while ( ( line = reader.readLine() ) != null )
+                {
+                    this.log( Level.FINEST, "\t" + line, null );
+                }
+
+                reader.close();
+            }
+
             return processed;
         }
         catch ( final InstantiationException e )
@@ -518,6 +571,14 @@ public abstract class ModelContext
             throw new ModelException( e );
         }
         catch ( final IllegalAccessException e )
+        {
+            throw new ModelException( e );
+        }
+        catch ( final IOException e )
+        {
+            throw new ModelException( e );
+        }
+        catch ( final JAXBException e )
         {
             throw new ModelException( e );
         }
