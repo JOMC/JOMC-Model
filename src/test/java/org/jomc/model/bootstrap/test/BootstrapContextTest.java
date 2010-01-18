@@ -98,7 +98,7 @@ public class BootstrapContextTest
             System.out.println( e.toString() );
         }
 
-        Assert.assertNotNull( this.getBootstrapContext().findResource( "META-INF/jomc.xslt" ) );
+        Assert.assertNotNull( this.getBootstrapContext().findResource( "META-INF/jomc.xsl" ) );
     }
 
     public void testFindResources() throws Exception
@@ -114,7 +114,7 @@ public class BootstrapContextTest
             System.out.println( e.toString() );
         }
 
-        Assert.assertTrue( this.getBootstrapContext().findResources( "META-INF/jomc.xslt" ).hasMoreElements() );
+        Assert.assertTrue( this.getBootstrapContext().findResources( "META-INF/jomc.xsl" ).hasMoreElements() );
     }
 
     public void testFindSchemas() throws Exception

@@ -105,7 +105,7 @@ public class ModelContextTest extends TestCase
             System.out.println( e.toString() );
         }
 
-        Assert.assertNotNull( this.getModelContext().findResource( "META-INF/jomc.xslt" ) );
+        Assert.assertNotNull( this.getModelContext().findResource( "META-INF/jomc.xsl" ) );
     }
 
     public void testFindResources() throws Exception
@@ -121,7 +121,7 @@ public class ModelContextTest extends TestCase
             System.out.println( e.toString() );
         }
 
-        Assert.assertTrue( this.getModelContext().findResources( "META-INF/jomc.xslt" ).hasMoreElements() );
+        Assert.assertTrue( this.getModelContext().findResources( "META-INF/jomc.xsl" ).hasMoreElements() );
     }
 
     public void testFindModules() throws Exception

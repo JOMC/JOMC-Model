@@ -68,7 +68,7 @@ public class DefaultModelProcessor implements ModelProcessor
      * Classpath location searched for transformers by default.
      * @see #getDefaultTransformerLocation()
      */
-    private static final String DEFAULT_TRANSFORMER_LOCATION = "META-INF/jomc.xslt";
+    private static final String DEFAULT_TRANSFORMER_LOCATION = "META-INF/jomc.xsl";
 
     /** Default transformer location. */
     private static volatile String defaultTransformerLocation;
