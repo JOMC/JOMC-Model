@@ -110,6 +110,8 @@ public class PropertyTest
     public void testGetJavaValue() throws Exception
     {
         final Property p = new Property();
+        Assert.assertNull( p.getJavaValue( this.getClass().getClassLoader() ) );
+
         p.setAny( new Object() );
 
         try
