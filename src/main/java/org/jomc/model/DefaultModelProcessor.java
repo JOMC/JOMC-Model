@@ -86,7 +86,7 @@ public class DefaultModelProcessor implements ModelProcessor
      * Gets the default location searched for transformer resources.
      * <p>The default transformer location is controlled by system property
      * {@code org.jomc.model.DefaultModelProcessor.defaultTransformerLocation} holding the location to search for
-     * transformer resources by default. If that property is not set, the {@code META-INF/jomc.xslt} default is
+     * transformer resources by default. If that property is not set, the {@code META-INF/jomc.xsl} default is
      * returned.</p>
      *
      * @return The location searched for transformer resources by default.
