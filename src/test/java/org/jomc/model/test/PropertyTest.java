@@ -70,7 +70,7 @@ public class PropertyTest
             throw new UnsupportedOperationException();
         }
 
-        public Object getJavaValue()
+        public Object getJavaValue( final ClassLoader classLoader )
         {
             throw new UnsupportedOperationException();
         }
@@ -80,7 +80,7 @@ public class PropertyTest
     public static class ObjectJavaValue
     {
 
-        public Object getJavaValue()
+        public Object getJavaValue( final ClassLoader classLoader )
         {
             return new Object();
         }
@@ -95,7 +95,7 @@ public class PropertyTest
             super();
         }
 
-        private Object getJavaValue()
+        private Object getJavaValue( final ClassLoader classLoader )
         {
             return null;
         }
@@ -114,7 +114,7 @@ public class PropertyTest
 
         try
         {
-            p.getJavaValue();
+            p.getJavaValue( this.getClass().getClassLoader() );
             Assert.fail( "Expected ModelException not thrown for missing mandatory type." );
         }
         catch ( final ModelException e )
@@ -128,7 +128,7 @@ public class PropertyTest
 
         try
         {
-            p.getJavaValue();
+            p.getJavaValue( this.getClass().getClassLoader() );
             Assert.fail( "Expected ModelException not thrown for unsupported getJavaValue operation." );
         }
         catch ( final ModelException e )
@@ -143,7 +143,7 @@ public class PropertyTest
         p.setAny( new Object()
         {
 
-            public Object getJavaValue()
+            public Object getJavaValue( final ClassLoader classLoader )
             {
                 return new Object();
             }
@@ -152,7 +152,7 @@ public class PropertyTest
 
         try
         {
-            p.getJavaValue();
+            p.getJavaValue( this.getClass().getClassLoader() );
             Assert.fail( "Expected ModelException not thrown for inaccessible getJavaValue method." );
         }
         catch ( final ModelException e )
@@ -167,7 +167,7 @@ public class PropertyTest
 
         try
         {
-            p.getJavaValue();
+            p.getJavaValue( this.getClass().getClassLoader() );
             Assert.fail( "Expected ModelException not thrown for incompatible getJavaValue method." );
         }
         catch ( final ModelException e )
@@ -182,7 +182,7 @@ public class PropertyTest
 
         try
         {
-            p.getJavaValue();
+            p.getJavaValue( this.getClass().getClassLoader() );
             Assert.fail( "Expected ModelException not thrown for mandatory primitive value." );
         }
         catch ( final ModelException e )
@@ -197,7 +197,7 @@ public class PropertyTest
 
         try
         {
-            p.getJavaValue();
+            p.getJavaValue( this.getClass().getClassLoader() );
             Assert.fail( "Expected ModelException not thrown for missing class." );
         }
         catch ( final ModelException e )
@@ -211,7 +211,7 @@ public class PropertyTest
 
         try
         {
-            p.getJavaValue();
+            p.getJavaValue( this.getClass().getClassLoader() );
             Assert.fail( "Expected ModelException not thrown for illegal char value." );
         }
         catch ( final ModelException e )
@@ -226,7 +226,7 @@ public class PropertyTest
 
         try
         {
-            p.getJavaValue();
+            p.getJavaValue( this.getClass().getClassLoader() );
             Assert.fail( "Expected ModelException not thrown for non-instantiable class." );
         }
         catch ( final ModelException e )
@@ -241,7 +241,7 @@ public class PropertyTest
 
         try
         {
-            p.getJavaValue();
+            p.getJavaValue( this.getClass().getClassLoader() );
             Assert.fail( "Expected ModelException not thrown for missing constructor." );
         }
         catch ( final ModelException e )
@@ -256,7 +256,7 @@ public class PropertyTest
 
         try
         {
-            p.getJavaValue();
+            p.getJavaValue( this.getClass().getClassLoader() );
             Assert.fail( "Expected ModelException not thrown for unsupported constructor." );
         }
         catch ( final ModelException e )
@@ -271,7 +271,7 @@ public class PropertyTest
 
         try
         {
-            p.getJavaValue();
+            p.getJavaValue( this.getClass().getClassLoader() );
             Assert.fail( "Expected ModelException not thrown for inaccessible constructor." );
         }
         catch ( final ModelException e )

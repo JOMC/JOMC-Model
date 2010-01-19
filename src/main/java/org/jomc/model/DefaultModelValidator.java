@@ -94,7 +94,7 @@ public class DefaultModelValidator implements ModelValidator
                 this.assertNoOverridePropertyDeclarations( m, report );
                 this.assertNoPropertyValueAndAnyObject( m, report );
                 this.assertPropertyTypeWithAnyObject( m, report );
-                this.assertValidPropertyJavaValues( m, report );
+                this.assertValidPropertyJavaValues( context, m, report );
 
                 if ( m.getImplementations() != null )
                 {
@@ -123,7 +123,7 @@ public class DefaultModelValidator implements ModelValidator
                         this.assertValidMessageTemplates( modules, i, report );
                         this.assertNoPropertyValueAndAnyObject( i, report );
                         this.assertPropertyTypeWithAnyObject( i, report );
-                        this.assertValidPropertyJavaValues( i, report );
+                        this.assertValidPropertyJavaValues( context, i, report );
                     }
                 }
 
@@ -136,7 +136,7 @@ public class DefaultModelValidator implements ModelValidator
                         this.assertSpecificationMultiplicityConstraint( modules, s, report );
                         this.assertNoPropertyValueAndAnyObject( s, report );
                         this.assertPropertyTypeWithAnyObject( s, report );
-                        this.assertValidPropertyJavaValues( s, report );
+                        this.assertValidPropertyJavaValues( context, s, report );
                     }
                 }
             }
@@ -149,7 +149,8 @@ public class DefaultModelValidator implements ModelValidator
         }
     }
 
-    private void assertValidPropertyJavaValues( final Module module, final ModelValidationReport report )
+    private void assertValidPropertyJavaValues( final ModelContext context, final Module module,
+                                                final ModelValidationReport report )
     {
         if ( module.getProperties() != null )
         {
@@ -157,7 +158,7 @@ public class DefaultModelValidator implements ModelValidator
             {
                 try
                 {
-                    p.getJavaValue();
+                    p.getJavaValue( context.getClassLoader() );
                 }
                 catch ( final ModelException e )
                 {
@@ -173,7 +174,8 @@ public class DefaultModelValidator implements ModelValidator
         }
     }
 
-    private void assertValidPropertyJavaValues( final Specification specification, final ModelValidationReport report )
+    private void assertValidPropertyJavaValues( final ModelContext context, final Specification specification,
+                                                final ModelValidationReport report )
     {
         if ( specification.getProperties() != null )
         {
@@ -181,7 +183,7 @@ public class DefaultModelValidator implements ModelValidator
             {
                 try
                 {
-                    p.getJavaValue();
+                    p.getJavaValue( context.getClassLoader() );
                 }
                 catch ( final ModelException e )
                 {
@@ -197,7 +199,8 @@ public class DefaultModelValidator implements ModelValidator
         }
     }
 
-    private void assertValidPropertyJavaValues( final Implementation implementation, final ModelValidationReport report )
+    private void assertValidPropertyJavaValues( final ModelContext context, final Implementation implementation,
+                                                final ModelValidationReport report )
     {
         if ( implementation.getProperties() != null )
         {
@@ -205,7 +208,7 @@ public class DefaultModelValidator implements ModelValidator
             {
                 try
                 {
-                    p.getJavaValue();
+                    p.getJavaValue( context.getClassLoader() );
                 }
                 catch ( final ModelException e )
                 {

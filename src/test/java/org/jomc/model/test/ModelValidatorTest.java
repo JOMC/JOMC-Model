@@ -465,7 +465,9 @@ public class ModelValidatorTest
         if ( expected != null )
         {
             Assert.assertNotNull( computed );
-            Assert.assertEquals( expected.getJavaValue(), computed.getJavaValue() );
+            Assert.assertEquals( expected.getJavaValue( ModelValidatorTest.class.getClassLoader() ),
+                                 computed.getJavaValue( ModelValidatorTest.class.getClassLoader() ) );
+
             Assert.assertEquals( expected.getName(), computed.getName() );
             Assert.assertEquals( expected.getType(), computed.getType() );
             Assert.assertEquals( expected.getValue(), computed.getValue() );

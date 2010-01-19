@@ -131,7 +131,7 @@ public abstract class ModelContext
      *
      * @return The class loader of the context.
      */
-    protected ClassLoader getClassLoader()
+    public ClassLoader getClassLoader()
     {
         if ( this.classLoader == null )
         {

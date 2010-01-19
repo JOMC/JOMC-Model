@@ -735,9 +735,9 @@
      * <ol>
      * <li>If property {@code any} is set, the Java value is computed based on the object returned by method
      * {@code getAny()} by possibly unwrapping any {@code JAXBElement} instances. If that object declares a
-     * <blockquote><pre>public Object getJavaValue()</pre></blockquote> method, the value returned by this method
-     * is the object returned by a call to that method using reflection. If that object does not declare such a method,
-     * the value returned by this method is that (possibly unwrapped) object.</li>
+     * <blockquote><pre>public Object getJavaValue( ClassLoader )</pre></blockquote> method, the value returned by this
+     * method is the object returned by a call to that method using reflection. If that object does not declare such a
+     * method, the value returned by this method is that (possibly unwrapped) object.</li>
      * <li>If property {@code value} is set, the Java value is computed based on the values of properties {@code type}
      * and {@code value}. If property {@code type} is not set or equals {@code java.lang.String}, the value returned
      * by this method is the string value returned by method {@code getValue()}. If property {@code type} equals a name
@@ -750,11 +750,14 @@
      * <li>If properties {@code any} and {@code value} are both {@code null}, this method returns {@code null}.</li>
      * </ol></p>
      *
+     * @param classLoader The class loader to use for getting the Java value; {@code null} to use the platform's
+     * bootstrap class loader.
+     *
      * @return The Java value of the property or {@code null}.
      *
      * @throws ModelException if getting the Java value of the property fails.
      */
-    public Object getJavaValue() throws ModelException
+    public Object getJavaValue( final ClassLoader classLoader ) throws ModelException
     {
         try
         {
@@ -772,11 +775,11 @@
                     typeName = typeName.substring( 0, idx );
                 }
 
-                final Class javaType = Class.forName( typeName );
+                final Class javaType = Class.forName( typeName, true, classLoader );
                 final Object anyObject = this.getAny() instanceof JAXBElement
                                          ? ( (JAXBElement) this.getAny() ).getValue() : this.getAny();
 
-                return this.getJavaValue( anyObject, javaType );
+                return this.getJavaValue( classLoader, anyObject, javaType );
             }
 
             Class javaType = String.class;
@@ -833,7 +836,7 @@
                         typeName = typeName.substring( 0, idx );
                     }
 
-                    javaType = Class.forName( typeName );
+                    javaType = Class.forName( typeName, true, classLoader );
                 }
             }
 
@@ -852,7 +855,8 @@
         }
     }
 
-    private Object getJavaValue( final Object any, final Class returnType ) throws ModelException
+    private Object getJavaValue( final ClassLoader classLoader, final Object any, final Class returnType )
+        throws ModelException
     {
         if ( any != null )
         {
@@ -860,8 +864,8 @@
 
             try
             {
-                final java.lang.reflect.Method m = any.getClass().getMethod( methodName, new Class[ 0 ] );
-                final Object result = m.invoke( any, (Object[]) null );
+                final java.lang.reflect.Method m = any.getClass().getMethod( methodName, ClassLoader.class );
+                final Object result = m.invoke( any, classLoader );
 
                 if ( result != null && !returnType.isAssignableFrom( result.getClass() ) )
                 {
