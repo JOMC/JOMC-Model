@@ -106,9 +106,9 @@ public class DefaultModelValidator implements ModelValidator
                         this.assertNoSpecificationDeclarations( i, report );
                         this.assertImplementationMessagesUniqueness( i, report );
                         this.assertImplementationPropertiesUniqueness( i, report );
-                        this.assertImplementationDependencyCompatibility( modules, i, report );
-                        this.assertImplementationInheritanceCompatibility( modules, i, report );
-                        this.assertImplementationSpecificationCompatibility( modules, i, report );
+                        this.assertImplementationDependencyCompatibility( context, modules, i, report );
+                        this.assertImplementationInheritanceCompatibility( context, modules, i, report );
+                        this.assertImplementationSpecificationCompatibility( context, modules, i, report );
                         this.assertNoMissingMandatoryDependencies( modules, i, report );
                         this.assertNoDependenciesWithoutSpecificationClass( modules, i, report );
                         this.assertNoInheritanceCycle( modules, i, report );
@@ -120,7 +120,7 @@ public class DefaultModelValidator implements ModelValidator
                         this.assertMessageOverrideConstraints( modules, i, report );
                         this.assertPropertyOverrideConstraints( modules, i, report );
                         this.assertDependencyPropertiesOverrideConstraints( modules, i, report );
-                        this.assertValidMessageTemplates( modules, i, report );
+                        this.assertValidMessageTemplates( context, modules, i, report );
                         this.assertNoPropertyValueAndAnyObject( i, report );
                         this.assertPropertyTypeWithAnyObject( i, report );
                         this.assertValidPropertyJavaValues( context, i, report );
@@ -162,6 +162,11 @@ public class DefaultModelValidator implements ModelValidator
                 }
                 catch ( final ModelException e )
                 {
+                    if ( context.isLoggable( Level.FINE ) )
+                    {
+                        context.log( Level.FINE, e.getMessage(), e );
+                    }
+
                     report.getDetails().add( this.createDetail(
                         "MODULE_PROPERTY_JAVA_VALUE_CONSTRAINT", Level.SEVERE,
                         "modulePropertyJavaValueConstraint", new Object[]
@@ -187,6 +192,11 @@ public class DefaultModelValidator implements ModelValidator
                 }
                 catch ( final ModelException e )
                 {
+                    if ( context.isLoggable( Level.FINE ) )
+                    {
+                        context.log( Level.FINE, e.getMessage(), e );
+                    }
+
                     report.getDetails().add( this.createDetail(
                         "SPECIFICATION_PROPERTY_JAVA_VALUE_CONSTRAINT", Level.SEVERE,
                         "specificationPropertyJavaValueConstraint", new Object[]
@@ -212,6 +222,11 @@ public class DefaultModelValidator implements ModelValidator
                 }
                 catch ( final ModelException e )
                 {
+                    if ( context.isLoggable( Level.FINE ) )
+                    {
+                        context.log( Level.FINE, e.getMessage(), e );
+                    }
+
                     report.getDetails().add( this.createDetail(
                         "IMPLEMENTATION_PROPERTY_JAVA_VALUE_CONSTRAINT", Level.SEVERE,
                         "implementationPropertyJavaValueConstraint", new Object[]
@@ -224,7 +239,8 @@ public class DefaultModelValidator implements ModelValidator
         }
     }
 
-    private void assertValidMessageTemplates( final Modules modules, final Implementation implementation,
+    private void assertValidMessageTemplates( final ModelContext context, final Modules modules,
+                                              final Implementation implementation,
                                               final ModelValidationReport report )
     {
         final Messages messages = modules.getMessages( implementation.getIdentifier() );
@@ -242,6 +258,11 @@ public class DefaultModelValidator implements ModelValidator
                         }
                         catch ( final IllegalArgumentException e )
                         {
+                            if ( context.isLoggable( Level.FINE ) )
+                            {
+                                context.log( Level.FINE, e.getMessage(), e );
+                            }
+
                             report.getDetails().add( this.createDetail(
                                 "IMPLEMENTATION_MESSAGE_TEMPLATE_CONSTRAINT", Level.SEVERE,
                                 "implementationMessageTemplateConstraint", new Object[]
@@ -690,7 +711,7 @@ public class DefaultModelValidator implements ModelValidator
         }
     }
 
-    private void assertImplementationSpecificationCompatibility( final Modules modules,
+    private void assertImplementationSpecificationCompatibility( final ModelContext context, final Modules modules,
                                                                  final Implementation implementation,
                                                                  final ModelValidationReport report )
     {
@@ -741,6 +762,11 @@ public class DefaultModelValidator implements ModelValidator
                         }
                         catch ( final ParseException e )
                         {
+                            if ( context.isLoggable( Level.FINE ) )
+                            {
+                                context.log( Level.FINE, e.getMessage(), e );
+                            }
+
                             final ModelValidationReport.Detail d = new ModelValidationReport.Detail(
                                 "IMPLEMENTATION_SPECIFICATION_COMPATIBILITY_VERSIONING_PARSE_EXCEPTION",
                                 Level.SEVERE, e.getMessage(),
@@ -750,6 +776,11 @@ public class DefaultModelValidator implements ModelValidator
                         }
                         catch ( final TokenMgrError e )
                         {
+                            if ( context.isLoggable( Level.FINE ) )
+                            {
+                                context.log( Level.FINE, e.getMessage(), e );
+                            }
+
                             final ModelValidationReport.Detail d = new ModelValidationReport.Detail(
                                 "IMPLEMENTATION_SPECIFICATION_COMPATIBILITY_VERSIONING_TOKEN_MANAGER_ERROR",
                                 Level.SEVERE, e.getMessage(),
@@ -763,7 +794,7 @@ public class DefaultModelValidator implements ModelValidator
         }
     }
 
-    private void assertImplementationDependencyCompatibility( final Modules modules,
+    private void assertImplementationDependencyCompatibility( final ModelContext context, final Modules modules,
                                                               final Implementation implementation,
                                                               final ModelValidationReport report )
     {
@@ -812,6 +843,11 @@ public class DefaultModelValidator implements ModelValidator
                         }
                         catch ( final ParseException e )
                         {
+                            if ( context.isLoggable( Level.FINE ) )
+                            {
+                                context.log( Level.FINE, e.getMessage(), e );
+                            }
+
                             final ModelValidationReport.Detail detail = new ModelValidationReport.Detail(
                                 "IMPLEMENTATION_DEPENDENCY_SPECIFICATION_COMPATIBILITY_VERSIONING_PARSE_EXCEPTION",
                                 Level.SEVERE, e.getMessage(),
@@ -821,6 +857,11 @@ public class DefaultModelValidator implements ModelValidator
                         }
                         catch ( final TokenMgrError e )
                         {
+                            if ( context.isLoggable( Level.FINE ) )
+                            {
+                                context.log( Level.FINE, e.getMessage(), e );
+                            }
+
                             final ModelValidationReport.Detail detail = new ModelValidationReport.Detail(
                                 "IMPLEMENTATION_DEPENDENCY_SPECIFICATION_COMPATIBILITY_VERSIONING_TOKEN_MANAGER_ERROR",
                                 Level.SEVERE, e.getMessage(),
@@ -1027,7 +1068,7 @@ public class DefaultModelValidator implements ModelValidator
         }
     }
 
-    private void assertImplementationInheritanceCompatibility( final Modules modules,
+    private void assertImplementationInheritanceCompatibility( final ModelContext context, final Modules modules,
                                                                final Implementation implementation,
                                                                final ModelValidationReport report )
     {
@@ -1066,6 +1107,11 @@ public class DefaultModelValidator implements ModelValidator
                         }
                         catch ( final ParseException e )
                         {
+                            if ( context.isLoggable( Level.FINE ) )
+                            {
+                                context.log( Level.FINE, e.getMessage(), e );
+                            }
+
                             final ModelValidationReport.Detail detail = new ModelValidationReport.Detail(
                                 "IMPLEMENTATION_INHERITANCE_COMPATIBILITY_VERSIONING_PARSE_EXCEPTION",
                                 Level.SEVERE, e.getMessage(),
@@ -1075,6 +1121,11 @@ public class DefaultModelValidator implements ModelValidator
                         }
                         catch ( final TokenMgrError e )
                         {
+                            if ( context.isLoggable( Level.FINE ) )
+                            {
+                                context.log( Level.FINE, e.getMessage(), e );
+                            }
+
                             final ModelValidationReport.Detail detail = new ModelValidationReport.Detail(
                                 "IMPLEMENTATION_INHERITANCE_COMPATIBILITY_VERSIONING_TOKEN_MANAGER_ERROR",
                                 Level.SEVERE, e.getMessage(),
