@@ -603,7 +603,7 @@ public abstract class ModelContext
 
         final Schema schema = this.createSchema();
         final Validator validator = schema.newValidator();
-        final ModelErrorHandler modelErrorHandler = new ModelErrorHandler();
+        final ModelErrorHandler modelErrorHandler = new ModelErrorHandler( this );
         validator.setErrorHandler( modelErrorHandler );
 
         try
@@ -612,6 +612,11 @@ public abstract class ModelContext
         }
         catch ( final SAXException e )
         {
+            if ( this.isLoggable( Level.FINE ) )
+            {
+                this.log( Level.FINE, e.getMessage(), e );
+            }
+
             if ( modelErrorHandler.getReport().isModelValid() )
             {
                 throw new ModelException( e );
@@ -902,23 +907,32 @@ public abstract class ModelContext
 class ModelErrorHandler extends DefaultHandler
 {
 
+    /** The context of the instance. */
+    private ModelContext context;
+
     /** The report of the instance. */
     private ModelValidationReport report;
 
-    /** Creates a new {@code ModelErrorHandler} instance. */
-    public ModelErrorHandler()
+    /**
+     * Creates a new {@code ModelErrorHandler} instance taking a context.
+     *
+     * @param context The context of the instance.
+     */
+    public ModelErrorHandler( final ModelContext context )
     {
-        this( null );
+        this( context, null );
     }
 
     /**
      * Creates a new {@code ModelErrorHandler} instance taking a report to use for collecting validation events.
      *
+     * @param context The context of the instance.
      * @param report A report to use for collecting validation events.
      */
-    public ModelErrorHandler( final ModelValidationReport report )
+    public ModelErrorHandler( final ModelContext context, final ModelValidationReport report )
     {
         super();
+        this.context = context;
         this.report = report;
     }
 
@@ -940,6 +954,11 @@ class ModelErrorHandler extends DefaultHandler
     @Override
     public void warning( final SAXParseException exception ) throws SAXException
     {
+        if ( this.context != null && this.context.isLoggable( Level.FINE ) )
+        {
+            this.context.log( Level.FINE, exception.getMessage(), exception );
+        }
+
         this.getReport().getDetails().add( new ModelValidationReport.Detail(
             "W3C XML 1.0 Recommendation - Warning condition", Level.WARNING, exception.getMessage(), null ) );
 
@@ -948,6 +967,11 @@ class ModelErrorHandler extends DefaultHandler
     @Override
     public void error( final SAXParseException exception ) throws SAXException
     {
+        if ( this.context != null && this.context.isLoggable( Level.FINE ) )
+        {
+            this.context.log( Level.FINE, exception.getMessage(), exception );
+        }
+
         this.getReport().getDetails().add( new ModelValidationReport.Detail(
             "W3C XML 1.0 Recommendation - Section 1.2 - Error", Level.SEVERE, exception.getMessage(), null ) );
 
@@ -956,6 +980,11 @@ class ModelErrorHandler extends DefaultHandler
     @Override
     public void fatalError( final SAXParseException exception ) throws SAXException
     {
+        if ( this.context != null && this.context.isLoggable( Level.FINE ) )
+        {
+            this.context.log( Level.FINE, exception.getMessage(), exception );
+        }
+
         this.getReport().getDetails().add( new ModelValidationReport.Detail(
             "W3C XML 1.0 Recommendation - Section 1.2 - Fatal Error", Level.SEVERE, exception.getMessage(), null ) );
 

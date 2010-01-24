@@ -145,6 +145,11 @@ public class DefaultModelValidator implements ModelValidator
         }
         catch ( final JAXBException e )
         {
+            if ( context.isLoggable( Level.FINE ) )
+            {
+                context.log( Level.FINE, e.getMessage(), e );
+            }
+
             throw new ModelException( e );
         }
     }
