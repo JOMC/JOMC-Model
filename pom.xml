@@ -97,6 +97,39 @@
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-schemas</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/schemas</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>src/main/schemas</directory>
+                  <filtering>false</filtering>
+                  <includes>
+                    <include>*.xsd</include>
+                    <include>*.xjb</include>
+                  </includes>
+                </resource>
+                <resource>
+                  <directory>${remoteResourcesOutputDirectory}</directory>
+                  <filtering>false</filtering>
+                  <includes>
+                    <include>**/*.txt</include>
+                  </includes>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
         <executions>
           <execution>
@@ -106,12 +139,8 @@
               <goal>jar</goal>
             </goals>
             <configuration>
-              <classesDirectory>src/main/schemas</classesDirectory>
+              <classesDirectory>${project.build.directory}/schemas</classesDirectory>
               <classifier>schemas</classifier>
-              <includes>
-                <include>*.xsd</include>
-                <include>*.xjb</include>
-              </includes>
             </configuration>
           </execution>
         </executions>
