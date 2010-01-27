@@ -32,6 +32,7 @@
  */
 package org.jomc.model.test;
 
+import java.util.logging.Level;
 import javax.xml.XMLConstants;
 import javax.xml.bind.util.JAXBSource;
 import javax.xml.transform.Source;
@@ -71,6 +72,17 @@ public class ModelContextTest extends TestCase
         if ( this.modelContext == null )
         {
             this.modelContext = ModelContext.createModelContext( this.getClass().getClassLoader() );
+            this.modelContext.getListeners().add( new ModelContext.Listener()
+            {
+
+                @Override
+                public void onLog( final Level level, final String message, final Throwable t )
+                {
+                    System.out.println( "[" + level.getLocalizedName() + "] " + message );
+                }
+
+            } );
+
         }
 
         return this.modelContext;

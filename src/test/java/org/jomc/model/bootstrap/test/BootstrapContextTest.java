@@ -36,6 +36,7 @@ import junit.framework.Assert;
 import org.jomc.model.bootstrap.BootstrapContext;
 import org.jomc.model.bootstrap.BootstrapException;
 import org.jomc.model.bootstrap.Schemas;
+import org.jomc.model.bootstrap.Services;
 
 /**
  * Test cases for {@code org.jomc.model.bootstrap.BootstrapContext} implementations.
@@ -115,6 +116,13 @@ public class BootstrapContextTest
         }
 
         Assert.assertTrue( this.getBootstrapContext().findResources( "META-INF/jomc.xsl" ).hasMoreElements() );
+    }
+
+    public void testFindServices() throws Exception
+    {
+        final Services provided = this.getBootstrapContext().findServices();
+        Assert.assertNotNull( provided );
+        Assert.assertNotNull( provided.getServices( "TestServiceProvider" ) );
     }
 
     public void testFindSchemas() throws Exception

@@ -32,9 +32,12 @@
  */
 package org.jomc.model;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 import java.net.URI;
@@ -62,14 +65,18 @@ import javax.xml.transform.Source;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
 import org.jomc.model.bootstrap.BootstrapContext;
 import org.jomc.model.bootstrap.BootstrapException;
 import org.jomc.model.bootstrap.Schemas;
+import org.jomc.model.bootstrap.Service;
+import org.jomc.model.bootstrap.Services;
 import org.w3c.dom.ls.LSInput;
 import org.w3c.dom.ls.LSResourceResolver;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
@@ -88,6 +95,9 @@ public class DefaultModelContext extends ModelContext
         "xsd"
     };
 
+    /** Cached {@code Services}. */
+    private Reference<Services> cachedServices = new SoftReference<Services>( null );
+
     /** Cached {@code Schemas}. */
     private Reference<Schemas> cachedSchemas = new SoftReference<Schemas>( null );
 
@@ -102,6 +112,306 @@ public class DefaultModelContext extends ModelContext
     public DefaultModelContext( final ClassLoader classLoader )
     {
         super( classLoader );
+    }
+
+    /**
+     * Searches the context for modules.
+     *
+     * @return The modules found in the context.
+     *
+     * @throws ModelException if searching modules fails.
+     *
+     * @see BootstrapContext#findServices()
+     * @see ModelProvider#findModules(org.jomc.model.ModelContext)
+     */
+    @Override
+    public Modules findModules() throws ModelException
+    {
+        try
+        {
+            final Text text = new Text();
+            text.setLanguage( "en" );
+            text.setValue( getMessage( "contextModulesInfo" ) );
+
+            final Modules modules = new Modules();
+            modules.setDocumentation( new Texts() );
+            modules.getDocumentation().setDefaultLanguage( "en" );
+            modules.getDocumentation().getText().add( text );
+
+            final List<Service> providers = this.getServices().getServices( ModelProvider.class );
+
+            if ( providers != null )
+            {
+                for ( Service provider : providers )
+                {
+                    final Class<ModelProvider> modelProviderClass =
+                        (Class<ModelProvider>) this.findClass( provider.getClazz() );
+
+                    if ( modelProviderClass == null )
+                    {
+                        throw new ModelException( getMessage( "serviceNotFound", provider.getOrdinal(),
+                                                              provider.getIdentifier(), provider.getClazz() ) );
+
+                    }
+
+                    final ModelProvider modelProvider = modelProviderClass.newInstance();
+                    final Modules provided = modelProvider.findModules( this );
+                    if ( provided != null )
+                    {
+                        modules.getModule().addAll( provided.getModule() );
+                    }
+                }
+            }
+
+            if ( this.isLoggable( Level.FINEST ) )
+            {
+                final StringWriter stringWriter = new StringWriter();
+                final Marshaller m = this.createMarshaller();
+                m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
+                m.marshal( new ObjectFactory().createModules( modules ), stringWriter );
+                stringWriter.close();
+
+                this.log( Level.FINEST, getMessage( "foundModules" ), null );
+
+                final BufferedReader reader = new BufferedReader( new StringReader( stringWriter.toString() ) );
+                String line;
+
+                while ( ( line = reader.readLine() ) != null )
+                {
+                    this.log( Level.FINEST, "\t" + line, null );
+                }
+
+                reader.close();
+            }
+
+            return modules;
+        }
+        catch ( final BootstrapException e )
+        {
+            throw new ModelException( e );
+        }
+        catch ( final InstantiationException e )
+        {
+            throw new ModelException( e );
+        }
+        catch ( final IllegalAccessException e )
+        {
+            throw new ModelException( e );
+        }
+        catch ( final IOException e )
+        {
+            throw new ModelException( e );
+        }
+        catch ( final JAXBException e )
+        {
+            throw new ModelException( e );
+        }
+    }
+
+    /**
+     * Processes modules.
+     *
+     * @param modules The modules to process.
+     *
+     * @return The processed modules.
+     *
+     * @throws NullPointerException if {@code modules} is {@code null}.
+     * @throws ModelException if processing modules fails.
+     *
+     * @see BootstrapContext#findServices()
+     * @see ModelProcessor#processModules(org.jomc.model.ModelContext, org.jomc.model.Modules)
+     */
+    @Override
+    public Modules processModules( final Modules modules ) throws ModelException
+    {
+        if ( modules == null )
+        {
+            throw new NullPointerException( "modules" );
+        }
+
+        try
+        {
+            Modules processed = modules;
+            final List<Service> processors = this.getServices().getServices( ModelProcessor.class );
+
+            if ( processors != null )
+            {
+                for ( Service processor : processors )
+                {
+                    final Class<ModelProcessor> modelProcessorClass =
+                        (Class<ModelProcessor>) this.findClass( processor.getClazz() );
+
+                    if ( modelProcessorClass == null )
+                    {
+                        throw new ModelException( getMessage( "serviceNotFound", processor.getOrdinal(),
+                                                              processor.getIdentifier(), processor.getClazz() ) );
+
+                    }
+
+                    final ModelProcessor modelProcessor = modelProcessorClass.newInstance();
+                    final Modules current = modelProcessor.processModules( this, processed );
+                    if ( current != null )
+                    {
+                        processed = current;
+                    }
+                }
+            }
+
+            if ( this.isLoggable( Level.FINEST ) )
+            {
+                final StringWriter stringWriter = new StringWriter();
+                final Marshaller m = this.createMarshaller();
+                m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
+                m.marshal( new ObjectFactory().createModules( processed ), stringWriter );
+                stringWriter.close();
+
+                this.log( Level.FINEST, getMessage( "processedModules" ), null );
+
+                final BufferedReader reader = new BufferedReader( new StringReader( stringWriter.toString() ) );
+                String line;
+
+                while ( ( line = reader.readLine() ) != null )
+                {
+                    this.log( Level.FINEST, "\t" + line, null );
+                }
+
+                reader.close();
+            }
+
+            return processed;
+        }
+        catch ( final BootstrapException e )
+        {
+            throw new ModelException( e );
+        }
+        catch ( final InstantiationException e )
+        {
+            throw new ModelException( e );
+        }
+        catch ( final IllegalAccessException e )
+        {
+            throw new ModelException( e );
+        }
+        catch ( final IOException e )
+        {
+            throw new ModelException( e );
+        }
+        catch ( final JAXBException e )
+        {
+            throw new ModelException( e );
+        }
+    }
+
+    /**
+     * Validates a given model.
+     *
+     * @param model A source providing the model to validate.
+     *
+     * @return Validation report.
+     *
+     * @throws NullPointerException if {@code model} is {@code null}.
+     * @throws ModelException if validating the model fails.
+     */
+    @Override
+    public ModelValidationReport validateModel( final Source model ) throws ModelException
+    {
+        if ( model == null )
+        {
+            throw new NullPointerException( "model" );
+        }
+
+        final Schema schema = this.createSchema();
+        final Validator validator = schema.newValidator();
+        final ModelErrorHandler modelErrorHandler = new ModelErrorHandler( this );
+        validator.setErrorHandler( modelErrorHandler );
+
+        try
+        {
+            validator.validate( model );
+        }
+        catch ( final SAXException e )
+        {
+            if ( this.isLoggable( Level.FINE ) )
+            {
+                this.log( Level.FINE, e.getMessage(), e );
+            }
+
+            if ( modelErrorHandler.getReport().isModelValid() )
+            {
+                throw new ModelException( e );
+            }
+        }
+        catch ( final IOException e )
+        {
+            throw new ModelException( e );
+        }
+
+        return modelErrorHandler.getReport();
+    }
+
+    /**
+     * Validates a given list of modules.
+     *
+     * @param modules The list of modules to validate.
+     *
+     * @return Validation report.
+     *
+     * @throws NullPointerException if {@code modules} is {@code null}.
+     * @throws ModelException if validating the modules fails.
+     *
+     * @see BootstrapContext#findServices()
+     * @see ModelValidator#validateModel(org.jomc.model.ModelContext, org.jomc.model.Modules)
+     */
+    @Override
+    public ModelValidationReport validateModel( final Modules modules ) throws ModelException
+    {
+        if ( modules == null )
+        {
+            throw new NullPointerException( "modules" );
+        }
+
+        try
+        {
+            final List<Service> validators = this.getServices().getServices( ModelValidator.class );
+            final ModelValidationReport report = new ModelValidationReport();
+
+            if ( validators != null )
+            {
+                for ( Service validator : validators )
+                {
+                    final Class<ModelValidator> modelValidatorClass =
+                        (Class<ModelValidator>) this.findClass( validator.getClazz() );
+
+                    if ( modelValidatorClass == null )
+                    {
+                        throw new ModelException( getMessage( "serviceNotFound", validator.getOrdinal(),
+                                                              validator.getIdentifier(), validator.getClazz() ) );
+
+                    }
+
+                    final ModelValidator modelValidator = modelValidatorClass.newInstance();
+                    final ModelValidationReport current = modelValidator.validateModel( this, modules );
+                    if ( current != null )
+                    {
+                        report.getDetails().addAll( current.getDetails() );
+                    }
+                }
+            }
+
+            return report;
+        }
+        catch ( final BootstrapException e )
+        {
+            throw new ModelException( e );
+        }
+        catch ( final InstantiationException e )
+        {
+            throw new ModelException( e );
+        }
+        catch ( final IllegalAccessException e )
+        {
+            throw new ModelException( e );
+        }
     }
 
     @Override
@@ -153,22 +463,16 @@ public class DefaultModelContext extends ModelContext
                             {
                                 if ( isLoggable( Level.WARNING ) )
                                 {
-                                    log( Level.WARNING, getMessage( "resourceNotFound", new Object[]
-                                        {
-                                            s.getClasspathId()
-                                        } ), null );
-
+                                    log( Level.WARNING, getMessage( "resourceNotFound", s.getClasspathId() ), null );
                                 }
                             }
                         }
 
                         if ( isLoggable( Level.FINE ) )
                         {
-                            log( Level.FINE, getMessage( "resolutionInfo", new Object[]
-                                {
-                                    publicId + ", " + systemId,
-                                    schemaSource.getPublicId() + ", " + schemaSource.getSystemId()
-                                } ), null );
+                            log( Level.FINE, getMessage(
+                                "resolutionInfo", publicId + ", " + systemId,
+                                schemaSource.getPublicId() + ", " + schemaSource.getSystemId() ), null );
 
                         }
                     }
@@ -195,11 +499,8 @@ public class DefaultModelContext extends ModelContext
 
                                     if ( isLoggable( Level.FINE ) )
                                     {
-                                        log( Level.FINE, getMessage( "resolutionInfo", new Object[]
-                                            {
-                                                systemUri.toASCIIString(),
-                                                schemaSource.getSystemId()
-                                            } ), null );
+                                        log( Level.FINE, getMessage( "resolutionInfo", systemUri.toASCIIString(),
+                                                                     schemaSource.getSystemId() ), null );
 
                                     }
 
@@ -211,10 +512,8 @@ public class DefaultModelContext extends ModelContext
                         {
                             if ( isLoggable( Level.WARNING ) )
                             {
-                                log( Level.WARNING, getMessage( "unsupportedSystemIdUri", new Object[]
-                                    {
-                                        systemId, systemUri.toASCIIString()
-                                    } ), null );
+                                log( Level.WARNING, getMessage( "unsupportedSystemIdUri", systemId,
+                                                                systemUri.toASCIIString() ), null );
 
                             }
 
@@ -226,25 +525,19 @@ public class DefaultModelContext extends ModelContext
                 {
                     if ( isLoggable( Level.WARNING ) )
                     {
-                        log( Level.WARNING, getMessage( "unsupportedSystemIdUri", new Object[]
-                            {
-                                systemId, e.getMessage()
-                            } ), null );
-
+                        log( Level.WARNING, getMessage( "unsupportedSystemIdUri", systemId, e.getMessage() ), null );
                     }
 
                     schemaSource = null;
                 }
                 catch ( final BootstrapException e )
                 {
-                    throw (IOException) new IOException( getMessage( "failedResolvingSchemas", null ) ).initCause( e );
+                    throw (IOException) new IOException( getMessage( "failedResolvingSchemas" ) ).initCause( e );
                 }
                 catch ( final ModelException e )
                 {
-                    throw (IOException) new IOException( getMessage( "failedResolving", new Object[]
-                        {
-                            publicId, systemId, e.getMessage()
-                        } ) ).initCause( e );
+                    throw (IOException) new IOException( getMessage(
+                        "failedResolving", publicId, systemId, e.getMessage() ) ).initCause( e );
 
                 }
 
@@ -285,11 +578,9 @@ public class DefaultModelContext extends ModelContext
 
                                 public void setCharacterStream( final Reader characterStream )
                                 {
-                                    log( Level.WARNING, getMessage( "unsupportedOperation", new Object[]
-                                        {
-                                            "setCharacterStream",
-                                            DefaultModelContext.class.getName() + ".LSResourceResolver"
-                                        } ), null );
+                                    log( Level.WARNING, getMessage(
+                                        "unsupportedOperation", "setCharacterStream",
+                                        DefaultModelContext.class.getName() + ".LSResourceResolver" ), null );
 
                                 }
 
@@ -300,11 +591,9 @@ public class DefaultModelContext extends ModelContext
 
                                 public void setByteStream( final InputStream byteStream )
                                 {
-                                    log( Level.WARNING, getMessage( "unsupportedOperation", new Object[]
-                                        {
-                                            "setByteStream",
-                                            DefaultModelContext.class.getName() + ".LSResourceResolver"
-                                        } ), null );
+                                    log( Level.WARNING, getMessage(
+                                        "unsupportedOperation", "setByteStream",
+                                        DefaultModelContext.class.getName() + ".LSResourceResolver" ), null );
 
                                 }
 
@@ -315,11 +604,9 @@ public class DefaultModelContext extends ModelContext
 
                                 public void setStringData( final String stringData )
                                 {
-                                    log( Level.WARNING, getMessage( "unsupportedOperation", new Object[]
-                                        {
-                                            "setStringData",
-                                            DefaultModelContext.class.getName() + ".LSResourceResolver"
-                                        } ), null );
+                                    log( Level.WARNING, getMessage(
+                                        "unsupportedOperation", "setStringData",
+                                        DefaultModelContext.class.getName() + ".LSResourceResolver" ), null );
 
                                 }
 
@@ -330,11 +617,9 @@ public class DefaultModelContext extends ModelContext
 
                                 public void setSystemId( final String systemId )
                                 {
-                                    log( Level.WARNING, getMessage( "unsupportedOperation", new Object[]
-                                        {
-                                            "setSystemId",
-                                            DefaultModelContext.class.getName() + ".LSResourceResolver"
-                                        } ), null );
+                                    log( Level.WARNING, getMessage(
+                                        "unsupportedOperation", "setSystemId",
+                                        DefaultModelContext.class.getName() + ".LSResourceResolver" ), null );
 
                                 }
 
@@ -345,11 +630,9 @@ public class DefaultModelContext extends ModelContext
 
                                 public void setPublicId( final String publicId )
                                 {
-                                    log( Level.WARNING, getMessage( "unsupportedOperation", new Object[]
-                                        {
-                                            "setPublicId",
-                                            DefaultModelContext.class.getName() + ".LSResourceResolver"
-                                        } ), null );
+                                    log( Level.WARNING, getMessage(
+                                        "unsupportedOperation", "setPublicId",
+                                        DefaultModelContext.class.getName() + ".LSResourceResolver" ), null );
 
                                 }
 
@@ -360,11 +643,9 @@ public class DefaultModelContext extends ModelContext
 
                                 public void setBaseURI( final String baseURI )
                                 {
-                                    log( Level.WARNING, getMessage( "unsupportedOperation", new Object[]
-                                        {
-                                            "setBaseURI",
-                                            DefaultModelContext.class.getName() + ".LSResourceResolver"
-                                        } ), null );
+                                    log( Level.WARNING, getMessage(
+                                        "unsupportedOperation", "setBaseURI",
+                                        DefaultModelContext.class.getName() + ".LSResourceResolver" ), null );
 
                                 }
 
@@ -375,11 +656,9 @@ public class DefaultModelContext extends ModelContext
 
                                 public void setEncoding( final String encoding )
                                 {
-                                    log( Level.WARNING, getMessage( "unsupportedOperation", new Object[]
-                                        {
-                                            "setEncoding",
-                                            DefaultModelContext.class.getName() + ".LSResourceResolver"
-                                        } ), null );
+                                    log( Level.WARNING, getMessage(
+                                        "unsupportedOperation", "setEncoding",
+                                        DefaultModelContext.class.getName() + ".LSResourceResolver" ), null );
 
                                 }
 
@@ -390,11 +669,9 @@ public class DefaultModelContext extends ModelContext
 
                                 public void setCertifiedText( final boolean certifiedText )
                                 {
-                                    log( Level.WARNING, getMessage( "unsupportedOperation", new Object[]
-                                        {
-                                            "setCertifiedText",
-                                            DefaultModelContext.class.getName() + ".LSResourceResolver"
-                                        } ), null );
+                                    log( Level.WARNING, getMessage(
+                                        "unsupportedOperation", "setCertifiedText",
+                                        DefaultModelContext.class.getName() + ".LSResourceResolver" ), null );
 
                                 }
 
@@ -404,21 +681,15 @@ public class DefaultModelContext extends ModelContext
                     }
                     else if ( isLoggable( Level.WARNING ) )
                     {
-                        log( Level.WARNING, getMessage( "unsupportedResourceType", new Object[]
-                            {
-                                type
-                            } ), null );
-
+                        log( Level.WARNING, getMessage( "unsupportedResourceType", type ), null );
                     }
                 }
                 catch ( final SAXException e )
                 {
                     if ( isLoggable( Level.SEVERE ) )
                     {
-                        log( Level.SEVERE, getMessage( "failedResolving", new Object[]
-                            {
-                                resolvePublicId, resolveSystemId, e.getMessage()
-                            } ), e );
+                        log( Level.SEVERE, getMessage( "failedResolving", resolvePublicId, resolveSystemId,
+                                                       e.getMessage() ), e );
 
                     }
                 }
@@ -426,10 +697,8 @@ public class DefaultModelContext extends ModelContext
                 {
                     if ( isLoggable( Level.SEVERE ) )
                     {
-                        log( Level.SEVERE, getMessage( "failedResolving", new Object[]
-                            {
-                                resolvePublicId, resolveSystemId, e.getMessage()
-                            } ), e );
+                        log( Level.SEVERE, getMessage( "failedResolving", resolvePublicId, resolveSystemId,
+                                                       e.getMessage() ), e );
 
                     }
                 }
@@ -437,10 +706,8 @@ public class DefaultModelContext extends ModelContext
                 {
                     if ( isLoggable( Level.SEVERE ) )
                     {
-                        log( Level.SEVERE, getMessage( "failedResolving", new Object[]
-                            {
-                                resolvePublicId, resolveSystemId, e.getMessage()
-                            } ), e );
+                        log( Level.SEVERE, getMessage( "failedResolving", resolvePublicId, resolveSystemId,
+                                                       e.getMessage() ), e );
 
                     }
                 }
@@ -474,7 +741,7 @@ public class DefaultModelContext extends ModelContext
 
             if ( sources.isEmpty() )
             {
-                throw new ModelException( this.getMessage( "missingSchemas", null ) );
+                throw new ModelException( getMessage( "missingSchemas" ) );
             }
 
             f.setResourceResolver( this.createResourceResolver() );
@@ -510,18 +777,14 @@ public class DefaultModelContext extends ModelContext
                     packageNames.append( ':' ).append( schema.getContextId() );
                     if ( this.isLoggable( Level.CONFIG ) )
                     {
-                        this.log( Level.CONFIG, this.getMessage( "foundContext", new Object[]
-                            {
-                                schema.getContextId()
-                            } ), null );
-
+                        this.log( Level.CONFIG, getMessage( "foundContext", schema.getContextId() ), null );
                     }
                 }
             }
 
             if ( packageNames.length() == 0 )
             {
-                throw new ModelException( this.getMessage( "missingSchemas", null ) );
+                throw new ModelException( getMessage( "missingSchemas" ) );
             }
 
             return JAXBContext.newInstance( packageNames.toString().substring( 1 ), this.getClassLoader() );
@@ -562,7 +825,7 @@ public class DefaultModelContext extends ModelContext
 
             if ( packageNames.length() == 0 )
             {
-                throw new ModelException( this.getMessage( "missingSchemas", null ) );
+                throw new ModelException( getMessage( "missingSchemas" ) );
             }
 
             final Marshaller m =
@@ -600,6 +863,37 @@ public class DefaultModelContext extends ModelContext
     }
 
     /**
+     * Gets the services of the instance.
+     *
+     * @return The services of the instance.
+     *
+     * @throws BootstrapException if getting the services fails.
+     */
+    private Services getServices() throws BootstrapException
+    {
+        Services services = this.cachedServices.get();
+
+        if ( services == null )
+        {
+            services = BootstrapContext.createBootstrapContext( this.getClassLoader() ).findServices();
+
+            if ( services != null && this.isLoggable( Level.CONFIG ) )
+            {
+                for ( org.jomc.model.bootstrap.Service s : services.getService() )
+                {
+                    this.log( Level.CONFIG, getMessage(
+                        "foundService", s.getOrdinal(), s.getIdentifier(), s.getClazz() ), null );
+
+                }
+            }
+
+            this.cachedServices = new SoftReference( services );
+        }
+
+        return services;
+    }
+
+    /**
      * Gets the schemas of the instance.
      *
      * @return The schemas of the instance.
@@ -618,10 +912,8 @@ public class DefaultModelContext extends ModelContext
             {
                 for ( org.jomc.model.bootstrap.Schema s : schemas.getSchema() )
                 {
-                    this.log( Level.CONFIG, this.getMessage( "foundSchema", new Object[]
-                        {
-                            s.getPublicId(), s.getSystemId(), s.getContextId(), s.getClasspathId()
-                        } ), null );
+                    this.log( Level.CONFIG, getMessage( "foundSchema", s.getPublicId(), s.getSystemId(),
+                                                        s.getContextId(), s.getClasspathId() ), null );
 
                 }
             }
@@ -664,11 +956,7 @@ public class DefaultModelContext extends ModelContext
 
                 if ( this.isLoggable( Level.FINE ) )
                 {
-                    this.log( Level.FINE, this.getMessage( "processing", new Object[]
-                        {
-                            externalForm
-                        } ), null );
-
+                    this.log( Level.FINE, getMessage( "processing", externalForm ), null );
                 }
 
                 for ( Map.Entry<String, Attributes> entry : mf.getEntries().entrySet() )
@@ -682,10 +970,8 @@ public class DefaultModelContext extends ModelContext
 
                             if ( this.isLoggable( Level.FINE ) )
                             {
-                                this.log( Level.FINE, this.getMessage( "foundSchemaCandidate", new Object[]
-                                    {
-                                        schemaUrl.toExternalForm()
-                                    } ), null );
+                                this.log( Level.FINE, getMessage( "foundSchemaCandidate", schemaUrl.toExternalForm() ),
+                                          null );
 
                             }
                         }
@@ -695,10 +981,8 @@ public class DefaultModelContext extends ModelContext
 
             if ( this.isLoggable( Level.FINE ) )
             {
-                this.log( Level.FINE, this.getMessage( "contextReport", new Object[]
-                    {
-                        count, "META-INF/MANIFEST.MF", Long.valueOf( System.currentTimeMillis() - t0 )
-                    } ), null );
+                this.log( Level.FINE, getMessage( "contextReport", count, "META-INF/MANIFEST.MF",
+                                                  Long.valueOf( System.currentTimeMillis() - t0 ) ), null );
 
             }
 
@@ -708,10 +992,104 @@ public class DefaultModelContext extends ModelContext
         return resources;
     }
 
-    private String getMessage( final String key, final Object args )
+    private static String getMessage( final String key, final Object... args )
     {
-        return new MessageFormat( ResourceBundle.getBundle( DefaultModelContext.class.getName().replace( '.', '/' ),
-                                                            Locale.getDefault() ).getString( key ) ).format( args );
+        return MessageFormat.format( ResourceBundle.getBundle(
+            DefaultModelContext.class.getName().replace( '.', '/' ), Locale.getDefault() ).getString( key ), args );
+
+    }
+
+}
+
+/**
+ * {@code ErrorHandler} collecting {@code ModelValidationReport} details.
+ *
+ * @author <a href="mailto:cs@jomc.org">Christian Schulte</a>
+ * @version $Id$
+ */
+class ModelErrorHandler extends DefaultHandler
+{
+
+    /** The context of the instance. */
+    private ModelContext context;
+
+    /** The report of the instance. */
+    private ModelValidationReport report;
+
+    /**
+     * Creates a new {@code ModelErrorHandler} instance taking a context.
+     *
+     * @param context The context of the instance.
+     */
+    public ModelErrorHandler( final ModelContext context )
+    {
+        this( context, null );
+    }
+
+    /**
+     * Creates a new {@code ModelErrorHandler} instance taking a report to use for collecting validation events.
+     *
+     * @param context The context of the instance.
+     * @param report A report to use for collecting validation events.
+     */
+    public ModelErrorHandler( final ModelContext context, final ModelValidationReport report )
+    {
+        super();
+        this.context = context;
+        this.report = report;
+    }
+
+    /**
+     * Gets the report of the instance.
+     *
+     * @return The report of the instance.
+     */
+    public ModelValidationReport getReport()
+    {
+        if ( this.report == null )
+        {
+            this.report = new ModelValidationReport();
+        }
+
+        return this.report;
+    }
+
+    @Override
+    public void warning( final SAXParseException exception ) throws SAXException
+    {
+        if ( this.context != null && this.context.isLoggable( Level.FINE ) )
+        {
+            this.context.log( Level.FINE, exception.getMessage(), exception );
+        }
+
+        this.getReport().getDetails().add( new ModelValidationReport.Detail(
+            "W3C XML 1.0 Recommendation - Warning condition", Level.WARNING, exception.getMessage(), null ) );
+
+    }
+
+    @Override
+    public void error( final SAXParseException exception ) throws SAXException
+    {
+        if ( this.context != null && this.context.isLoggable( Level.FINE ) )
+        {
+            this.context.log( Level.FINE, exception.getMessage(), exception );
+        }
+
+        this.getReport().getDetails().add( new ModelValidationReport.Detail(
+            "W3C XML 1.0 Recommendation - Section 1.2 - Error", Level.SEVERE, exception.getMessage(), null ) );
+
+    }
+
+    @Override
+    public void fatalError( final SAXParseException exception ) throws SAXException
+    {
+        if ( this.context != null && this.context.isLoggable( Level.FINE ) )
+        {
+            this.context.log( Level.FINE, exception.getMessage(), exception );
+        }
+
+        this.getReport().getDetails().add( new ModelValidationReport.Detail(
+            "W3C XML 1.0 Recommendation - Section 1.2 - Fatal Error", Level.SEVERE, exception.getMessage(), null ) );
 
     }
 

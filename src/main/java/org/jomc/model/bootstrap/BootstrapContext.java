@@ -47,8 +47,12 @@ import java.util.Enumeration;
 import java.util.Map;
 import java.util.TreeMap;
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.util.JAXBSource;
+import javax.xml.validation.Validator;
+import org.xml.sax.SAXException;
 
 /**
  * Object management and configuration model bootstrap context interface.
@@ -71,7 +75,7 @@ public abstract class BootstrapContext
      *
      * @param classLoader The class loader of the context.
      */
-    protected BootstrapContext( final ClassLoader classLoader )
+    public BootstrapContext( final ClassLoader classLoader )
     {
         super();
         this.classLoader = classLoader;
@@ -82,7 +86,7 @@ public abstract class BootstrapContext
      *
      * @return The class loader of the context.
      */
-    protected ClassLoader getClassLoader()
+    public ClassLoader getClassLoader()
     {
         if ( this.classLoader == null )
         {
@@ -243,6 +247,10 @@ public abstract class BootstrapContext
                 }
             }
 
+            final javax.xml.validation.Schema bootstrapSchema = this.createSchema();
+            final Validator validator = bootstrapSchema.newValidator();
+            validator.validate( new JAXBSource( this.createContext(), new ObjectFactory().createSchemas( schemas ) ) );
+
             return schemas;
         }
         catch ( final InstantiationException e )
@@ -250,6 +258,75 @@ public abstract class BootstrapContext
             throw new BootstrapException( e );
         }
         catch ( final IllegalAccessException e )
+        {
+            throw new BootstrapException( e );
+        }
+        catch ( final JAXBException e )
+        {
+            throw new BootstrapException( e );
+        }
+        catch ( final SAXException e )
+        {
+            throw new BootstrapException( e );
+        }
+        catch ( final IOException e )
+        {
+            throw new BootstrapException( e );
+        }
+    }
+
+    /**
+     * Searches the context for services.
+     * <p>This method loads {@code ServiceProvider} classes setup via
+     * {@code META-INF/services/org.jomc.model.bootstrap.ServiceProvider} resources and returns a list of provided
+     * services.</p>
+     *
+     * @return The services found in the context.
+     *
+     * @throws BootstrapException if searching services fails.
+     *
+     * @see ServiceProvider#findServices(org.jomc.model.bootstrap.BootstrapContext)
+     */
+    public Services findServices() throws BootstrapException
+    {
+        try
+        {
+            final Services services = new Services();
+
+            final Collection<Class<ServiceProvider>> providers = this.loadProviders( ServiceProvider.class );
+            for ( Class<ServiceProvider> provider : providers )
+            {
+                final ServiceProvider serviceProvider = provider.newInstance();
+                final Services provided = serviceProvider.findServices( this );
+                if ( provided != null )
+                {
+                    services.getService().addAll( provided.getService() );
+                }
+            }
+
+            final javax.xml.validation.Schema bootstrapSchema = this.createSchema();
+            final Validator validator = bootstrapSchema.newValidator();
+            validator.validate( new JAXBSource( this.createContext(), new ObjectFactory().createServices( services ) ) );
+
+            return services;
+        }
+        catch ( final InstantiationException e )
+        {
+            throw new BootstrapException( e );
+        }
+        catch ( final IllegalAccessException e )
+        {
+            throw new BootstrapException( e );
+        }
+        catch ( final JAXBException e )
+        {
+            throw new BootstrapException( e );
+        }
+        catch ( final SAXException e )
+        {
+            throw new BootstrapException( e );
+        }
+        catch ( final IOException e )
         {
             throw new BootstrapException( e );
         }

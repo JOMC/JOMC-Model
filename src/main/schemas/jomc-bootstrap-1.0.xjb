@@ -126,5 +126,90 @@
         <jaxb:javadoc>The Java classpath location of the referenced schema or {@code null}.</jaxb:javadoc>
       </jaxb:property>
     </jaxb:bindings>
+    <!-- *********************************************************************************************************** -->
+    <jaxb:bindings node="xs:complexType[@name='Services']">
+      <ci:code><![CDATA[
+    /**
+     * Gets all services for a given identifier from this list of services.
+     *
+     * @param identifier The identifier of the services to return.
+     *
+     * @return An unmodifiable, sorted list holding services matching {@code identifier} from the list or an empty list
+     * if no services matching {@code identifier} are found.
+     *
+     * @throws NullPointerException if {@code identifier} is {@code null}.
+     *
+     * @see #getService()
+     */
+    public List<Service> getServices( final String identifier )
+    {
+        if ( identifier == null )
+        {
+            throw new NullPointerException( "identifier" );
+        }
+
+        final java.util.List<Service> services = new java.util.ArrayList<Service>( this.getService().size() );
+
+        for ( Service s : this.getService() )
+        {
+            if ( identifier.equals( s.getIdentifier() ) )
+            {
+                services.add( s );
+            }
+        }
+
+        java.util.Collections.sort( services, new java.util.Comparator<Service>()
+        {
+
+            public int compare( final Service s1, final Service s2 )
+            {
+                return s1.getOrdinal() - s2.getOrdinal();
+            }
+
+        } );
+
+        return java.util.Collections.unmodifiableList( services );
+    }
+
+    /**
+     * Gets all services for a given class from this list of services.
+     *
+     * @param clazz The class of the services to return.
+     *
+     * @return An unmodifiable, sorted list holding services matching {@code class} from the list or an empty list
+     * if no services matching {@code clazz} are found.
+     *
+     * @throws NullPointerException if {@code clazz} is {@code null}.
+     *
+     * @see #getService()
+     */
+    public List<Service> getServices( final Class clazz )
+    {
+        if ( clazz == null )
+        {
+            throw new NullPointerException( "clazz" );
+        }
+
+        return this.getServices( clazz.getName() );
+    }
+]]>
+      </ci:code>
+    </jaxb:bindings>
+    <!-- *********************************************************************************************************** -->
+    <jaxb:bindings node="xs:complexType[@name='Service']/xs:complexContent/xs:extension/xs:attribute[@name='ordinal']">
+      <jaxb:property>
+        <jaxb:javadoc>The ordinal number of the service.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Service']/xs:complexContent/xs:extension/xs:attribute[@name='identifier']">
+      <jaxb:property>
+        <jaxb:javadoc>The identifier of the service.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Service']/xs:complexContent/xs:extension/xs:attribute[@name='class']">
+      <jaxb:property>
+        <jaxb:javadoc>The class providing the service implementation.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
   </jaxb:bindings>
 </jaxb:bindings>

@@ -32,40 +32,24 @@
  */
 package org.jomc.model;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.text.MessageFormat;
-import java.util.Collection;
-import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.TreeMap;
 import java.util.logging.Level;
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.Source;
 import javax.xml.validation.Schema;
-import javax.xml.validation.Validator;
 import org.w3c.dom.ls.LSResourceResolver;
 import org.xml.sax.EntityResolver;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
-import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * Object management and configuration model context interface.
@@ -120,7 +104,7 @@ public abstract class ModelContext
      *
      * @param classLoader The class loader of the context.
      */
-    protected ModelContext( final ClassLoader classLoader )
+    public ModelContext( final ClassLoader classLoader )
     {
         super();
         this.classLoader = classLoader;
@@ -220,10 +204,8 @@ public abstract class ModelContext
         if ( this.logLevel == null )
         {
             this.logLevel = getDefaultLogLevel();
-            this.log( Level.CONFIG, this.getMessage( "defaultLogLevelInfo", new Object[]
-                {
-                    this.getClass().getCanonicalName(), this.logLevel.getLocalizedName()
-                } ), null );
+            this.log( Level.CONFIG, getMessage( "defaultLogLevelInfo", this.getClass().getCanonicalName(),
+                                                this.logLevel.getLocalizedName() ), null );
 
         }
 
@@ -354,11 +336,7 @@ public abstract class ModelContext
         {
             if ( this.isLoggable( Level.FINE ) )
             {
-                this.log( Level.FINE, this.getMessage( "classNotFound", new Object[]
-                    {
-                        name
-                    } ), e );
-
+                this.log( Level.FINE, getMessage( "classNotFound", name ), e );
             }
 
             return null;
@@ -415,93 +393,15 @@ public abstract class ModelContext
 
     /**
      * Searches the context for modules.
-     * <p>This method loads {@code ModelProvider} classes setup via
-     * {@code META-INF/services/org.jomc.model.ModelProvider} resources and returns a list of provided modules.</p>
      *
      * @return The modules found in the context.
      *
      * @throws ModelException if searching modules fails.
-     *
-     * @see ModelProvider#findModules(org.jomc.model.ModelContext)
      */
-    public Modules findModules() throws ModelException
-    {
-        try
-        {
-            final Text text = new Text();
-            text.setLanguage( "en" );
-            text.setValue( this.getMessage( "contextModulesInfo", null ) );
-
-            final Modules modules = new Modules();
-            modules.setDocumentation( new Texts() );
-            modules.getDocumentation().setDefaultLanguage( "en" );
-            modules.getDocumentation().getText().add( text );
-
-            final Collection<Class<ModelProvider>> providers = this.loadProviders( ModelProvider.class );
-            for ( Class<ModelProvider> provider : providers )
-            {
-                if ( this.isLoggable( Level.CONFIG ) )
-                {
-                    this.log( Level.CONFIG, this.getMessage( "modelProviderInfo", new Object[]
-                        {
-                            provider.getName()
-                        } ), null );
-
-                }
-
-                final ModelProvider modelProvider = provider.newInstance();
-                final Modules provided = modelProvider.findModules( this );
-                if ( provided != null )
-                {
-                    modules.getModule().addAll( provided.getModule() );
-                }
-            }
-
-            if ( this.isLoggable( Level.FINEST ) )
-            {
-                final StringWriter stringWriter = new StringWriter();
-                final Marshaller m = this.createMarshaller();
-                m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
-                m.marshal( new ObjectFactory().createModules( modules ), stringWriter );
-                stringWriter.close();
-
-                this.log( Level.FINEST, this.getMessage( "foundModules", null ), null );
-
-                final BufferedReader reader = new BufferedReader( new StringReader( stringWriter.toString() ) );
-                String line;
-
-                while ( ( line = reader.readLine() ) != null )
-                {
-                    this.log( Level.FINEST, "\t" + line, null );
-                }
-
-                reader.close();
-            }
-
-            return modules;
-        }
-        catch ( final InstantiationException e )
-        {
-            throw new ModelException( e );
-        }
-        catch ( final IllegalAccessException e )
-        {
-            throw new ModelException( e );
-        }
-        catch ( final IOException e )
-        {
-            throw new ModelException( e );
-        }
-        catch ( final JAXBException e )
-        {
-            throw new ModelException( e );
-        }
-    }
+    public abstract Modules findModules() throws ModelException;
 
     /**
      * Processes modules.
-     * <p>This method loads {@code ModelProcessor} classes setup via
-     * {@code META-INF/services/org.jomc.model.ModelProcessor} resources and returns a list of processed modules.</p>
      *
      * @param modules The modules to process.
      *
@@ -509,80 +409,8 @@ public abstract class ModelContext
      *
      * @throws NullPointerException if {@code modules} is {@code null}.
      * @throws ModelException if processing modules fails.
-     *
-     * @see ModelProcessor#processModules(org.jomc.model.ModelContext, org.jomc.model.Modules)
      */
-    public Modules processModules( final Modules modules ) throws ModelException
-    {
-        if ( modules == null )
-        {
-            throw new NullPointerException( "modules" );
-        }
-
-        try
-        {
-            Modules processed = modules;
-            final Collection<Class<ModelProcessor>> processors = this.loadProviders( ModelProcessor.class );
-
-            for ( Class<ModelProcessor> processor : processors )
-            {
-                if ( this.isLoggable( Level.CONFIG ) )
-                {
-                    this.log( Level.CONFIG, this.getMessage( "modelProcessorInfo", new Object[]
-                        {
-                            processor.getName()
-                        } ), null );
-
-                }
-
-                final ModelProcessor modelProcessor = processor.newInstance();
-                final Modules current = modelProcessor.processModules( this, processed );
-                if ( current != null )
-                {
-                    processed = current;
-                }
-            }
-
-            if ( this.isLoggable( Level.FINEST ) )
-            {
-                final StringWriter stringWriter = new StringWriter();
-                final Marshaller m = this.createMarshaller();
-                m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
-                m.marshal( new ObjectFactory().createModules( processed ), stringWriter );
-                stringWriter.close();
-
-                this.log( Level.FINEST, this.getMessage( "processedModules", null ), null );
-
-                final BufferedReader reader = new BufferedReader( new StringReader( stringWriter.toString() ) );
-                String line;
-
-                while ( ( line = reader.readLine() ) != null )
-                {
-                    this.log( Level.FINEST, "\t" + line, null );
-                }
-
-                reader.close();
-            }
-
-            return processed;
-        }
-        catch ( final InstantiationException e )
-        {
-            throw new ModelException( e );
-        }
-        catch ( final IllegalAccessException e )
-        {
-            throw new ModelException( e );
-        }
-        catch ( final IOException e )
-        {
-            throw new ModelException( e );
-        }
-        catch ( final JAXBException e )
-        {
-            throw new ModelException( e );
-        }
-    }
+    public abstract Modules processModules( final Modules modules ) throws ModelException;
 
     /**
      * Validates a given model.
@@ -594,46 +422,10 @@ public abstract class ModelContext
      * @throws NullPointerException if {@code model} is {@code null}.
      * @throws ModelException if validating the model fails.
      */
-    public ModelValidationReport validateModel( final Source model ) throws ModelException
-    {
-        if ( model == null )
-        {
-            throw new NullPointerException( "model" );
-        }
-
-        final Schema schema = this.createSchema();
-        final Validator validator = schema.newValidator();
-        final ModelErrorHandler modelErrorHandler = new ModelErrorHandler( this );
-        validator.setErrorHandler( modelErrorHandler );
-
-        try
-        {
-            validator.validate( model );
-        }
-        catch ( final SAXException e )
-        {
-            if ( this.isLoggable( Level.FINE ) )
-            {
-                this.log( Level.FINE, e.getMessage(), e );
-            }
-
-            if ( modelErrorHandler.getReport().isModelValid() )
-            {
-                throw new ModelException( e );
-            }
-        }
-        catch ( final IOException e )
-        {
-            throw new ModelException( e );
-        }
-
-        return modelErrorHandler.getReport();
-    }
+    public abstract ModelValidationReport validateModel( final Source model ) throws ModelException;
 
     /**
      * Validates a given list of modules.
-     * <p>This method loads {@code ModelValidator} classes setup via
-     * {@code META-INF/services/org.jomc.model.ModelValidator} resources and returns an aggregated validation report.</p>
      *
      * @param modules The list of modules to validate.
      *
@@ -641,51 +433,8 @@ public abstract class ModelContext
      *
      * @throws NullPointerException if {@code modules} is {@code null}.
      * @throws ModelException if validating the modules fails.
-     *
-     * @see ModelValidator#validateModel(org.jomc.model.ModelContext, org.jomc.model.Modules)
      */
-    public ModelValidationReport validateModel( final Modules modules ) throws ModelException
-    {
-        if ( modules == null )
-        {
-            throw new NullPointerException( "modules" );
-        }
-
-        try
-        {
-            final Collection<Class<ModelValidator>> validators = this.loadProviders( ModelValidator.class );
-            final ModelValidationReport report = new ModelValidationReport();
-
-            for ( Class<ModelValidator> validator : validators )
-            {
-                if ( this.isLoggable( Level.CONFIG ) )
-                {
-                    this.log( Level.CONFIG, this.getMessage( "modelValidatorInfo", new Object[]
-                        {
-                            validator.getName()
-                        } ), null );
-
-                }
-
-                final ModelValidator modelValidator = validator.newInstance();
-                final ModelValidationReport current = modelValidator.validateModel( this, modules );
-                if ( current != null )
-                {
-                    report.getDetails().addAll( current.getDetails() );
-                }
-            }
-
-            return report;
-        }
-        catch ( final InstantiationException e )
-        {
-            throw new ModelException( e );
-        }
-        catch ( final IllegalAccessException e )
-        {
-            throw new ModelException( e );
-        }
-    }
+    public abstract ModelValidationReport validateModel( final Modules modules ) throws ModelException;
 
     /**
      * Creates a new object management and configuration model {@code ModelContext} instance.
@@ -796,197 +545,10 @@ public abstract class ModelContext
      */
     public abstract Unmarshaller createUnmarshaller() throws ModelException;
 
-    private <T> Collection<Class<T>> loadProviders( final Class<T> providerClass ) throws ModelException
+    private static String getMessage( final String key, final Object... args )
     {
-        try
-        {
-            final String providerNamePrefix = providerClass.getName() + ".";
-            final Map<String, Class<T>> providers = new TreeMap<String, Class<T>>( new Comparator<String>()
-            {
-
-                public int compare( final String key1, final String key2 )
-                {
-                    return key1.compareTo( key2 );
-                }
-
-            } );
-
-            final File platformProviders = new File( new StringBuilder().append( System.getProperty( "java.home" ) ).
-                append( File.separator ).append( "jre" ).append( File.separator ).append( "lib" ).
-                append( File.separator ).append( "jomc.properties" ).toString() );
-
-            if ( platformProviders.exists() )
-            {
-                if ( this.isLoggable( Level.CONFIG ) )
-                {
-                    this.log( Level.CONFIG, this.getMessage( "processing", new Object[]
-                        {
-                            platformProviders.getAbsolutePath()
-                        } ), null );
-
-                }
-
-                InputStream in = null;
-                final java.util.Properties p = new java.util.Properties();
-
-                try
-                {
-                    in = new FileInputStream( platformProviders );
-                    p.load( in );
-                }
-                finally
-                {
-                    if ( in != null )
-                    {
-                        in.close();
-                    }
-                }
-
-                for ( Map.Entry e : p.entrySet() )
-                {
-                    if ( e.getKey().toString().startsWith( providerNamePrefix ) )
-                    {
-                        final Class<T> provider = this.findClass( e.getValue().toString() );
-                        if ( provider != null )
-                        {
-                            providers.put( e.getKey().toString(), provider );
-                        }
-                    }
-                }
-            }
-
-            final Enumeration<URL> serviceProviders =
-                this.findResources( "META-INF/services/" + providerClass.getName() );
-
-            while ( serviceProviders.hasMoreElements() )
-            {
-                final URL url = serviceProviders.nextElement();
-                final BufferedReader reader = new BufferedReader( new InputStreamReader( url.openStream(), "UTF-8" ) );
-
-                String line = null;
-                while ( ( line = reader.readLine() ) != null )
-                {
-                    if ( line.contains( "#" ) )
-                    {
-                        continue;
-                    }
-
-                    final Class<T> provider = this.findClass( line );
-                    if ( provider != null )
-                    {
-                        providers.put( providerNamePrefix + providers.size(), provider );
-                    }
-                }
-
-                reader.close();
-            }
-
-            return providers.values();
-        }
-        catch ( final IOException e )
-        {
-            throw new ModelException( e );
-        }
-    }
-
-    private String getMessage( final String key, final Object args )
-    {
-        return new MessageFormat( ResourceBundle.getBundle( ModelContext.class.getName().replace( '.', '/' ),
-                                                            Locale.getDefault() ).getString( key ) ).format( args );
-
-    }
-
-}
-
-/**
- * {@code ErrorHandler} collecting {@code ModelValidationReport} details.
- *
- * @author <a href="mailto:cs@jomc.org">Christian Schulte</a>
- * @version $Id$
- */
-class ModelErrorHandler extends DefaultHandler
-{
-
-    /** The context of the instance. */
-    private ModelContext context;
-
-    /** The report of the instance. */
-    private ModelValidationReport report;
-
-    /**
-     * Creates a new {@code ModelErrorHandler} instance taking a context.
-     *
-     * @param context The context of the instance.
-     */
-    public ModelErrorHandler( final ModelContext context )
-    {
-        this( context, null );
-    }
-
-    /**
-     * Creates a new {@code ModelErrorHandler} instance taking a report to use for collecting validation events.
-     *
-     * @param context The context of the instance.
-     * @param report A report to use for collecting validation events.
-     */
-    public ModelErrorHandler( final ModelContext context, final ModelValidationReport report )
-    {
-        super();
-        this.context = context;
-        this.report = report;
-    }
-
-    /**
-     * Gets the report of the instance.
-     *
-     * @return The report of the instance.
-     */
-    public ModelValidationReport getReport()
-    {
-        if ( this.report == null )
-        {
-            this.report = new ModelValidationReport();
-        }
-
-        return this.report;
-    }
-
-    @Override
-    public void warning( final SAXParseException exception ) throws SAXException
-    {
-        if ( this.context != null && this.context.isLoggable( Level.FINE ) )
-        {
-            this.context.log( Level.FINE, exception.getMessage(), exception );
-        }
-
-        this.getReport().getDetails().add( new ModelValidationReport.Detail(
-            "W3C XML 1.0 Recommendation - Warning condition", Level.WARNING, exception.getMessage(), null ) );
-
-    }
-
-    @Override
-    public void error( final SAXParseException exception ) throws SAXException
-    {
-        if ( this.context != null && this.context.isLoggable( Level.FINE ) )
-        {
-            this.context.log( Level.FINE, exception.getMessage(), exception );
-        }
-
-        this.getReport().getDetails().add( new ModelValidationReport.Detail(
-            "W3C XML 1.0 Recommendation - Section 1.2 - Error", Level.SEVERE, exception.getMessage(), null ) );
-
-    }
-
-    @Override
-    public void fatalError( final SAXParseException exception ) throws SAXException
-    {
-        if ( this.context != null && this.context.isLoggable( Level.FINE ) )
-        {
-            this.context.log( Level.FINE, exception.getMessage(), exception );
-        }
-
-        this.getReport().getDetails().add( new ModelValidationReport.Detail(
-            "W3C XML 1.0 Recommendation - Section 1.2 - Fatal Error", Level.SEVERE, exception.getMessage(), null ) );
+        return MessageFormat.format( ResourceBundle.getBundle( ModelContext.class.getName().replace( '.', '/' ),
+                                                               Locale.getDefault() ).getString( key ), args );
 
     }
 

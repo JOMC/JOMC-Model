@@ -37,8 +37,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.util.JAXBSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.Validator;
 import junit.framework.Assert;
 import org.jomc.model.DefaultModelValidator;
 import org.jomc.model.Dependencies;
@@ -52,13 +50,11 @@ import org.jomc.model.ModelException;
 import org.jomc.model.ModelObject;
 import org.jomc.model.ModelValidationReport;
 import org.jomc.model.ModelValidator;
-import org.jomc.model.Module;
 import org.jomc.model.Modules;
 import org.jomc.model.Properties;
 import org.jomc.model.Property;
 import org.jomc.model.SpecificationReference;
 import org.jomc.model.Specifications;
-import org.xml.sax.SAXException;
 
 /**
  * Test cases for class {@code org.jomc.model.ModelObjectValidator} implementations.
@@ -163,8 +159,6 @@ public class ModelValidatorTest
     {
         final ModelContext context = ModelContext.createModelContext( this.getClass().getClassLoader() );
         final JAXBContext jaxbContext = context.createContext();
-        final Schema schema = context.createSchema();
-        final Validator validator = schema.newValidator();
 
         for ( SchemaConstraintsTest test : this.getTestSuite().getSchemaConstraintsTest() )
         {

@@ -40,110 +40,110 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 /**
- * Default {@code SchemaProvider} implementation.
+ * Default {@code ServiceProvider} implementation.
  *
  * @author <a href="mailto:cs@jomc.org">Christian Schulte</a>
  * @version $Id$
- * @see BootstrapContext#findSchemas()
+ * @see BootstrapContext#findServices()
  */
-public class DefaultSchemaProvider implements SchemaProvider
+public class DefaultServiceProvider implements ServiceProvider
 {
 
     /**
-     * Classpath location searched for schemas by default.
-     * @see #getDefaultSchemaLocation()
+     * Classpath location searched for services by default.
+     * @see #getDefaultServiceLocation()
      */
-    private static final String DEFAULT_SCHEMA_LOCATION = "META-INF/jomc-schemas.xml";
+    private static final String DEFAULT_SERVICE_LOCATION = "META-INF/jomc-services.xml";
 
-    /** Default schema location. */
-    private static volatile String defaultSchemaLocation;
+    /** Default service location. */
+    private static volatile String defaultServiceLocation;
 
-    /** Schema location of the instance. */
-    private String schemaLocation;
+    /** Service location of the instance. */
+    private String serviceLocation;
 
-    /** Creates a new {@code DefaultSchemaProvider} instance. */
-    public DefaultSchemaProvider()
+    /** Creates a new {@code DefaultServiceProvider} instance. */
+    public DefaultServiceProvider()
     {
         super();
     }
 
     /**
-     * Gets the default location searched for schema resources.
-     * <p>The default schema location is controlled by system property
-     * {@code org.jomc.model.bootstrap.DefaultSchemaProvider.defaultSchemaLocation} holding the location to search for
-     * schema resources by default. If that property is not set, the {@code META-INF/jomc-schemas.xml} default is
+     * Gets the default location searched for service resources.
+     * <p>The default service location is controlled by system property
+     * {@code org.jomc.model.bootstrap.DefaultServiceProvider.defaultServiceLocation} holding the location to search for
+     * service resources by default. If that property is not set, the {@code META-INF/jomc-services.xml} default is
      * returned.</p>
      *
-     * @return The location searched for schema resources by default.
+     * @return The location searched for service resources by default.
      *
-     * @see #setDefaultSchemaLocation(java.lang.String)
+     * @see #setDefaultServiceLocation(java.lang.String)
      */
-    public static String getDefaultSchemaLocation()
+    public static String getDefaultServiceLocation()
     {
-        if ( defaultSchemaLocation == null )
+        if ( defaultServiceLocation == null )
         {
-            defaultSchemaLocation = System.getProperty(
-                "org.jomc.model.bootstrap.DefaultSchemaProvider.defaultSchemaLocation", DEFAULT_SCHEMA_LOCATION );
+            defaultServiceLocation = System.getProperty(
+                "org.jomc.model.bootstrap.DefaultServiceProvider.defaultServiceLocation", DEFAULT_SERVICE_LOCATION );
 
         }
 
-        return defaultSchemaLocation;
+        return defaultServiceLocation;
     }
 
     /**
-     * Sets the default location searched for schema resources.
+     * Sets the default location searched for service resources.
      *
-     * @param value The new default location to search for schema resources or {@code null}.
+     * @param value The new default location to search for service resources or {@code null}.
      *
-     * @see #getDefaultSchemaLocation()
+     * @see #getDefaultServiceLocation()
      */
-    public static void setDefaultSchemaLocation( final String value )
+    public static void setDefaultServiceLocation( final String value )
     {
-        defaultSchemaLocation = value;
+        defaultServiceLocation = value;
     }
 
     /**
-     * Gets the location searched for schema resources.
+     * Gets the location searched for service resources.
      *
-     * @return The location searched for schema resources.
+     * @return The location searched for service resources.
      *
-     * @see #getDefaultSchemaLocation()
-     * @see #setSchemaLocation(java.lang.String)
+     * @see #getDefaultServiceLocation()
+     * @see #setServiceLocation(java.lang.String)
      */
-    public String getSchemaLocation()
+    public String getServiceLocation()
     {
-        if ( this.schemaLocation == null )
+        if ( this.serviceLocation == null )
         {
-            this.schemaLocation = getDefaultSchemaLocation();
+            this.serviceLocation = getDefaultServiceLocation();
         }
 
-        return this.schemaLocation;
+        return this.serviceLocation;
     }
 
     /**
-     * Sets the location searched for schema resources.
+     * Sets the location searched for service resources.
      *
-     * @param value The new location to search for schema resources or {@code null}.
+     * @param value The new location to search for service resources or {@code null}.
      *
-     * @see #getSchemaLocation()
+     * @see #getServiceLocation()
      */
-    public void setSchemaLocation( final String value )
+    public void setServiceLocation( final String value )
     {
-        this.schemaLocation = value;
+        this.serviceLocation = value;
     }
 
     /**
-     * Searches a given context for schemas.
+     * Searches a given context for services.
      *
-     * @param context The context to search for schemas.
+     * @param context The context to search for services.
      * @param location The location to search at.
      *
-     * @return The schemas found at {@code location} in {@code context} or {@code null} of no schemas are found.
+     * @return The services found at {@code location} in {@code context} or {@code null} of no services are found.
      *
      * @throws NullPointerException if {@code context} or {@code location} is {@code null}.
      * @throws BootstrapException if searching the context fails.
      */
-    public Schemas findSchemas( final BootstrapContext context, final String location ) throws BootstrapException
+    public Services findServices( final BootstrapContext context, final String location ) throws BootstrapException
     {
         if ( context == null )
         {
@@ -156,7 +156,7 @@ public class DefaultSchemaProvider implements SchemaProvider
 
         try
         {
-            final Schemas schemas = new Schemas();
+            final Services services = new Services();
             final JAXBContext ctx = context.createContext();
             final Unmarshaller u = ctx.createUnmarshaller();
             final Enumeration<URL> e = context.findResources( location );
@@ -171,20 +171,20 @@ public class DefaultSchemaProvider implements SchemaProvider
                     content = ( (JAXBElement) content ).getValue();
                 }
 
-                if ( content instanceof Schema )
+                if ( content instanceof Service )
                 {
-                    schemas.getSchema().add( (Schema) content );
+                    services.getService().add( (Service) content );
                 }
-                else if ( content instanceof Schemas )
+                else if ( content instanceof Services )
                 {
-                    for ( Schema s : ( (Schemas) content ).getSchema() )
+                    for ( Service s : ( (Services) content ).getService() )
                     {
-                        schemas.getSchema().add( s );
+                        services.getService().add( s );
                     }
                 }
             }
 
-            return schemas.getSchema().isEmpty() ? null : schemas;
+            return services.getService().isEmpty() ? null : services;
         }
         catch ( final JAXBException e )
         {
@@ -195,17 +195,17 @@ public class DefaultSchemaProvider implements SchemaProvider
     /**
      * {@inheritDoc}
      *
-     * @see #getSchemaLocation()
-     * @see #findSchemas(org.jomc.model.bootstrap.BootstrapContext, java.lang.String)
+     * @see #getServiceLocation()
+     * @see #findServices(org.jomc.model.bootstrap.BootstrapContext, java.lang.String)
      */
-    public Schemas findSchemas( final BootstrapContext context ) throws BootstrapException
+    public Services findServices( final BootstrapContext context ) throws BootstrapException
     {
         if ( context == null )
         {
             throw new NullPointerException( "context" );
         }
 
-        return this.findSchemas( context, this.getSchemaLocation() );
+        return this.findServices( context, this.getServiceLocation() );
     }
 
 }

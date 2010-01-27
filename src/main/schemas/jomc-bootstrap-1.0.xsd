@@ -131,6 +131,43 @@ schema. Attribute 'classpath-id' holds the Java classpath location of the refere
     </xsd:complexContent>
   </xsd:complexType>
   <!-- ************************************************************************************************************* -->
+  <xsd:element name="services" type="bootstrap:Services">
+    <xsd:key name="service-key">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">Key of a service.</xsd:documentation>
+      </xsd:annotation>
+      <xsd:selector xpath="bootstrap:service"/>
+      <xsd:field xpath="@identifier"/>
+      <xsd:field xpath="@class"/>
+    </xsd:key>
+  </xsd:element>
+  <xsd:complexType name="Services">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en">List of services.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="bootstrap:BootstrapObject">
+        <xsd:sequence>
+          <xsd:element ref="bootstrap:service" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!-- ************************************************************************************************************* -->
+  <xsd:element name="service" type="bootstrap:Service"/>
+  <xsd:complexType name="Service">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en">Service.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="bootstrap:BootstrapObject">
+        <xsd:attribute name="ordinal" type="xsd:int" use="optional" default="1000"/>
+        <xsd:attribute name="identifier" type="bootstrap:Identifier" use="required"/>
+        <xsd:attribute name="class" type="bootstrap:Identifier" use="required"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!-- ************************************************************************************************************* -->
   <xsd:simpleType name="Identifier">
     <xsd:restriction base="xsd:token"/>
   </xsd:simpleType>

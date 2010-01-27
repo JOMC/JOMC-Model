@@ -30,28 +30,39 @@
  *   $Id$
  *
  */
-package org.jomc.model.bootstrap;
+package org.jomc.model.bootstrap.test;
+
+import org.jomc.model.bootstrap.BootstrapContext;
+import org.jomc.model.bootstrap.BootstrapException;
+import org.jomc.model.bootstrap.Service;
+import org.jomc.model.bootstrap.ServiceProvider;
+import org.jomc.model.bootstrap.Services;
 
 /**
- * Object management and configuration model bootstrap schema provider interface.
+ * {@code ServiceProvider} test implementation.
  *
- * @author <a href="mailto:cs@jomc.org">Christian Schulte</a>
+ * @author <a href="mailto:cs@jomc.org">Christian Schulte</a> 1.0
  * @version $Id$
- * @see BootstrapContext#findSchemas()
  */
-public interface SchemaProvider
+public class TestServiceProvider implements ServiceProvider
 {
 
-    /**
-     * Searches a given context for schemas.
-     *
-     * @param context The context to search for schemas.
-     *
-     * @return The schemas found in the context or {@code null} if no schemas are found.
-     *
-     * @throws NullPointerException if {@code context} is {@code null}.
-     * @throws BootstrapException if searching the context fails.
-     */
-    Schemas findSchemas( BootstrapContext context ) throws NullPointerException, BootstrapException;
+    public TestServiceProvider()
+    {
+        super();
+    }
+
+    public Services findServices( final BootstrapContext context ) throws BootstrapException
+    {
+        final Services services = new Services();
+        final Service service = new Service();
+        services.getService().add( service );
+
+        service.setClazz( "TestServiceProvider" );
+        service.setIdentifier( "TestServiceProvider" );
+        service.setOrdinal( 0 );
+
+        return services;
+    }
 
 }
