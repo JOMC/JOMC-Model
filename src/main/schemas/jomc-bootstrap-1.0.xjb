@@ -37,7 +37,7 @@
                xmlns:xs="http://www.w3.org/2001/XMLSchema"
                xmlns:bootstrap="http://jomc.org/model/bootstrap"
                xmlns:ci="http://jaxb.dev.java.net/plugin/code-injector"
-               jaxb:version="2.0">
+               version="2.0">
 
   <jaxb:bindings schemaLocation="jomc-bootstrap-1.0.xsd">
     <!-- *********************************************************************************************************** -->
