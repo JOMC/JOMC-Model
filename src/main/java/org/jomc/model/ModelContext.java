@@ -387,7 +387,7 @@ public abstract class ModelContext
         }
         catch ( final IOException e )
         {
-            throw new ModelException( e );
+            throw new ModelException( e.getMessage(), e );
         }
     }
 
@@ -463,27 +463,27 @@ public abstract class ModelContext
         }
         catch ( final ClassNotFoundException e )
         {
-            throw new ModelException( e );
+            throw new ModelException( e.getMessage(), e );
         }
         catch ( final NoSuchMethodException e )
         {
-            throw new ModelException( e );
+            throw new ModelException( e.getMessage(), e );
         }
         catch ( final InstantiationException e )
         {
-            throw new ModelException( e );
+            throw new ModelException( e.getMessage(), e );
         }
         catch ( final IllegalAccessException e )
         {
-            throw new ModelException( e );
+            throw new ModelException( e.getMessage(), e );
         }
         catch ( final InvocationTargetException e )
         {
-            throw new ModelException( e );
+            throw new ModelException( e.getMessage(), e );
         }
         catch ( final ClassCastException e )
         {
-            throw new ModelException( e );
+            throw new ModelException( e.getMessage(), e );
         }
     }
 

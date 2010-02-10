@@ -71,7 +71,7 @@ public class DefaultBootstrapContext extends BootstrapContext
         }
         catch ( final SAXException e )
         {
-            throw new BootstrapException( e );
+            throw new BootstrapException( e.getMessage(), e );
         }
     }
 
@@ -84,7 +84,7 @@ public class DefaultBootstrapContext extends BootstrapContext
         }
         catch ( final JAXBException e )
         {
-            throw new BootstrapException( e );
+            throw new BootstrapException( e.getMessage(), e );
         }
     }
 
@@ -101,7 +101,7 @@ public class DefaultBootstrapContext extends BootstrapContext
         }
         catch ( final JAXBException e )
         {
-            throw new BootstrapException( e );
+            throw new BootstrapException( e.getMessage(), e );
         }
     }
 
@@ -114,7 +114,7 @@ public class DefaultBootstrapContext extends BootstrapContext
         }
         catch ( final JAXBException e )
         {
-            throw new BootstrapException( e );
+            throw new BootstrapException( e.getMessage(), e );
         }
     }
 

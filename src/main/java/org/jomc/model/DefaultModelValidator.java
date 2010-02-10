@@ -150,7 +150,7 @@ public class DefaultModelValidator implements ModelValidator
                 context.log( Level.FINE, e.getMessage(), e );
             }
 
-            throw new ModelException( e );
+            throw new ModelException( e.getMessage(), e );
         }
     }
 

@@ -247,11 +247,11 @@ public class DefaultModelProcessor implements ModelProcessor
         }
         catch ( final IOException e )
         {
-            throw new ModelException( e );
+            throw new ModelException( e.getMessage(), e );
         }
         catch ( final TransformerConfigurationException e )
         {
-            throw new ModelException( e );
+            throw new ModelException( e.getMessage(), e );
         }
     }
 
@@ -295,11 +295,11 @@ public class DefaultModelProcessor implements ModelProcessor
         }
         catch ( final TransformerException e )
         {
-            throw new ModelException( e );
+            throw new ModelException( e.getMessage(), e );
         }
         catch ( final JAXBException e )
         {
-            throw new ModelException( e );
+            throw new ModelException( e.getMessage(), e );
         }
     }
 

@@ -2634,11 +2634,11 @@
         }
         catch ( final IllegalAccessException e )
         {
-            throw (InstantiationException) new InstantiationException().initCause( e );
+            throw (InstantiationException) new InstantiationException( e.getMessage() ).initCause( e );
         }
         catch ( final ClassNotFoundException e )
         {
-            throw (InstantiationException) new InstantiationException().initCause( e );
+            throw (InstantiationException) new InstantiationException( e.getMessage() ).initCause( e );
         }
     }
 

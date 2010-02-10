@@ -188,7 +188,7 @@ public class DefaultSchemaProvider implements SchemaProvider
         }
         catch ( final JAXBException e )
         {
-            throw new BootstrapException( e );
+            throw new BootstrapException( e.getMessage(), e );
         }
     }
 

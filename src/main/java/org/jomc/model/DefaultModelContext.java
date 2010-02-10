@@ -188,23 +188,23 @@ public class DefaultModelContext extends ModelContext
         }
         catch ( final BootstrapException e )
         {
-            throw new ModelException( e );
+            throw new ModelException( e.getMessage(), e );
         }
         catch ( final InstantiationException e )
         {
-            throw new ModelException( e );
+            throw new ModelException( e.getMessage(), e );
         }
         catch ( final IllegalAccessException e )
         {
-            throw new ModelException( e );
+            throw new ModelException( e.getMessage(), e );
         }
         catch ( final IOException e )
         {
-            throw new ModelException( e );
+            throw new ModelException( e.getMessage(), e );
         }
         catch ( final JAXBException e )
         {
-            throw new ModelException( e );
+            throw new ModelException( e.getMessage(), e );
         }
     }
 
@@ -282,23 +282,23 @@ public class DefaultModelContext extends ModelContext
         }
         catch ( final BootstrapException e )
         {
-            throw new ModelException( e );
+            throw new ModelException( e.getMessage(), e );
         }
         catch ( final InstantiationException e )
         {
-            throw new ModelException( e );
+            throw new ModelException( e.getMessage(), e );
         }
         catch ( final IllegalAccessException e )
         {
-            throw new ModelException( e );
+            throw new ModelException( e.getMessage(), e );
         }
         catch ( final IOException e )
         {
-            throw new ModelException( e );
+            throw new ModelException( e.getMessage(), e );
         }
         catch ( final JAXBException e )
         {
-            throw new ModelException( e );
+            throw new ModelException( e.getMessage(), e );
         }
     }
 
@@ -338,12 +338,12 @@ public class DefaultModelContext extends ModelContext
 
             if ( modelErrorHandler.getReport().isModelValid() )
             {
-                throw new ModelException( e );
+                throw new ModelException( e.getMessage(), e );
             }
         }
         catch ( final IOException e )
         {
-            throw new ModelException( e );
+            throw new ModelException( e.getMessage(), e );
         }
 
         return modelErrorHandler.getReport();
@@ -402,15 +402,15 @@ public class DefaultModelContext extends ModelContext
         }
         catch ( final BootstrapException e )
         {
-            throw new ModelException( e );
+            throw new ModelException( e.getMessage(), e );
         }
         catch ( final InstantiationException e )
         {
-            throw new ModelException( e );
+            throw new ModelException( e.getMessage(), e );
         }
         catch ( final IllegalAccessException e )
         {
-            throw new ModelException( e );
+            throw new ModelException( e.getMessage(), e );
         }
     }
 
@@ -749,15 +749,15 @@ public class DefaultModelContext extends ModelContext
         }
         catch ( final BootstrapException e )
         {
-            throw new ModelException( e );
+            throw new ModelException( e.getMessage(), e );
         }
         catch ( final IOException e )
         {
-            throw new ModelException( e );
+            throw new ModelException( e.getMessage(), e );
         }
         catch ( final SAXException e )
         {
-            throw new ModelException( e );
+            throw new ModelException( e.getMessage(), e );
         }
     }
 
@@ -791,11 +791,11 @@ public class DefaultModelContext extends ModelContext
         }
         catch ( final BootstrapException e )
         {
-            throw new ModelException( e );
+            throw new ModelException( e.getMessage(), e );
         }
         catch ( final JAXBException e )
         {
-            throw new ModelException( e );
+            throw new ModelException( e.getMessage(), e );
         }
     }
 
@@ -841,11 +841,11 @@ public class DefaultModelContext extends ModelContext
         }
         catch ( final BootstrapException e )
         {
-            throw new ModelException( e );
+            throw new ModelException( e.getMessage(), e );
         }
         catch ( final JAXBException e )
         {
-            throw new ModelException( e );
+            throw new ModelException( e.getMessage(), e );
         }
     }
 
@@ -858,7 +858,7 @@ public class DefaultModelContext extends ModelContext
         }
         catch ( final JAXBException e )
         {
-            throw new ModelException( e );
+            throw new ModelException( e.getMessage(), e );
         }
     }
 

@@ -214,7 +214,7 @@ public abstract class BootstrapContext
         }
         catch ( final IOException e )
         {
-            throw new BootstrapException( e );
+            throw new BootstrapException( e.getMessage(), e );
         }
     }
 
@@ -255,23 +255,23 @@ public abstract class BootstrapContext
         }
         catch ( final InstantiationException e )
         {
-            throw new BootstrapException( e );
+            throw new BootstrapException( e.getMessage(), e );
         }
         catch ( final IllegalAccessException e )
         {
-            throw new BootstrapException( e );
+            throw new BootstrapException( e.getMessage(), e );
         }
         catch ( final JAXBException e )
         {
-            throw new BootstrapException( e );
+            throw new BootstrapException( e.getMessage(), e );
         }
         catch ( final SAXException e )
         {
-            throw new BootstrapException( e );
+            throw new BootstrapException( e.getMessage(), e );
         }
         catch ( final IOException e )
         {
-            throw new BootstrapException( e );
+            throw new BootstrapException( e.getMessage(), e );
         }
     }
 
@@ -312,23 +312,23 @@ public abstract class BootstrapContext
         }
         catch ( final InstantiationException e )
         {
-            throw new BootstrapException( e );
+            throw new BootstrapException( e.getMessage(), e );
         }
         catch ( final IllegalAccessException e )
         {
-            throw new BootstrapException( e );
+            throw new BootstrapException( e.getMessage(), e );
         }
         catch ( final JAXBException e )
         {
-            throw new BootstrapException( e );
+            throw new BootstrapException( e.getMessage(), e );
         }
         catch ( final SAXException e )
         {
-            throw new BootstrapException( e );
+            throw new BootstrapException( e.getMessage(), e );
         }
         catch ( final IOException e )
         {
-            throw new BootstrapException( e );
+            throw new BootstrapException( e.getMessage(), e );
         }
     }
 
@@ -360,27 +360,27 @@ public abstract class BootstrapContext
         }
         catch ( final ClassNotFoundException e )
         {
-            throw new BootstrapException( e );
+            throw new BootstrapException( e.getMessage(), e );
         }
         catch ( final NoSuchMethodException e )
         {
-            throw new BootstrapException( e );
+            throw new BootstrapException( e.getMessage(), e );
         }
         catch ( final InstantiationException e )
         {
-            throw new BootstrapException( e );
+            throw new BootstrapException( e.getMessage(), e );
         }
         catch ( final IllegalAccessException e )
         {
-            throw new BootstrapException( e );
+            throw new BootstrapException( e.getMessage(), e );
         }
         catch ( final InvocationTargetException e )
         {
-            throw new BootstrapException( e );
+            throw new BootstrapException( e.getMessage(), e );
         }
         catch ( final ClassCastException e )
         {
-            throw new BootstrapException( e );
+            throw new BootstrapException( e.getMessage(), e );
         }
     }
 
@@ -504,7 +504,7 @@ public abstract class BootstrapContext
         }
         catch ( final IOException e )
         {
-            throw new BootstrapException( e );
+            throw new BootstrapException( e.getMessage(), e );
         }
     }
 
