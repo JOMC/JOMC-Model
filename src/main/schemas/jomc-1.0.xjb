@@ -1238,7 +1238,7 @@
             {
                 if ( this.getType() == null )
                 {
-                    throw new ModelException( this.getMessage( "mandatoryType", this.getName() ) );
+                    throw new ModelException( getMessage( "mandatoryType", this.getName() ) );
                 }
 
                 String typeName = this.getType();
@@ -1315,16 +1315,14 @@
 
             if ( this.getValue() == null && primitive )
             {
-                throw new ModelException( this.getMessage(
-                    "mandatoryPrimitiveValue", this.getName(), this.getType() ) );
-
+                throw new ModelException( getMessage( "mandatoryPrimitiveValue", this.getName(), this.getType() ) );
             }
 
             return this.getJavaValue( javaType, this.getValue() );
         }
         catch ( final ClassNotFoundException e )
         {
-            throw new ModelException( this.getMessage( "classNotFound", this.getName(), this.getType() ), e );
+            throw new ModelException( getMessage( "classNotFound", this.getName(), this.getType() ), e );
         }
     }
 
@@ -1342,9 +1340,9 @@
 
                 if ( result != null && !returnType.isAssignableFrom( result.getClass() ) )
                 {
-                    throw new ModelException( this.getMessage(
-                        "illegalMethodInvocationResult", methodName, any.getClass().getName(),
-                        result.getClass().getName(), returnType.getName() ) );
+                    throw new ModelException( getMessage( "illegalMethodInvocationResult", methodName,
+                                                          any.getClass().getName(), result.getClass().getName(),
+                                                          returnType.getName() ) );
 
                 }
 
@@ -1352,9 +1350,7 @@
             }
             catch ( final IllegalAccessException e )
             {
-                throw new ModelException( this.getMessage(
-                    "methodAccessDenied", methodName, any.getClass().getName() ), e );
-
+                throw new ModelException( getMessage( "methodAccessDenied", methodName, any.getClass().getName() ), e );
             }
             catch ( final IllegalArgumentException e )
             {
@@ -1362,15 +1358,13 @@
             }
             catch ( final InvocationTargetException e )
             {
-                throw new ModelException( this.getMessage(
-                    "methodInvocationFailure", methodName, any.getClass().getName() ), e );
+                throw new ModelException( getMessage( "methodInvocationFailure", methodName,
+                                                      any.getClass().getName() ), e );
 
             }
             catch ( final SecurityException e )
             {
-                throw new ModelException( this.getMessage(
-                    "methodAccessDenied", methodName, any.getClass().getName() ), e );
-
+                throw new ModelException( getMessage( "methodAccessDenied", methodName, any.getClass().getName() ), e );
             }
             catch ( final NoSuchMethodException e )
             {
@@ -1391,7 +1385,7 @@
                 {
                     if ( value.length() != 1 )
                     {
-                        throw new ModelException( this.getMessage( "illegalValue", value, Character.class.getName() ) );
+                        throw new ModelException( getMessage( "illegalValue", value, Character.class.getName() ) );
                     }
 
                     return type.getConstructor( new Class[]
@@ -1418,11 +1412,11 @@
             }
             catch ( final InstantiationException e )
             {
-                throw new ModelException( this.getMessage( "instantiationException", type.getName() ), e );
+                throw new ModelException( getMessage( "instantiationException", type.getName() ), e );
             }
             catch ( final IllegalAccessException e )
             {
-                throw new ModelException( this.getMessage( "constructorAccessDenied", type.getName() ), e );
+                throw new ModelException( getMessage( "constructorAccessDenied", type.getName() ), e );
             }
             catch ( final IllegalArgumentException e )
             {
@@ -1430,18 +1424,18 @@
             }
             catch ( final InvocationTargetException e )
             {
-                throw new ModelException( this.getMessage( "constructorInvocationFailure", type.getName() ), e );
+                throw new ModelException( getMessage( "constructorInvocationFailure", type.getName() ), e );
             }
             catch ( final NoSuchMethodException e )
             {
-                throw new ModelException( this.getMessage( "constructorNotFound", type.getName() ), e );
+                throw new ModelException( getMessage( "constructorNotFound", type.getName() ), e );
             }
         }
 
         return value;
     }
 
-    private String getMessage( final String key, final Object... arguments )
+    private static String getMessage( final String key, final Object... arguments )
     {
         return java.text.MessageFormat.format( java.util.ResourceBundle.getBundle(
             Property.class.getName().replace( '.', '/' ), java.util.Locale.getDefault() ).getString( key ), arguments );
@@ -3433,10 +3427,8 @@
 
                     if ( factoryMethod == null )
                     {
-                        throw new InstantiationException( this.getMessage( "failedCreatingObject", new Object[]
-                            {
-                                instance.getIdentifier(), clazz.getName(), methodName
-                            } ) );
+                        throw new InstantiationException( getMessage( "failedCreatingObject", instance.getIdentifier(),
+                                                                      clazz.getName(), methodName ) );
 
                     }
 
@@ -3467,10 +3459,8 @@
                     }
                     else
                     {
-                        throw new InstantiationException( this.getMessage( "failedCreatingObject", new Object[]
-                            {
-                                instance.getIdentifier(), clazz.getName(), methodName
-                            } ) );
+                        throw new InstantiationException( getMessage( "failedCreatingObject", instance.getIdentifier(),
+                                                                      clazz.getName(), methodName ) );
 
                     }
                 }
@@ -4020,11 +4010,11 @@
         return factoryMethod;
     }
 
-    private String getMessage( final String key, final Object args )
+    private static String getMessage( final String key, final Object... args )
     {
-        return new java.text.MessageFormat( java.util.ResourceBundle.getBundle(
+        return java.text.MessageFormat.format( java.util.ResourceBundle.getBundle(
             Modules.class.getName().replace( '.', '/' ), java.util.Locale.getDefault() ).
-            getString( key ) ).format( args );
+            getString( key ), args );
 
     }]]>
       </ci:code>
