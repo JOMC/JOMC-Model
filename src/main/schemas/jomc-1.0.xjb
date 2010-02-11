@@ -54,8 +54,8 @@
      *
      * @param language The language of the text to return.
      *
-     * @return The text with language {@code language} or the default text, if
-     * no text matching {@code language} is found.
+     * @return The text with language {@code language} or the default text, if no text matching {@code language} is
+     * found.
      *
      * @throws NullPointerException if {@code language} is {@code null}.
      */
@@ -81,8 +81,7 @@
         }
 
         return defaultText;
-    }
-]]>
+    }]]>
       </ci:code>
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Texts']/xs:attribute[@name='defaultLanguage']">
@@ -115,6 +114,184 @@
       <jaxb:property>
         <jaxb:javadoc>{@code true} if this object is deprecated.</jaxb:javadoc>
       </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='ModelObject']">
+      <ci:code><![CDATA[
+    /**
+     * Gets the first {@code JAXBElement} matching a namespace URI and local part from a given list of objects.
+     *
+     * @param any The list to search.
+     * @param namespaceURI The namespace URI of the {@code JAXBElement} to return.
+     * @param localPart The local part of the {@code JAXBElement} to return.
+     *
+     * @return The first {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any}
+     * list or {@code null} if no such element is found.
+     *
+     * @throws NullPointerException if {@code any}, {@code namespaceURI} or {@code localPart} is {@code null}.
+     */
+    protected javax.xml.bind.JAXBElement getAnyElement( final java.util.List<Object> any, final String namespaceURI,
+                                                        final String localPart )
+    {
+        if ( any == null )
+        {
+            throw new NullPointerException( "any" );
+        }
+        if ( namespaceURI == null )
+        {
+            throw new NullPointerException( "namespaceURI" );
+        }
+        if ( localPart == null )
+        {
+            throw new NullPointerException( "localPart" );
+        }
+
+        for ( Object o : any )
+        {
+            if ( o instanceof javax.xml.bind.JAXBElement )
+            {
+                final javax.xml.bind.JAXBElement e = (javax.xml.bind.JAXBElement) o;
+
+                if ( namespaceURI.equals( e.getName().getNamespaceURI() ) &&
+                     localPart.equals( e.getName().getLocalPart() ) )
+                {
+                    return e;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Gets a list containing all {@code JAXBElement}s matching a namespace URI and local part from a given list of
+     * objects.
+     *
+     * @param any The list to search.
+     * @param namespaceURI The namespace URI of the {@code JAXBElement}s to return.
+     * @param localPart The local part of the {@code JAXBElement}s to return.
+     *
+     * @return An unmodifiable list of all {@code JAXBElement}s matching {@code namespaceURI} and {@code localPart} from
+     * the {@code any} list - an empty list if no such elements are found.
+     *
+     * @throws NullPointerException if {@code any}, {@code namespaceURI} or {@code localPart} is {@code null}.
+     */
+    protected java.util.List<javax.xml.bind.JAXBElement> getAnyElements( final java.util.List<Object> any,
+                                                                         final String namespaceURI,
+                                                                         final String localPart )
+    {
+        if ( any == null )
+        {
+            throw new NullPointerException( "any" );
+        }
+        if ( namespaceURI == null )
+        {
+            throw new NullPointerException( "namespaceURI" );
+        }
+        if ( localPart == null )
+        {
+            throw new NullPointerException( "localPart" );
+        }
+
+        final java.util.List<javax.xml.bind.JAXBElement> anyElements =
+            new java.util.ArrayList<javax.xml.bind.JAXBElement>( any.size() );
+
+        for ( Object o : any )
+        {
+            if ( o instanceof javax.xml.bind.JAXBElement )
+            {
+                final javax.xml.bind.JAXBElement e = (javax.xml.bind.JAXBElement) o;
+
+                if ( namespaceURI.equals( e.getName().getNamespaceURI() ) &&
+                     localPart.equals( e.getName().getLocalPart() ) )
+                {
+                    anyElements.add( e );
+                }
+            }
+        }
+
+        return java.util.Collections.unmodifiableList( anyElements );
+    }
+
+    /**
+     * Gets the first object matching a class from a given list of objects.
+     *
+     * @param any The list to search.
+     * @param clazz The class to return an instance of.
+     * @param <T> The type of the object to return.
+     *
+     * @return The first instance of {@code clazz} from the {@code any} list or {@code null} if no such instance is
+     * found.
+     *
+     * @throws NullPointerException if {@code any} or {@code clazz} is {@code null}.
+     */
+    protected <T> T getAnyObject( final java.util.List<Object> any, final Class<T> clazz )
+    {
+        if ( any == null )
+        {
+            throw new NullPointerException( "any" );
+        }
+        if ( clazz == null )
+        {
+            throw new NullPointerException( "clazz" );
+        }
+
+        for ( Object o : any )
+        {
+            if ( o instanceof javax.xml.bind.JAXBElement )
+            {
+                o = ( (javax.xml.bind.JAXBElement) o ).getValue();
+            }
+
+            if ( clazz.isAssignableFrom( o.getClass() ) )
+            {
+                return (T) o;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Gets a list containing all objects matching a class from a given list of objects.
+     *
+     * @param any The list to search.
+     * @param clazz The class to return all instances of.
+     * @param <T> The type of the objects to return.
+     *
+     * @return An unmodifiable list of all instances of {@code clazz} from the {@code any} list - an empty list if no
+     * such objects are found.
+     *
+     * @throws NullPointerException if {@code any} or {@code clazz} is {@code null}.
+     */
+    protected <T> java.util.List<T> getAnyObjects( final java.util.List<Object> any, final Class<T> clazz )
+    {
+        if ( any == null )
+        {
+            throw new NullPointerException( "any" );
+        }
+        if ( clazz == null )
+        {
+            throw new NullPointerException( "namespaceURI" );
+        }
+
+        final java.util.List<T> anyElements = new java.util.ArrayList<T>( any.size() );
+
+        for ( Object o : any )
+        {
+            if ( o instanceof javax.xml.bind.JAXBElement )
+            {
+                o = ( (javax.xml.bind.JAXBElement) o ).getValue();
+            }
+
+            if ( clazz.isAssignableFrom( o.getClass() ) )
+            {
+                anyElements.add( (T) o );
+            }
+        }
+
+        return java.util.Collections.unmodifiableList( anyElements );
+    }]]>
+      </ci:code>
     </jaxb:bindings>
     <!-- *********************************************************************************************************** -->
     <jaxb:bindings node="xs:complexType[@name='Module']/xs:complexContent/xs:extension/xs:sequence/xs:element[@ref='jomc:specifications']">
@@ -152,18 +329,90 @@
         <jaxb:javadoc>Vendor of this module or {@code null}.</jaxb:javadoc>
       </jaxb:property>
     </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Module']">
+      <ci:code><![CDATA[
+    /**
+     * Gets the first {@code JAXBElement} matching a namespace URI and local part from the {@code any} property of the
+     * instance.
+     *
+     * @param namespaceURI The namespace URI of the {@code JAXBElement} to return.
+     * @param localPart The local part of the {@code JAXBElement} to return.
+     *
+     * @return The first {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any}
+     * property of the instance or {@code null} if no such element is found.
+     *
+     * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
+     *
+     * @see #getAnyElement(java.util.List, java.lang.String, java.lang.String)
+     */
+    public javax.xml.bind.JAXBElement getAnyElement( final String namespaceURI, final String localPart )
+    {
+        return this.getAnyElement( this.getAny(), namespaceURI, localPart );
+    }
+
+    /**
+     * Gets a list containing all {@code JAXBElement}s matching a namespace URI and local part from the {@code any}
+     * property of the instance.
+     *
+     * @param namespaceURI The namespace URI of the {@code JAXBElement}s to return.
+     * @param localPart The local part of the {@code JAXBElement}s to return.
+     *
+     * @return An unmodifiable list of all {@code JAXBElement}s matching {@code namespaceURI} and {@code localPart} from
+     * the {@code any} property of the instance - an empty list if no such elements are found.
+     *
+     * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
+     *
+     * @see #getAnyElements(java.util.List, java.lang.String, java.lang.String)
+     */
+    public java.util.List<javax.xml.bind.JAXBElement> getAnyElements( final String namespaceURI,
+                                                                      final String localPart )
+    {
+        return this.getAnyElements( this.getAny(), namespaceURI, localPart );
+    }
+
+    /**
+     * Gets the first object matching a given class from the {@code any} property of the instance.
+     *
+     * @param clazz The class to return an instance of.
+     * @param <T> The type of the object to return.
+     *
+     * @return The first instance of {@code clazz} from the {@code any} property of the instance or {@code null} if no
+     * such instance is found.
+     *
+     * @throws NullPointerException if {@code clazz} is {@code null}.
+     */
+    public <T> T getAnyObject( final Class<T> clazz )
+    {
+        return this.getAnyObject( this.getAny(), clazz );
+    }
+
+    /**
+     * Gets a list containing all objects matching a given class from the {@code any} property of the instance.
+     *
+     * @param clazz The class to return all instances of.
+     * @param <T> The type of the objects to return.
+     *
+     * @return An unmodifiable list of all instances of {@code clazz} from the {@code any} property of the instance -
+     * an empty list if no such objects are found.
+     *
+     * @throws NullPointerException if {@code clazz} is {@code null}.
+     */
+    public <T> java.util.List<T> getAnyObjects( final Class<T> clazz )
+    {
+        return this.getAnyObjects( this.getAny(), clazz );
+    }]]>
+      </ci:code>
+    </jaxb:bindings>
     <!-- *********************************************************************************************************** -->
     <jaxb:bindings node="xs:complexType[@name='Specifications']">
       <ci:code><![CDATA[
     /**
-     * Gets a specification for a given identifier from the list of
-     * specifications.
+     * Gets a specification for a given identifier from the list of specifications.
      *
      * @param specification The identifier of the specification to return.
      *
-     * @return The specification identified by {@code specification} from the
-     * list or {@code null}, if no specification matching {@code specification}
-     * is found.
+     * @return The specification identified by {@code specification} from the list or {@code null}, if no specification
+     * matching {@code specification} is found.
      *
      * @throws NullPointerException if {@code specification} is {@code null}.
      *
@@ -218,14 +467,12 @@
     }
 
     /**
-     * Gets a specification reference for a given identifier from the list of
-     * references.
+     * Gets a specification reference for a given identifier from the list of references.
      *
      * @param specification The identifier of the reference to return.
      *
-     * @return The specification reference identified by {@code specification}
-     * from the list or {@code null}, if no specification reference matching
-     * {@code specification} is found.
+     * @return The specification reference identified by {@code specification} from the list or {@code null}, if no
+     * specification reference matching {@code specification} is found.
      *
      * @throws NullPointerException if {@code specification} is {@code null}.
      *
@@ -247,8 +494,7 @@
         }
 
         return null;
-    }
-]]>
+    }]]>
       </ci:code>
     </jaxb:bindings>
     <!-- *********************************************************************************************************** -->
@@ -292,6 +538,80 @@
         <jaxb:javadoc>{@code true} if this specification declares the class given by property {@code clazz}.</jaxb:javadoc>
       </jaxb:property>
     </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Specification']">
+      <ci:code><![CDATA[
+    /**
+     * Gets the first {@code JAXBElement} matching a namespace URI and local part from the {@code any} property of the
+     * instance.
+     *
+     * @param namespaceURI The namespace URI of the {@code JAXBElement} to return.
+     * @param localPart The local part of the {@code JAXBElement} to return.
+     *
+     * @return The first {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any}
+     * property of the instance or {@code null} if no such element is found.
+     *
+     * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
+     *
+     * @see #getAnyElement(java.util.List, java.lang.String, java.lang.String)
+     */
+    public javax.xml.bind.JAXBElement getAnyElement( final String namespaceURI, final String localPart )
+    {
+        return this.getAnyElement( this.getAny(), namespaceURI, localPart );
+    }
+
+    /**
+     * Gets a list containing all {@code JAXBElement}s matching a namespace URI and local part from the {@code any}
+     * property of the instance.
+     *
+     * @param namespaceURI The namespace URI of the {@code JAXBElement}s to return.
+     * @param localPart The local part of the {@code JAXBElement}s to return.
+     *
+     * @return An unmodifiable list of all {@code JAXBElement}s matching {@code namespaceURI} and {@code localPart} from
+     * the {@code any} property of the instance - an empty list if no such elements are found.
+     *
+     * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
+     *
+     * @see #getAnyElements(java.util.List, java.lang.String, java.lang.String)
+     */
+    public java.util.List<javax.xml.bind.JAXBElement> getAnyElements( final String namespaceURI,
+                                                                      final String localPart )
+    {
+        return this.getAnyElements( this.getAny(), namespaceURI, localPart );
+    }
+
+    /**
+     * Gets the first object matching a given class from the {@code any} property of the instance.
+     *
+     * @param clazz The class to return an instance of.
+     * @param <T> The type of the object to return.
+     *
+     * @return The first instance of {@code clazz} from the {@code any} property of the instance or {@code null} if no
+     * such instance is found.
+     *
+     * @throws NullPointerException if {@code clazz} is {@code null}.
+     */
+    public <T> T getAnyObject( final Class<T> clazz )
+    {
+        return this.getAnyObject( this.getAny(), clazz );
+    }
+
+    /**
+     * Gets a list containing all objects matching a given class from the {@code any} property of the instance.
+     *
+     * @param clazz The class to return all instances of.
+     * @param <T> The type of the objects to return.
+     *
+     * @return An unmodifiable list of all instances of {@code clazz} from the {@code any} property of the instance -
+     * an empty list if no such objects are found.
+     *
+     * @throws NullPointerException if {@code clazz} is {@code null}.
+     */
+    public <T> java.util.List<T> getAnyObjects( final Class<T> clazz )
+    {
+        return this.getAnyObjects( this.getAny(), clazz );
+    }]]>
+      </ci:code>
+    </jaxb:bindings>
     <!-- *********************************************************************************************************** -->
     <jaxb:bindings node="xs:complexType[@name='SpecificationReference']/xs:complexContent/xs:extension/xs:attribute[@name='identifier']">
       <jaxb:property>
@@ -321,9 +641,8 @@
      *
      * @param implementation The identifier of the implementation to return.
      *
-     * @return The implementation identified by {@code implementation} from the
-     * list or {@code null}, if no implementation matching
-     * {@code implementation} is found.
+     * @return The implementation identified by {@code implementation} from the list or {@code null}, if no
+     * implementation matching {@code implementation} is found.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
      *
@@ -352,9 +671,8 @@
      *
      * @param implementation The class of the implementation to return.
      *
-     * @return The implementation identified by {@code implementation} from the
-     * list or {@code null}, if no implementation matching
-     * {@code implementation} is found.
+     * @return The implementation identified by {@code implementation} from the list or {@code null}, if no
+     * implementation matching {@code implementation} is found.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
      *
@@ -383,8 +701,8 @@
      *
      * @param name The name of the implementation to return.
      *
-     * @return The implementation named {@code name} from the list or
-     * {@code null}, if no implementation matching {@code name} is found.
+     * @return The implementation named {@code name} from the list or {@code null}, if no implementation matching
+     * {@code name} is found.
      *
      * @throws NullPointerException if {@code name} is {@code null}.
      *
@@ -409,14 +727,12 @@
     }
 
     /**
-     * Gets an implementation reference for a given identifier from the list of
-     * references.
+     * Gets an implementation reference for a given identifier from the list of references.
      *
      * @param implementation The identifier of the reference to return.
      *
-     * @return The implementation reference identified by {@code implementation}
-     * from the list or {@code null}, if no implementation reference matching
-     * {@code implementation} is found.
+     * @return The implementation reference identified by {@code implementation} from the list or {@code null}, if no
+     * implementation reference matching {@code implementation} is found.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
      *
@@ -438,8 +754,7 @@
         }
 
         return null;
-    }
-]]>
+    }]]>
       </ci:code>
     </jaxb:bindings>
     <!-- *********************************************************************************************************** -->
@@ -546,7 +861,77 @@
             throw new AssertionError( e );
         }
     }
-]]>
+
+    /**
+     * Gets the first {@code JAXBElement} matching a namespace URI and local part from the {@code any} property of the
+     * instance.
+     *
+     * @param namespaceURI The namespace URI of the {@code JAXBElement} to return.
+     * @param localPart The local part of the {@code JAXBElement} to return.
+     *
+     * @return The first {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any}
+     * property of the instance or {@code null} if no such element is found.
+     *
+     * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
+     *
+     * @see #getAnyElement(java.util.List, java.lang.String, java.lang.String)
+     */
+    public javax.xml.bind.JAXBElement getAnyElement( final String namespaceURI, final String localPart )
+    {
+        return this.getAnyElement( this.getAny(), namespaceURI, localPart );
+    }
+
+    /**
+     * Gets a list containing all {@code JAXBElement}s matching a namespace URI and local part from the {@code any}
+     * property of the instance.
+     *
+     * @param namespaceURI The namespace URI of the {@code JAXBElement}s to return.
+     * @param localPart The local part of the {@code JAXBElement}s to return.
+     *
+     * @return An unmodifiable list of all {@code JAXBElement}s matching {@code namespaceURI} and {@code localPart} from
+     * the {@code any} property of the instance - an empty list if no such elements are found.
+     *
+     * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
+     *
+     * @see #getAnyElements(java.util.List, java.lang.String, java.lang.String)
+     */
+    public java.util.List<javax.xml.bind.JAXBElement> getAnyElements( final String namespaceURI,
+                                                                      final String localPart )
+    {
+        return this.getAnyElements( this.getAny(), namespaceURI, localPart );
+    }
+
+    /**
+     * Gets the first object matching a given class from the {@code any} property of the instance.
+     *
+     * @param clazz The class to return an instance of.
+     * @param <T> The type of the object to return.
+     *
+     * @return The first instance of {@code clazz} from the {@code any} property of the instance or {@code null} if no
+     * such instance is found.
+     *
+     * @throws NullPointerException if {@code clazz} is {@code null}.
+     */
+    public <T> T getAnyObject( final Class<T> clazz )
+    {
+        return this.getAnyObject( this.getAny(), clazz );
+    }
+
+    /**
+     * Gets a list containing all objects matching a given class from the {@code any} property of the instance.
+     *
+     * @param clazz The class to return all instances of.
+     * @param <T> The type of the objects to return.
+     *
+     * @return An unmodifiable list of all instances of {@code clazz} from the {@code any} property of the instance -
+     * an empty list if no such objects are found.
+     *
+     * @throws NullPointerException if {@code clazz} is {@code null}.
+     */
+    public <T> java.util.List<T> getAnyObjects( final Class<T> clazz )
+    {
+        return this.getAnyObjects( this.getAny(), clazz );
+    }]]>
       </ci:code>
     </jaxb:bindings>
     <!-- *********************************************************************************************************** -->
@@ -578,8 +963,8 @@
      *
      * @param name The name of the dependency to return.
      *
-     * @return The dependency with name {@code name} from the list or
-     * {@code null}, if no dependency matching {@code name} is found.
+     * @return The dependency with name {@code name} from the list or {@code null}, if no dependency matching
+     * {@code name} is found.
      *
      * @throws NullPointerException if {@code name} is {@code null}.
      *
@@ -601,8 +986,7 @@
         }
 
         return null;
-    }
-]]>
+    }]]>
       </ci:code>
     </jaxb:bindings>
     <!-- *********************************************************************************************************** -->
@@ -631,6 +1015,80 @@
         <jaxb:javadoc>{@code true} if this dependency is optional.</jaxb:javadoc>
       </jaxb:property>
     </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Dependency']">
+      <ci:code><![CDATA[
+    /**
+     * Gets the first {@code JAXBElement} matching a namespace URI and local part from the {@code any} property of the
+     * instance.
+     *
+     * @param namespaceURI The namespace URI of the {@code JAXBElement} to return.
+     * @param localPart The local part of the {@code JAXBElement} to return.
+     *
+     * @return The first {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any}
+     * property of the instance or {@code null} if no such element is found.
+     *
+     * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
+     *
+     * @see #getAnyElement(java.util.List, java.lang.String, java.lang.String)
+     */
+    public javax.xml.bind.JAXBElement getAnyElement( final String namespaceURI, final String localPart )
+    {
+        return this.getAnyElement( this.getAny(), namespaceURI, localPart );
+    }
+
+    /**
+     * Gets a list containing all {@code JAXBElement}s matching a namespace URI and local part from the {@code any}
+     * property of the instance.
+     *
+     * @param namespaceURI The namespace URI of the {@code JAXBElement}s to return.
+     * @param localPart The local part of the {@code JAXBElement}s to return.
+     *
+     * @return An unmodifiable list of all {@code JAXBElement}s matching {@code namespaceURI} and {@code localPart} from
+     * the {@code any} property of the instance - an empty list if no such elements are found.
+     *
+     * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
+     *
+     * @see #getAnyElements(java.util.List, java.lang.String, java.lang.String)
+     */
+    public java.util.List<javax.xml.bind.JAXBElement> getAnyElements( final String namespaceURI,
+                                                                      final String localPart )
+    {
+        return this.getAnyElements( this.getAny(), namespaceURI, localPart );
+    }
+
+    /**
+     * Gets the first object matching a given class from the {@code any} property of the instance.
+     *
+     * @param clazz The class to return an instance of.
+     * @param <T> The type of the object to return.
+     *
+     * @return The first instance of {@code clazz} from the {@code any} property of the instance or {@code null} if no
+     * such instance is found.
+     *
+     * @throws NullPointerException if {@code clazz} is {@code null}.
+     */
+    public <T> T getAnyObject( final Class<T> clazz )
+    {
+        return this.getAnyObject( this.getAny(), clazz );
+    }
+
+    /**
+     * Gets a list containing all objects matching a given class from the {@code any} property of the instance.
+     *
+     * @param clazz The class to return all instances of.
+     * @param <T> The type of the objects to return.
+     *
+     * @return An unmodifiable list of all instances of {@code clazz} from the {@code any} property of the instance -
+     * an empty list if no such objects are found.
+     *
+     * @throws NullPointerException if {@code clazz} is {@code null}.
+     */
+    public <T> java.util.List<T> getAnyObjects( final Class<T> clazz )
+    {
+        return this.getAnyObjects( this.getAny(), clazz );
+    }]]>
+      </ci:code>
+    </jaxb:bindings>
     <!-- *********************************************************************************************************** -->
     <jaxb:bindings node="xs:complexType[@name='Properties']">
       <ci:code><![CDATA[
@@ -639,8 +1097,8 @@
      *
      * @param name The name of the property to return.
      *
-     * @return The property with name {@code name} from the list or
-     * {@code null}, if no property matching {@code name} is found.
+     * @return The property with name {@code name} from the list or {@code null}, if no property matching {@code name}
+     * is found.
      *
      * @throws NullPointerException if {@code name} is {@code null}.
      *
@@ -669,8 +1127,8 @@
      *
      * @param name The name of the property reference to return.
      *
-     * @return The property reference with name {@code name} from the list or
-     * {@code null}, if no property reference matching {@code name} is found.
+     * @return The property reference with name {@code name} from the list or {@code null}, if no property reference
+     * matching {@code name} is found.
      *
      * @throws NullPointerException if {@code name} is {@code null}.
      *
@@ -692,8 +1150,7 @@
         }
 
         return null;
-    }
-]]>
+    }]]>
       </ci:code>
     </jaxb:bindings>
     <!-- *********************************************************************************************************** -->
@@ -973,8 +1430,7 @@
         return java.text.MessageFormat.format( java.util.ResourceBundle.getBundle(
             Property.class.getName().replace( '.', '/' ), java.util.Locale.getDefault() ).getString( key ), arguments );
 
-    }
-]]>
+    }]]>
       </ci:code>
     </jaxb:bindings>
     <!-- *********************************************************************************************************** -->
@@ -1001,8 +1457,8 @@
      *
      * @param name The name of the message to return.
      *
-     * @return The message with name {@code name} from the list or {@code null},
-     * if no message matching {@code name} is found.
+     * @return The message with name {@code name} from the list or {@code null}, if no message matching {@code name} is
+     * found.
      *
      * @throws NullPointerException if {@code name} is {@code null}.
      *
@@ -1031,8 +1487,8 @@
      *
      * @param name The name of the message reference to return.
      *
-     * @return The message reference with name {@code name} from the list or
-     * {@code null}, if no message reference matching {@code name} is found.
+     * @return The message reference with name {@code name} from the list or {@code null}, if no message reference
+     * matching {@code name} is found.
      *
      * @throws NullPointerException if {@code name} is {@code null}.
      *
@@ -1054,8 +1510,7 @@
         }
 
         return null;
-    }
-]]>
+    }]]>
       </ci:code>
     </jaxb:bindings>
     <!-- *********************************************************************************************************** -->
@@ -1084,6 +1539,80 @@
         <jaxb:javadoc>{@code true} if this message is intended to override a super message.</jaxb:javadoc>
       </jaxb:property>
     </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Message']">
+      <ci:code><![CDATA[
+    /**
+     * Gets the first {@code JAXBElement} matching a namespace URI and local part from the {@code any} property of the
+     * instance.
+     *
+     * @param namespaceURI The namespace URI of the {@code JAXBElement} to return.
+     * @param localPart The local part of the {@code JAXBElement} to return.
+     *
+     * @return The first {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any}
+     * property of the instance or {@code null} if no such element is found.
+     *
+     * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
+     *
+     * @see #getAnyElement(java.util.List, java.lang.String, java.lang.String)
+     */
+    public javax.xml.bind.JAXBElement getAnyElement( final String namespaceURI, final String localPart )
+    {
+        return this.getAnyElement( this.getAny(), namespaceURI, localPart );
+    }
+
+    /**
+     * Gets a list containing all {@code JAXBElement}s matching a namespace URI and local part from the {@code any}
+     * property of the instance.
+     *
+     * @param namespaceURI The namespace URI of the {@code JAXBElement}s to return.
+     * @param localPart The local part of the {@code JAXBElement}s to return.
+     *
+     * @return An unmodifiable list of all {@code JAXBElement}s matching {@code namespaceURI} and {@code localPart} from
+     * the {@code any} property of the instance - an empty list if no such elements are found.
+     *
+     * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
+     *
+     * @see #getAnyElements(java.util.List, java.lang.String, java.lang.String)
+     */
+    public java.util.List<javax.xml.bind.JAXBElement> getAnyElements( final String namespaceURI,
+                                                                      final String localPart )
+    {
+        return this.getAnyElements( this.getAny(), namespaceURI, localPart );
+    }
+
+    /**
+     * Gets the first object matching a given class from the {@code any} property of the instance.
+     *
+     * @param clazz The class to return an instance of.
+     * @param <T> The type of the object to return.
+     *
+     * @return The first instance of {@code clazz} from the {@code any} property of the instance or {@code null} if no
+     * such instance is found.
+     *
+     * @throws NullPointerException if {@code clazz} is {@code null}.
+     */
+    public <T> T getAnyObject( final Class<T> clazz )
+    {
+        return this.getAnyObject( this.getAny(), clazz );
+    }
+
+    /**
+     * Gets a list containing all objects matching a given class from the {@code any} property of the instance.
+     *
+     * @param clazz The class to return all instances of.
+     * @param <T> The type of the objects to return.
+     *
+     * @return An unmodifiable list of all instances of {@code clazz} from the {@code any} property of the instance -
+     * an empty list if no such objects are found.
+     *
+     * @throws NullPointerException if {@code clazz} is {@code null}.
+     */
+    public <T> java.util.List<T> getAnyObjects( final Class<T> clazz )
+    {
+        return this.getAnyObjects( this.getAny(), clazz );
+    }]]>
+      </ci:code>
+    </jaxb:bindings>
     <!-- *********************************************************************************************************** -->
     <jaxb:bindings node="xs:complexType[@name='MessageReference']/xs:complexContent/xs:extension/xs:attribute[@name='name']">
       <jaxb:property>
@@ -1108,8 +1637,8 @@
      *
      * @param name The name of the argument to return.
      *
-     * @return The argument with name {@code name} from the list or
-     * {@code null}, if no argument matching {@code name} is found.
+     * @return The argument with name {@code name} from the list or {@code null}, if no argument matching {@code name}
+     * is found.
      *
      * @throws NullPointerException if {@code name} is {@code null}.
      *
@@ -1140,8 +1669,8 @@
      *
      * @return The argument at {@code index} from the list.
      *
-     * @throws IndexOutOfBoundsException if {@code index} is negative, greater
-     * or equal to the size of the list of arguments.
+     * @throws IndexOutOfBoundsException if {@code index} is negative, greater or equal to the size of the list of
+     * arguments.
      *
      * @see #getArgument()
      */
@@ -1161,8 +1690,7 @@
         }
 
         return null;
-    }
-]]>
+    }]]>
       </ci:code>
     </jaxb:bindings>
     <!-- *********************************************************************************************************** -->
@@ -1181,6 +1709,80 @@
         <jaxb:javadoc>Type of this argument.</jaxb:javadoc>
       </jaxb:property>
     </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Argument']">
+      <ci:code><![CDATA[
+    /**
+     * Gets the first {@code JAXBElement} matching a namespace URI and local part from the {@code any} property of the
+     * instance.
+     *
+     * @param namespaceURI The namespace URI of the {@code JAXBElement} to return.
+     * @param localPart The local part of the {@code JAXBElement} to return.
+     *
+     * @return The first {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any}
+     * property of the instance or {@code null} if no such element is found.
+     *
+     * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
+     *
+     * @see #getAnyElement(java.util.List, java.lang.String, java.lang.String)
+     */
+    public javax.xml.bind.JAXBElement getAnyElement( final String namespaceURI, final String localPart )
+    {
+        return this.getAnyElement( this.getAny(), namespaceURI, localPart );
+    }
+
+    /**
+     * Gets a list containing all {@code JAXBElement}s matching a namespace URI and local part from the {@code any}
+     * property of the instance.
+     *
+     * @param namespaceURI The namespace URI of the {@code JAXBElement}s to return.
+     * @param localPart The local part of the {@code JAXBElement}s to return.
+     *
+     * @return An unmodifiable list of all {@code JAXBElement}s matching {@code namespaceURI} and {@code localPart} from
+     * the {@code any} property of the instance - an empty list if no such elements are found.
+     *
+     * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
+     *
+     * @see #getAnyElements(java.util.List, java.lang.String, java.lang.String)
+     */
+    public java.util.List<javax.xml.bind.JAXBElement> getAnyElements( final String namespaceURI,
+                                                                      final String localPart )
+    {
+        return this.getAnyElements( this.getAny(), namespaceURI, localPart );
+    }
+
+    /**
+     * Gets the first object matching a given class from the {@code any} property of the instance.
+     *
+     * @param clazz The class to return an instance of.
+     * @param <T> The type of the object to return.
+     *
+     * @return The first instance of {@code clazz} from the {@code any} property of the instance or {@code null} if no
+     * such instance is found.
+     *
+     * @throws NullPointerException if {@code clazz} is {@code null}.
+     */
+    public <T> T getAnyObject( final Class<T> clazz )
+    {
+        return this.getAnyObject( this.getAny(), clazz );
+    }
+
+    /**
+     * Gets a list containing all objects matching a given class from the {@code any} property of the instance.
+     *
+     * @param clazz The class to return all instances of.
+     * @param <T> The type of the objects to return.
+     *
+     * @return An unmodifiable list of all instances of {@code clazz} from the {@code any} property of the instance -
+     * an empty list if no such objects are found.
+     *
+     * @throws NullPointerException if {@code clazz} is {@code null}.
+     */
+    public <T> java.util.List<T> getAnyObjects( final Class<T> clazz )
+    {
+        return this.getAnyObjects( this.getAny(), clazz );
+    }]]>
+      </ci:code>
+    </jaxb:bindings>
     <!-- *********************************************************************************************************** -->
     <jaxb:bindings node="xs:complexType[@name='Instances']">
       <ci:code><![CDATA[
@@ -1189,8 +1791,8 @@
      *
      * @param identifier The identifier of the instance to return.
      *
-     * @return The instance identified by {@code identifier} from the list or
-     * {@code null}, if no instance matching {@code identifier} is found.
+     * @return The instance identified by {@code identifier} from the list or {@code null}, if no instance matching
+     * {@code identifier} is found.
      *
      * @throws NullPointerException if {@code identifier} is {@code null}.
      *
@@ -1212,8 +1814,7 @@
         }
 
         return null;
-    }
-]]>
+    }]]>
       </ci:code>
     </jaxb:bindings>
     <!-- *********************************************************************************************************** -->
@@ -1294,7 +1895,77 @@
 
         return this.propertyObjects;
     }
-]]>
+
+    /**
+     * Gets the first {@code JAXBElement} matching a namespace URI and local part from the {@code any} property of the
+     * instance.
+     *
+     * @param namespaceURI The namespace URI of the {@code JAXBElement} to return.
+     * @param localPart The local part of the {@code JAXBElement} to return.
+     *
+     * @return The first {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any}
+     * property of the instance or {@code null} if no such element is found.
+     *
+     * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
+     *
+     * @see #getAnyElement(java.util.List, java.lang.String, java.lang.String)
+     */
+    public javax.xml.bind.JAXBElement getAnyElement( final String namespaceURI, final String localPart )
+    {
+        return this.getAnyElement( this.getAny(), namespaceURI, localPart );
+    }
+
+    /**
+     * Gets a list containing all {@code JAXBElement}s matching a namespace URI and local part from the {@code any}
+     * property of the instance.
+     *
+     * @param namespaceURI The namespace URI of the {@code JAXBElement}s to return.
+     * @param localPart The local part of the {@code JAXBElement}s to return.
+     *
+     * @return An unmodifiable list of all {@code JAXBElement}s matching {@code namespaceURI} and {@code localPart} from
+     * the {@code any} property of the instance - an empty list if no such elements are found.
+     *
+     * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
+     *
+     * @see #getAnyElements(java.util.List, java.lang.String, java.lang.String)
+     */
+    public java.util.List<javax.xml.bind.JAXBElement> getAnyElements( final String namespaceURI,
+                                                                      final String localPart )
+    {
+        return this.getAnyElements( this.getAny(), namespaceURI, localPart );
+    }
+
+    /**
+     * Gets the first object matching a given class from the {@code any} property of the instance.
+     *
+     * @param clazz The class to return an instance of.
+     * @param <T> The type of the object to return.
+     *
+     * @return The first instance of {@code clazz} from the {@code any} property of the instance or {@code null} if no
+     * such instance is found.
+     *
+     * @throws NullPointerException if {@code clazz} is {@code null}.
+     */
+    public <T> T getAnyObject( final Class<T> clazz )
+    {
+        return this.getAnyObject( this.getAny(), clazz );
+    }
+
+    /**
+     * Gets a list containing all objects matching a given class from the {@code any} property of the instance.
+     *
+     * @param clazz The class to return all instances of.
+     * @param <T> The type of the objects to return.
+     *
+     * @return An unmodifiable list of all instances of {@code clazz} from the {@code any} property of the instance -
+     * an empty list if no such objects are found.
+     *
+     * @throws NullPointerException if {@code clazz} is {@code null}.
+     */
+    public <T> java.util.List<T> getAnyObjects( final Class<T> clazz )
+    {
+        return this.getAnyObjects( this.getAny(), clazz );
+    }]]>
       </ci:code>
     </jaxb:bindings>
     <!-- *********************************************************************************************************** -->
@@ -1308,11 +1979,159 @@
         <jaxb:javadoc>Mail address of this person or {@code null}.</jaxb:javadoc>
       </jaxb:property>
     </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Person']">
+      <ci:code><![CDATA[
+    /**
+     * Gets the first {@code JAXBElement} matching a namespace URI and local part from the {@code any} property of the
+     * instance.
+     *
+     * @param namespaceURI The namespace URI of the {@code JAXBElement} to return.
+     * @param localPart The local part of the {@code JAXBElement} to return.
+     *
+     * @return The first {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any}
+     * property of the instance or {@code null} if no such element is found.
+     *
+     * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
+     *
+     * @see #getAnyElement(java.util.List, java.lang.String, java.lang.String)
+     */
+    public javax.xml.bind.JAXBElement getAnyElement( final String namespaceURI, final String localPart )
+    {
+        return this.getAnyElement( this.getAny(), namespaceURI, localPart );
+    }
+
+    /**
+     * Gets a list containing all {@code JAXBElement}s matching a namespace URI and local part from the {@code any}
+     * property of the instance.
+     *
+     * @param namespaceURI The namespace URI of the {@code JAXBElement}s to return.
+     * @param localPart The local part of the {@code JAXBElement}s to return.
+     *
+     * @return An unmodifiable list of all {@code JAXBElement}s matching {@code namespaceURI} and {@code localPart} from
+     * the {@code any} property of the instance - an empty list if no such elements are found.
+     *
+     * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
+     *
+     * @see #getAnyElements(java.util.List, java.lang.String, java.lang.String)
+     */
+    public java.util.List<javax.xml.bind.JAXBElement> getAnyElements( final String namespaceURI,
+                                                                      final String localPart )
+    {
+        return this.getAnyElements( this.getAny(), namespaceURI, localPart );
+    }
+
+    /**
+     * Gets the first object matching a given class from the {@code any} property of the instance.
+     *
+     * @param clazz The class to return an instance of.
+     * @param <T> The type of the object to return.
+     *
+     * @return The first instance of {@code clazz} from the {@code any} property of the instance or {@code null} if no
+     * such instance is found.
+     *
+     * @throws NullPointerException if {@code clazz} is {@code null}.
+     */
+    public <T> T getAnyObject( final Class<T> clazz )
+    {
+        return this.getAnyObject( this.getAny(), clazz );
+    }
+
+    /**
+     * Gets a list containing all objects matching a given class from the {@code any} property of the instance.
+     *
+     * @param clazz The class to return all instances of.
+     * @param <T> The type of the objects to return.
+     *
+     * @return An unmodifiable list of all instances of {@code clazz} from the {@code any} property of the instance -
+     * an empty list if no such objects are found.
+     *
+     * @throws NullPointerException if {@code clazz} is {@code null}.
+     */
+    public <T> java.util.List<T> getAnyObjects( final Class<T> clazz )
+    {
+        return this.getAnyObjects( this.getAny(), clazz );
+    }]]>
+      </ci:code>
+    </jaxb:bindings>
     <!-- *********************************************************************************************************** -->
     <jaxb:bindings node="xs:complexType[@name='Author']/xs:complexContent/xs:extension/xs:attribute[@name='version']">
       <jaxb:property>
         <jaxb:javadoc>The version created by this author or {@code null}.</jaxb:javadoc>
       </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Author']">
+      <ci:code><![CDATA[
+    /**
+     * Gets the first {@code JAXBElement} matching a namespace URI and local part from the {@code any} property of the
+     * instance.
+     *
+     * @param namespaceURI The namespace URI of the {@code JAXBElement} to return.
+     * @param localPart The local part of the {@code JAXBElement} to return.
+     *
+     * @return The first {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any}
+     * property of the instance or {@code null} if no such element is found.
+     *
+     * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
+     *
+     * @see #getAnyElement(java.util.List, java.lang.String, java.lang.String)
+     */
+    public javax.xml.bind.JAXBElement getAnyElement( final String namespaceURI, final String localPart )
+    {
+        return this.getAnyElement( this.getAny(), namespaceURI, localPart );
+    }
+
+    /**
+     * Gets a list containing all {@code JAXBElement}s matching a namespace URI and local part from the {@code any}
+     * property of the instance.
+     *
+     * @param namespaceURI The namespace URI of the {@code JAXBElement}s to return.
+     * @param localPart The local part of the {@code JAXBElement}s to return.
+     *
+     * @return An unmodifiable list of all {@code JAXBElement}s matching {@code namespaceURI} and {@code localPart} from
+     * the {@code any} property of the instance - an empty list if no such elements are found.
+     *
+     * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
+     *
+     * @see #getAnyElements(java.util.List, java.lang.String, java.lang.String)
+     */
+    public java.util.List<javax.xml.bind.JAXBElement> getAnyElements( final String namespaceURI,
+                                                                      final String localPart )
+    {
+        return this.getAnyElements( this.getAny(), namespaceURI, localPart );
+    }
+
+    /**
+     * Gets the first object matching a given class from the {@code any} property of the instance.
+     *
+     * @param clazz The class to return an instance of.
+     * @param <T> The type of the object to return.
+     *
+     * @return The first instance of {@code clazz} from the {@code any} property of the instance or {@code null} if no
+     * such instance is found.
+     *
+     * @throws NullPointerException if {@code clazz} is {@code null}.
+     */
+    public <T> T getAnyObject( final Class<T> clazz )
+    {
+        return this.getAnyObject( this.getAny(), clazz );
+    }
+
+    /**
+     * Gets a list containing all objects matching a given class from the {@code any} property of the instance.
+     *
+     * @param clazz The class to return all instances of.
+     * @param <T> The type of the objects to return.
+     *
+     * @return An unmodifiable list of all instances of {@code clazz} from the {@code any} property of the instance -
+     * an empty list if no such objects are found.
+     *
+     * @throws NullPointerException if {@code clazz} is {@code null}.
+     */
+    public <T> java.util.List<T> getAnyObjects( final Class<T> clazz )
+    {
+        return this.getAnyObjects( this.getAny(), clazz );
+    }]]>
+      </ci:code>
     </jaxb:bindings>
     <!-- *********************************************************************************************************** -->
     <jaxb:bindings node="xs:simpleType[@name='ArgumentType']/xs:restriction/xs:enumeration[@value='Number']">
@@ -1482,8 +2301,8 @@
      *
      * @param name The name of the module to return.
      *
-     * @return The module with name {@code name} from the list or {@code null},
-     * if no module matching {@code name} is found.
+     * @return The module with name {@code name} from the list or {@code null}, if no module matching {@code name} is
+     * found.
      *
      * @throws NullPointerException if {@code name} is {@code null}.
      *
@@ -1510,8 +2329,7 @@
     /**
      * Gets all specifications declared in this list of modules.
      *
-     * @return All specifications declared in the list or {@code null}, if no
-     * specifications are declared.
+     * @return All specifications declared in the list or {@code null}, if no specifications are declared.
      *
      * @see #getModule()
      */
@@ -1532,8 +2350,7 @@
     /**
      * Gets all implementations declared in this list of modules.
      *
-     * @return All implementations declared in the list or {@code null}, if no
-     * implementations are declared.
+     * @return All implementations declared in the list or {@code null}, if no implementations are declared.
      *
      * @see #getModule()
      */
@@ -1556,8 +2373,8 @@
      *
      * @param specification The identifier of the specification whose declaring module to return.
      *
-     * @return The module declaring {@code specification} from the list or {@code null}, if no module
-     * is found declaring {@code specification}.
+     * @return The module declaring {@code specification} from the list or {@code null}, if no module is found declaring
+     * {@code specification}.
      *
      * @throws NullPointerException if {@code specification} is {@code null}.
      *
@@ -1586,8 +2403,8 @@
      *
      * @param implementation The identifier of the implementation whose declaring module to return.
      *
-     * @return The module declaring {@code implementation} from the list or {@code null}, if no module
-     * is found declaring {@code implementation}.
+     * @return The module declaring {@code implementation} from the list or {@code null}, if no module is found
+     * declaring {@code implementation}.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
      *
@@ -1616,8 +2433,8 @@
      *
      * @param specification The identifier of the specification to return.
      *
-     * @return The specification identified by {@code specification} from the list or {@code null},
-     * if no specification matching {@code specification} is found.
+     * @return The specification identified by {@code specification} from the list or {@code null}, if no specification
+     * matching {@code specification} is found.
      *
      * @throws NullPointerException if {@code specification} is {@code null}.
      *
@@ -1650,8 +2467,8 @@
      *
      * @param specification The class of the specification to return.
      *
-     * @return The specification identified by {@code specification} from the list or {@code null},
-     * if no specification matching {@code specification} is found.
+     * @return The specification identified by {@code specification} from the list or {@code null}, if no specification
+     * matching {@code specification} is found.
      *
      * @throws NullPointerException if {@code specification} is {@code null}.
      *
@@ -1772,8 +2589,8 @@
      *
      * @param implementation The identifier of the implementation to return.
      *
-     * @return The implementation identified by {@code implementation} from the list or {@code null},
-     * if no implementation matching {@code implementation} is found.
+     * @return The implementation identified by {@code implementation} from the list or {@code null}, if no
+     * implementation matching {@code implementation} is found.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
      *
@@ -1806,8 +2623,8 @@
      *
      * @param implementation The class of the implementation to return.
      *
-     * @return The implementation identified by {@code implementation} from the list or {@code null},
-     * if no implementation matching {@code implementation} is found.
+     * @return The implementation identified by {@code implementation} from the list or {@code null}, if no
+     * implementation matching {@code implementation} is found.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
      *
@@ -1840,8 +2657,8 @@
      *
      * @param object The object of the implementation to return.
      *
-     * @return The implementation identified by {@code object} from the list or {@code null},
-     * if no implementation matching {@code object} is found.
+     * @return The implementation identified by {@code object} from the list or {@code null}, if no implementation
+     * matching {@code object} is found.
      *
      * @throws NullPointerException if {@code object} is {@code null}.
      *
@@ -1891,8 +2708,8 @@
      *
      * @param implementation The identifier of the implementation to get all dependencies of.
      *
-     * @return List of all dependencies of {@code implementation} from the list or {@code null},
-     * if no dependencies are found.
+     * @return List of all dependencies of {@code implementation} from the list or {@code null}, if no dependencies are
+     * found.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
      *
@@ -1963,8 +2780,8 @@
      *
      * @param implementation The identifier of the implementation to get all properties of.
      *
-     * @return List of all properties of {@code implementation} from the list or {@code null},
-     * if no properties are found.
+     * @return List of all properties of {@code implementation} from the list or {@code null}, if no properties are
+     * found.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
      *
@@ -2048,8 +2865,8 @@
      *
      * @param implementation The identifier of the implementation to return specified properties of.
      *
-     * @return List of all properties specified for {@code implementation} from the list or {@code null},
-     * if no properties are found.
+     * @return List of all properties specified for {@code implementation} from the list or {@code null}, if no
+     * properties are found.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
      *
@@ -2094,8 +2911,7 @@
      *
      * @param implementation The identifier of the implementation to get all messages of.
      *
-     * @return List of all messages of {@code implementation} from the list or {@code null},
-     * if no messages are found.
+     * @return List of all messages of {@code implementation} from the list or {@code null}, if no messages are found.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
      *
@@ -2166,8 +2982,8 @@
      *
      * @param specification The identifier of the specification to return all implementations of.
      *
-     * @return All implementations implementing the specification identified by {@code specification}
-     * from the list or {@code null}, if no implementation implementing {@code specification} is found.
+     * @return All implementations implementing the specification identified by {@code specification} from the list or
+     * {@code null}, if no implementation implementing {@code specification} is found.
      *
      * @throws NullPointerException if {@code specification} is {@code null}.
      *
@@ -3174,8 +3990,7 @@
             Modules.class.getName().replace( '.', '/' ), java.util.Locale.getDefault() ).
             getString( key ) ).format( args );
 
-    }
-]]>
+    }]]>
       </ci:code>
     </jaxb:bindings>
   </jaxb:bindings>
