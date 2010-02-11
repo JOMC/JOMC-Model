@@ -380,6 +380,8 @@
      * such instance is found.
      *
      * @throws NullPointerException if {@code clazz} is {@code null}.
+     *
+     * @see #getAnyObject(java.util.List, java.lang.Class)
      */
     public <T> T getAnyObject( final Class<T> clazz )
     {
@@ -396,6 +398,8 @@
      * an empty list if no such objects are found.
      *
      * @throws NullPointerException if {@code clazz} is {@code null}.
+     *
+     * @see #getAnyObjects(java.util.List, java.lang.Class)
      */
     public <T> java.util.List<T> getAnyObjects( final Class<T> clazz )
     {
@@ -589,6 +593,8 @@
      * such instance is found.
      *
      * @throws NullPointerException if {@code clazz} is {@code null}.
+     *
+     * @see #getAnyObject(java.util.List, java.lang.Class)
      */
     public <T> T getAnyObject( final Class<T> clazz )
     {
@@ -605,6 +611,8 @@
      * an empty list if no such objects are found.
      *
      * @throws NullPointerException if {@code clazz} is {@code null}.
+     *
+     * @see #getAnyObjects(java.util.List, java.lang.Class)
      */
     public <T> java.util.List<T> getAnyObjects( final Class<T> clazz )
     {
@@ -911,6 +919,8 @@
      * such instance is found.
      *
      * @throws NullPointerException if {@code clazz} is {@code null}.
+     *
+     * @see #getAnyObject(java.util.List, java.lang.Class)
      */
     public <T> T getAnyObject( final Class<T> clazz )
     {
@@ -927,6 +937,8 @@
      * an empty list if no such objects are found.
      *
      * @throws NullPointerException if {@code clazz} is {@code null}.
+     *
+     * @see #getAnyObjects(java.util.List, java.lang.Class)
      */
     public <T> java.util.List<T> getAnyObjects( final Class<T> clazz )
     {
@@ -1066,6 +1078,8 @@
      * such instance is found.
      *
      * @throws NullPointerException if {@code clazz} is {@code null}.
+     *
+     * @see #getAnyObject(java.util.List, java.lang.Class)
      */
     public <T> T getAnyObject( final Class<T> clazz )
     {
@@ -1082,6 +1096,8 @@
      * an empty list if no such objects are found.
      *
      * @throws NullPointerException if {@code clazz} is {@code null}.
+     *
+     * @see #getAnyObjects(java.util.List, java.lang.Class)
      */
     public <T> java.util.List<T> getAnyObjects( final Class<T> clazz )
     {
@@ -1590,6 +1606,8 @@
      * such instance is found.
      *
      * @throws NullPointerException if {@code clazz} is {@code null}.
+     *
+     * @see #getAnyObject(java.util.List, java.lang.Class)
      */
     public <T> T getAnyObject( final Class<T> clazz )
     {
@@ -1606,6 +1624,8 @@
      * an empty list if no such objects are found.
      *
      * @throws NullPointerException if {@code clazz} is {@code null}.
+     *
+     * @see #getAnyObjects(java.util.List, java.lang.Class)
      */
     public <T> java.util.List<T> getAnyObjects( final Class<T> clazz )
     {
@@ -1760,6 +1780,8 @@
      * such instance is found.
      *
      * @throws NullPointerException if {@code clazz} is {@code null}.
+     *
+     * @see #getAnyObject(java.util.List, java.lang.Class)
      */
     public <T> T getAnyObject( final Class<T> clazz )
     {
@@ -1776,6 +1798,8 @@
      * an empty list if no such objects are found.
      *
      * @throws NullPointerException if {@code clazz} is {@code null}.
+     *
+     * @see #getAnyObjects(java.util.List, java.lang.Class)
      */
     public <T> java.util.List<T> getAnyObjects( final Class<T> clazz )
     {
@@ -1945,6 +1969,8 @@
      * such instance is found.
      *
      * @throws NullPointerException if {@code clazz} is {@code null}.
+     *
+     * @see #getAnyObject(java.util.List, java.lang.Class)
      */
     public <T> T getAnyObject( final Class<T> clazz )
     {
@@ -1961,6 +1987,8 @@
      * an empty list if no such objects are found.
      *
      * @throws NullPointerException if {@code clazz} is {@code null}.
+     *
+     * @see #getAnyObjects(java.util.List, java.lang.Class)
      */
     public <T> java.util.List<T> getAnyObjects( final Class<T> clazz )
     {
@@ -2030,6 +2058,8 @@
      * such instance is found.
      *
      * @throws NullPointerException if {@code clazz} is {@code null}.
+     *
+     * @see #getAnyObject(java.util.List, java.lang.Class)
      */
     public <T> T getAnyObject( final Class<T> clazz )
     {
@@ -2046,6 +2076,8 @@
      * an empty list if no such objects are found.
      *
      * @throws NullPointerException if {@code clazz} is {@code null}.
+     *
+     * @see #getAnyObjects(java.util.List, java.lang.Class)
      */
     public <T> java.util.List<T> getAnyObjects( final Class<T> clazz )
     {
@@ -2110,6 +2142,8 @@
      * such instance is found.
      *
      * @throws NullPointerException if {@code clazz} is {@code null}.
+     *
+     * @see #getAnyObject(java.util.List, java.lang.Class)
      */
     public <T> T getAnyObject( final Class<T> clazz )
     {
@@ -2126,6 +2160,8 @@
      * an empty list if no such objects are found.
      *
      * @throws NullPointerException if {@code clazz} is {@code null}.
+     *
+     * @see #getAnyObjects(java.util.List, java.lang.Class)
      */
     public <T> java.util.List<T> getAnyObjects( final Class<T> clazz )
     {
