@@ -118,16 +118,17 @@
     <jaxb:bindings node="xs:complexType[@name='ModelObject']">
       <ci:code><![CDATA[
     /**
-     * Gets the first {@code JAXBElement} matching a namespace URI and local part from a given list of objects.
+     * Gets a single {@code JAXBElement} matching a namespace URI and local part from a given list of objects.
      *
      * @param any The list to search.
      * @param namespaceURI The namespace URI of the {@code JAXBElement} to return.
      * @param localPart The local part of the {@code JAXBElement} to return.
      *
-     * @return The first {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any}
-     * list or {@code null} if no such element is found.
+     * @return A {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any} list or
+     * {@code null} if no such element is found.
      *
      * @throws NullPointerException if {@code any}, {@code namespaceURI} or {@code localPart} is {@code null}.
+     * @throws IllegalStateException if {@code any} contains more than one matching element.
      */
     protected javax.xml.bind.JAXBElement getAnyElement( final java.util.List<Object> any, final String namespaceURI,
                                                         final String localPart )
@@ -145,6 +146,8 @@
             throw new NullPointerException( "localPart" );
         }
 
+        javax.xml.bind.JAXBElement anyElement = null;
+
         for ( Object o : any )
         {
             if ( o instanceof javax.xml.bind.JAXBElement )
@@ -154,12 +157,21 @@
                 if ( namespaceURI.equals( e.getName().getNamespaceURI() ) &&
                      localPart.equals( e.getName().getLocalPart() ) )
                 {
-                    return e;
+                    if ( anyElement == null )
+                    {
+                        anyElement = e;
+                    }
+                    else
+                    {
+                        throw new IllegalStateException( getMessage( "nonUniqueElement", this.getClass().getName(),
+                                                                     namespaceURI, localPart ) );
+
+                    }
                 }
             }
         }
 
-        return null;
+        return anyElement;
     }
 
     /**
@@ -213,16 +225,16 @@
     }
 
     /**
-     * Gets the first object matching a class from a given list of objects.
+     * Gets a single object matching a class from a given list of objects.
      *
      * @param any The list to search.
      * @param clazz The class to return an instance of.
      * @param <T> The type of the object to return.
      *
-     * @return The first instance of {@code clazz} from the {@code any} list or {@code null} if no such instance is
-     * found.
+     * @return An instance of {@code clazz} from the {@code any} list or {@code null} if no such instance is found.
      *
      * @throws NullPointerException if {@code any} or {@code clazz} is {@code null}.
+     * @throws IllegalStateException if {@code any} contains more than one matching object.
      */
     protected <T> T getAnyObject( final java.util.List<Object> any, final Class<T> clazz )
     {
@@ -235,6 +247,8 @@
             throw new NullPointerException( "clazz" );
         }
 
+        T anyObject = null;
+
         for ( Object o : any )
         {
             if ( o instanceof javax.xml.bind.JAXBElement )
@@ -242,13 +256,22 @@
                 o = ( (javax.xml.bind.JAXBElement) o ).getValue();
             }
 
-            if ( clazz.isAssignableFrom( o.getClass() ) )
+            if ( clazz.equals( o.getClass() ) )
             {
-                return (T) o;
+                if ( anyObject == null )
+                {
+                    anyObject = (T) o;
+                }
+                else
+                {
+                    throw new IllegalStateException( getMessage( "nonUniqueObject", this.getClass().getName(),
+                                                                 clazz.getName() ) );
+
+                }
             }
         }
 
-        return null;
+        return anyObject;
     }
 
     /**
@@ -283,13 +306,21 @@
                 o = ( (javax.xml.bind.JAXBElement) o ).getValue();
             }
 
-            if ( clazz.isAssignableFrom( o.getClass() ) )
+            if ( clazz.equals( o.getClass() ) )
             {
                 anyElements.add( (T) o );
             }
         }
 
         return java.util.Collections.unmodifiableList( anyElements );
+    }
+
+    private static String getMessage( final String key, final Object... args )
+    {
+        return java.text.MessageFormat.format( java.util.ResourceBundle.getBundle(
+            ModelObject.class.getName().replace( '.', '/' ), java.util.Locale.getDefault() ).
+            getString( key ), args );
+
     }]]>
       </ci:code>
     </jaxb:bindings>
