@@ -124,7 +124,7 @@
      * @param namespaceURI The namespace URI of the {@code JAXBElement} to return.
      * @param localPart The local part of the {@code JAXBElement} to return.
      *
-     * @return A {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any} list or
+     * @return The {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any} list or
      * {@code null} if no such element is found.
      *
      * @throws NullPointerException if {@code any}, {@code namespaceURI} or {@code localPart} is {@code null}.
@@ -231,7 +231,7 @@
      * @param clazz The class to return an instance of.
      * @param <T> The type of the object to return.
      *
-     * @return An instance of {@code clazz} from the {@code any} list or {@code null} if no such instance is found.
+     * @return The instance of {@code clazz} from the {@code any} list or {@code null} if no such instance is found.
      *
      * @throws NullPointerException if {@code any} or {@code clazz} is {@code null}.
      * @throws IllegalStateException if {@code any} contains more than one matching object.
@@ -363,16 +363,17 @@
     <jaxb:bindings node="xs:complexType[@name='Module']">
       <ci:code><![CDATA[
     /**
-     * Gets the first {@code JAXBElement} matching a namespace URI and local part from the {@code any} property of the
+     * Gets a single {@code JAXBElement} matching a namespace URI and local part from the {@code any} property of the
      * instance.
      *
      * @param namespaceURI The namespace URI of the {@code JAXBElement} to return.
      * @param localPart The local part of the {@code JAXBElement} to return.
      *
-     * @return The first {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any}
-     * property of the instance or {@code null} if no such element is found.
+     * @return The {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any} property
+     * of the instance or {@code null} if no such element is found.
      *
      * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
+     * @throws IllegalStateException if the {@code any} property contains more than one matching element.
      *
      * @see #getAnyElement(java.util.List, java.lang.String, java.lang.String)
      */
@@ -402,15 +403,16 @@
     }
 
     /**
-     * Gets the first object matching a given class from the {@code any} property of the instance.
+     * Gets a single object matching a given class from the {@code any} property of the instance.
      *
      * @param clazz The class to return an instance of.
      * @param <T> The type of the object to return.
      *
-     * @return The first instance of {@code clazz} from the {@code any} property of the instance or {@code null} if no
-     * such instance is found.
+     * @return The instance of {@code clazz} from the {@code any} property of the instance or {@code null} if no such
+     * instance is found.
      *
      * @throws NullPointerException if {@code clazz} is {@code null}.
+     * @throws IllegalStateException if the {@code any} property contains more than one matching object.
      *
      * @see #getAnyObject(java.util.List, java.lang.Class)
      */
@@ -576,16 +578,17 @@
     <jaxb:bindings node="xs:complexType[@name='Specification']">
       <ci:code><![CDATA[
     /**
-     * Gets the first {@code JAXBElement} matching a namespace URI and local part from the {@code any} property of the
+     * Gets a single {@code JAXBElement} matching a namespace URI and local part from the {@code any} property of the
      * instance.
      *
      * @param namespaceURI The namespace URI of the {@code JAXBElement} to return.
      * @param localPart The local part of the {@code JAXBElement} to return.
      *
-     * @return The first {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any}
-     * property of the instance or {@code null} if no such element is found.
+     * @return The {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any} property
+     * of the instance or {@code null} if no such element is found.
      *
      * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
+     * @throws IllegalStateException if the {@code any} property contains more than one matching element.
      *
      * @see #getAnyElement(java.util.List, java.lang.String, java.lang.String)
      */
@@ -615,15 +618,16 @@
     }
 
     /**
-     * Gets the first object matching a given class from the {@code any} property of the instance.
+     * Gets a single object matching a given class from the {@code any} property of the instance.
      *
      * @param clazz The class to return an instance of.
      * @param <T> The type of the object to return.
      *
-     * @return The first instance of {@code clazz} from the {@code any} property of the instance or {@code null} if no
-     * such instance is found.
+     * @return The instance of {@code clazz} from the {@code any} property of the instance or {@code null} if no such
+     * instance is found.
      *
      * @throws NullPointerException if {@code clazz} is {@code null}.
+     * @throws IllegalStateException if the {@code any} property contains more than one matching object.
      *
      * @see #getAnyObject(java.util.List, java.lang.Class)
      */
@@ -902,16 +906,17 @@
     }
 
     /**
-     * Gets the first {@code JAXBElement} matching a namespace URI and local part from the {@code any} property of the
+     * Gets a single {@code JAXBElement} matching a namespace URI and local part from the {@code any} property of the
      * instance.
      *
      * @param namespaceURI The namespace URI of the {@code JAXBElement} to return.
      * @param localPart The local part of the {@code JAXBElement} to return.
      *
-     * @return The first {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any}
-     * property of the instance or {@code null} if no such element is found.
+     * @return The {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any} property
+     * of the instance or {@code null} if no such element is found.
      *
      * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
+     * @throws IllegalStateException if the {@code any} property contains more than one matching element.
      *
      * @see #getAnyElement(java.util.List, java.lang.String, java.lang.String)
      */
@@ -941,15 +946,16 @@
     }
 
     /**
-     * Gets the first object matching a given class from the {@code any} property of the instance.
+     * Gets a single object matching a given class from the {@code any} property of the instance.
      *
      * @param clazz The class to return an instance of.
      * @param <T> The type of the object to return.
      *
-     * @return The first instance of {@code clazz} from the {@code any} property of the instance or {@code null} if no
-     * such instance is found.
+     * @return The instance of {@code clazz} from the {@code any} property of the instance or {@code null} if no such
+     * instance is found.
      *
      * @throws NullPointerException if {@code clazz} is {@code null}.
+     * @throws IllegalStateException if the {@code any} property contains more than one matching object.
      *
      * @see #getAnyObject(java.util.List, java.lang.Class)
      */
@@ -1061,16 +1067,17 @@
     <jaxb:bindings node="xs:complexType[@name='Dependency']">
       <ci:code><![CDATA[
     /**
-     * Gets the first {@code JAXBElement} matching a namespace URI and local part from the {@code any} property of the
+     * Gets a single {@code JAXBElement} matching a namespace URI and local part from the {@code any} property of the
      * instance.
      *
      * @param namespaceURI The namespace URI of the {@code JAXBElement} to return.
      * @param localPart The local part of the {@code JAXBElement} to return.
      *
-     * @return The first {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any}
-     * property of the instance or {@code null} if no such element is found.
+     * @return The {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any} property
+     * of the instance or {@code null} if no such element is found.
      *
      * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
+     * @throws IllegalStateException if the {@code any} property contains more than one matching element.
      *
      * @see #getAnyElement(java.util.List, java.lang.String, java.lang.String)
      */
@@ -1100,15 +1107,16 @@
     }
 
     /**
-     * Gets the first object matching a given class from the {@code any} property of the instance.
+     * Gets a single object matching a given class from the {@code any} property of the instance.
      *
      * @param clazz The class to return an instance of.
      * @param <T> The type of the object to return.
      *
-     * @return The first instance of {@code clazz} from the {@code any} property of the instance or {@code null} if no
-     * such instance is found.
+     * @return The instance of {@code clazz} from the {@code any} property of the instance or {@code null} if no such
+     * instance is found.
      *
      * @throws NullPointerException if {@code clazz} is {@code null}.
+     * @throws IllegalStateException if the {@code any} property contains more than one matching object.
      *
      * @see #getAnyObject(java.util.List, java.lang.Class)
      */
@@ -1583,16 +1591,17 @@
     <jaxb:bindings node="xs:complexType[@name='Message']">
       <ci:code><![CDATA[
     /**
-     * Gets the first {@code JAXBElement} matching a namespace URI and local part from the {@code any} property of the
+     * Gets a single {@code JAXBElement} matching a namespace URI and local part from the {@code any} property of the
      * instance.
      *
      * @param namespaceURI The namespace URI of the {@code JAXBElement} to return.
      * @param localPart The local part of the {@code JAXBElement} to return.
      *
-     * @return The first {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any}
-     * property of the instance or {@code null} if no such element is found.
+     * @return The {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any} property
+     * of the instance or {@code null} if no such element is found.
      *
      * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
+     * @throws IllegalStateException if the {@code any} property contains more than one matching element.
      *
      * @see #getAnyElement(java.util.List, java.lang.String, java.lang.String)
      */
@@ -1622,15 +1631,16 @@
     }
 
     /**
-     * Gets the first object matching a given class from the {@code any} property of the instance.
+     * Gets a single object matching a given class from the {@code any} property of the instance.
      *
      * @param clazz The class to return an instance of.
      * @param <T> The type of the object to return.
      *
-     * @return The first instance of {@code clazz} from the {@code any} property of the instance or {@code null} if no
-     * such instance is found.
+     * @return The instance of {@code clazz} from the {@code any} property of the instance or {@code null} if no such
+     * instance is found.
      *
      * @throws NullPointerException if {@code clazz} is {@code null}.
+     * @throws IllegalStateException if the {@code any} property contains more than one matching object.
      *
      * @see #getAnyObject(java.util.List, java.lang.Class)
      */
@@ -1757,16 +1767,17 @@
     <jaxb:bindings node="xs:complexType[@name='Argument']">
       <ci:code><![CDATA[
     /**
-     * Gets the first {@code JAXBElement} matching a namespace URI and local part from the {@code any} property of the
+     * Gets a single {@code JAXBElement} matching a namespace URI and local part from the {@code any} property of the
      * instance.
      *
      * @param namespaceURI The namespace URI of the {@code JAXBElement} to return.
      * @param localPart The local part of the {@code JAXBElement} to return.
      *
-     * @return The first {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any}
-     * property of the instance or {@code null} if no such element is found.
+     * @return The {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any} property
+     * of the instance or {@code null} if no such element is found.
      *
      * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
+     * @throws IllegalStateException if the {@code any} property contains more than one matching element.
      *
      * @see #getAnyElement(java.util.List, java.lang.String, java.lang.String)
      */
@@ -1796,15 +1807,16 @@
     }
 
     /**
-     * Gets the first object matching a given class from the {@code any} property of the instance.
+     * Gets a single object matching a given class from the {@code any} property of the instance.
      *
      * @param clazz The class to return an instance of.
      * @param <T> The type of the object to return.
      *
-     * @return The first instance of {@code clazz} from the {@code any} property of the instance or {@code null} if no
-     * such instance is found.
+     * @return The instance of {@code clazz} from the {@code any} property of the instance or {@code null} if no such
+     * instance is found.
      *
      * @throws NullPointerException if {@code clazz} is {@code null}.
+     * @throws IllegalStateException if the {@code any} property contains more than one matching object.
      *
      * @see #getAnyObject(java.util.List, java.lang.Class)
      */
@@ -1946,16 +1958,17 @@
     }
 
     /**
-     * Gets the first {@code JAXBElement} matching a namespace URI and local part from the {@code any} property of the
+     * Gets a single {@code JAXBElement} matching a namespace URI and local part from the {@code any} property of the
      * instance.
      *
      * @param namespaceURI The namespace URI of the {@code JAXBElement} to return.
      * @param localPart The local part of the {@code JAXBElement} to return.
      *
-     * @return The first {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any}
-     * property of the instance or {@code null} if no such element is found.
+     * @return The {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any} property
+     * of the instance or {@code null} if no such element is found.
      *
      * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
+     * @throws IllegalStateException if the {@code any} property contains more than one matching element.
      *
      * @see #getAnyElement(java.util.List, java.lang.String, java.lang.String)
      */
@@ -1985,15 +1998,16 @@
     }
 
     /**
-     * Gets the first object matching a given class from the {@code any} property of the instance.
+     * Gets a single object matching a given class from the {@code any} property of the instance.
      *
      * @param clazz The class to return an instance of.
      * @param <T> The type of the object to return.
      *
-     * @return The first instance of {@code clazz} from the {@code any} property of the instance or {@code null} if no
-     * such instance is found.
+     * @return The instance of {@code clazz} from the {@code any} property of the instance or {@code null} if no such
+     * instance is found.
      *
      * @throws NullPointerException if {@code clazz} is {@code null}.
+     * @throws IllegalStateException if the {@code any} property contains more than one matching object.
      *
      * @see #getAnyObject(java.util.List, java.lang.Class)
      */
@@ -2035,16 +2049,17 @@
     <jaxb:bindings node="xs:complexType[@name='Person']">
       <ci:code><![CDATA[
     /**
-     * Gets the first {@code JAXBElement} matching a namespace URI and local part from the {@code any} property of the
+     * Gets a single {@code JAXBElement} matching a namespace URI and local part from the {@code any} property of the
      * instance.
      *
      * @param namespaceURI The namespace URI of the {@code JAXBElement} to return.
      * @param localPart The local part of the {@code JAXBElement} to return.
      *
-     * @return The first {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any}
-     * property of the instance or {@code null} if no such element is found.
+     * @return The {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any} property
+     * of the instance or {@code null} if no such element is found.
      *
      * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
+     * @throws IllegalStateException if the {@code any} property contains more than one matching element.
      *
      * @see #getAnyElement(java.util.List, java.lang.String, java.lang.String)
      */
@@ -2074,15 +2089,16 @@
     }
 
     /**
-     * Gets the first object matching a given class from the {@code any} property of the instance.
+     * Gets a single object matching a given class from the {@code any} property of the instance.
      *
      * @param clazz The class to return an instance of.
      * @param <T> The type of the object to return.
      *
-     * @return The first instance of {@code clazz} from the {@code any} property of the instance or {@code null} if no
-     * such instance is found.
+     * @return The instance of {@code clazz} from the {@code any} property of the instance or {@code null} if no such
+     * instance is found.
      *
      * @throws NullPointerException if {@code clazz} is {@code null}.
+     * @throws IllegalStateException if the {@code any} property contains more than one matching object.
      *
      * @see #getAnyObject(java.util.List, java.lang.Class)
      */
@@ -2119,16 +2135,17 @@
     <jaxb:bindings node="xs:complexType[@name='Author']">
       <ci:code><![CDATA[
     /**
-     * Gets the first {@code JAXBElement} matching a namespace URI and local part from the {@code any} property of the
+     * Gets a single {@code JAXBElement} matching a namespace URI and local part from the {@code any} property of the
      * instance.
      *
      * @param namespaceURI The namespace URI of the {@code JAXBElement} to return.
      * @param localPart The local part of the {@code JAXBElement} to return.
      *
-     * @return The first {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any}
-     * property of the instance or {@code null} if no such element is found.
+     * @return The {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any} property
+     * of the instance or {@code null} if no such element is found.
      *
      * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
+     * @throws IllegalStateException if the {@code any} property contains more than one matching element.
      *
      * @see #getAnyElement(java.util.List, java.lang.String, java.lang.String)
      */
@@ -2158,15 +2175,16 @@
     }
 
     /**
-     * Gets the first object matching a given class from the {@code any} property of the instance.
+     * Gets a single object matching a given class from the {@code any} property of the instance.
      *
      * @param clazz The class to return an instance of.
      * @param <T> The type of the object to return.
      *
-     * @return The first instance of {@code clazz} from the {@code any} property of the instance or {@code null} if no
-     * such instance is found.
+     * @return The instance of {@code clazz} from the {@code any} property of the instance or {@code null} if no such
+     * instance is found.
      *
      * @throws NullPointerException if {@code clazz} is {@code null}.
+     * @throws IllegalStateException if the {@code any} property contains more than one matching object.
      *
      * @see #getAnyObject(java.util.List, java.lang.Class)
      */
