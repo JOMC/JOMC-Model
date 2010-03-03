@@ -1,6 +1,6 @@
 /*
  *   Copyright (c) 2009 The JOMC Project
- *   Copyright (c) 2005 Christian Schulte <cs@jomc.org>
+ *   Copyright (c) 2005 Christian Schulte <schulte2005@users.sourceforge.net>
  *   All rights reserved.
  *
  *   Redistribution and use in source and binary forms, with or without
@@ -82,7 +82,7 @@ import org.xml.sax.helpers.DefaultHandler;
 /**
  * Default {@code ModelContext} implementation.
  *
- * @author <a href="mailto:cs@jomc.org">Christian Schulte</a>
+ * @author <a href="mailto:schulte2005@users.sourceforge.net">Christian Schulte</a>
  * @version $Id$
  * @see ModelContext#createModelContext(java.lang.ClassLoader)
  */
@@ -1004,7 +1004,7 @@ public class DefaultModelContext extends ModelContext
 /**
  * {@code ErrorHandler} collecting {@code ModelValidationReport} details.
  *
- * @author <a href="mailto:cs@jomc.org">Christian Schulte</a>
+ * @author <a href="mailto:schulte2005@users.sourceforge.net">Christian Schulte</a>
  * @version $Id$
  */
 class ModelErrorHandler extends DefaultHandler
