@@ -31,7 +31,7 @@
 
   $Id$
 
-  Location: http://jomc.org/model/jomc-1.0.xsd
+  Location: http://jomc.sourceforge.net/model/jomc-1.0.xsd
 
 -->
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
@@ -72,7 +72,7 @@
 
   $Id$
 
-  Location: http://jomc.org/model/jomc-1.0.xsd
+  Location: http://jomc.sourceforge.net/model/jomc-1.0.xsd
 
 ]]>
     </xsd:documentation>

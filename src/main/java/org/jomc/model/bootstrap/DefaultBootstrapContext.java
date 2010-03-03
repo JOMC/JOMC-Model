@@ -95,7 +95,7 @@ public class DefaultBootstrapContext extends BootstrapContext
         {
             final Marshaller m = this.createContext().createMarshaller();
             m.setProperty( Marshaller.JAXB_SCHEMA_LOCATION,
-                           "http://jomc.org/model/bootstrap http://jomc.org/model/bootstrap/jomc-bootstrap-1.0.xsd" );
+                           "http://jomc.org/model/bootstrap http://jomc.sourceforge.net/model/bootstrap/jomc-bootstrap-1.0.xsd" );
 
             return m;
         }

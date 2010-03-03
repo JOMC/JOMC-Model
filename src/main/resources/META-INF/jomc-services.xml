@@ -34,7 +34,7 @@
 -->
 <services xmlns="http://jomc.org/model/bootstrap"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://jomc.org/model/bootstrap http://jomc.org/model/bootstrap/jomc-bootstrap-1.0.xsd">
+         xsi:schemaLocation="http://jomc.org/model/bootstrap http://jomc.sourceforge.net/model/bootstrap/jomc-bootstrap-1.0.xsd">
 
   <service identifier="org.jomc.model.ModelProcessor" class="org.jomc.model.DefaultModelProcessor"/>
   <service identifier="org.jomc.model.ModelProvider" class="org.jomc.model.DefaultModelProvider"/>

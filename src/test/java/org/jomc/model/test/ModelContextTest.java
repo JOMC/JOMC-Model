@@ -225,18 +225,18 @@ public class ModelContextTest extends TestCase
 
         Assert.assertNotNull( this.getModelContext().createResourceResolver().
             resolveResource( XMLConstants.W3C_XML_SCHEMA_NS_URI, "http://jomc.org/model", null,
-                             "http://jomc.org/model/jomc-1.0.xsd", null ) );
+                             "http://jomc.sourceforge.net/model/jomc-1.0.xsd", null ) );
 
         Assert.assertNotNull( this.getModelContext().createResourceResolver().
             resolveResource( XMLConstants.W3C_XML_SCHEMA_NS_URI, null, "http://jomc.org/model",
-                             "http://jomc.org/model/jomc-1.0.xsd", null ) );
+                             "http://jomc.sourceforge.net/model/jomc-1.0.xsd", null ) );
 
         Assert.assertNull( this.getModelContext().createResourceResolver().
             resolveResource( "UNSUPPORTED", null, null, null, null ) );
 
         final LSInput input = this.getModelContext().createResourceResolver().
             resolveResource( XMLConstants.W3C_XML_SCHEMA_NS_URI, null, "http://jomc.org/model",
-                             "http://jomc.org/model/jomc-1.0.xsd", null );
+                             "http://jomc.sourceforge.net/model/jomc-1.0.xsd", null );
 
         Assert.assertNotNull( input );
 
