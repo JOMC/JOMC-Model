@@ -113,7 +113,7 @@ public class ModelValidatorTest
         }
         catch ( final JAXBException e )
         {
-            throw new ModelException( e );
+            throw new ModelException( e.getMessage(), e );
         }
     }
 
