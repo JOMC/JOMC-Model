@@ -311,6 +311,8 @@ public class DefaultModelContext extends ModelContext
      *
      * @throws NullPointerException if {@code model} is {@code null}.
      * @throws ModelException if validating the model fails.
+     *
+     * @see #createSchema()
      */
     @Override
     public ModelValidationReport validateModel( final Source model ) throws ModelException
@@ -414,6 +416,11 @@ public class DefaultModelContext extends ModelContext
         }
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see BootstrapContext#findSchemas()
+     */
     @Override
     public EntityResolver createEntityResolver() throws ModelException
     {
@@ -547,6 +554,11 @@ public class DefaultModelContext extends ModelContext
         };
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see BootstrapContext#findSchemas()
+     */
     @Override
     public LSResourceResolver createResourceResolver() throws ModelException
     {
@@ -719,6 +731,11 @@ public class DefaultModelContext extends ModelContext
 
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see BootstrapContext#findSchemas()
+     */
     @Override
     public Schema createSchema() throws ModelException
     {
@@ -761,6 +778,11 @@ public class DefaultModelContext extends ModelContext
         }
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see BootstrapContext#findSchemas()
+     */
     @Override
     public JAXBContext createContext() throws ModelException
     {
@@ -799,6 +821,11 @@ public class DefaultModelContext extends ModelContext
         }
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see BootstrapContext#findSchemas()
+     */
     @Override
     public Marshaller createMarshaller() throws ModelException
     {
@@ -849,6 +876,11 @@ public class DefaultModelContext extends ModelContext
         }
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see BootstrapContext#findSchemas()
+     */
     @Override
     public Unmarshaller createUnmarshaller() throws ModelException
     {
@@ -868,6 +900,8 @@ public class DefaultModelContext extends ModelContext
      * @return The services of the instance.
      *
      * @throws BootstrapException if getting the services fails.
+     *
+     * @see BootstrapContext#findServices()
      */
     private Services getServices() throws BootstrapException
     {
@@ -887,7 +921,7 @@ public class DefaultModelContext extends ModelContext
                 }
             }
 
-            this.cachedServices = new SoftReference( services );
+            this.cachedServices = new SoftReference<Services>( services );
         }
 
         return services;
@@ -899,6 +933,8 @@ public class DefaultModelContext extends ModelContext
      * @return The schemas of the instance.
      *
      * @throws BootstrapException if getting the schemas fails.
+     *
+     * @see BootstrapContext#findSchemas()
      */
     private Schemas getSchemas() throws BootstrapException
     {
@@ -918,7 +954,7 @@ public class DefaultModelContext extends ModelContext
                 }
             }
 
-            this.cachedSchemas = new SoftReference( schemas );
+            this.cachedSchemas = new SoftReference<Schemas>( schemas );
         }
 
         return schemas;
@@ -986,7 +1022,7 @@ public class DefaultModelContext extends ModelContext
 
             }
 
-            this.cachedSchemaResources = new SoftReference( resources );
+            this.cachedSchemaResources = new SoftReference<Set<URI>>( resources );
         }
 
         return resources;
