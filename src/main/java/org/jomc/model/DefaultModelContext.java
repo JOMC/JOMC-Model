@@ -154,6 +154,14 @@ public class DefaultModelContext extends ModelContext
 
                     }
 
+                    if ( !ModelProvider.class.isAssignableFrom( modelProviderClass ) )
+                    {
+                        throw new ModelException( getMessage( "illegalService", provider.getOrdinal(),
+                                                              provider.getIdentifier(), provider.getClazz(),
+                                                              ModelProvider.class.getName() ) );
+
+                    }
+
                     final ModelProvider modelProvider = modelProviderClass.newInstance();
                     final Modules provided = modelProvider.findModules( this );
                     if ( provided != null )
@@ -245,6 +253,14 @@ public class DefaultModelContext extends ModelContext
                     {
                         throw new ModelException( getMessage( "serviceNotFound", processor.getOrdinal(),
                                                               processor.getIdentifier(), processor.getClazz() ) );
+
+                    }
+
+                    if ( !ModelProcessor.class.isAssignableFrom( modelProcessorClass ) )
+                    {
+                        throw new ModelException( getMessage( "illegalService", processor.getOrdinal(),
+                                                              processor.getIdentifier(), processor.getClazz(),
+                                                              ModelProcessor.class.getName() ) );
 
                     }
 
@@ -388,6 +404,14 @@ public class DefaultModelContext extends ModelContext
                     {
                         throw new ModelException( getMessage( "serviceNotFound", validator.getOrdinal(),
                                                               validator.getIdentifier(), validator.getClazz() ) );
+
+                    }
+
+                    if ( !ModelValidator.class.isAssignableFrom( modelValidatorClass ) )
+                    {
+                        throw new ModelException( getMessage( "illegalService", validator.getOrdinal(),
+                                                              validator.getIdentifier(), validator.getClazz(),
+                                                              ModelValidator.class.getName() ) );
 
                     }
 
@@ -907,7 +931,7 @@ public class DefaultModelContext extends ModelContext
     {
         Services services = this.cachedServices.get();
 
-        if ( services == null )
+        if ( services == null || System.getProperty( this.getClass().getName() + ".disableCaching" ) != null )
         {
             services = BootstrapContext.createBootstrapContext( this.getClassLoader() ).findServices();
 
@@ -940,7 +964,7 @@ public class DefaultModelContext extends ModelContext
     {
         Schemas schemas = this.cachedSchemas.get();
 
-        if ( schemas == null )
+        if ( schemas == null || System.getProperty( this.getClass().getName() + ".disableCaching" ) != null )
         {
             schemas = BootstrapContext.createBootstrapContext( this.getClassLoader() ).findSchemas();
 
@@ -973,7 +997,7 @@ public class DefaultModelContext extends ModelContext
     {
         Set<URI> resources = this.cachedSchemaResources.get();
 
-        if ( resources == null )
+        if ( resources == null || System.getProperty( this.getClass().getName() + ".disableCaching" ) != null )
         {
             resources = new HashSet<URI>();
             final long t0 = System.currentTimeMillis();

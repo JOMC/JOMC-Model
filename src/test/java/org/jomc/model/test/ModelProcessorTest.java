@@ -56,6 +56,7 @@ public class ModelProcessorTest
 
     public ModelProcessorTest( final ModelProcessor modelProcessor )
     {
+        super();
         this.modelProcessor = modelProcessor;
     }
 
@@ -104,58 +105,6 @@ public class ModelProcessorTest
         {
             Assert.assertNotNull( e.getMessage() );
             System.out.println( e );
-        }
-    }
-
-    public void testDefaultModelProcessor() throws Exception
-    {
-        if ( this.getModelProcessor() instanceof DefaultModelProcessor )
-        {
-            final ModelContext context = ModelContext.createModelContext( this.getClass().getClassLoader() );
-            final DefaultModelProcessor defaultModelProcessor = (DefaultModelProcessor) this.getModelProcessor();
-
-            try
-            {
-                defaultModelProcessor.findTransformers( context, null );
-                Assert.fail( "Expected NullPointerException not thrown." );
-            }
-            catch ( final NullPointerException e )
-            {
-                Assert.assertNotNull( e.getMessage() );
-                System.out.println( e );
-            }
-
-            try
-            {
-                defaultModelProcessor.findTransformers( null, "" );
-                Assert.fail( "Expected NullPointerException not thrown." );
-            }
-            catch ( final NullPointerException e )
-            {
-                Assert.assertNotNull( e.getMessage() );
-                System.out.println( e );
-            }
-
-            DefaultModelProcessor.setDefaultTransformerLocation( "DEFAULT_LOCATION" );
-            defaultModelProcessor.setTransformerLocation( null );
-            Assert.assertEquals( "DEFAULT_LOCATION", defaultModelProcessor.getTransformerLocation() );
-
-            DefaultModelProcessor.setDefaultTransformerLocation( null );
-            defaultModelProcessor.setTransformerLocation( null );
-            Assert.assertEquals( 1, defaultModelProcessor.findTransformers(
-                context, DefaultModelProcessor.getDefaultTransformerLocation() ).size() );
-
-            DefaultModelProcessor.setDefaultTransformerLocation( "DOES_NOT_EXIST" );
-            defaultModelProcessor.setTransformerLocation( "DOES_NOT_EXIST" );
-
-            Assert.assertNull( defaultModelProcessor.findTransformers(
-                context, DefaultModelProcessor.getDefaultTransformerLocation() ) );
-
-            Assert.assertNull( defaultModelProcessor.findTransformers(
-                context, defaultModelProcessor.getTransformerLocation() ) );
-
-            DefaultModelProcessor.setDefaultTransformerLocation( null );
-            defaultModelProcessor.setTransformerLocation( null );
         }
     }
 

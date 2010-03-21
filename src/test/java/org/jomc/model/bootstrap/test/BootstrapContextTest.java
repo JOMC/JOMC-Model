@@ -83,7 +83,8 @@ public class BootstrapContextTest
             System.out.println( e.toString() );
         }
 
-        Assert.assertNotNull( this.getBootstrapContext().findClass( "java.lang.Object" ) );
+        Assert.assertEquals( Object.class, this.getBootstrapContext().findClass( "java.lang.Object" ) );
+        Assert.assertNull( this.getBootstrapContext().findClass( "DOES_NOT_EXIST" ) );
     }
 
     public void testFindResource() throws Exception
@@ -130,6 +131,39 @@ public class BootstrapContextTest
         final Schemas provided = this.getBootstrapContext().findSchemas();
         Assert.assertNotNull( provided );
         Assert.assertNotNull( provided.getSchemaByPublicId( "http://jomc.org/model/empty" ) );
+    }
+
+    public void testCreateBootstrapContext() throws Exception
+    {
+        BootstrapContext.setBootstrapContextClassName( null );
+        Assert.assertNotNull( BootstrapContext.createBootstrapContext( null ) );
+        Assert.assertNotNull( BootstrapContext.createBootstrapContext( this.getClass().getClassLoader() ) );
+
+        BootstrapContext.setBootstrapContextClassName( "DOES_NOT_EXIST" );
+
+        try
+        {
+            BootstrapContext.createBootstrapContext( null );
+            Assert.fail( "Expected BootstrapException not thrown." );
+        }
+        catch ( final BootstrapException e )
+        {
+            Assert.assertNotNull( e.getMessage() );
+            System.out.println( e );
+        }
+
+        try
+        {
+            BootstrapContext.createBootstrapContext( this.getClass().getClassLoader() );
+            Assert.fail( "Expected BootstrapException not thrown." );
+        }
+        catch ( final BootstrapException e )
+        {
+            Assert.assertNotNull( e.getMessage() );
+            System.out.println( e );
+        }
+
+        BootstrapContext.setBootstrapContextClassName( null );
     }
 
     public void testCreateContext() throws Exception

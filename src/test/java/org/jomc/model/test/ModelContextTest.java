@@ -33,17 +33,12 @@
 package org.jomc.model.test;
 
 import java.util.logging.Level;
-import javax.xml.XMLConstants;
-import javax.xml.bind.util.JAXBSource;
 import javax.xml.transform.Source;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 import org.jomc.model.ModelContext;
 import org.jomc.model.ModelException;
-import org.jomc.model.ModelValidationReport;
 import org.jomc.model.Modules;
-import org.jomc.model.ObjectFactory;
-import org.w3c.dom.ls.LSInput;
 
 /**
  * Test cases for {@code org.jomc.model.ModelContext} implementations.
@@ -101,7 +96,8 @@ public class ModelContextTest extends TestCase
             System.out.println( e.toString() );
         }
 
-        Assert.assertNotNull( this.getModelContext().findClass( "java.lang.Object" ) );
+        Assert.assertEquals( Object.class, this.getModelContext().findClass( "java.lang.Object" ) );
+        Assert.assertNull( this.getModelContext().findClass( "DOES_NOT_EXIST" ) );
     }
 
     public void testFindResource() throws Exception
@@ -138,18 +134,23 @@ public class ModelContextTest extends TestCase
 
     public void testFindModules() throws Exception
     {
-        final Modules provided = this.getModelContext().findModules();
-        Assert.assertNotNull( provided );
-        Assert.assertNotNull( provided.getModule( "TestModelProvider" ) );
+        this.getModelContext().findModules();
     }
 
     public void testProcessModules() throws Exception
     {
-        final Modules provided = this.getModelContext().findModules();
-        Assert.assertNotNull( provided );
-        final Modules processed = this.getModelContext().processModules( provided );
-        Assert.assertNotNull( processed );
-        Assert.assertNotNull( processed.getModule( "TestModelProcessor" ) );
+        try
+        {
+            this.getModelContext().processModules( null );
+            Assert.fail( "Expected NullPointerException not thrown." );
+        }
+        catch ( final NullPointerException e )
+        {
+            Assert.assertNotNull( e.getMessage() );
+            System.out.println( e );
+        }
+
+        this.getModelContext().processModules( new Modules() );
     }
 
     public void testValidateModel() throws Exception
@@ -176,15 +177,40 @@ public class ModelContextTest extends TestCase
             System.out.println( e.toString() );
         }
 
-        ModelValidationReport report = this.getModelContext().validateModel( new Modules() );
-        Assert.assertNotNull( report );
-        Assert.assertEquals( 1, report.getDetails( "TestModelValidator" ).size() );
+        this.getModelContext().validateModel( new Modules() );
+    }
 
-        report = this.getModelContext().validateModel( new JAXBSource(
-            this.getModelContext().createContext(), new ObjectFactory().createModules( new Modules() ) ) );
+    public void testCreateModelContext() throws Exception
+    {
+        ModelContext.setModelContextClassName( null );
+        Assert.assertNotNull( ModelContext.createModelContext( null ) );
+        Assert.assertNotNull( ModelContext.createModelContext( this.getClass().getClassLoader() ) );
 
-        Assert.assertNotNull( report );
-        Assert.assertTrue( report.isModelValid() );
+        ModelContext.setModelContextClassName( "DOES_NOT_EXIST" );
+
+        try
+        {
+            ModelContext.createModelContext( null );
+            Assert.fail( "Expected ModelException not thrown." );
+        }
+        catch ( final ModelException e )
+        {
+            Assert.assertNotNull( e.getMessage() );
+            System.out.println( e );
+        }
+
+        try
+        {
+            ModelContext.createModelContext( this.getClass().getClassLoader() );
+            Assert.fail( "Expected ModelException not thrown." );
+        }
+        catch ( final ModelException e )
+        {
+            Assert.assertNotNull( e.getMessage() );
+            System.out.println( e );
+        }
+
+        ModelContext.setModelContextClassName( null );
     }
 
     public void testCreateContext() throws Exception
@@ -210,53 +236,11 @@ public class ModelContextTest extends TestCase
     public void testCreateEntityResolver() throws Exception
     {
         Assert.assertNotNull( this.getModelContext().createEntityResolver() );
-        Assert.assertNull( this.getModelContext().createEntityResolver().resolveEntity( null, "UNKNOWN" ) );
-        Assert.assertNotNull( this.getModelContext().createEntityResolver().
-            resolveEntity( "http://jomc.org/model", "UNKNOWN" ) );
-
     }
 
     public void testCreateResourceResolver() throws Exception
     {
         Assert.assertNotNull( this.getModelContext().createResourceResolver() );
-
-        Assert.assertNotNull( this.getModelContext().createResourceResolver().
-            resolveResource( XMLConstants.W3C_XML_SCHEMA_NS_URI, "http://jomc.org/model", null, null, null ) );
-
-        Assert.assertNotNull( this.getModelContext().createResourceResolver().
-            resolveResource( XMLConstants.W3C_XML_SCHEMA_NS_URI, "http://jomc.org/model", null,
-                             "http://jomc.sourceforge.net/model/jomc-1.0.xsd", null ) );
-
-        Assert.assertNotNull( this.getModelContext().createResourceResolver().
-            resolveResource( XMLConstants.W3C_XML_SCHEMA_NS_URI, null, "http://jomc.org/model",
-                             "http://jomc.sourceforge.net/model/jomc-1.0.xsd", null ) );
-
-        Assert.assertNull( this.getModelContext().createResourceResolver().
-            resolveResource( "UNSUPPORTED", null, null, null, null ) );
-
-        final LSInput input = this.getModelContext().createResourceResolver().
-            resolveResource( XMLConstants.W3C_XML_SCHEMA_NS_URI, null, "http://jomc.org/model",
-                             "http://jomc.sourceforge.net/model/jomc-1.0.xsd", null );
-
-        Assert.assertNotNull( input );
-
-        input.getBaseURI();
-        input.getByteStream();
-        input.getCertifiedText();
-        input.getCharacterStream();
-        input.getEncoding();
-        input.getPublicId();
-        input.getStringData();
-        input.getSystemId();
-
-        input.setBaseURI( null );
-        input.setByteStream( null );
-        input.setCertifiedText( false );
-        input.setCharacterStream( null );
-        input.setEncoding( null );
-        input.setPublicId( null );
-        input.setStringData( null );
-        input.setSystemId( null );
     }
 
 }

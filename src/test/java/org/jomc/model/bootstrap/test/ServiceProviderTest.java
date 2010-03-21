@@ -30,49 +30,49 @@
  *   $Id$
  *
  */
-package org.jomc.model.test;
+package org.jomc.model.bootstrap.test;
 
 import junit.framework.Assert;
-import org.jomc.model.DefaultModelProvider;
-import org.jomc.model.ModelProvider;
+import org.jomc.model.bootstrap.BootstrapContext;
+import org.jomc.model.bootstrap.DefaultServiceProvider;
+import org.jomc.model.bootstrap.ServiceProvider;
 
 /**
- * Test cases for {@code org.jomc.model.ModelProvider} implementations.
+ * Test cases for {@code org.jomc.model.bootstrap.ServiceProvider} implementations.
  *
  * @author <a href="mailto:schulte2005@users.sourceforge.net">Christian Schulte</a> 1.0
  * @version $Id$
  */
-public class ModelProviderTest
+public class ServiceProviderTest
 {
 
-    private ModelProvider modelProvider;
+    private ServiceProvider serviceProvider;
 
-    public ModelProviderTest()
+    public ServiceProviderTest()
     {
         this( null );
     }
 
-    public ModelProviderTest( final ModelProvider modelProvider )
+    public ServiceProviderTest( final ServiceProvider serviceProvider )
     {
-        super();
-        this.modelProvider = modelProvider;
+        this.serviceProvider = serviceProvider;
     }
 
-    public ModelProvider getModelProvider()
+    public ServiceProvider getServiceProvider()
     {
-        if ( this.modelProvider == null )
+        if ( this.serviceProvider == null )
         {
-            this.modelProvider = new DefaultModelProvider();
+            this.serviceProvider = new DefaultServiceProvider();
         }
 
-        return this.modelProvider;
+        return this.serviceProvider;
     }
 
-    public void testFindModules() throws Exception
+    public void testFindServices() throws Exception
     {
         try
         {
-            this.getModelProvider().findModules( null );
+            this.getServiceProvider().findServices( null );
             Assert.fail( "Expected NullPointerException not thrown." );
         }
         catch ( final NullPointerException e )
@@ -80,6 +80,10 @@ public class ModelProviderTest
             Assert.assertNotNull( e.getMessage() );
             System.out.println( e );
         }
+
+        Assert.assertNotNull( this.getServiceProvider().findServices(
+            BootstrapContext.createBootstrapContext( this.getClass().getClassLoader() ) ) );
+
     }
 
 }

@@ -91,11 +91,6 @@ public class ModelValidatorTest
         return this.modelValidator;
     }
 
-    public void setModelValidator( final ModelValidator value )
-    {
-        this.modelValidator = value;
-    }
-
     public TestSuite getTestSuite() throws ModelException
     {
         try
@@ -115,11 +110,6 @@ public class ModelValidatorTest
         {
             throw new ModelException( e.getMessage(), e );
         }
-    }
-
-    public void setTestSuite( final TestSuite value )
-    {
-        this.testSuite = value;
     }
 
     public void testIllegalArguments() throws Exception

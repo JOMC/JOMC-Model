@@ -80,64 +80,10 @@ public class SchemaProviderTest
             Assert.assertNotNull( e.getMessage() );
             System.out.println( e );
         }
-    }
 
-    public void testDefaultSchemaProvider() throws Exception
-    {
-        if ( this.getSchemaProvider() instanceof DefaultSchemaProvider )
-        {
-            final DefaultSchemaProvider defaultSchemaProvider = (DefaultSchemaProvider) this.getSchemaProvider();
-            final BootstrapContext context =
-                BootstrapContext.createBootstrapContext( this.getClass().getClassLoader() );
+        Assert.assertNotNull( this.getSchemaProvider().findSchemas(
+            BootstrapContext.createBootstrapContext( this.getClass().getClassLoader() ) ) );
 
-            try
-            {
-                defaultSchemaProvider.findSchemas( context, null );
-                Assert.fail( "Expected NullPointerException not thrown." );
-            }
-            catch ( final NullPointerException e )
-            {
-                Assert.assertNotNull( e.getMessage() );
-                System.out.println( e );
-            }
-
-            try
-            {
-                defaultSchemaProvider.findSchemas( null, "" );
-                Assert.fail( "Expected NullPointerException not thrown." );
-            }
-            catch ( final NullPointerException e )
-            {
-                Assert.assertNotNull( e.getMessage() );
-                System.out.println( e );
-            }
-
-            DefaultSchemaProvider.setDefaultSchemaLocation( "DEFAULT_LOCATION" );
-            defaultSchemaProvider.setSchemaLocation( null );
-            Assert.assertEquals( "DEFAULT_LOCATION", defaultSchemaProvider.getSchemaLocation() );
-
-            DefaultSchemaProvider.setDefaultSchemaLocation( null );
-            defaultSchemaProvider.setSchemaLocation( null );
-            Assert.assertEquals( 2, defaultSchemaProvider.findSchemas( context ).getSchema().size() );
-            Assert.assertEquals( 2, defaultSchemaProvider.findSchemas(
-                context, DefaultSchemaProvider.getDefaultSchemaLocation() ).getSchema().size() );
-
-            Assert.assertEquals( 2, defaultSchemaProvider.findSchemas(
-                context, defaultSchemaProvider.getSchemaLocation() ).getSchema().size() );
-
-            DefaultSchemaProvider.setDefaultSchemaLocation( "DOES_NOT_EXIST" );
-            defaultSchemaProvider.setSchemaLocation( "DOES_NOT_EXIST" );
-
-            Assert.assertNull( defaultSchemaProvider.findSchemas( context ) );
-            Assert.assertNull( defaultSchemaProvider.findSchemas(
-                context, DefaultSchemaProvider.getDefaultSchemaLocation() ) );
-
-            Assert.assertNull( defaultSchemaProvider.findSchemas(
-                context, defaultSchemaProvider.getSchemaLocation() ) );
-
-            DefaultSchemaProvider.setDefaultSchemaLocation( null );
-            defaultSchemaProvider.setSchemaLocation( null );
-        }
     }
 
 }

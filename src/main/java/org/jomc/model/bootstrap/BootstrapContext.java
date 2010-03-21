@@ -32,27 +32,14 @@
  */
 package org.jomc.model.bootstrap;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
-import java.util.Collection;
-import java.util.Comparator;
 import java.util.Enumeration;
-import java.util.Map;
-import java.util.TreeMap;
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.util.JAXBSource;
-import javax.xml.validation.Validator;
-import org.xml.sax.SAXException;
 
 /**
  * Object management and configuration model bootstrap context interface.
@@ -220,117 +207,21 @@ public abstract class BootstrapContext
 
     /**
      * Searches the context for schemas.
-     * <p>This method loads {@code SchemaProvider} classes setup via
-     * {@code META-INF/services/org.jomc.model.bootstrap.SchemaProvider} resources and returns a list of provided
-     * schemas.</p>
      *
      * @return The schemas found in the context.
      *
      * @throws BootstrapException if searching schemas fails.
-     *
-     * @see SchemaProvider#findSchemas(org.jomc.model.bootstrap.BootstrapContext)
      */
-    public Schemas findSchemas() throws BootstrapException
-    {
-        try
-        {
-            final Schemas schemas = new Schemas();
-
-            final Collection<Class<SchemaProvider>> providers = this.loadProviders( SchemaProvider.class );
-            for ( Class<SchemaProvider> provider : providers )
-            {
-                final SchemaProvider schemaProvider = provider.newInstance();
-                final Schemas provided = schemaProvider.findSchemas( this );
-                if ( provided != null )
-                {
-                    schemas.getSchema().addAll( provided.getSchema() );
-                }
-            }
-
-            final javax.xml.validation.Schema bootstrapSchema = this.createSchema();
-            final Validator validator = bootstrapSchema.newValidator();
-            validator.validate( new JAXBSource( this.createContext(), new ObjectFactory().createSchemas( schemas ) ) );
-
-            return schemas;
-        }
-        catch ( final InstantiationException e )
-        {
-            throw new BootstrapException( e.getMessage(), e );
-        }
-        catch ( final IllegalAccessException e )
-        {
-            throw new BootstrapException( e.getMessage(), e );
-        }
-        catch ( final JAXBException e )
-        {
-            throw new BootstrapException( e.getMessage(), e );
-        }
-        catch ( final SAXException e )
-        {
-            throw new BootstrapException( e.getMessage(), e );
-        }
-        catch ( final IOException e )
-        {
-            throw new BootstrapException( e.getMessage(), e );
-        }
-    }
+    public abstract Schemas findSchemas() throws BootstrapException;
 
     /**
      * Searches the context for services.
-     * <p>This method loads {@code ServiceProvider} classes setup via
-     * {@code META-INF/services/org.jomc.model.bootstrap.ServiceProvider} resources and returns a list of provided
-     * services.</p>
      *
      * @return The services found in the context.
      *
      * @throws BootstrapException if searching services fails.
-     *
-     * @see ServiceProvider#findServices(org.jomc.model.bootstrap.BootstrapContext)
      */
-    public Services findServices() throws BootstrapException
-    {
-        try
-        {
-            final Services services = new Services();
-
-            final Collection<Class<ServiceProvider>> providers = this.loadProviders( ServiceProvider.class );
-            for ( Class<ServiceProvider> provider : providers )
-            {
-                final ServiceProvider serviceProvider = provider.newInstance();
-                final Services provided = serviceProvider.findServices( this );
-                if ( provided != null )
-                {
-                    services.getService().addAll( provided.getService() );
-                }
-            }
-
-            final javax.xml.validation.Schema bootstrapSchema = this.createSchema();
-            final Validator validator = bootstrapSchema.newValidator();
-            validator.validate( new JAXBSource( this.createContext(), new ObjectFactory().createServices( services ) ) );
-
-            return services;
-        }
-        catch ( final InstantiationException e )
-        {
-            throw new BootstrapException( e.getMessage(), e );
-        }
-        catch ( final IllegalAccessException e )
-        {
-            throw new BootstrapException( e.getMessage(), e );
-        }
-        catch ( final JAXBException e )
-        {
-            throw new BootstrapException( e.getMessage(), e );
-        }
-        catch ( final SAXException e )
-        {
-            throw new BootstrapException( e.getMessage(), e );
-        }
-        catch ( final IOException e )
-        {
-            throw new BootstrapException( e.getMessage(), e );
-        }
-    }
+    public abstract Services findServices() throws BootstrapException;
 
     /**
      * Creates a new object management and configuration model {@code BootstrapContext} instance.
@@ -423,89 +314,5 @@ public abstract class BootstrapContext
      * unmarshaller instance fails.
      */
     public abstract Unmarshaller createUnmarshaller() throws BootstrapException;
-
-    private <T> Collection<Class<T>> loadProviders( final Class<T> providerClass ) throws BootstrapException
-    {
-        try
-        {
-            final String providerNamePrefix = providerClass.getName() + ".";
-            final Map<String, Class<T>> providers = new TreeMap<String, Class<T>>( new Comparator<String>()
-            {
-
-                public int compare( final String key1, final String key2 )
-                {
-                    return key1.compareTo( key2 );
-                }
-
-            } );
-
-            final File platformProviders = new File( new StringBuilder().append( System.getProperty( "java.home" ) ).
-                append( File.separator ).append( "jre" ).append( File.separator ).append( "lib" ).
-                append( File.separator ).append( "jomc.properties" ).toString() );
-
-            if ( platformProviders.exists() )
-            {
-                InputStream in = null;
-                final java.util.Properties p = new java.util.Properties();
-
-                try
-                {
-                    in = new FileInputStream( platformProviders );
-                    p.load( in );
-                }
-                finally
-                {
-                    if ( in != null )
-                    {
-                        in.close();
-                    }
-                }
-
-                for ( Map.Entry e : p.entrySet() )
-                {
-                    if ( e.getKey().toString().startsWith( providerNamePrefix ) )
-                    {
-                        final Class<T> provider = this.findClass( e.getValue().toString() );
-                        if ( provider != null )
-                        {
-                            providers.put( e.getKey().toString(), provider );
-                        }
-                    }
-                }
-            }
-
-            final Enumeration<URL> serviceProviders =
-                this.findResources( "META-INF/services/" + providerClass.getName() );
-
-            while ( serviceProviders.hasMoreElements() )
-            {
-                final URL url = serviceProviders.nextElement();
-                final BufferedReader reader = new BufferedReader( new InputStreamReader( url.openStream(), "UTF-8" ) );
-
-                String line = null;
-                while ( ( line = reader.readLine() ) != null )
-                {
-                    if ( line.contains( "#" ) )
-                    {
-                        continue;
-                    }
-
-                    final Class<T> provider = this.findClass( line );
-                    if ( provider != null )
-                    {
-                        providers.put( providerNamePrefix + providers.size(), provider );
-                    }
-                }
-
-                reader.close();
-            }
-
-            return providers.values();
-        }
-        catch ( final IOException e )
-        {
-            throw new BootstrapException( e.getMessage(), e );
-        }
-    }
 
 }
