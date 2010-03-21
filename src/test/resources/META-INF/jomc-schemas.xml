@@ -36,7 +36,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://jomc.org/model/bootstrap http://jomc.sourceforge.net/model/bootstrap/jomc-bootstrap-1.0.xsd">
 
-  <schema public-id="http://jomc.org/model/test" system-id="http://jomc.org/model/test/jomc-test-1.0.xsd"
+  <schema public-id="http://jomc.org/model/test" system-id="http://jomc.sourceforge.net/model/test/jomc-test-1.0.xsd"
           context-id="org.jomc.model.test" classpath-id="org/jomc/model/test/jomc-test-1.0.xsd"/>
 
 </schemas>
