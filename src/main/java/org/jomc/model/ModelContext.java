@@ -321,7 +321,7 @@ public abstract class ModelContext
      * @throws NullPointerException if {@code name} is {@code null}.
      * @throws ModelException if searching fails.
      */
-    public Class findClass( final String name ) throws ModelException
+    public Class<?> findClass( final String name ) throws ModelException
     {
         if ( name == null )
         {
@@ -457,9 +457,11 @@ public abstract class ModelContext
 
         try
         {
-            final Class clazz = Class.forName( getModelContextClassName(), true, classLoader );
-            final Constructor ctor = clazz.getConstructor( ClassLoader.class );
-            return (ModelContext) ctor.newInstance( classLoader );
+            final Class<?> clazz = Class.forName( getModelContextClassName(), true, classLoader );
+            final Constructor<? extends ModelContext> ctor =
+                clazz.asSubclass( ModelContext.class ).getConstructor( ClassLoader.class );
+
+            return ctor.newInstance( classLoader );
         }
         catch ( final ClassNotFoundException e )
         {

@@ -144,17 +144,16 @@ public class DefaultModelContext extends ModelContext
             {
                 for ( Service provider : providers )
                 {
-                    final Class<ModelProvider> modelProviderClass =
-                        (Class<ModelProvider>) this.findClass( provider.getClazz() );
+                    final Class<?> clazz = this.findClass( provider.getClazz() );
 
-                    if ( modelProviderClass == null )
+                    if ( clazz == null )
                     {
                         throw new ModelException( getMessage( "serviceNotFound", provider.getOrdinal(),
                                                               provider.getIdentifier(), provider.getClazz() ) );
 
                     }
 
-                    if ( !ModelProvider.class.isAssignableFrom( modelProviderClass ) )
+                    if ( !ModelProvider.class.isAssignableFrom( clazz ) )
                     {
                         throw new ModelException( getMessage( "illegalService", provider.getOrdinal(),
                                                               provider.getIdentifier(), provider.getClazz(),
@@ -162,6 +161,7 @@ public class DefaultModelContext extends ModelContext
 
                     }
 
+                    final Class<? extends ModelProvider> modelProviderClass = clazz.asSubclass( ModelProvider.class );
                     final ModelProvider modelProvider = modelProviderClass.newInstance();
                     final Modules provided = modelProvider.findModules( this );
                     if ( provided != null )
@@ -246,23 +246,25 @@ public class DefaultModelContext extends ModelContext
             {
                 for ( Service processor : processors )
                 {
-                    final Class<ModelProcessor> modelProcessorClass =
-                        (Class<ModelProcessor>) this.findClass( processor.getClazz() );
+                    final Class<?> clazz = this.findClass( processor.getClazz() );
 
-                    if ( modelProcessorClass == null )
+                    if ( clazz == null )
                     {
                         throw new ModelException( getMessage( "serviceNotFound", processor.getOrdinal(),
                                                               processor.getIdentifier(), processor.getClazz() ) );
 
                     }
 
-                    if ( !ModelProcessor.class.isAssignableFrom( modelProcessorClass ) )
+                    if ( !ModelProcessor.class.isAssignableFrom( clazz ) )
                     {
                         throw new ModelException( getMessage( "illegalService", processor.getOrdinal(),
                                                               processor.getIdentifier(), processor.getClazz(),
                                                               ModelProcessor.class.getName() ) );
 
                     }
+
+                    final Class<? extends ModelProcessor> modelProcessorClass =
+                        clazz.asSubclass( ModelProcessor.class );
 
                     final ModelProcessor modelProcessor = modelProcessorClass.newInstance();
                     final Modules current = modelProcessor.processModules( this, processed );
@@ -397,23 +399,25 @@ public class DefaultModelContext extends ModelContext
             {
                 for ( Service validator : validators )
                 {
-                    final Class<ModelValidator> modelValidatorClass =
-                        (Class<ModelValidator>) this.findClass( validator.getClazz() );
+                    final Class<?> clazz = this.findClass( validator.getClazz() );
 
-                    if ( modelValidatorClass == null )
+                    if ( clazz == null )
                     {
                         throw new ModelException( getMessage( "serviceNotFound", validator.getOrdinal(),
                                                               validator.getIdentifier(), validator.getClazz() ) );
 
                     }
 
-                    if ( !ModelValidator.class.isAssignableFrom( modelValidatorClass ) )
+                    if ( !ModelValidator.class.isAssignableFrom( clazz ) )
                     {
                         throw new ModelException( getMessage( "illegalService", validator.getOrdinal(),
                                                               validator.getIdentifier(), validator.getClazz(),
                                                               ModelValidator.class.getName() ) );
 
                     }
+
+                    final Class<? extends ModelValidator> modelValidatorClass =
+                        clazz.asSubclass( ModelValidator.class );
 
                     final ModelValidator modelValidator = modelValidatorClass.newInstance();
                     final ModelValidationReport current = modelValidator.validateModel( this, modules );

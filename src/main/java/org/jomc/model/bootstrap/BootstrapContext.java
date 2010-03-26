@@ -140,7 +140,7 @@ public abstract class BootstrapContext
      * @throws NullPointerException if {@code name} is {@code null}.
      * @throws BootstrapException if searching fails.
      */
-    public Class findClass( final String name ) throws BootstrapException
+    public Class<?> findClass( final String name ) throws BootstrapException
     {
         if ( name == null )
         {
@@ -245,9 +245,11 @@ public abstract class BootstrapContext
 
         try
         {
-            final Class clazz = Class.forName( getBootstrapContextClassName(), true, classLoader );
-            final Constructor ctor = clazz.getConstructor( ClassLoader.class );
-            return (BootstrapContext) ctor.newInstance( classLoader );
+            final Class<?> clazz = Class.forName( getBootstrapContextClassName(), true, classLoader );
+            final Constructor<? extends BootstrapContext> ctor =
+                clazz.asSubclass( BootstrapContext.class ).getConstructor( ClassLoader.class );
+
+            return ctor.newInstance( classLoader );
         }
         catch ( final ClassNotFoundException e )
         {

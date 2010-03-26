@@ -332,9 +332,9 @@ public class DefaultBootstrapContext extends BootstrapContext
         try
         {
             final Schemas schemas = new Schemas();
+            final Collection<Class<? extends SchemaProvider>> providers = this.loadProviders( SchemaProvider.class );
 
-            final Collection<Class<SchemaProvider>> providers = this.loadProviders( SchemaProvider.class );
-            for ( Class<SchemaProvider> provider : providers )
+            for ( Class<? extends SchemaProvider> provider : providers )
             {
                 final SchemaProvider schemaProvider = provider.newInstance();
                 final Schemas provided = schemaProvider.findSchemas( this );
@@ -392,8 +392,8 @@ public class DefaultBootstrapContext extends BootstrapContext
         {
             final Services services = new Services();
 
-            final Collection<Class<ServiceProvider>> providers = this.loadProviders( ServiceProvider.class );
-            for ( Class<ServiceProvider> provider : providers )
+            final Collection<Class<? extends ServiceProvider>> providers = this.loadProviders( ServiceProvider.class );
+            for ( Class<? extends ServiceProvider> provider : providers )
             {
                 final ServiceProvider serviceProvider = provider.newInstance();
                 final Services provided = serviceProvider.findServices( this );
@@ -489,12 +489,13 @@ public class DefaultBootstrapContext extends BootstrapContext
         }
     }
 
-    private <T> Collection<Class<T>> loadProviders( final Class<T> providerClass ) throws BootstrapException
+    private <T> Collection<Class<? extends T>> loadProviders( final Class<T> providerClass ) throws BootstrapException
     {
         try
         {
             final String providerNamePrefix = providerClass.getName() + ".";
-            final Map<String, Class<T>> providers = new TreeMap<String, Class<T>>( new Comparator<String>()
+            final Map<String, Class<? extends T>> providers =
+                new TreeMap<String, Class<? extends T>>( new Comparator<String>()
             {
 
                 public int compare( final String key1, final String key2 )
@@ -528,7 +529,7 @@ public class DefaultBootstrapContext extends BootstrapContext
                 {
                     if ( e.getKey().toString().startsWith( providerNamePrefix ) )
                     {
-                        final Class<T> provider = (Class<T>) this.findClass( e.getValue().toString() );
+                        final Class<?> provider = this.findClass( e.getValue().toString() );
 
                         if ( provider == null )
                         {
@@ -546,7 +547,7 @@ public class DefaultBootstrapContext extends BootstrapContext
 
                         }
 
-                        providers.put( e.getKey().toString(), provider );
+                        providers.put( e.getKey().toString(), provider.asSubclass( providerClass ) );
                     }
                 }
             }
@@ -567,7 +568,7 @@ public class DefaultBootstrapContext extends BootstrapContext
                         continue;
                     }
 
-                    final Class<T> provider = (Class<T>) this.findClass( line );
+                    final Class<?> provider = this.findClass( line );
 
                     if ( provider == null )
                     {
@@ -583,7 +584,7 @@ public class DefaultBootstrapContext extends BootstrapContext
 
                     }
 
-                    providers.put( providerNamePrefix + providers.size(), provider );
+                    providers.put( providerNamePrefix + providers.size(), provider.asSubclass( providerClass ) );
                 }
 
                 reader.close();
