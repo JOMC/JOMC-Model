@@ -206,7 +206,7 @@ public class ModelValidationReport implements Serializable
      */
     public List<Detail> getDetails( final String identifier )
     {
-        final List<Detail> list = new ArrayList( this.getDetails().size() );
+        final List<Detail> list = new ArrayList<Detail>( this.getDetails().size() );
 
         for ( Detail d : this.getDetails() )
         {
