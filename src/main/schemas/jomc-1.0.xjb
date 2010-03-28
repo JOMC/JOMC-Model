@@ -1287,14 +1287,14 @@
                     typeName = typeName.substring( 0, idx );
                 }
 
-                final Class javaType = Class.forName( typeName, true, classLoader );
+                final Class<?> javaType = Class.forName( typeName, true, classLoader );
                 final Object anyObject = this.getAny() instanceof JAXBElement
                                          ? ( (JAXBElement) this.getAny() ).getValue() : this.getAny();
 
                 return this.getJavaValue( classLoader, anyObject, javaType );
             }
 
-            Class javaType = String.class;
+            Class<?> javaType = String.class;
             boolean primitive = false;
 
             if ( this.getType() != null )
@@ -2132,86 +2132,6 @@
         <jaxb:javadoc>The version created by this author or {@code null}.</jaxb:javadoc>
       </jaxb:property>
     </jaxb:bindings>
-    <jaxb:bindings node="xs:complexType[@name='Author']">
-      <ci:code><![CDATA[
-    /**
-     * Gets a single {@code JAXBElement} matching a namespace URI and local part from the {@code any} property of the
-     * instance.
-     *
-     * @param namespaceURI The namespace URI of the {@code JAXBElement} to return.
-     * @param localPart The local part of the {@code JAXBElement} to return.
-     *
-     * @return The {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any} property
-     * of the instance or {@code null} if no such element is found.
-     *
-     * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
-     * @throws IllegalStateException if the {@code any} property contains more than one matching element.
-     *
-     * @see #getAnyElement(java.util.List, java.lang.String, java.lang.String)
-     */
-    public javax.xml.bind.JAXBElement getAnyElement( final String namespaceURI, final String localPart )
-    {
-        return this.getAnyElement( this.getAny(), namespaceURI, localPart );
-    }
-
-    /**
-     * Gets a list containing all {@code JAXBElement}s matching a namespace URI and local part from the {@code any}
-     * property of the instance.
-     *
-     * @param namespaceURI The namespace URI of the {@code JAXBElement}s to return.
-     * @param localPart The local part of the {@code JAXBElement}s to return.
-     *
-     * @return An unmodifiable list of all {@code JAXBElement}s matching {@code namespaceURI} and {@code localPart} from
-     * the {@code any} property of the instance - an empty list if no such elements are found.
-     *
-     * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
-     *
-     * @see #getAnyElements(java.util.List, java.lang.String, java.lang.String)
-     */
-    public java.util.List<javax.xml.bind.JAXBElement> getAnyElements( final String namespaceURI,
-                                                                      final String localPart )
-    {
-        return this.getAnyElements( this.getAny(), namespaceURI, localPart );
-    }
-
-    /**
-     * Gets a single object matching a given class from the {@code any} property of the instance.
-     *
-     * @param clazz The class to return an instance of.
-     * @param <T> The type of the object to return.
-     *
-     * @return The instance of {@code clazz} from the {@code any} property of the instance or {@code null} if no such
-     * instance is found.
-     *
-     * @throws NullPointerException if {@code clazz} is {@code null}.
-     * @throws IllegalStateException if the {@code any} property contains more than one matching object.
-     *
-     * @see #getAnyObject(java.util.List, java.lang.Class)
-     */
-    public <T> T getAnyObject( final Class<T> clazz )
-    {
-        return this.getAnyObject( this.getAny(), clazz );
-    }
-
-    /**
-     * Gets a list containing all objects matching a given class from the {@code any} property of the instance.
-     *
-     * @param clazz The class to return all instances of.
-     * @param <T> The type of the objects to return.
-     *
-     * @return An unmodifiable list of all instances of {@code clazz} from the {@code any} property of the instance -
-     * an empty list if no such objects are found.
-     *
-     * @throws NullPointerException if {@code clazz} is {@code null}.
-     *
-     * @see #getAnyObjects(java.util.List, java.lang.Class)
-     */
-    public <T> java.util.List<T> getAnyObjects( final Class<T> clazz )
-    {
-        return this.getAnyObjects( this.getAny(), clazz );
-    }]]>
-      </ci:code>
-    </jaxb:bindings>
     <!-- *********************************************************************************************************** -->
     <jaxb:bindings node="xs:simpleType[@name='ArgumentType']/xs:restriction/xs:enumeration[@value='Number']">
       <jaxb:typesafeEnumMember name="NUMBER">
@@ -2272,6 +2192,8 @@
      */
     public Modules( final java.util.Map<Object, Instance> objects )
     {
+        super();
+
         if ( objects == null )
         {
             throw new NullPointerException( "objects" );
@@ -2596,12 +2518,12 @@
         }
 
         final Specifications specs = new Specifications();
-        this.collectSpecifications( this.getImplementation( implementation ), specs, new Implementations(), true );
-
-        Implementation declaration = null;
         final Implementation impl = this.getImplementation( implementation );
 
-        if ( impl != null && impl.getClazz() != null && !impl.getIdentifier().equals( impl.getClazz() ) )
+        this.collectSpecifications( impl, specs, new Implementations(), true );
+
+        Implementation declaration = null;
+        if ( impl != null && impl.getClazz() != null && !impl.isClassDeclaration() )
         {
             for ( Module m : this.getModule() )
             {
@@ -2609,8 +2531,8 @@
                 {
                     for ( Implementation i : m.getImplementations().getImplementation() )
                     {
-                        if ( i.getClazz() != null && i.getClazz().equals( i.getIdentifier() ) &&
-                             i.getClazz().equals( impl.getClazz() ) )
+                        if ( i.getClazz() != null && i.getClazz().equals( impl.getClazz() ) &&
+                             i.isClassDeclaration() )
                         {
                             declaration = i;
                             break;
@@ -2802,12 +2724,12 @@
         }
 
         final Dependencies dependencies = new Dependencies();
-        this.collectDependencies( this.getImplementation( implementation ), dependencies, new Implementations(), true );
+        final Implementation impl = this.getImplementation( implementation );
+        this.collectDependencies( impl, dependencies, new Implementations(), true );
 
         Implementation declaration = null;
-        final Implementation impl = this.getImplementation( implementation );
 
-        if ( impl != null && impl.getClazz() != null && !impl.getIdentifier().equals( impl.getClazz() ) )
+        if ( impl != null && impl.getClazz() != null && !impl.isClassDeclaration() )
         {
             for ( Module m : this.getModule() )
             {
@@ -2815,8 +2737,8 @@
                 {
                     for ( Implementation i : m.getImplementations().getImplementation() )
                     {
-                        if ( i.getClazz() != null && i.getClazz().equals( i.getIdentifier() ) &&
-                             i.getClazz().equals( impl.getClazz() ) )
+                        if ( i.getClazz() != null && i.getClazz().equals( impl.getClazz() ) &&
+                             i.isClassDeclaration() )
                         {
                             declaration = i;
                             break;
@@ -2874,12 +2796,12 @@
         }
 
         final Properties properties = new Properties();
-        this.collectProperties( this.getImplementation( implementation ), properties, new Implementations(), true );
+        final Implementation impl = this.getImplementation( implementation );
+        this.collectProperties( impl, properties, new Implementations(), true );
 
         Implementation declaration = null;
-        final Implementation impl = this.getImplementation( implementation );
 
-        if ( impl != null && impl.getClazz() != null && !impl.getIdentifier().equals( impl.getClazz() ) )
+        if ( impl != null && impl.getClazz() != null && !impl.isClassDeclaration() )
         {
             for ( Module m : this.getModule() )
             {
@@ -2887,8 +2809,8 @@
                 {
                     for ( Implementation i : m.getImplementations().getImplementation() )
                     {
-                        if ( i.getClazz() != null && i.getClazz().equals( i.getIdentifier() ) &&
-                             i.getClazz().equals( impl.getClazz() ) )
+                        if ( i.getClazz() != null && i.getClazz().equals( i.getClazz() ) &&
+                             i.isClassDeclaration() )
                         {
                             declaration = i;
                             break;
@@ -3004,12 +2926,12 @@
         }
 
         final Messages msgs = new Messages();
-        this.collectMessages( this.getImplementation( implementation ), msgs, new Implementations(), true );
+        final Implementation impl = this.getImplementation( implementation );
+        this.collectMessages( impl, msgs, new Implementations(), true );
 
         Implementation declaration = null;
-        final Implementation impl = this.getImplementation( implementation );
 
-        if ( impl != null && impl.getClazz() != null && !impl.getIdentifier().equals( impl.getClazz() ) )
+        if ( impl != null && impl.getClazz() != null && !impl.isClassDeclaration() )
         {
             for ( Module m : this.getModule() )
             {
@@ -3017,8 +2939,8 @@
                 {
                     for ( Implementation i : m.getImplementations().getImplementation() )
                     {
-                        if ( i.getClazz() != null && i.getClazz().equals( i.getIdentifier() ) &&
-                             i.getClazz().equals( impl.getClazz() ) )
+                        if ( i.getClazz() != null && i.getClazz().equals( impl.getClazz() ) &&
+                             i.isClassDeclaration() )
                         {
                             declaration = i;
                             break;
@@ -3084,15 +3006,9 @@
                 {
                     final Specifications specs = this.getSpecifications( i.getIdentifier() );
 
-                    if ( specs != null )
+                    if ( specs != null && specs.getSpecification( specification ) != null )
                     {
-                        for ( Specification s : specs.getSpecification() )
-                        {
-                            if ( specification.equals( s.getIdentifier() ) )
-                            {
-                                implementations.getImplementation().add( i );
-                            }
-                        }
+                        implementations.getImplementation().add( i );
                     }
                 }
             }
@@ -3247,7 +3163,7 @@
 
         synchronized ( this.objects )
         {
-            Instance instance = (Instance) this.objects.get( object );
+            Instance instance = this.objects.get( object );
 
             if ( instance == null )
             {
@@ -3385,7 +3301,7 @@
 
         try
         {
-            final Class clazz = Class.forName( instance.getClazz(), true, classLoader );
+            final Class<?> clazz = Class.forName( instance.getClazz(), true, classLoader );
 
             if ( java.lang.reflect.Modifier.isPublic( clazz.getModifiers() ) )
             {
@@ -3410,7 +3326,7 @@
                     {
                         if ( s.getClazz() != null )
                         {
-                            final Class specClass = Class.forName( s.getClazz(), true, classLoader );
+                            final Class<?> specClass = Class.forName( s.getClazz(), true, classLoader );
                             if ( !specClass.isAssignableFrom( clazz ) )
                             {
                                 assignable = false;
@@ -3901,7 +3817,7 @@
         {
             try
             {
-                final Class classpathSpec = Class.forName( identifier, true, classLoader );
+                final Class<?> classpathSpec = Class.forName( identifier, true, classLoader );
                 if ( java.lang.reflect.Modifier.isPublic( classpathSpec.getModifiers() ) )
                 {
                     classpathSpecification = true;
@@ -3954,7 +3870,7 @@
 
             try
             {
-                final Class classpathImpl = Class.forName( specification.getClazz(), true, classLoader );
+                final Class<?> classpathImpl = Class.forName( specification.getClazz(), true, classLoader );
 
                 if ( java.lang.reflect.Modifier.isPublic( classpathImpl.getModifiers() ) )
                 {
@@ -4040,7 +3956,7 @@
         return classpathImplementation;
     }
 
-    private boolean checkFactoryMethod( final Class clazz, final Class type, final String methodName )
+    private boolean checkFactoryMethod( final Class<?> clazz, final Class<?> type, final String methodName )
     {
         boolean factoryMethod = false;
 
