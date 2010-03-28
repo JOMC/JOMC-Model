@@ -485,7 +485,7 @@
      *
      * @see #getSpecification()
      */
-    public Specification getSpecification( final Class specification )
+    public Specification getSpecification( final Class<?> specification )
     {
         if ( specification == null )
         {
@@ -721,7 +721,7 @@
      *
      * @see #getImplementation()
      */
-    public Implementation getImplementation( final Class implementation )
+    public Implementation getImplementation( final Class<?> implementation )
     {
         if ( implementation == null )
         {
@@ -1365,7 +1365,7 @@
         }
     }
 
-    private Object getJavaValue( final ClassLoader classLoader, final Object any, final Class returnType )
+    private Object getJavaValue( final ClassLoader classLoader, final Object any, final Class<?> returnType )
         throws ModelException
     {
         if ( any != null )
@@ -1414,7 +1414,7 @@
         return any;
     }
 
-    private Object getJavaValue( final Class type, final String value ) throws ModelException
+    private Object getJavaValue( final Class<?> type, final String value ) throws ModelException
     {
         if ( value != null )
         {
@@ -2178,7 +2178,7 @@
     private static volatile String defaultClasspathModuleName;
 
     /** Empty {@code Class} array. */
-    private static final Class[] NO_CLASSES =
+    private static final Class<?>[] NO_CLASSES =
     {
     };
 
@@ -2475,7 +2475,7 @@
      *
      * @see #getModule()
      */
-    public Specification getSpecification( final Class specification )
+    public Specification getSpecification( final Class<?> specification )
     {
         if ( specification == null )
         {
@@ -2631,7 +2631,7 @@
      *
      * @see #getModule()
      */
-    public Implementation getImplementation( final Class implementation )
+    public Implementation getImplementation( final Class<?> implementation )
     {
         if ( implementation == null )
         {
@@ -3697,7 +3697,7 @@
         }
     }
 
-    private Implementation collectImplementation( final Class clazz )
+    private Implementation collectImplementation( final Class<?> clazz )
     {
         Implementation i = this.getImplementation( clazz );
         if ( i == null && clazz.getSuperclass() != null )
