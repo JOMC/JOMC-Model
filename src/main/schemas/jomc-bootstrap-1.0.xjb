@@ -183,7 +183,7 @@
      *
      * @see #getService()
      */
-    public List<Service> getServices( final Class clazz )
+    public List<Service> getServices( final Class<?> clazz )
     {
         if ( clazz == null )
         {
