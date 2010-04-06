@@ -437,7 +437,7 @@ public class DefaultBootstrapContext extends BootstrapContext
         try
         {
             return SchemaFactory.newInstance( XMLConstants.W3C_XML_SCHEMA_NS_URI ).
-                newSchema( this.getClass().getResource( "jomc-bootstrap-1.0.xsd" ) );
+                newSchema( this.getClass().getResource( "/org/jomc/model/bootstrap/jomc-bootstrap-1.0.xsd" ) );
 
         }
         catch ( final SAXException e )
