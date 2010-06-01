@@ -106,7 +106,7 @@
               <schemaDirectory>src/test/schemas</schemaDirectory>
               <extension>true</extension>
               <outputDirectory>${xjcTestOutputDirectory}</outputDirectory>
-              <staleFile>${project.build.directory}/testXjc.staleFile</staleFile>
+              <staleFile>${project.build.directory}/testXjc.staleFile</staleFile> <!-- See http://jira.codehaus.org/browse/MJAXB-34 -->
             </configuration>
           </execution>
         </executions>
