@@ -106,6 +106,7 @@
               <schemaDirectory>src/test/schemas</schemaDirectory>
               <extension>true</extension>
               <outputDirectory>${xjcTestOutputDirectory}</outputDirectory>
+              <staleFile>${project.build.directory}/testXjc.staleFile</staleFile>
             </configuration>
           </execution>
         </executions>
