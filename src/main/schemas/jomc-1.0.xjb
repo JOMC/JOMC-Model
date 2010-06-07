@@ -3372,7 +3372,7 @@
                         {
                             factoryMethod = clazz.getMethod( methodName, (Class[]) null );
                         }
-                        catch ( NoSuchMethodException e )
+                        catch ( final NoSuchMethodException e )
                         {
                             factoryMethod = null;
                         }
@@ -3384,7 +3384,7 @@
                         {
                             factoryMethod = clazz.getMethod( "getObject", (Class[]) null );
                         }
-                        catch ( NoSuchMethodException e )
+                        catch ( final NoSuchMethodException e )
                         {
                             factoryMethod = null;
                         }
@@ -3393,7 +3393,7 @@
                     if ( factoryMethod == null )
                     {
                         throw new InstantiationException( getMessage( "failedCreatingObject", instance.getIdentifier(),
-                                                                      clazz.getName(), methodName ) );
+                            clazz.getName(), methodName ) );
 
                     }
 
@@ -3425,7 +3425,7 @@
                     else
                     {
                         throw new InstantiationException( getMessage( "failedCreatingObject", instance.getIdentifier(),
-                                                                      clazz.getName(), methodName ) );
+                            clazz.getName(), methodName ) );
 
                     }
                 }
@@ -3435,17 +3435,22 @@
         }
         catch ( final java.lang.reflect.InvocationTargetException e )
         {
-            throw (InstantiationException) new InstantiationException().initCause(
-                e.getTargetException() != null ? e.getTargetException() : e );
+            final Throwable target = e.getTargetException() != null ? e.getTargetException() : e;
+            throw (InstantiationException) new InstantiationException( getMessage( "exceptionCreatingObject",
+                instance.getIdentifier() ) ).initCause( target );
 
         }
         catch ( final IllegalAccessException e )
         {
-            throw (InstantiationException) new InstantiationException( e.getMessage() ).initCause( e );
+            throw (InstantiationException) new InstantiationException( getMessage( "exceptionCreatingObject",
+                instance.getIdentifier() ) ).initCause( e );
+
         }
         catch ( final ClassNotFoundException e )
         {
-            throw (InstantiationException) new InstantiationException( e.getMessage() ).initCause( e );
+            throw (InstantiationException) new InstantiationException( getMessage( "exceptionCreatingObject",
+                instance.getIdentifier() ) ).initCause( e );
+
         }
     }
 
