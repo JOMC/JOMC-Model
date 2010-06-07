@@ -200,9 +200,9 @@ public class ModelValidatorTest
                     final List<ModelValidationReport.Detail> reportedDetails =
                         report.getDetails( expectedDetail.getIdentifier() );
 
-                    Assert.assertTrue( "[" + test.getIdentifier() + "] Expected " + expectedDetail.getCount() + " " +
-                                       expectedDetail.getIdentifier() + " details but got " + reportedDetails.size() +
-                                       ".", expectedDetail.getCount() == reportedDetails.size() );
+                    Assert.assertTrue( "[" + test.getIdentifier() + "] Expected " + expectedDetail.getCount() + " "
+                                       + expectedDetail.getIdentifier() + " details but got " + reportedDetails.size()
+                                       + ".", expectedDetail.getCount() == reportedDetails.size() );
 
                     report.getDetails().removeAll( reportedDetails );
                 }

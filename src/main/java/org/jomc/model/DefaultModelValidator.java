@@ -1028,8 +1028,8 @@ public class DefaultModelValidator implements ModelValidator
                     {
                         missing = true;
                     }
-                    else if ( d.getImplementationName() != null &&
-                              available.getImplementationByName( d.getImplementationName() ) == null )
+                    else if ( d.getImplementationName() != null
+                              && available.getImplementationByName( d.getImplementationName() ) == null )
                     {
                         missing = true;
                     }
@@ -1290,8 +1290,8 @@ public class DefaultModelValidator implements ModelValidator
                         }, new ObjectFactory().createImplementation( implementation ) ) );
 
                 }
-                if ( ( parentMessage != null && parentMessage.isFinal() ) ||
-                     ( parentReference != null && parentReference.isFinal() ) )
+                if ( ( parentMessage != null && parentMessage.isFinal() )
+                     || ( parentReference != null && parentReference.isFinal() ) )
                 {
                     report.getDetails().add( this.createDetail(
                         "IMPLEMENTATION_MESSAGE_INHERITANCE_CONSTRAINT", Level.SEVERE,
@@ -1317,8 +1317,8 @@ public class DefaultModelValidator implements ModelValidator
                         }, new ObjectFactory().createImplementation( implementation ) ) );
 
                 }
-                if ( ( parentMessage != null && parentMessage.isFinal() ) ||
-                     ( parentReference != null && parentReference.isFinal() ) )
+                if ( ( parentMessage != null && parentMessage.isFinal() )
+                     || ( parentReference != null && parentReference.isFinal() ) )
                 {
                     report.getDetails().add( this.createDetail(
                         "IMPLEMENTATION_MESSAGE_INHERITANCE_CONSTRAINT", Level.SEVERE,
@@ -1356,8 +1356,8 @@ public class DefaultModelValidator implements ModelValidator
                         }, new ObjectFactory().createImplementation( implementation ) ) );
 
                 }
-                if ( ( parentProperty != null && parentProperty.isFinal() ) ||
-                     ( parentReference != null && parentReference.isFinal() ) )
+                if ( ( parentProperty != null && parentProperty.isFinal() )
+                     || ( parentReference != null && parentReference.isFinal() ) )
                 {
                     report.getDetails().add( this.createDetail(
                         "IMPLEMENTATION_PROPERTY_INHERITANCE_CONSTRAINT", Level.SEVERE,
@@ -1383,8 +1383,8 @@ public class DefaultModelValidator implements ModelValidator
                         }, new ObjectFactory().createImplementation( implementation ) ) );
 
                 }
-                if ( ( parentProperty != null && parentProperty.isFinal() ) ||
-                     ( parentReference != null && parentReference.isFinal() ) )
+                if ( ( parentProperty != null && parentProperty.isFinal() )
+                     || ( parentReference != null && parentReference.isFinal() ) )
                 {
                     report.getDetails().add( this.createDetail(
                         "IMPLEMENTATION_PROPERTY_INHERITANCE_CONSTRAINT", Level.SEVERE,
@@ -1516,9 +1516,9 @@ public class DefaultModelValidator implements ModelValidator
 
             for ( Map.Entry<String, List<SpecificationReference>> e : specMap.entrySet() )
             {
-                if ( e.getValue().size() > 1 &&
-                     ( implementation.getSpecifications() == null ||
-                       implementation.getSpecifications().getReference( e.getKey() ) == null ) )
+                if ( e.getValue().size() > 1
+                     && ( implementation.getSpecifications() == null
+                          || implementation.getSpecifications().getReference( e.getKey() ) == null ) )
                 {
                     report.getDetails().add( this.createDetail(
                         "IMPLEMENTATION_SPECIFICATION_MULTIPLE_INHERITANCE_CONSTRAINT", Level.SEVERE,
@@ -1532,9 +1532,9 @@ public class DefaultModelValidator implements ModelValidator
 
             for ( Map.Entry<String, List<Dependency>> e : dependencyMap.entrySet() )
             {
-                if ( e.getValue().size() > 1 &&
-                     ( implementation.getDependencies() == null ||
-                       implementation.getDependencies().getDependency( e.getKey() ) == null ) )
+                if ( e.getValue().size() > 1
+                     && ( implementation.getDependencies() == null
+                          || implementation.getDependencies().getDependency( e.getKey() ) == null ) )
                 {
                     report.getDetails().add( this.createDetail(
                         "IMPLEMENTATION_DEPENDENCY_MULTIPLE_INHERITANCE_CONSTRAINT", Level.SEVERE,
@@ -1548,10 +1548,10 @@ public class DefaultModelValidator implements ModelValidator
 
             for ( Map.Entry<String, List<Message>> e : messageMap.entrySet() )
             {
-                if ( e.getValue().size() > 1 &&
-                     ( implementation.getMessages() == null ||
-                       ( implementation.getMessages().getMessage( e.getKey() ) == null &&
-                         implementation.getMessages().getReference( e.getKey() ) == null ) ) )
+                if ( e.getValue().size() > 1
+                     && ( implementation.getMessages() == null
+                          || ( implementation.getMessages().getMessage( e.getKey() ) == null
+                               && implementation.getMessages().getReference( e.getKey() ) == null ) ) )
                 {
                     report.getDetails().add( this.createDetail(
                         "IMPLEMENTATION_MESSAGE_MULTIPLE_INHERITANCE_CONSTRAINT", Level.SEVERE,
@@ -1565,10 +1565,10 @@ public class DefaultModelValidator implements ModelValidator
 
             for ( Map.Entry<String, List<Property>> e : propertyMap.entrySet() )
             {
-                if ( e.getValue().size() > 1 &&
-                     ( implementation.getProperties() == null ||
-                       ( implementation.getProperties().getProperty( e.getKey() ) == null &&
-                         implementation.getProperties().getReference( e.getKey() ) == null ) ) )
+                if ( e.getValue().size() > 1
+                     && ( implementation.getProperties() == null
+                          || ( implementation.getProperties().getProperty( e.getKey() ) == null
+                               && implementation.getProperties().getReference( e.getKey() ) == null ) ) )
                 {
                     report.getDetails().add( this.createDetail(
                         "IMPLEMENTATION_PROPERTY_MULTIPLE_INHERITANCE_CONSTRAINT", Level.SEVERE,
@@ -1628,8 +1628,8 @@ public class DefaultModelValidator implements ModelValidator
     {
         final Implementations impls = modules.getImplementations( specification.getIdentifier() );
 
-        if ( specification.getMultiplicity() == Multiplicity.ONE && impls != null &&
-             impls.getImplementation().size() > 1 )
+        if ( specification.getMultiplicity() == Multiplicity.ONE && impls != null
+             && impls.getImplementation().size() > 1 )
         {
             for ( Implementation i : impls.getImplementation() )
             {

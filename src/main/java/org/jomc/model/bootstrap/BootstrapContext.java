@@ -83,8 +83,8 @@ public abstract class BootstrapContext
                 @Override
                 public String toString()
                 {
-                    return BootstrapContext.class.getName() + ".BootstrapClassLoader@" +
-                           System.identityHashCode( this );
+                    return BootstrapContext.class.getName() + ".BootstrapClassLoader@"
+                           + System.identityHashCode( this );
 
                 }
 
