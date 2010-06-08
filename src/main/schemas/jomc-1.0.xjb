@@ -3251,25 +3251,65 @@
         if ( instance != null )
         {
             final Specification dependencySpecification = this.getSpecification( dependency.getIdentifier() );
-            if ( dependencySpecification != null && dependencySpecification.getScope() == null &&
-                 dependency.getProperties() != null && !dependency.getProperties().getProperty().isEmpty() )
-            {
-                instance = new Instance( instance );
-                final Properties properties = new Properties();
-                properties.getProperty().addAll( dependency.getProperties().getProperty() );
 
-                if ( instance.getProperties() != null )
+            if ( dependencySpecification != null && dependencySpecification.getScope() == null )
+            {
+                if ( dependency.getDependencies() != null && !dependency.getDependencies().getDependency().isEmpty() )
                 {
-                    for ( Property p : instance.getProperties().getProperty() )
+                    final Dependencies dependencies = new Dependencies();
+                    dependencies.getDependency().addAll( dependency.getDependencies().getDependency() );
+
+                    if ( instance.getDependencies() != null )
                     {
-                        if ( properties.getProperty( p.getName() ) == null )
+                        for ( Dependency d : instance.getDependencies().getDependency() )
                         {
-                            properties.getProperty().add( p );
+                            if ( dependencies.getDependency( d.getName() ) == null )
+                            {
+                                dependencies.getDependency().add( d );
+                            }
                         }
                     }
+
+                    instance.setDependencies( dependencies );
                 }
 
-                instance.setProperties( properties );
+                if ( dependency.getMessages() != null && !dependency.getMessages().getMessage().isEmpty() )
+                {
+                    final Messages messages = new Messages();
+                    messages.getMessage().addAll( dependency.getMessages().getMessage() );
+
+                    if ( instance.getMessages() != null )
+                    {
+                        for ( Message m : instance.getMessages().getMessage() )
+                        {
+                            if ( messages.getMessage( m.getName() ) == null )
+                            {
+                                messages.getMessage().add( m );
+                            }
+                        }
+                    }
+
+                    instance.setMessages( messages );
+                }
+
+                if ( dependency.getProperties() != null && !dependency.getProperties().getProperty().isEmpty() )
+                {
+                    final Properties properties = new Properties();
+                    properties.getProperty().addAll( dependency.getProperties().getProperty() );
+
+                    if ( instance.getProperties() != null )
+                    {
+                        for ( Property p : instance.getProperties().getProperty() )
+                        {
+                            if ( properties.getProperty( p.getName() ) == null )
+                            {
+                                properties.getProperty().add( p );
+                            }
+                        }
+                    }
+
+                    instance.setProperties( properties );
+                }
             }
         }
 
@@ -3506,29 +3546,15 @@
                 {
                     for ( Dependency d : implementation.getDependencies().getDependency() )
                     {
-                        final Dependency dependency = dependencies.getDependency( d.getName() );
+                        Dependency dependency = dependencies.getDependency( d.getName() );
 
-                        if ( dependency != null )
+                        if ( dependency == null )
                         {
-                            if ( d.getProperties() != null )
-                            {
-                                if ( dependency.getProperties() == null )
-                                {
-                                    dependency.setProperties( new Properties() );
-                                }
-
-                                for ( Property p : d.getProperties().getProperty() )
-                                {
-                                    if ( dependency.getProperties().getProperty( p.getName() ) == null )
-                                    {
-                                        dependency.getProperties().getProperty().add( p );
-                                    }
-                                }
-                            }
+                            dependencies.getDependency().add( d );
                         }
                         else
                         {
-                            dependencies.getDependency().add( d );
+                            this.collectDependencies( d, dependency );
                         }
                     }
                 }
@@ -3541,6 +3567,63 @@
                             this.getImplementation( r.getIdentifier() ), dependencies, seen, true );
 
                     }
+                }
+            }
+        }
+    }
+
+    private void collectDependencies( final Dependency source, final Dependency target )
+    {
+        if ( source.getMessages() != null )
+        {
+            if ( target.getMessages() == null )
+            {
+                target.setMessages( new Messages() );
+            }
+
+            for ( Message m : source.getMessages().getMessage() )
+            {
+                if ( target.getMessages().getMessage( m.getName() ) == null )
+                {
+                    target.getMessages().getMessage().add( new Message( m ) );
+                }
+            }
+        }
+
+        if ( source.getProperties() != null )
+        {
+            if ( target.getProperties() == null )
+            {
+                target.setProperties( new Properties() );
+            }
+
+            for ( Property p : source.getProperties().getProperty() )
+            {
+                if ( target.getProperties().getProperty( p.getName() ) == null )
+                {
+                    target.getProperties().getProperty().add( new Property( p ) );
+                }
+            }
+        }
+
+        if ( source.getDependencies() != null )
+        {
+            if ( target.getDependencies() == null )
+            {
+                target.setDependencies( new Dependencies() );
+            }
+
+            for ( Dependency sd : source.getDependencies().getDependency() )
+            {
+                Dependency td = target.getDependencies().getDependency( sd.getName() );
+
+                if ( td == null )
+                {
+                    target.getDependencies().getDependency().add( sd );
+                }
+                else
+                {
+                    this.collectDependencies( td, sd );
                 }
             }
         }

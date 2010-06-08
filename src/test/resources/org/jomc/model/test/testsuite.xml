@@ -899,7 +899,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="DEPENDENCY_PROPERTY_REFERENCE_DECLARATION_CONSTRAINT">
+  <modules-constraints-test identifier="DEPENDENCY_REFERENCE_DECLARATION_CONSTRAINTS">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -910,6 +910,13 @@
             <implementation identifier="Implementation" name="Implementation Name">
               <dependencies>
                 <dependency name="Dependency" identifier="Specification" version="1.0" optional="true">
+                  <messages>
+                    <reference name="Message 1"/>
+                    <reference name="Message 2"/>
+                    <reference name="Message 3"/>
+                    <reference name="Message 4"/>
+                    <reference name="Message 5"/>
+                  </messages>
                   <properties>
                     <reference name="Property 1"/>
                     <reference name="Property 2"/>
@@ -921,6 +928,33 @@
               </dependencies>
             </implementation>
           </implementations>
+          <messages>
+            <message name="Message 1">
+              <template defaultLanguage="en">
+                <text language="en">Text 1</text>
+              </template>
+            </message>
+            <message name="Message 2">
+              <template defaultLanguage="en">
+                <text language="en">Text 2</text>
+              </template>
+            </message>
+            <message name="Message 3">
+              <template defaultLanguage="en">
+                <text language="en">Text 3</text>
+              </template>
+            </message>
+            <message name="Message 4">
+              <template defaultLanguage="en">
+                <text language="en">Text 4</text>
+              </template>
+            </message>
+            <message name="Message 5">
+              <template defaultLanguage="en">
+                <text language="en">Text 5</text>
+              </template>
+            </message>
+          </messages>
           <properties>
             <property name="Property 1"/>
             <property name="Property 2"/>
@@ -931,11 +965,12 @@
         </module>
       </modules>
     </modules>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_MESSAGE_REFERENCE_DECLARATION_CONSTRAINT" count="5"/>
     <detail identifier="IMPLEMENTATION_DEPENDENCY_PROPERTY_REFERENCE_DECLARATION_CONSTRAINT" count="5"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="DEPENDENCY_PROPERTIES_OVERRIDE_CONSTRAINT">
+  <modules-constraints-test identifier="DEPENDENCY_OVERRIDE_CONSTRAINTS">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -946,6 +981,40 @@
             <implementation identifier="Implementation" name="Implementation Name">
               <dependencies>
                 <dependency name="Dependency" identifier="Specification" version="1.0" optional="true">
+                  <dependencies>
+                    <dependency name="Dependency 1" identifier="Specification" optional="true"/>
+                    <dependency name="Dependency 2" identifier="Specification" optional="true"/>
+                    <dependency name="Dependency 3" identifier="Specification" optional="true"/>
+                    <dependency name="Dependency 4" identifier="Specification" optional="true"/>
+                    <dependency name="Dependency 5" identifier="Specification" optional="true"/>
+                  </dependencies>
+                  <messages>
+                    <message name="Message 1">
+                      <template defaultLanguage="en">
+                        <text language="en">Text 1</text>
+                      </template>
+                    </message>
+                    <message name="Message 2">
+                      <template defaultLanguage="en">
+                        <text language="en">Text 2</text>
+                      </template>
+                    </message>
+                    <message name="Message 3">
+                      <template defaultLanguage="en">
+                        <text language="en">Text 3</text>
+                      </template>
+                    </message>
+                    <message name="Message 4">
+                      <template defaultLanguage="en">
+                        <text language="en">Text 4</text>
+                      </template>
+                    </message>
+                    <message name="Message 5">
+                      <template defaultLanguage="en">
+                        <text language="en">Text 5</text>
+                      </template>
+                    </message>
+                  </messages>
                   <properties>
                     <property name="Property 1"/>
                     <property name="Property 2"/>
@@ -960,6 +1029,8 @@
         </module>
       </modules>
     </modules>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_DEPENDENCIES_OVERRIDE_CONSTRAINT" count="5"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_MESSAGES_OVERRIDE_CONSTRAINT" count="5"/>
     <detail identifier="IMPLEMENTATION_DEPENDENCY_PROPERTIES_OVERRIDE_CONSTRAINT" count="5"/>
   </modules-constraints-test>
 
@@ -974,9 +1045,21 @@
             <specification identifier="Specification 3" class="java.lang.Object" scope="TEST"/>
             <specification identifier="Specification 4" class="java.lang.Object" scope="TEST"/>
             <specification identifier="Specification 5" class="java.lang.Object" scope="TEST"/>
+            <specification identifier="Specification 6" class="java.lang.Object" scope="TEST"/>
+            <specification identifier="Specification 7" class="java.lang.Object" scope="TEST"/>
+            <specification identifier="Specification 8" class="java.lang.Object" scope="TEST"/>
+            <specification identifier="Specification 9" class="java.lang.Object" scope="TEST"/>
+            <specification identifier="Specification 10" class="java.lang.Object" scope="TEST"/>
           </specifications>
           <implementations>
-            <implementation identifier="Implementation" name="Implementation Name">
+            <implementation identifier="Implementation 1" name="Implementation Name 1">
+              <specifications>
+                <reference identifier="Specification 6"/>
+                <reference identifier="Specification 7"/>
+                <reference identifier="Specification 8"/>
+                <reference identifier="Specification 9"/>
+                <reference identifier="Specification 10"/>
+              </specifications>
               <dependencies>
                 <dependency name="Dependency 1" identifier="Specification 1" optional="false"/>
                 <dependency name="Dependency 2" identifier="Specification 2" optional="false"/>
@@ -985,18 +1068,27 @@
                 <dependency name="Dependency 5" identifier="Specification 5" optional="false"/>
               </dependencies>
             </implementation>
+            <implementation identifier="Implementation 2" name="Implementation Name 2">
+              <dependencies>
+                <dependency name="Named Dependency 1" identifier="Specification 6" optional="false" implementationName="DOES NOT EXIST"/>
+                <dependency name="Named Dependency 2" identifier="Specification 7" optional="false" implementationName="DOES NOT EXIST"/>
+                <dependency name="Named Dependency 3" identifier="Specification 8" optional="false" implementationName="DOES NOT EXIST"/>
+                <dependency name="Named Dependency 4" identifier="Specification 9" optional="false" implementationName="DOES NOT EXIST"/>
+                <dependency name="Named Dependency 5" identifier="Specification 10" optional="false" implementationName="DOES NOT EXIST"/>
+              </dependencies>
+            </implementation>
           </implementations>
         </module>
       </modules>
     </modules>
-    <detail identifier="IMPLEMENTATION_MANDATORY_DEPENDENCY_CONSTRAINT" count="5"/>
+    <detail identifier="IMPLEMENTATION_MANDATORY_DEPENDENCY_CONSTRAINT" count="10"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
   <modules-constraints-test identifier="IMPLEMENTATION_INHERITANCE_CONSTRAINT">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="Moule">
+        <module name="Module">
           <implementations>
             <implementation identifier="Final 1" name="Final Name 1" final="true"/>
             <implementation identifier="Final 2" name="Final Name 2" final="true"/>
@@ -1023,7 +1115,7 @@
   <modules-constraints-test identifier="IMPLEMENTATION_REFERENCE_INHERITANCE_CONSTRAINT">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="Moule">
+        <module name="Module">
           <implementations>
             <implementation identifier="Parent Implementation" name="Parent Implementation Name"/>
             <implementation identifier="Child Implementation" name="Child Implementation Name">
@@ -1042,6 +1134,25 @@
       </modules>
     </modules>
     <detail identifier="IMPLEMENTATION_IMPLEMENTATION_REFERENCE_INHERITANCE_CONSTRAINT" count="1"/>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="IMPLEMENTATION_IMPLEMENTATION_OVERRIDE_CONSTRAINT">
+    <modules valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <implementations>
+            <implementation identifier="Implementation 1" name="Implementation Name 1"/>
+            <implementation identifier="Implementation 2" name="Implementation Name 2">
+              <implementations>
+                <reference identifier="Implementation 1" override="true"/>
+              </implementations>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="IMPLEMENTATION_IMPLEMENTATION_OVERRIDE_CONSTRAINT" count="1"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
@@ -2522,7 +2633,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="DEPENDENCY_OVERRIDES_PROPERTIES_INVALID">
+  <modules-constraints-test identifier="DEPENDENCY_MODEL_OBJECT_OVERRIDES_INVALID">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -2534,6 +2645,16 @@
               <specifications>
                 <reference identifier="Specification"/>
               </specifications>
+              <dependencies>
+                <dependency name="Final Dependency" identifier="Specification" final="true"/>
+              </dependencies>
+              <messages>
+                <message name="Final Message" final="true">
+                  <template defaultLanguage="en">
+                    <text language="en">Text</text>
+                  </template>
+                </message>
+              </messages>
               <properties>
                 <property name="Final Property" final="true"/>
               </properties>
@@ -2541,9 +2662,25 @@
             <implementation identifier="Test Implementation" name="Test Implementation Name">
               <dependencies>
                 <dependency name="Dependency" identifier="Specification">
+                  <dependencies>
+                    <dependency name="Final Dependency" identifier="Specification"/>
+                    <dependency name="Dependency - Not Overriden" identifier="Specification" override="true"/>
+                  </dependencies>
+                  <messages>
+                    <message name="Final Message">
+                      <template defaultLanguage="en">
+                        <text language="en">Text</text>
+                      </template>
+                    </message>
+                    <message name="Message - Not Overriden" override="true">
+                      <template defaultLanguage="en">
+                        <text language="en">Text</text>
+                      </template>
+                    </message>
+                  </messages>
                   <properties>
                     <property name="Final Property"/>
-                    <property name="Not Overridden" override="true"/>
+                    <property name="Property - Not Overridden" override="true"/>
                   </properties>
                 </dependency>
               </dependencies>
@@ -2552,6 +2689,10 @@
         </module>
       </modules>
     </modules>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_FINAL_DEPENDENCY_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_OVERRIDE_DEPENDENCY_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_FINAL_MESSAGE_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_OVERRIDE_MESSAGE_CONSTRAINT" count="1"/>
     <detail identifier="IMPLEMENTATION_DEPENDENCY_FINAL_PROPERTY_CONSTRAINT" count="1"/>
     <detail identifier="IMPLEMENTATION_DEPENDENCY_OVERRIDE_PROPERTY_CONSTRAINT" count="1"/>
   </modules-constraints-test>
@@ -2720,7 +2861,8 @@
         </module>
       </modules>
     </modules>
-    <detail identifier="IMPLEMENTATION_MESSAGE_TEMPLATE_CONSTRAINT" count="2"/>
+    <detail identifier="IMPLEMENTATION_MESSAGE_TEMPLATE_CONSTRAINT" count="1"/>
+    <detail identifier="MODULE_MESSAGE_TEMPLATE_CONSTRAINT" count="1"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
@@ -2817,12 +2959,57 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="IMPLEMENTATION_PROPERTY_VALUE_CONSTRAINT">
+  <modules-constraints-test identifier="IMPLEMENTATION_PROPERTIES_VALUE_CONSTRAINT">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
+          <specifications>
+            <specification identifier="Specification" class="java.lang.Object"/>
+          </specifications>
           <implementations>
             <implementation identifier="Implementation" name="Implementation Name">
+              <dependencies>
+                <dependency name="Dependency 1" identifier="Specification" optional="true">
+                  <dependencies>
+                    <dependency name="Override Dependency 1" identifier="Specification" optional="true">
+                      <properties>
+                        <property name="Override Dependency Property 1" value="Value 1" type="org.jomc.model.test.ModulesConstraintsTest">
+                          <modules-constraints-test xmlns="http://jomc.org/model/test" identifier="Any Value 1"/>
+                        </property>
+                        <property name="Override Dependency Property 2" value="Value 2" type="org.jomc.model.test.ModulesConstraintsTest">
+                          <modules-constraints-test xmlns="http://jomc.org/model/test" identifier="Any Value 2"/>
+                        </property>
+                        <property name="Override Dependency Property 3" value="Value 3" type="org.jomc.model.test.ModulesConstraintsTest">
+                          <modules-constraints-test xmlns="http://jomc.org/model/test" identifier="Any Value 3"/>
+                        </property>
+                        <property name="Override Dependency Property 4" value="Value 4" type="org.jomc.model.test.ModulesConstraintsTest">
+                          <modules-constraints-test xmlns="http://jomc.org/model/test" identifier="Any Value 4"/>
+                        </property>
+                        <property name="Override Dependency Property 5" value="Value 5" type="org.jomc.model.test.ModulesConstraintsTest">
+                          <modules-constraints-test xmlns="http://jomc.org/model/test" identifier="Any Value 5"/>
+                        </property>
+                      </properties>
+                    </dependency>
+                  </dependencies>
+                  <properties>
+                    <property name="Dependency Property 1" value="Value 1" type="org.jomc.model.test.ModulesConstraintsTest">
+                      <modules-constraints-test xmlns="http://jomc.org/model/test" identifier="Any Value 1"/>
+                    </property>
+                    <property name="Dependency Property 2" value="Value 2" type="org.jomc.model.test.ModulesConstraintsTest">
+                      <modules-constraints-test xmlns="http://jomc.org/model/test" identifier="Any Value 2"/>
+                    </property>
+                    <property name="Dependency Property 3" value="Value 3" type="org.jomc.model.test.ModulesConstraintsTest">
+                      <modules-constraints-test xmlns="http://jomc.org/model/test" identifier="Any Value 3"/>
+                    </property>
+                    <property name="Dependency Property 4" value="Value 4" type="org.jomc.model.test.ModulesConstraintsTest">
+                      <modules-constraints-test xmlns="http://jomc.org/model/test" identifier="Any Value 4"/>
+                    </property>
+                    <property name="Dependency Property 5" value="Value 5" type="org.jomc.model.test.ModulesConstraintsTest">
+                      <modules-constraints-test xmlns="http://jomc.org/model/test" identifier="Any Value 5"/>
+                    </property>
+                  </properties>
+                </dependency>
+              </dependencies>
               <properties>
                 <property name="Property 1" value="Value 1" type="org.jomc.model.test.ModulesConstraintsTest">
                   <modules-constraints-test xmlns="http://jomc.org/model/test" identifier="Any Value 1"/>
@@ -2845,6 +3032,7 @@
         </module>
       </modules>
     </modules>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_PROPERTY_VALUE_CONSTRAINT" count="10"/>
     <detail identifier="IMPLEMENTATION_PROPERTY_VALUE_CONSTRAINT" count="5"/>
   </modules-constraints-test>
 
@@ -2875,8 +3063,53 @@
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
+          <specifications>
+            <specification identifier="Specification" class="java.lang.Object"/>
+          </specifications>
           <implementations>
             <implementation identifier="Implementation" name="Implementation Name">
+              <dependencies>
+                <dependency name="Dependency 1" identifier="Specification" optional="true">
+                  <dependencies>
+                    <dependency name="Dependency 1" identifier="Specification" optional="true">
+                      <properties>
+                        <property name="Dependency Property 1">
+                          <modules-constraints-test xmlns="http://jomc.org/model/test" identifier="Any Value 1"/>
+                        </property>
+                        <property name="Dependency Property 2">
+                          <modules-constraints-test xmlns="http://jomc.org/model/test" identifier="Any Value 2"/>
+                        </property>
+                        <property name="Dependency Property 3">
+                          <modules-constraints-test xmlns="http://jomc.org/model/test" identifier="Any Value 3"/>
+                        </property>
+                        <property name="Dependency Property 4">
+                          <modules-constraints-test xmlns="http://jomc.org/model/test" identifier="Any Value 4"/>
+                        </property>
+                        <property name="Dependency Property 5">
+                          <modules-constraints-test xmlns="http://jomc.org/model/test" identifier="Any Value 5"/>
+                        </property>
+                      </properties>
+                    </dependency>
+                  </dependencies>
+                  <properties>
+                    <property name="Dependency Property 1">
+                      <modules-constraints-test xmlns="http://jomc.org/model/test" identifier="Any Value 1"/>
+                    </property>
+                    <property name="Dependency Property 2">
+                      <modules-constraints-test xmlns="http://jomc.org/model/test" identifier="Any Value 2"/>
+                    </property>
+                    <property name="Dependency Property 3">
+                      <modules-constraints-test xmlns="http://jomc.org/model/test" identifier="Any Value 3"/>
+                    </property>
+                    <property name="Dependency Property 4">
+                      <modules-constraints-test xmlns="http://jomc.org/model/test" identifier="Any Value 4"/>
+                    </property>
+                    <property name="Dependency Property 5">
+                      <modules-constraints-test xmlns="http://jomc.org/model/test" identifier="Any Value 5"/>
+                    </property>
+                  </properties>
+                </dependency>
+              </dependencies>
               <properties>
                 <property name="Property 1">
                   <modules-constraints-test xmlns="http://jomc.org/model/test" identifier="Any Value 1"/>
@@ -2899,6 +3132,8 @@
         </module>
       </modules>
     </modules>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_PROPERTY_TYPE_CONSTRAINT" count="10"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_PROPERTY_JAVA_VALUE_CONSTRAINT" count="10"/>
     <detail identifier="IMPLEMENTATION_PROPERTY_TYPE_CONSTRAINT" count="5"/>
     <detail identifier="IMPLEMENTATION_PROPERTY_JAVA_VALUE_CONSTRAINT" count="5"/>
   </modules-constraints-test>

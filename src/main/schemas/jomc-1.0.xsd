@@ -439,14 +439,16 @@ The 'Dependency' type extends the 'SpecificationReference' type adding attribute
 'bound' and 'optional'. Attribute 'implementationName' holds an identifier selecting a single implementation from the
 set of implementations implementing the referenced specification. Attribute 'name' holds an identifier uniquely
 identifying the dependency in a set of dependencies. Attribute 'bound' flags the instances of the dependency bound
-to the declaring implementation. Attribute 'optional' flags a dependency optional. Properties set with a dependency
-override properties of the selected implementations.
+to the declaring implementation. Attribute 'optional' flags a dependency optional. Dependencies, messages and properties
+set with a dependency override dependencies, messages and properties of the selected implementations.
       </xsd:documentation>
     </xsd:annotation>
     <xsd:complexContent>
       <xsd:extension base="jomc:SpecificationReference">
         <xsd:sequence>
+          <xsd:element ref="jomc:dependencies" minOccurs="0" maxOccurs="1"/>
           <xsd:element ref="jomc:properties" minOccurs="0" maxOccurs="1"/>
+          <xsd:element ref="jomc:messages" minOccurs="0" maxOccurs="1"/>
           <xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:sequence>
         <xsd:attribute name="implementationName" type="jomc:Identifier" use="optional"/>
