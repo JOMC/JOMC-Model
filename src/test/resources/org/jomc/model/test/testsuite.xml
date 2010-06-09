@@ -34,7 +34,7 @@
 -->
 <testsuite xmlns="http://jomc.org/model/test">
   <!-- ********************************************************************* -->
-  <schema-constraints-test identifier="TEXTS_VALID">
+  <schema-constraints-test identifier="SCT0001">
     <model-object valid="true">
       <texts xmlns="http://jomc.org/model" defaultLanguage="en">
         <text language="en">Test</text>
@@ -44,21 +44,21 @@
   </schema-constraints-test>
 
   <!-- ********************************************************************* -->
-  <schema-constraints-test identifier="TEXTS_NO_DEFAULT_LANGUAGE">
+  <schema-constraints-test identifier="SCT0002">
     <model-object valid="false">
       <texts xmlns="http://jomc.org/model"/>
     </model-object>
   </schema-constraints-test>
 
   <!-- ********************************************************************* -->
-  <schema-constraints-test identifier="TEXTS_DEFAULT_LANGUAGE_EMPTY_TEXT">
+  <schema-constraints-test identifier="SCT0003">
     <model-object valid="false">
       <texts xmlns="http://jomc.org/model" defaultLanguage="en"/>
     </model-object>
   </schema-constraints-test>
 
   <!-- ********************************************************************* -->
-  <schema-constraints-test identifier="TEXTS_DEFAULT_LANGUAGE_MISSING_TEXT">
+  <schema-constraints-test identifier="SCT0004">
     <model-object valid="false">
       <texts xmlns="http://jomc.org/model" defaultLanguage="en">
         <text language="de">Test</text>
@@ -67,7 +67,7 @@
   </schema-constraints-test>
 
   <!-- ********************************************************************* -->
-  <schema-constraints-test identifier="DOCUMENTATION_VALID">
+  <schema-constraints-test identifier="SCT0005">
     <model-object valid="true">
       <documentation xmlns="http://jomc.org/model" defaultLanguage="en">
         <text language="en">Test</text>
@@ -77,21 +77,21 @@
   </schema-constraints-test>
 
   <!-- ********************************************************************* -->
-  <schema-constraints-test identifier="DOCUMENTATION_NO_DEFAULT_LANGUAGE">
+  <schema-constraints-test identifier="SCT0006">
     <model-object valid="false">
       <documentation xmlns="http://jomc.org/model"/>
     </model-object>
   </schema-constraints-test>
 
   <!-- ********************************************************************* -->
-  <schema-constraints-test identifier="DOCUMENTATION_DEFAULT_LANGUAGE_EMPTY_TEXT">
+  <schema-constraints-test identifier="SCT0007">
     <model-object valid="false">
       <documentation xmlns="http://jomc.org/model" defaultLanguage="en"/>
     </model-object>
   </schema-constraints-test>
 
   <!-- ********************************************************************* -->
-  <schema-constraints-test identifier="DOCUMENTATION_DEFAULT_LANGUAGE_MISSING_TEXT">
+  <schema-constraints-test identifier="SCT0008">
     <model-object valid="false">
       <documentation xmlns="http://jomc.org/model" defaultLanguage="en">
         <text language="de">Test</text>
@@ -100,7 +100,7 @@
   </schema-constraints-test>
 
   <!-- ********************************************************************* -->
-  <schema-constraints-test identifier="TEMPLATE_VALID">
+  <schema-constraints-test identifier="SCT0009">
     <model-object valid="true">
       <template xmlns="http://jomc.org/model" defaultLanguage="en">
         <text language="en">Test</text>
@@ -110,21 +110,21 @@
   </schema-constraints-test>
 
   <!-- ********************************************************************* -->
-  <schema-constraints-test identifier="TEMPLATE_NO_DEFAULT_LANGUAGE">
+  <schema-constraints-test identifier="SCT0010">
     <model-object valid="false">
       <template xmlns="http://jomc.org/model"/>
     </model-object>
   </schema-constraints-test>
 
   <!-- ********************************************************************* -->
-  <schema-constraints-test identifier="TEMPLATE_DEFAULT_LANGUAGE_EMPTY_TEXT">
+  <schema-constraints-test identifier="SCT0011">
     <model-object valid="false">
       <template xmlns="http://jomc.org/model" defaultLanguage="en"/>
     </model-object>
   </schema-constraints-test>
 
   <!-- ********************************************************************* -->
-  <schema-constraints-test identifier="TEMPLATE_DEFAULT_LANGUAGE_MISSING_TEXT">
+  <schema-constraints-test identifier="SCT0012">
     <model-object valid="false">
       <template xmlns="http://jomc.org/model" defaultLanguage="en">
         <text language="de">Test</text>
@@ -133,7 +133,7 @@
   </schema-constraints-test>
 
   <!-- ********************************************************************* -->
-  <schema-constraints-test identifier="MODULES_NON_UNIQUE_MODULES">
+  <schema-constraints-test identifier="SCT0013">
     <model-object valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="TEST"/>
@@ -143,7 +143,7 @@
   </schema-constraints-test>
 
   <!-- ********************************************************************* -->
-  <schema-constraints-test identifier="MODULES_NON_UNIQUE_SPECIFICATIONS">
+  <schema-constraints-test identifier="SCT0014">
     <model-object valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="TEST 1">
@@ -161,7 +161,7 @@
   </schema-constraints-test>
 
   <!-- ********************************************************************* -->
-  <schema-constraints-test identifier="MODULES_NON_UNIQUE_IMPLEMENTATIONS">
+  <schema-constraints-test identifier="SCT0015">
     <model-object valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="TEST 1">
@@ -179,7 +179,7 @@
   </schema-constraints-test>
 
   <!-- ********************************************************************* -->
-  <schema-constraints-test identifier="MODULE_NON_UNIQUE_MESSAGES">
+  <schema-constraints-test identifier="SCT0016">
     <model-object valid="false">
       <module xmlns="http://jomc.org/model" name="TEST">
         <messages>
@@ -191,7 +191,7 @@
   </schema-constraints-test>
 
   <!-- ********************************************************************* -->
-  <schema-constraints-test identifier="MODULES_NON_UNIQUE_PROPERTIES">
+  <schema-constraints-test identifier="SCT0017">
     <model-object valid="false">
       <module xmlns="http://jomc.org/model" name="TEST">
         <properties>
@@ -203,7 +203,7 @@
   </schema-constraints-test>
 
   <!-- ********************************************************************* -->
-  <schema-constraints-test identifier="MODULES_SPECIFICATION_NOT_FOUND_1">
+  <schema-constraints-test identifier="SCT0018">
     <model-object valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="TEST">
@@ -220,7 +220,7 @@
   </schema-constraints-test>
 
   <!-- ********************************************************************* -->
-  <schema-constraints-test identifier="MODULES_SPECIFICATION_NOT_FOUND_2">
+  <schema-constraints-test identifier="SCT0019">
     <model-object valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="TEST">
@@ -237,7 +237,7 @@
   </schema-constraints-test>
 
   <!-- ********************************************************************* -->
-  <schema-constraints-test identifier="MODULES_IMPLEMENTATION_NOT_FOUND">
+  <schema-constraints-test identifier="SCT0020">
     <model-object valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="TEST">
@@ -254,7 +254,7 @@
   </schema-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="MODULE_SPECIFICATION_REFERENCE_DECLARATION_CONSTRAINT">
+  <modules-constraints-test identifier="MCT0001">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -277,7 +277,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="MODULE_IMPLEMENTATION_REFERENCE_DECLARATION_CONSTRAINT">
+  <modules-constraints-test identifier="MCT0002">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -300,7 +300,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="FINAL_MODULE_MESSAGE_CONSTRAINT">
+  <modules-constraints-test identifier="MCT0003">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -338,7 +338,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="OVERRIDE_MODULE_MESSAGE_CONSTRAINT">
+  <modules-constraints-test identifier="MCT0004">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -376,7 +376,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="MODULE_MESSAGE_REFERENCE_DECLARATION_CONSTRAINT">
+  <modules-constraints-test identifier="MCT0005">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -419,7 +419,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="FINAL_MODULE_PROPERTY_CONSTRAINT">
+  <modules-constraints-test identifier="MCT0006">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -437,7 +437,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="OVERRIDE_MODULE_PROPERTY_CONSTRAINT">
+  <modules-constraints-test identifier="MCT0007">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -455,7 +455,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="MODULE_PROPERTY_REFERENCE_DECLARATION_CONSTRAINT">
+  <modules-constraints-test identifier="MCT0008">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -478,7 +478,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="IMPLEMENTATION_IMPLEMENTATION_DECLARATION_CONSTRAINT">
+  <modules-constraints-test identifier="MCT0009">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -500,7 +500,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="IMPLEMENTATION_MESSAGES_UNIQUENESS_CONSTRAINT">
+  <modules-constraints-test identifier="MCT0010">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -574,7 +574,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="IMPLEMENTATION_PROPERTIES_UNIQUENESS_CONSTRAINT">
+  <modules-constraints-test identifier="MCT0011">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -608,7 +608,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="IMPLEMENTATION_SPECIFICATION_DECLARATION_CONSTRAINT">
+  <modules-constraints-test identifier="MCT0012">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -630,7 +630,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="ABSTRACT_IMPLEMENTATION_LOCATION_CONSTRAINT">
+  <modules-constraints-test identifier="MCT0013">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -648,7 +648,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="IMPLEMENTATION_VERSIONING_CONSTRAINT">
+  <modules-constraints-test identifier="MCT0014">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -667,7 +667,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="SPECIFICATION_VERSIONING_CONSTRAINT">
+  <modules-constraints-test identifier="MCT0015">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -692,7 +692,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="IMPLEMENTATION_COMPATIBILITY_CONSTRAINT_1">
+  <modules-constraints-test identifier="MCT0016">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -713,7 +713,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="IMPLEMENTATION_COMPATIBILITY_CONSTRAINT_2">
+  <modules-constraints-test identifier="MCT0017">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -734,7 +734,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="IMPLEMENTATION_SPECIFICATION_COMPATIBILITY_VERSIONING_PARSE_EXCEPTION_1">
+  <modules-constraints-test identifier="MCT0018">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -755,7 +755,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="IMPLEMENTATION_SPECIFICATION_COMPATIBILITY_VERSIONING_PARSE_EXCEPTION_2">
+  <modules-constraints-test identifier="MCT0019">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -776,7 +776,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="IMPLEMENTATION_COMPATIBILITY_CONSTRAINT_VALID">
+  <modules-constraints-test identifier="MCT0020">
     <modules valid="true">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -796,7 +796,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="DEPENDENCY_COMPATIBILITY_CONSTRAINT_1">
+  <modules-constraints-test identifier="MCT0021">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -817,7 +817,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="IMPLEMENTATION_DEPENDENCY_SPECIFICATION_COMPATIBILITY_VERSIONING_PARSE_EXCEPTION_1">
+  <modules-constraints-test identifier="MCT0022">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -838,7 +838,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="IMPLEMENTATION_DEPENDENCY_SPECIFICATION_COMPATIBILITY_VERSIONING_PARSE_EXCEPTION_2">
+  <modules-constraints-test identifier="MCT0023">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -859,7 +859,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="DEPENDENCY_COMPATIBILITY_CONSTRAINT_VALID_1">
+  <modules-constraints-test identifier="MCT0024">
     <modules valid="true">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -879,7 +879,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="DEPENDENCY_COMPATIBILITY_CONSTRAINT_VALID_2">
+  <modules-constraints-test identifier="MCT0025">
     <modules valid="true">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -899,7 +899,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="DEPENDENCY_REFERENCE_DECLARATION_CONSTRAINTS">
+  <modules-constraints-test identifier="MCT0026">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -970,7 +970,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="DEPENDENCY_OVERRIDE_CONSTRAINTS">
+  <modules-constraints-test identifier="MCT0027">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -1035,7 +1035,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="MANDATORY_DEPENDENCY_CONSTRAINT">
+  <modules-constraints-test identifier="MCT0028">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -1085,7 +1085,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="IMPLEMENTATION_INHERITANCE_CONSTRAINT">
+  <modules-constraints-test identifier="MCT0029">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -1112,7 +1112,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="IMPLEMENTATION_REFERENCE_INHERITANCE_CONSTRAINT">
+  <modules-constraints-test identifier="MCT0030">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -1137,7 +1137,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="IMPLEMENTATION_IMPLEMENTATION_OVERRIDE_CONSTRAINT">
+  <modules-constraints-test identifier="MCT0031">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -1156,7 +1156,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="SPECIFICATION_INHERITANCE_CONSTRANT">
+  <modules-constraints-test identifier="MCT0032">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -1209,7 +1209,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="DEPENDENCY_INHERITANCE_CONSTRAINT">
+  <modules-constraints-test identifier="MCT0033">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -1262,7 +1262,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="PROPERTY_INHERITANCE_CONSTRAINT">
+  <modules-constraints-test identifier="MCT0034">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -1333,7 +1333,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="PROPERTY_INHERITANCE_CONSTRAINT_2">
+  <modules-constraints-test identifier="MCT0035">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -1404,7 +1404,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="MESSAGE_INHERITANCE_CONSTRAINT">
+  <modules-constraints-test identifier="MCT0036">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -1555,7 +1555,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="MESSAGE_INHERITANCE_CONSTRAINT_2">
+  <modules-constraints-test identifier="MCT0037">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -1686,7 +1686,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="SPECIFICATION_PROPERTY_REFERENCE_DECLARATION_CONSTRAINT">
+  <modules-constraints-test identifier="MCT0038">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -1715,7 +1715,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="IMPLEMENTATION_NAME_CONSTRAINT">
+  <modules-constraints-test identifier="MCT0039">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -1756,7 +1756,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="MULTIPLICITY_CONSTRAINT">
+  <modules-constraints-test identifier="MCT0040">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -1798,7 +1798,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="SPECIFICATION_OVERRIDE_CONSTRAINT">
+  <modules-constraints-test identifier="MCT0041">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -1827,7 +1827,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="DEPENDENCY_OVERRIDE_CONSTRAINT">
+  <modules-constraints-test identifier="MCT0042">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -1852,7 +1852,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="PROPERTY_OVERRIDE_CONSTRAINT">
+  <modules-constraints-test identifier="MCT0043">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -1886,7 +1886,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="MESSAGE_OVERRIDE_CONSTRAINT">
+  <modules-constraints-test identifier="MCT0044">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -1960,7 +1960,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="SPECIFICATION_MULTIPLE_INHERITANCE_CONSTRAINT_INVALID_1">
+  <modules-constraints-test identifier="MCT0045">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -1992,7 +1992,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="SPECIFICATION_MULTIPLE_INHERITANCE_CONSTRAINT_INVALID_2">
+  <modules-constraints-test identifier="MCT0046">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -2033,7 +2033,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="SPECIFICATION_MULTIPLE_INHERITANCE_CONSTRAINT_VALID">
+  <modules-constraints-test identifier="MCT0047">
     <modules valid="true">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -2072,7 +2072,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="DEPENDENCY_MULTIPLE_INHERITANCE_CONSTRAINT_INVALID_1">
+  <modules-constraints-test identifier="MCT0048">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -2104,7 +2104,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="DEPENDENCY_MULTIPLE_INHERITANCE_CONSTRAINT_INVALID_2">
+  <modules-constraints-test identifier="MCT0049">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -2145,7 +2145,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="DEPENDENCY_MULTIPLE_INHERITANCE_CONSTRAINT_VALID">
+  <modules-constraints-test identifier="MCT0050">
     <modules valid="true">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -2184,7 +2184,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="MESSAGE_MULTIPLE_INHERITANCE_CONSTRAINT_INVALID_1">
+  <modules-constraints-test identifier="MCT0051">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -2221,7 +2221,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="MESSAGE_MULTIPLE_INHERITANCE_CONSTRAINT_INVALID_2">
+  <modules-constraints-test identifier="MCT0052">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -2271,7 +2271,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="MESSAGE_MULTIPLE_INHERITANCE_CONSTRAINT_VALID">
+  <modules-constraints-test identifier="MCT0053">
     <modules valid="true">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -2319,7 +2319,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="PROPERTY_MULTIPLE_INHERITANCE_CONSTRAINT_INVALID_1">
+  <modules-constraints-test identifier="MCT0054">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -2348,7 +2348,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="PROPERTY_MULTIPLE_INHERITANCE_CONSTRAINT_INVALID_2">
+  <modules-constraints-test identifier="MCT0055">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -2386,7 +2386,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="PROPERTY_MULTIPLE_INHERITANCE_CONSTRAINT_VALID">
+  <modules-constraints-test identifier="MCT0056">
     <modules valid="true">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -2422,7 +2422,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="IMPLEMENTATION_INHERITANCE_CYCLE_CONSTRAINT_1">
+  <modules-constraints-test identifier="MCT0057">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -2440,7 +2440,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="IMPLEMENTATION_INHERITANCE_CYCLE_CONSTRAINT_2">
+  <modules-constraints-test identifier="MCT0058">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -2468,7 +2468,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="IMPLEMENTATION_INHERITANCE_COMPATIBILITY_CONSTRAINT_VALID_1">
+  <modules-constraints-test identifier="MCT0059">
     <modules valid="true">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -2486,7 +2486,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="IMPLEMENTATION_INHERITANCE_COMPATIBILITY_CONSTRAINT_VALID_2">
+  <modules-constraints-test identifier="MCT0060">
     <modules valid="true">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -2504,7 +2504,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="IMPLEMENTATION_INHERITANCE_COMPATIBILITY_CONSTRAINT_INVALID">
+  <modules-constraints-test identifier="MCT0061">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -2523,7 +2523,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="IMPLEMENTATION_INHERITANCE_COMPATIBILITY_VERSIONING_PARSE_EXCEPTION_1">
+  <modules-constraints-test identifier="MCT0062">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -2542,7 +2542,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="IMPLEMENTATION_INHERITANCE_COMPATIBILITY_VERSIONING_PARSE_EXCEPTION_2">
+  <modules-constraints-test identifier="MCT0063">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -2561,7 +2561,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="DEPENDENCY_OVERRIDES_PROPERTIES_VALID">
+  <modules-constraints-test identifier="MCT0064">
     <modules valid="true">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -2593,7 +2593,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="DEPENDENCY_OVERRIDES_PROPERTIES_USING_NAME_VALID">
+  <modules-constraints-test identifier="MCT0065">
     <modules valid="true">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -2633,7 +2633,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="DEPENDENCY_MODEL_OBJECT_OVERRIDES_INVALID">
+  <modules-constraints-test identifier="MCT0066">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -2698,7 +2698,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="DEPENDENCY_OVERRIDES_PROPERTIES_USING_NAME_INVALID">
+  <modules-constraints-test identifier="MCT0067">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -2741,7 +2741,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="IMPLEMENTATION_DEPENDENCY_SPECIFICATION_CLASS_CONSTRAINT_INVALID">
+  <modules-constraints-test identifier="MCT0068">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -2781,7 +2781,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="SPECIFICATION_CLASS_CONSTRAINT">
+  <modules-constraints-test identifier="MCT0069">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -2799,7 +2799,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="SPECIFICATION_CLASS_DECLARATION_CONSTRAINT">
+  <modules-constraints-test identifier="MCT0070">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -2817,7 +2817,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="IMPLEMENTATION_CLASS_CONSTRAINT">
+  <modules-constraints-test identifier="MCT0071">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -2835,7 +2835,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="IMPLEMENTATION_MESSAGE_TEMPLATE_CONSTRAINT_1">
+  <modules-constraints-test identifier="MCT0072">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -2866,7 +2866,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="IMPLEMENTATION_CLASS_DECLARATION_CONSTRAINT">
+  <modules-constraints-test identifier="MCT0073">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -2884,7 +2884,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="MODULE_PROPERTY_VALUE_CONSTRAINT">
+  <modules-constraints-test identifier="MCT0074">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -2912,7 +2912,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="MODULE_PROPERTY_JAVA_VALUE_CONSTRAINT">
+  <modules-constraints-test identifier="MCT0075">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -2930,7 +2930,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="MODULE_PROPERTY_TYPE_CONSTRAINT">
+  <modules-constraints-test identifier="MCT0076">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -2959,7 +2959,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="IMPLEMENTATION_PROPERTIES_VALUE_CONSTRAINT">
+  <modules-constraints-test identifier="MCT0077">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -3037,7 +3037,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="IMPLEMENTATION_PROPERTY_JAVA_VALUE_CONSTRAINT">
+  <modules-constraints-test identifier="MCT0078">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -3059,7 +3059,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="IMPLEMENTATION_PROPERTY_TYPE_CONSTRAINT">
+  <modules-constraints-test identifier="MCT0079">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -3139,7 +3139,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="SPECIFICATION_PROPERTY_VALUE_CONSTRAINT">
+  <modules-constraints-test identifier="MCT0080">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -3171,7 +3171,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="SPECIFICATION_PROPERTY_JAVA_VALUE_CONSTRAINT">
+  <modules-constraints-test identifier="MCT0081">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -3193,7 +3193,7 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <modules-constraints-test identifier="SPECIFICATION_PROPERTY_TYPE_CONSTRAINT">
+  <modules-constraints-test identifier="MCT0082">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -3226,7 +3226,73 @@
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
-  <implementation-test identifier="MULTIPLE_INHERITANCE">
+  <modules-constraints-test identifier="MCT0083">
+    <modules valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <specifications>
+            <specification identifier="Specification 1" class="java.lang.Object"/>
+            <specification identifier="Specification 2" class="java.lang.Object" multiplicity="One" scope="Scope"/>
+            <specification identifier="Specification 3" class="java.lang.Object"/>
+          </specifications>
+          <implementations>
+            <implementation identifier="Implementation 1" name="Implementation Name 1">
+              <specifications>
+                <reference identifier="Specification 1"/>
+              </specifications>
+              <dependencies>
+                <dependency name="Dependency 1" identifier="Specification 1"/>
+                <dependency name="Dependency 2" identifier="Specification 2"/>
+                <dependency name="Dependency 3" identifier="Specification 3" implementationName="Implementation Name"
+                            optional="true"/>
+
+              </dependencies>
+            </implementation>
+            <implementation identifier="Implementation 2" name="Implementation Name 2">
+              <specifications>
+                <reference identifier="Specification 2"/>
+              </specifications>
+              <dependencies>
+                <dependency name="Dependency 1" identifier="Specification 1"/>
+                <dependency name="Dependency 2" identifier="Specification 2"/>
+                <dependency name="Dependency 3" identifier="Specification 3"/>
+              </dependencies>
+            </implementation>
+            <implementation identifier="Implementation 3" name="Implementation Name 3">
+              <specifications>
+                <reference identifier="Specification 3"/>
+              </specifications>
+              <dependencies>
+                <dependency name="Dependency 1" identifier="Specification 1"/>
+                <dependency name="Dependency 2" identifier="Specification 2"/>
+                <dependency name="Dependency 3" identifier="Specification 3"/>
+              </dependencies>
+            </implementation>
+            <implementation identifier="Test Implementation 1" name="Test Implementation Name 1">
+              <dependencies>
+                <dependency name="Test Dependency 1" identifier="Specification 1">
+                  <dependencies>
+                    <dependency name="Dependency 1" identifier="Specification 2" override="true"
+                                implementationName="Implementation Name" optional="true"/>
+
+                    <dependency name="Dependency 3" identifier="Specification 1" override="true"/>
+                  </dependencies>
+                </dependency>
+              </dependencies>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_MULTIPLICITY_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_SCOPE_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_NO_IMPLEMENTATION_NAME_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_IMPLEMENTATION_NAME_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_OPTIONALITY_CONSTRAINT" count="2"/>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <implementation-test identifier="IMT0001">
     <modules>
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
@@ -3421,7 +3487,7 @@
   </implementation-test>
 
   <!-- ********************************************************************* -->
-  <implementation-test identifier="MULTIPLE_INHERITANCE_OVERRIDEN">
+  <implementation-test identifier="IMT0002">
     <modules>
       <modules xmlns="http://jomc.org/model">
         <module name="Module">

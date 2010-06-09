@@ -1053,18 +1053,6 @@ public class DefaultModelValidator implements ModelValidator
                         {
                             final Dependency overriden = dependencies.getDependency( override.getName() );
 
-                            if ( overriden != null && overriden.isFinal() )
-                            {
-                                report.getDetails().add( this.createDetail(
-                                    "IMPLEMENTATION_DEPENDENCY_FINAL_DEPENDENCY_CONSTRAINT", Level.SEVERE,
-                                    "implementationDependencyFinalDependencyConstraint", new Object[]
-                                    {
-                                        implementation.getIdentifier(), dependency.getName(), a.getIdentifier(),
-                                        override.getName()
-                                    }, new ObjectFactory().createImplementation( implementation ) ) );
-
-                            }
-
                             if ( overriden == null && override.isOverride() )
                             {
                                 report.getDetails().add( this.createDetail(
@@ -1075,6 +1063,103 @@ public class DefaultModelValidator implements ModelValidator
                                         override.getName()
                                     }, new ObjectFactory().createImplementation( implementation ) ) );
 
+                            }
+
+                            if ( overriden != null )
+                            {
+                                final Specification overrideSpecification =
+                                    modules.getSpecification( override.getIdentifier() );
+
+                                final Specification overridenSpecification =
+                                    modules.getSpecification( overriden.getIdentifier() );
+
+                                if ( overriden.isFinal() )
+                                {
+                                    report.getDetails().add( this.createDetail(
+                                        "IMPLEMENTATION_DEPENDENCY_FINAL_DEPENDENCY_CONSTRAINT", Level.SEVERE,
+                                        "implementationDependencyFinalDependencyConstraint", new Object[]
+                                        {
+                                            implementation.getIdentifier(), dependency.getName(), a.getIdentifier(),
+                                            override.getName()
+                                        }, new ObjectFactory().createImplementation( implementation ) ) );
+
+                                }
+
+                                if ( overrideSpecification != null && overridenSpecification != null )
+                                {
+                                    if ( overrideSpecification.getMultiplicity()
+                                         != overridenSpecification.getMultiplicity() )
+                                    {
+                                        report.getDetails().add( this.createDetail(
+                                            "IMPLEMENTATION_DEPENDENCY_MULTIPLICITY_CONSTRAINT", Level.SEVERE,
+                                            "implementationDependencyMultiplicityConstraint", new Object[]
+                                            {
+                                                implementation.getIdentifier(), dependency.getName(), a.getIdentifier(),
+                                                overrideSpecification.getMultiplicity().value(),
+                                                overridenSpecification.getMultiplicity().value()
+                                            }, new ObjectFactory().createImplementation( implementation ) ) );
+
+                                    }
+
+                                    if ( overrideSpecification.getScope() != null
+                                         ? !overrideSpecification.getScope().equals( overridenSpecification.getScope() )
+                                         : overridenSpecification.getScope() != null )
+                                    {
+                                        report.getDetails().add( this.createDetail(
+                                            "IMPLEMENTATION_DEPENDENCY_SCOPE_CONSTRAINT", Level.SEVERE,
+                                            "implementationDependencyScopeConstraint", new Object[]
+                                            {
+                                                implementation.getIdentifier(), dependency.getName(), a.getIdentifier(),
+                                                overrideSpecification.getScope() == null
+                                                ? "Multiton" : overrideSpecification.getScope(),
+                                                overridenSpecification.getScope() == null
+                                                ? "Multiton" : overridenSpecification.getScope()
+                                            }, new ObjectFactory().createImplementation( implementation ) ) );
+
+                                    }
+
+                                    if ( overridenSpecification.getMultiplicity() == Multiplicity.MANY )
+                                    {
+                                        if ( override.getImplementationName() == null
+                                             && overriden.getImplementationName() != null )
+                                        {
+                                            report.getDetails().add( this.createDetail(
+                                                "IMPLEMENTATION_DEPENDENCY_NO_IMPLEMENTATION_NAME_CONSTRAINT",
+                                                Level.SEVERE,
+                                                "implementationDependencyNoImplementationNameConstraint", new Object[]
+                                                {
+                                                    implementation.getIdentifier(), dependency.getName(),
+                                                    a.getIdentifier()
+                                                }, new ObjectFactory().createImplementation( implementation ) ) );
+
+                                        }
+
+                                        if ( override.getImplementationName() != null
+                                             && overriden.getImplementationName() == null )
+                                        {
+                                            report.getDetails().add( this.createDetail(
+                                                "IMPLEMENTATION_DEPENDENCY_IMPLEMENTATION_NAME_CONSTRAINT",
+                                                Level.SEVERE,
+                                                "implementationDependencyImplementationNameConstraint", new Object[]
+                                                {
+                                                    implementation.getIdentifier(), dependency.getName(),
+                                                    a.getIdentifier(), override.getImplementationName()
+                                                }, new ObjectFactory().createImplementation( implementation ) ) );
+
+                                        }
+                                    }
+                                }
+
+                                if ( override.isOptional() != overriden.isOptional() )
+                                {
+                                    report.getDetails().add( this.createDetail(
+                                        "IMPLEMENTATION_DEPENDENCY_OPTIONALITY_CONSTRAINT", Level.SEVERE,
+                                        "implementationDependencyOptonalityConstraint", new Object[]
+                                        {
+                                            implementation.getIdentifier(), dependency.getName(), a.getIdentifier()
+                                        }, new ObjectFactory().createImplementation( implementation ) ) );
+
+                                }
                             }
                         }
                     }
