@@ -66,7 +66,9 @@ public class TestModelValidator implements ModelValidator
         }
 
         final ModelValidationReport report = new ModelValidationReport();
-        report.getDetails().add( new ModelValidationReport.Detail( "TestModelValidator", Level.OFF, "Message", null ) );
+        report.getDetails().add( new ModelValidationReport.Detail(
+            "TestModelValidator", Level.FINEST, "Message", null ) );
+
         return report;
     }
 

@@ -1095,7 +1095,7 @@ public class DefaultModelValidator implements ModelValidator
                                             "implementationDependencyMultiplicityConstraint", new Object[]
                                             {
                                                 implementation.getIdentifier(), dependency.getName(), a.getIdentifier(),
-                                                overrideSpecification.getMultiplicity().value(),
+                                                overriden.getName(), overrideSpecification.getMultiplicity().value(),
                                                 overridenSpecification.getMultiplicity().value()
                                             }, new ObjectFactory().createImplementation( implementation ) ) );
 
@@ -1110,6 +1110,7 @@ public class DefaultModelValidator implements ModelValidator
                                             "implementationDependencyScopeConstraint", new Object[]
                                             {
                                                 implementation.getIdentifier(), dependency.getName(), a.getIdentifier(),
+                                                overriden.getName(),
                                                 overrideSpecification.getScope() == null
                                                 ? "Multiton" : overrideSpecification.getScope(),
                                                 overridenSpecification.getScope() == null
@@ -1129,7 +1130,7 @@ public class DefaultModelValidator implements ModelValidator
                                                 "implementationDependencyNoImplementationNameConstraint", new Object[]
                                                 {
                                                     implementation.getIdentifier(), dependency.getName(),
-                                                    a.getIdentifier()
+                                                    a.getIdentifier(), overriden.getName()
                                                 }, new ObjectFactory().createImplementation( implementation ) ) );
 
                                         }
@@ -1143,7 +1144,8 @@ public class DefaultModelValidator implements ModelValidator
                                                 "implementationDependencyImplementationNameConstraint", new Object[]
                                                 {
                                                     implementation.getIdentifier(), dependency.getName(),
-                                                    a.getIdentifier(), override.getImplementationName()
+                                                    a.getIdentifier(), overriden.getName(),
+                                                    override.getImplementationName()
                                                 }, new ObjectFactory().createImplementation( implementation ) ) );
 
                                         }
@@ -1156,7 +1158,8 @@ public class DefaultModelValidator implements ModelValidator
                                         "IMPLEMENTATION_DEPENDENCY_OPTIONALITY_CONSTRAINT", Level.SEVERE,
                                         "implementationDependencyOptonalityConstraint", new Object[]
                                         {
-                                            implementation.getIdentifier(), dependency.getName(), a.getIdentifier()
+                                            implementation.getIdentifier(), dependency.getName(), a.getIdentifier(),
+                                            overriden.getName()
                                         }, new ObjectFactory().createImplementation( implementation ) ) );
 
                                 }

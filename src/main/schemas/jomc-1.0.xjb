@@ -3263,9 +3263,15 @@
                     {
                         for ( Dependency d : instance.getDependencies().getDependency() )
                         {
-                            if ( dependencies.getDependency( d.getName() ) == null )
+                            final Dependency td = dependencies.getDependency( d.getName() );
+
+                            if ( td == null )
                             {
                                 dependencies.getDependency().add( d );
+                            }
+                            else
+                            {
+                                this.collectDependencies( d, td );
                             }
                         }
                     }
@@ -3585,7 +3591,7 @@
             {
                 if ( target.getMessages().getMessage( m.getName() ) == null )
                 {
-                    target.getMessages().getMessage().add( new Message( m ) );
+                    target.getMessages().getMessage().add( m );
                 }
             }
         }
@@ -3601,7 +3607,7 @@
             {
                 if ( target.getProperties().getProperty( p.getName() ) == null )
                 {
-                    target.getProperties().getProperty().add( new Property( p ) );
+                    target.getProperties().getProperty().add( p );
                 }
             }
         }
@@ -3623,7 +3629,7 @@
                 }
                 else
                 {
-                    this.collectDependencies( td, sd );
+                    this.collectDependencies( sd, td );
                 }
             }
         }
@@ -3805,10 +3811,10 @@
                 final org.w3c.dom.Element current = (org.w3c.dom.Element) o;
                 if ( ( e.getNamespaceURI() == null
                        ? current.getNamespaceURI() == null
-                       : e.getNamespaceURI().equals( current.getNamespaceURI() ) ) &&
-                     ( e.getLocalName() == null
-                       ? current.getLocalName() == null
-                       : e.getLocalName().equals( current.getLocalName() ) ) )
+                       : e.getNamespaceURI().equals( current.getNamespaceURI() ) )
+                     && ( e.getLocalName() == null
+                          ? current.getLocalName() == null
+                          : e.getLocalName().equals( current.getLocalName() ) ) )
                 {
                     return current;
                 }

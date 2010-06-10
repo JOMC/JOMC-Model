@@ -107,6 +107,13 @@
       <xsd:selector xpath="test:implementation-test"/>
       <xsd:field xpath="@identifier"/>
     </xsd:unique>
+    <xsd:unique name="instance-test-uniqueness">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">Checks uniqueness of instance tests.</xsd:documentation>
+      </xsd:annotation>
+      <xsd:selector xpath="test:instance-test"/>
+      <xsd:field xpath="@identifier"/>
+    </xsd:unique>
   </xsd:element>
   <xsd:complexType name="TestSuite">
     <xsd:annotation>
@@ -120,6 +127,7 @@
       <xsd:element name="schema-constraints-test" type="test:SchemaConstraintsTest" minOccurs="0" maxOccurs="unbounded"/>
       <xsd:element name="modules-constraints-test" type="test:ModulesConstraintsTest" minOccurs="0" maxOccurs="unbounded"/>
       <xsd:element name="implementation-test" type="test:ImplementationTest" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="instance-test" type="test:InstanceTest" minOccurs="0" maxOccurs="unbounded"/>
     </xsd:sequence>
   </xsd:complexType>
   <!--                                                                                                               -->
@@ -129,7 +137,7 @@
     <xsd:annotation>
       <xsd:appinfo>
         <jaxb:class>
-          <jaxb:javadoc>Performs schema validation.</jaxb:javadoc>
+          <jaxb:javadoc>Schema validation test.</jaxb:javadoc>
         </jaxb:class>
       </xsd:appinfo>
     </xsd:annotation>
@@ -154,7 +162,7 @@
     <xsd:annotation>
       <xsd:appinfo>
         <jaxb:class>
-          <jaxb:javadoc>Performs modules validation.</jaxb:javadoc>
+          <jaxb:javadoc>Modules validation test.</jaxb:javadoc>
         </jaxb:class>
       </xsd:appinfo>
     </xsd:annotation>
@@ -181,7 +189,7 @@
     <xsd:annotation>
       <xsd:appinfo>
         <jaxb:class>
-          <jaxb:javadoc>Performs implementation tests.</jaxb:javadoc>
+          <jaxb:javadoc>Implementation test.</jaxb:javadoc>
         </jaxb:class>
       </xsd:appinfo>
     </xsd:annotation>
@@ -196,6 +204,51 @@
         <xsd:appinfo>
           <jaxb:property>
             <jaxb:javadoc>Identifier of this test.</jaxb:javadoc>
+          </jaxb:property>
+        </xsd:appinfo>
+      </xsd:annotation>
+    </xsd:attribute>
+  </xsd:complexType>
+  <!--                                                                                                               -->
+  <!-- InstanceTest                                                                                            -->
+  <!--                                                                                                               -->
+  <xsd:complexType name="InstanceTest">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <jaxb:class>
+          <jaxb:javadoc>Instance test.</jaxb:javadoc>
+        </jaxb:class>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="modules" type="test:AnyModelObject" minOccurs="0"
+                   maxOccurs="1"/>
+      <xsd:element name="instance" type="test:AnyModelObject"
+                   minOccurs="1" maxOccurs="1"/>
+    </xsd:sequence>
+    <xsd:attribute name="identifier" type="xsd:string" use="required">
+      <xsd:annotation>
+        <xsd:appinfo>
+          <jaxb:property>
+            <jaxb:javadoc>Identifier of this test.</jaxb:javadoc>
+          </jaxb:property>
+        </xsd:appinfo>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="implementationIdentifier" type="xsd:string" use="required">
+      <xsd:annotation>
+        <xsd:appinfo>
+          <jaxb:property>
+            <jaxb:javadoc>Identifier of the implementation to test an instance of.</jaxb:javadoc>
+          </jaxb:property>
+        </xsd:appinfo>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="dependencyName" type="xsd:string" use="optional">
+      <xsd:annotation>
+        <xsd:appinfo>
+          <jaxb:property>
+            <jaxb:javadoc>Name of the dependency of the implementation to test an instance of.</jaxb:javadoc>
           </jaxb:property>
         </xsd:appinfo>
       </xsd:annotation>
