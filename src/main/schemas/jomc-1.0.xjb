@@ -1039,6 +1039,16 @@
       </ci:code>
     </jaxb:bindings>
     <!-- *********************************************************************************************************** -->
+    <jaxb:bindings node="xs:complexType[@name='Dependency']/xs:complexContent/xs:extension/xs:sequence/xs:element[@ref='jomc:dependencies']">
+      <jaxb:property>
+        <jaxb:javadoc>Dependencies of this dependency or {@code null}.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Dependency']/xs:complexContent/xs:extension/xs:sequence/xs:element[@ref='jomc:messages']">
+      <jaxb:property>
+        <jaxb:javadoc>Messages of this dependency or {@code null}.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Dependency']/xs:complexContent/xs:extension/xs:sequence/xs:element[@ref='jomc:properties']">
       <jaxb:property>
         <jaxb:javadoc>Properties of this dependency or {@code null}.</jaxb:javadoc>
