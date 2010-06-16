@@ -70,6 +70,11 @@ public class BootstrapContextTest
         return this.bootstrapContext;
     }
 
+    public void testGetAttributes() throws Exception
+    {
+        Assert.assertNotNull( this.getBootstrapContext().getAttributes() );
+    }
+
     public void testFindClass() throws Exception
     {
         try

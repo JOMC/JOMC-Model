@@ -38,9 +38,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import javax.xml.bind.JAXBContext;
@@ -90,6 +92,9 @@ public abstract class ModelContext
     /** Class name of the {@code ModelContext} implementation. */
     private static volatile String modelContextClassName;
 
+    /** The attributes of the instance. */
+    private Map<String, Object> attributes;
+
     /** The listeners of the instance. */
     private List<Listener> listeners;
 
@@ -136,7 +141,24 @@ public abstract class ModelContext
     }
 
     /**
-     * Gets the list of registered listeners.
+     * Gets the attributes of the instance.
+     * <p>This accessor method returns a reference to the live map, not a snapshot. Therefore any modification you make
+     * to the returned map will be present inside the object.</p>
+     *
+     * @return The map of attributes of the instance.
+     */
+    public Map<String, Object> getAttributes()
+    {
+        if ( this.attributes == null )
+        {
+            this.attributes = new HashMap<String, Object>();
+        }
+
+        return this.attributes;
+    }
+
+    /**
+     * Gets the listeners of the instance.
      * <p>This accessor method returns a reference to the live list, not a snapshot. Therefore any modification you make
      * to the returned list will be present inside the object. This is why there is no {@code set} method for the
      * listeners property.</p>

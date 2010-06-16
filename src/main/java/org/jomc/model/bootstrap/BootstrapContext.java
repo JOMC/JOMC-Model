@@ -37,6 +37,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
@@ -54,6 +56,9 @@ public abstract class BootstrapContext
     /** Class name of the {@code BootstrapContext} implementation. */
     private static volatile String bootstrapContextClassName;
 
+    /** The attributes of the instance. */
+    private Map<String, Object> attributes;
+
     /** The class loader of the context. */
     private ClassLoader classLoader;
 
@@ -66,6 +71,23 @@ public abstract class BootstrapContext
     {
         super();
         this.classLoader = classLoader;
+    }
+
+    /**
+     * Gets the attributes of the instance.
+     * <p>This accessor method returns a reference to the live map, not a snapshot. Therefore any modification you make
+     * to the returned map will be present inside the object.</p>
+     *
+     * @return The map of attributes of the instance.
+     */
+    public Map<String, Object> getAttributes()
+    {
+        if ( this.attributes == null )
+        {
+            this.attributes = new HashMap<String, Object>();
+        }
+
+        return this.attributes;
     }
 
     /**

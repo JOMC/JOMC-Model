@@ -83,6 +83,16 @@ public class ModelContextTest extends TestCase
         return this.modelContext;
     }
 
+    public void testGetAttributes() throws Exception
+    {
+        Assert.assertNotNull( this.getModelContext().getAttributes() );
+    }
+
+    public void testGetListeners() throws Exception
+    {
+        Assert.assertNotNull( this.getModelContext().getListeners() );
+    }
+
     public void testFindClass() throws Exception
     {
         try
