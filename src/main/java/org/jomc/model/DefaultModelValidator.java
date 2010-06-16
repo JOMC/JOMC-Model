@@ -93,7 +93,14 @@ public class DefaultModelValidator implements ModelValidator
                 context.log( Level.FINE, e.getMessage(), e );
             }
 
-            throw new ModelException( e.getMessage(), e );
+            if ( e.getLinkedException() != null )
+            {
+                throw new ModelException( e.getLinkedException().getMessage(), e.getLinkedException() );
+            }
+            else
+            {
+                throw new ModelException( e.getMessage(), e );
+            }
         }
     }
 

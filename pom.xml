@@ -59,9 +59,9 @@
       <resource>
         <filtering>false</filtering>
         <directory>src/main/schemas</directory>
-        <targetPath>org/jomc/model/bootstrap</targetPath>
+        <targetPath>org/jomc/model/modlet</targetPath>
         <includes>
-          <include>jomc-bootstrap-1.0.xsd</include>
+          <include>jomc-modlet-1.0.xsd</include>
         </includes>
       </resource>
     </resources>

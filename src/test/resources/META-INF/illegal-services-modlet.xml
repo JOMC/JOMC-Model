@@ -32,13 +32,15 @@
   $Id$
 
 -->
-<module xmlns="http://jomc.org/model"
+<modlet xmlns="http://jomc.org/model/modlet"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://jomc.org/model http://jomc.sourceforge.net/model/jomc-1.0.xsd"
-        name="${project.name} Tests" version="${project.version}" vendor="${project.organization.name}"
-        modelVersion="1.0">
+        xsi:schemaLocation="http://jomc.org/model/modlet http://jomc.sourceforge.net/model/modlet/jomc-modlet-1.0.xsd"
+        identifier="${project.name} Tests" model="http://jomc.org/model" name="${project.name} Tests"
+        vendor="${project.organization.name}" version="${project.version}">
 
-  <documentation defaultLanguage="en">
-    <text language="en">${project.description}</text>
-  </documentation>
-</module>
+  <services>
+    <service identifier="org.jomc.model.ModelProcessor" class="java.lang.Object"/>
+    <service identifier="org.jomc.model.ModelProvider" class="java.lang.Object"/>
+    <service identifier="org.jomc.model.ModelValidator" class="java.lang.Object"/>
+  </services>
+</modlet>

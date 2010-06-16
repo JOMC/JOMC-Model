@@ -98,7 +98,14 @@ public class ModelValidatorTest
         }
         catch ( final JAXBException e )
         {
-            throw new ModelException( e.getMessage(), e );
+            if ( e.getLinkedException() != null )
+            {
+                throw new ModelException( e.getLinkedException().getMessage(), e.getLinkedException() );
+            }
+            else
+            {
+                throw new ModelException( e.getMessage(), e );
+            }
         }
     }
 

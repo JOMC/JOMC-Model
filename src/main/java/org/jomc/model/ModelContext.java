@@ -141,11 +141,11 @@ public abstract class ModelContext
     }
 
     /**
-     * Gets the attributes of the instance.
+     * Gets the attributes of the context.
      * <p>This accessor method returns a reference to the live map, not a snapshot. Therefore any modification you make
      * to the returned map will be present inside the object.</p>
      *
-     * @return The map of attributes of the instance.
+     * @return The map of attributes of the context.
      */
     public Map<String, Object> getAttributes()
     {
@@ -158,12 +158,12 @@ public abstract class ModelContext
     }
 
     /**
-     * Gets the listeners of the instance.
+     * Gets the listeners of the context.
      * <p>This accessor method returns a reference to the live list, not a snapshot. Therefore any modification you make
      * to the returned list will be present inside the object. This is why there is no {@code set} method for the
      * listeners property.</p>
      *
-     * @return The list of registered listeners.
+     * @return The list of listeners of the context.
      *
      * @see #log(java.util.logging.Level, java.lang.String, java.lang.Throwable)
      */
@@ -213,9 +213,9 @@ public abstract class ModelContext
     }
 
     /**
-     * Gets the log level of the instance.
+     * Gets the log level of the context.
      *
-     * @return The log level of the instance.
+     * @return The log level of the context.
      *
      * @see #getDefaultLogLevel()
      * @see #setLogLevel(java.util.logging.Level)
@@ -235,9 +235,9 @@ public abstract class ModelContext
     }
 
     /**
-     * Sets the log level of the instance.
+     * Sets the log level of the context.
      *
-     * @param value The new log level of the instance or {@code null}.
+     * @param value The new log level of the context or {@code null}.
      *
      * @see #getLogLevel()
      * @see #isLoggable(java.util.logging.Level)
@@ -248,12 +248,12 @@ public abstract class ModelContext
     }
 
     /**
-     * Checks if a message at a given level is provided to the listeners of the instance.
+     * Checks if a message at a given level is provided to the listeners of the context.
      *
      * @param level The level to test.
      *
-     * @return {@code true} if messages at {@code level} are provided to the listeners of the instance;
-     * {@code false} if messages at {@code level} are not provided to the listeners of the instance.
+     * @return {@code true} if messages at {@code level} are provided to the listeners of the context;
+     * {@code false} if messages at {@code level} are not provided to the listeners of the context.
      *
      * @throws NullPointerException if {@code level} is {@code null}.
      *
@@ -271,7 +271,7 @@ public abstract class ModelContext
     }
 
     /**
-     * Notifies registered listeners.
+     * Notifies all listeners of the context.
      *
      * @param level The level of the event.
      * @param message The message of the event or {@code null}.

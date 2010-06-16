@@ -42,9 +42,8 @@ import org.jomc.model.ModelException;
 import org.jomc.model.ModelValidationReport;
 import org.jomc.model.Modules;
 import org.jomc.model.ObjectFactory;
-import org.jomc.model.bootstrap.DefaultBootstrapContext;
-import org.jomc.model.bootstrap.DefaultSchemaProvider;
-import org.jomc.model.bootstrap.DefaultServiceProvider;
+import org.jomc.model.modlet.DefaultModletContext;
+import org.jomc.model.modlet.DefaultModletProvider;
 import org.w3c.dom.ls.LSInput;
 
 /**
@@ -98,17 +97,16 @@ public class DefaultModelContextTest extends ModelContextTest
 
         System.setProperty( DefaultModelContext.class.getName() + ".disableCaching", Boolean.toString( true ) );
 
-        DefaultBootstrapContext.setDefaultBootstrapSchemaSystemId( null );
-        DefaultBootstrapContext.setDefaultPlatformProviderLocation( null );
-        DefaultBootstrapContext.setDefaultProviderLocation( null );
-        DefaultSchemaProvider.setDefaultSchemaLocation( null );
-        DefaultServiceProvider.setDefaultServiceLocation( null );
+        DefaultModletContext.setDefaultModletSchemaSystemId( null );
+        DefaultModletContext.setDefaultPlatformProviderLocation( null );
+        DefaultModletContext.setDefaultProviderLocation( null );
+        DefaultModletProvider.setDefaultModletLocation( null );
 
         final Modules provided = this.getModelContext().findModules();
         Assert.assertNotNull( provided );
         Assert.assertNotNull( provided.getModule( "TestModelProvider" ) );
 
-        DefaultServiceProvider.setDefaultServiceLocation( "META-INF/non-existent-services.xml" );
+        DefaultModletProvider.setDefaultModletLocation( "META-INF/non-existent-services-modlet.xml" );
 
         try
         {
@@ -121,7 +119,29 @@ public class DefaultModelContextTest extends ModelContextTest
             System.out.println( e );
         }
 
-        DefaultServiceProvider.setDefaultServiceLocation( "META-INF/illegal-services.xml" );
+        try
+        {
+            this.getModelContext().processModules( new Modules() );
+            Assert.fail( "Expected ModelException not thrown." );
+        }
+        catch ( final ModelException e )
+        {
+            Assert.assertNotNull( e.getMessage() );
+            System.out.println( e );
+        }
+
+        try
+        {
+            this.getModelContext().validateModel( new Modules() );
+            Assert.fail( "Expected ModelException not thrown." );
+        }
+        catch ( final ModelException e )
+        {
+            Assert.assertNotNull( e.getMessage() );
+            System.out.println( e );
+        }
+
+        DefaultModletProvider.setDefaultModletLocation( "META-INF/illegal-services-modlet.xml" );
 
         try
         {
@@ -134,11 +154,10 @@ public class DefaultModelContextTest extends ModelContextTest
             System.out.println( e );
         }
 
-        DefaultBootstrapContext.setDefaultBootstrapSchemaSystemId( null );
-        DefaultBootstrapContext.setDefaultPlatformProviderLocation( null );
-        DefaultBootstrapContext.setDefaultProviderLocation( null );
-        DefaultSchemaProvider.setDefaultSchemaLocation( null );
-        DefaultServiceProvider.setDefaultServiceLocation( null );
+        DefaultModletContext.setDefaultModletSchemaSystemId( null );
+        DefaultModletContext.setDefaultPlatformProviderLocation( null );
+        DefaultModletContext.setDefaultProviderLocation( null );
+        DefaultModletProvider.setDefaultModletLocation( null );
 
         System.clearProperty( DefaultModelContext.class.getName() + ".disableCaching" );
     }
@@ -150,11 +169,10 @@ public class DefaultModelContextTest extends ModelContextTest
 
         System.setProperty( DefaultModelContext.class.getName() + ".disableCaching", Boolean.toString( true ) );
 
-        DefaultBootstrapContext.setDefaultBootstrapSchemaSystemId( null );
-        DefaultBootstrapContext.setDefaultPlatformProviderLocation( null );
-        DefaultBootstrapContext.setDefaultProviderLocation( null );
-        DefaultSchemaProvider.setDefaultSchemaLocation( null );
-        DefaultServiceProvider.setDefaultServiceLocation( null );
+        DefaultModletContext.setDefaultModletSchemaSystemId( null );
+        DefaultModletContext.setDefaultPlatformProviderLocation( null );
+        DefaultModletContext.setDefaultProviderLocation( null );
+        DefaultModletProvider.setDefaultModletLocation( null );
 
         final Modules provided = this.getModelContext().findModules();
         Assert.assertNotNull( provided );
@@ -163,37 +181,11 @@ public class DefaultModelContextTest extends ModelContextTest
         Assert.assertNotNull( processed );
         Assert.assertNotNull( processed.getModule( "TestModelProcessor" ) );
 
-        DefaultServiceProvider.setDefaultServiceLocation( "META-INF/non-existent-services.xml" );
 
-        try
-        {
-            this.getModelContext().processModules( provided );
-            Assert.fail( "Expected ModelException not thrown." );
-        }
-        catch ( final ModelException e )
-        {
-            Assert.assertNotNull( e.getMessage() );
-            System.out.println( e );
-        }
-
-        DefaultServiceProvider.setDefaultServiceLocation( "META-INF/illegal-services.xml" );
-
-        try
-        {
-            this.getModelContext().processModules( provided );
-            Assert.fail( "Expected ModelException not thrown." );
-        }
-        catch ( final ModelException e )
-        {
-            Assert.assertNotNull( e.getMessage() );
-            System.out.println( e );
-        }
-
-        DefaultBootstrapContext.setDefaultBootstrapSchemaSystemId( null );
-        DefaultBootstrapContext.setDefaultPlatformProviderLocation( null );
-        DefaultBootstrapContext.setDefaultProviderLocation( null );
-        DefaultSchemaProvider.setDefaultSchemaLocation( null );
-        DefaultServiceProvider.setDefaultServiceLocation( null );
+        DefaultModletContext.setDefaultModletSchemaSystemId( null );
+        DefaultModletContext.setDefaultPlatformProviderLocation( null );
+        DefaultModletContext.setDefaultProviderLocation( null );
+        DefaultModletProvider.setDefaultModletLocation( null );
 
         System.clearProperty( DefaultModelContext.class.getName() + ".disableCaching" );
     }
@@ -205,11 +197,10 @@ public class DefaultModelContextTest extends ModelContextTest
 
         System.setProperty( DefaultModelContext.class.getName() + ".disableCaching", Boolean.toString( true ) );
 
-        DefaultBootstrapContext.setDefaultBootstrapSchemaSystemId( null );
-        DefaultBootstrapContext.setDefaultPlatformProviderLocation( null );
-        DefaultBootstrapContext.setDefaultProviderLocation( null );
-        DefaultSchemaProvider.setDefaultSchemaLocation( null );
-        DefaultServiceProvider.setDefaultServiceLocation( null );
+        DefaultModletContext.setDefaultModletSchemaSystemId( null );
+        DefaultModletContext.setDefaultPlatformProviderLocation( null );
+        DefaultModletContext.setDefaultProviderLocation( null );
+        DefaultModletProvider.setDefaultModletLocation( null );
 
         ModelValidationReport report = this.getModelContext().validateModel( new Modules() );
         Assert.assertNotNull( report );
@@ -221,37 +212,10 @@ public class DefaultModelContextTest extends ModelContextTest
         Assert.assertNotNull( report );
         Assert.assertTrue( report.isModelValid() );
 
-        DefaultServiceProvider.setDefaultServiceLocation( "META-INF/non-existent-services.xml" );
-
-        try
-        {
-            this.getModelContext().validateModel( new Modules() );
-            Assert.fail( "Expected ModelException not thrown." );
-        }
-        catch ( final ModelException e )
-        {
-            Assert.assertNotNull( e.getMessage() );
-            System.out.println( e );
-        }
-
-        DefaultServiceProvider.setDefaultServiceLocation( "META-INF/illegal-services.xml" );
-
-        try
-        {
-            this.getModelContext().validateModel( new Modules() );
-            Assert.fail( "Expected ModelException not thrown." );
-        }
-        catch ( final ModelException e )
-        {
-            Assert.assertNotNull( e.getMessage() );
-            System.out.println( e );
-        }
-
-        DefaultBootstrapContext.setDefaultBootstrapSchemaSystemId( null );
-        DefaultBootstrapContext.setDefaultPlatformProviderLocation( null );
-        DefaultBootstrapContext.setDefaultProviderLocation( null );
-        DefaultSchemaProvider.setDefaultSchemaLocation( null );
-        DefaultServiceProvider.setDefaultServiceLocation( null );
+        DefaultModletContext.setDefaultModletSchemaSystemId( null );
+        DefaultModletContext.setDefaultPlatformProviderLocation( null );
+        DefaultModletContext.setDefaultProviderLocation( null );
+        DefaultModletProvider.setDefaultModletLocation( null );
 
         System.clearProperty( DefaultModelContext.class.getName() + ".disableCaching" );
     }
@@ -263,11 +227,10 @@ public class DefaultModelContextTest extends ModelContextTest
 
         System.setProperty( DefaultModelContext.class.getName() + ".disableCaching", Boolean.toString( true ) );
 
-        DefaultBootstrapContext.setDefaultBootstrapSchemaSystemId( null );
-        DefaultBootstrapContext.setDefaultPlatformProviderLocation( "DOES_NOT_EXIST" );
-        DefaultBootstrapContext.setDefaultProviderLocation( "DOES_NOT_EXIST" );
-        DefaultServiceProvider.setDefaultServiceLocation( null );
-        DefaultSchemaProvider.setDefaultSchemaLocation( "META-INF/no-schemas.xml" );
+        DefaultModletContext.setDefaultModletSchemaSystemId( null );
+        DefaultModletContext.setDefaultPlatformProviderLocation( "DOES_NOT_EXIST" );
+        DefaultModletContext.setDefaultProviderLocation( "DOES_NOT_EXIST" );
+        DefaultModletProvider.setDefaultModletLocation( null );
 
         try
         {
@@ -280,11 +243,10 @@ public class DefaultModelContextTest extends ModelContextTest
             System.out.println( e );
         }
 
-        DefaultBootstrapContext.setDefaultBootstrapSchemaSystemId( null );
-        DefaultBootstrapContext.setDefaultPlatformProviderLocation( null );
-        DefaultBootstrapContext.setDefaultProviderLocation( null );
-        DefaultSchemaProvider.setDefaultSchemaLocation( null );
-        DefaultServiceProvider.setDefaultServiceLocation( null );
+        DefaultModletContext.setDefaultModletSchemaSystemId( null );
+        DefaultModletContext.setDefaultPlatformProviderLocation( null );
+        DefaultModletContext.setDefaultProviderLocation( null );
+        DefaultModletProvider.setDefaultModletLocation( null );
 
         System.clearProperty( DefaultModelContext.class.getName() + ".disableCaching" );
     }
@@ -296,11 +258,10 @@ public class DefaultModelContextTest extends ModelContextTest
 
         System.setProperty( DefaultModelContext.class.getName() + ".disableCaching", Boolean.toString( true ) );
 
-        DefaultBootstrapContext.setDefaultBootstrapSchemaSystemId( null );
-        DefaultBootstrapContext.setDefaultPlatformProviderLocation( "DOES_NOT_EXIST" );
-        DefaultBootstrapContext.setDefaultProviderLocation( "DOES_NOT_EXIST" );
-        DefaultServiceProvider.setDefaultServiceLocation( null );
-        DefaultSchemaProvider.setDefaultSchemaLocation( "META-INF/no-schemas.xml" );
+        DefaultModletContext.setDefaultModletSchemaSystemId( null );
+        DefaultModletContext.setDefaultPlatformProviderLocation( "DOES_NOT_EXIST" );
+        DefaultModletContext.setDefaultProviderLocation( "DOES_NOT_EXIST" );
+        DefaultModletProvider.setDefaultModletLocation( "META-INF/empty-modlet.xml" );
 
         try
         {
@@ -313,11 +274,10 @@ public class DefaultModelContextTest extends ModelContextTest
             System.out.println( e );
         }
 
-        DefaultBootstrapContext.setDefaultBootstrapSchemaSystemId( null );
-        DefaultBootstrapContext.setDefaultPlatformProviderLocation( null );
-        DefaultBootstrapContext.setDefaultProviderLocation( null );
-        DefaultSchemaProvider.setDefaultSchemaLocation( null );
-        DefaultServiceProvider.setDefaultServiceLocation( null );
+        DefaultModletContext.setDefaultModletSchemaSystemId( null );
+        DefaultModletContext.setDefaultPlatformProviderLocation( null );
+        DefaultModletContext.setDefaultProviderLocation( null );
+        DefaultModletProvider.setDefaultModletLocation( null );
 
         System.clearProperty( DefaultModelContext.class.getName() + ".disableCaching" );
     }
@@ -329,11 +289,10 @@ public class DefaultModelContextTest extends ModelContextTest
 
         System.setProperty( DefaultModelContext.class.getName() + ".disableCaching", Boolean.toString( true ) );
 
-        DefaultBootstrapContext.setDefaultBootstrapSchemaSystemId( null );
-        DefaultBootstrapContext.setDefaultPlatformProviderLocation( "DOES_NOT_EXIST" );
-        DefaultBootstrapContext.setDefaultProviderLocation( "DOES_NOT_EXIST" );
-        DefaultServiceProvider.setDefaultServiceLocation( null );
-        DefaultSchemaProvider.setDefaultSchemaLocation( "META-INF/no-schemas.xml" );
+        DefaultModletContext.setDefaultModletSchemaSystemId( null );
+        DefaultModletContext.setDefaultPlatformProviderLocation( "DOES_NOT_EXIST" );
+        DefaultModletContext.setDefaultProviderLocation( "DOES_NOT_EXIST" );
+        DefaultModletProvider.setDefaultModletLocation( "META-INF/empty-modlet.xml" );
 
         try
         {
@@ -346,11 +305,10 @@ public class DefaultModelContextTest extends ModelContextTest
             System.out.println( e );
         }
 
-        DefaultBootstrapContext.setDefaultBootstrapSchemaSystemId( null );
-        DefaultBootstrapContext.setDefaultPlatformProviderLocation( null );
-        DefaultBootstrapContext.setDefaultProviderLocation( null );
-        DefaultSchemaProvider.setDefaultSchemaLocation( null );
-        DefaultServiceProvider.setDefaultServiceLocation( null );
+        DefaultModletContext.setDefaultModletSchemaSystemId( null );
+        DefaultModletContext.setDefaultPlatformProviderLocation( null );
+        DefaultModletContext.setDefaultProviderLocation( null );
+        DefaultModletProvider.setDefaultModletLocation( null );
 
         System.clearProperty( DefaultModelContext.class.getName() + ".disableCaching" );
     }
@@ -362,11 +320,10 @@ public class DefaultModelContextTest extends ModelContextTest
 
         System.setProperty( DefaultModelContext.class.getName() + ".disableCaching", Boolean.toString( true ) );
 
-        DefaultBootstrapContext.setDefaultBootstrapSchemaSystemId( null );
-        DefaultBootstrapContext.setDefaultPlatformProviderLocation( "DOES_NOT_EXIST" );
-        DefaultBootstrapContext.setDefaultProviderLocation( "DOES_NOT_EXIST" );
-        DefaultServiceProvider.setDefaultServiceLocation( null );
-        DefaultSchemaProvider.setDefaultSchemaLocation( "META-INF/no-schemas.xml" );
+        DefaultModletContext.setDefaultModletSchemaSystemId( null );
+        DefaultModletContext.setDefaultPlatformProviderLocation( "DOES_NOT_EXIST" );
+        DefaultModletContext.setDefaultProviderLocation( "DOES_NOT_EXIST" );
+        DefaultModletProvider.setDefaultModletLocation( "META-INF/empty-modlet.xml" );
 
         try
         {
@@ -379,11 +336,10 @@ public class DefaultModelContextTest extends ModelContextTest
             System.out.println( e );
         }
 
-        DefaultBootstrapContext.setDefaultBootstrapSchemaSystemId( null );
-        DefaultBootstrapContext.setDefaultPlatformProviderLocation( null );
-        DefaultBootstrapContext.setDefaultProviderLocation( null );
-        DefaultSchemaProvider.setDefaultSchemaLocation( null );
-        DefaultServiceProvider.setDefaultServiceLocation( null );
+        DefaultModletContext.setDefaultModletSchemaSystemId( null );
+        DefaultModletContext.setDefaultPlatformProviderLocation( null );
+        DefaultModletContext.setDefaultProviderLocation( null );
+        DefaultModletProvider.setDefaultModletLocation( null );
 
         System.clearProperty( DefaultModelContext.class.getName() + ".disableCaching" );
     }
@@ -395,29 +351,27 @@ public class DefaultModelContextTest extends ModelContextTest
 
         System.setProperty( DefaultModelContext.class.getName() + ".disableCaching", Boolean.toString( true ) );
 
-        DefaultBootstrapContext.setDefaultBootstrapSchemaSystemId( null );
-        DefaultBootstrapContext.setDefaultPlatformProviderLocation( null );
-        DefaultBootstrapContext.setDefaultProviderLocation( null );
-        DefaultSchemaProvider.setDefaultSchemaLocation( null );
-        DefaultServiceProvider.setDefaultServiceLocation( null );
+        DefaultModletContext.setDefaultModletSchemaSystemId( null );
+        DefaultModletContext.setDefaultPlatformProviderLocation( null );
+        DefaultModletContext.setDefaultProviderLocation( null );
+        DefaultModletProvider.setDefaultModletLocation( null );
 
         Assert.assertNotNull( this.getModelContext().createEntityResolver() );
         Assert.assertNull( this.getModelContext().createEntityResolver().resolveEntity( null, "UNKNOWN" ) );
         Assert.assertNotNull( this.getModelContext().createEntityResolver().
             resolveEntity( "http://jomc.org/model", "UNKNOWN" ) );
 
-        DefaultBootstrapContext.setDefaultPlatformProviderLocation( "DOES_NOT_EXIST" );
-        DefaultBootstrapContext.setDefaultProviderLocation( "DOES_NOT_EXIST" );
-        DefaultSchemaProvider.setDefaultSchemaLocation( "META-INF/no-schemas.xml" );
+        DefaultModletContext.setDefaultPlatformProviderLocation( "DOES_NOT_EXIST" );
+        DefaultModletContext.setDefaultProviderLocation( "DOES_NOT_EXIST" );
+        DefaultModletProvider.setDefaultModletLocation( "META-INF/empty-modlet.xml" );
 
         Assert.assertNull( this.getModelContext().createEntityResolver().
             resolveEntity( "http://jomc.org/model", "UNKNOWN" ) );
 
-        DefaultBootstrapContext.setDefaultBootstrapSchemaSystemId( null );
-        DefaultBootstrapContext.setDefaultPlatformProviderLocation( null );
-        DefaultBootstrapContext.setDefaultProviderLocation( null );
-        DefaultSchemaProvider.setDefaultSchemaLocation( null );
-        DefaultServiceProvider.setDefaultServiceLocation( null );
+        DefaultModletContext.setDefaultModletSchemaSystemId( null );
+        DefaultModletContext.setDefaultPlatformProviderLocation( null );
+        DefaultModletContext.setDefaultProviderLocation( null );
+        DefaultModletProvider.setDefaultModletLocation( null );
 
         System.clearProperty( DefaultModelContext.class.getName() + ".disableCaching" );
     }
@@ -429,11 +383,10 @@ public class DefaultModelContextTest extends ModelContextTest
 
         System.setProperty( DefaultModelContext.class.getName() + ".disableCaching", Boolean.toString( true ) );
 
-        DefaultBootstrapContext.setDefaultBootstrapSchemaSystemId( null );
-        DefaultBootstrapContext.setDefaultPlatformProviderLocation( null );
-        DefaultBootstrapContext.setDefaultProviderLocation( null );
-        DefaultSchemaProvider.setDefaultSchemaLocation( null );
-        DefaultServiceProvider.setDefaultServiceLocation( null );
+        DefaultModletContext.setDefaultModletSchemaSystemId( null );
+        DefaultModletContext.setDefaultPlatformProviderLocation( null );
+        DefaultModletContext.setDefaultProviderLocation( null );
+        DefaultModletProvider.setDefaultModletLocation( null );
 
         Assert.assertNotNull( this.getModelContext().createResourceResolver() );
 
@@ -475,19 +428,18 @@ public class DefaultModelContextTest extends ModelContextTest
         input.setStringData( null );
         input.setSystemId( null );
 
-        DefaultBootstrapContext.setDefaultPlatformProviderLocation( "DOES_NOT_EXIST" );
-        DefaultBootstrapContext.setDefaultProviderLocation( "DOES_NOT_EXIST" );
-        DefaultSchemaProvider.setDefaultSchemaLocation( "META-INF/no-schemas.xml" );
+        DefaultModletContext.setDefaultPlatformProviderLocation( "DOES_NOT_EXIST" );
+        DefaultModletContext.setDefaultProviderLocation( "DOES_NOT_EXIST" );
+        DefaultModletProvider.setDefaultModletLocation( "META-INF/empty-modlet.xml" );
 
         Assert.assertNull( this.getModelContext().createResourceResolver().
             resolveResource( XMLConstants.W3C_XML_SCHEMA_NS_URI, null, "http://jomc.org/model",
                              "http://jomc.sourceforge.net/model/jomc-1.0.xsd", null ) );
 
-        DefaultBootstrapContext.setDefaultBootstrapSchemaSystemId( null );
-        DefaultBootstrapContext.setDefaultPlatformProviderLocation( null );
-        DefaultBootstrapContext.setDefaultProviderLocation( null );
-        DefaultSchemaProvider.setDefaultSchemaLocation( null );
-        DefaultServiceProvider.setDefaultServiceLocation( null );
+        DefaultModletContext.setDefaultModletSchemaSystemId( null );
+        DefaultModletContext.setDefaultPlatformProviderLocation( null );
+        DefaultModletContext.setDefaultProviderLocation( null );
+        DefaultModletProvider.setDefaultModletLocation( null );
 
         System.clearProperty( DefaultModelContext.class.getName() + ".disableCaching" );
     }

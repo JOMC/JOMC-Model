@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+  Copyright (c) 2009 The JOMC Project
+  Copyright (c) 2005 Christian Schulte <schulte2005@users.sourceforge.net>
+  All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions
+  are met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in
+      the documentation and/or other materials provided with the
+      distribution.
+
+  THIS SOFTWARE IS PROVIDED BY THE JOMC PROJECT AND CONTRIBUTORS "AS IS"
+  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+  THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE JOMC PROJECT OR
+  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+  $Id$
+
+  Location: http://jomc.sourceforge.net/model/modlet/jomc-modlet-1.0.xsd
+
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://jomc.org/model/modlet"
+            xmlns:modlet="http://jomc.org/model/modlet"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en"><![CDATA[
+
+  Copyright (c) 2009 The JOMC Project
+  Copyright (c) 2005 Christian Schulte <schulte2005@users.sourceforge.net>
+  All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions
+  are met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in
+      the documentation and/or other materials provided with the
+      distribution.
+
+  THIS SOFTWARE IS PROVIDED BY THE JOMC PROJECT AND CONTRIBUTORS "AS IS"
+  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+  THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE JOMC PROJECT OR
+  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+  $Id$
+
+  Location: http://jomc.sourceforge.net/model/modlet/jomc-modlet-1.0.xsd
+
+]]>
+    </xsd:documentation>
+  </xsd:annotation>
+  <!-- ************************************************************************************************************* -->
+  <xsd:complexType name="ModletObject">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en">Base modlet object.</xsd:documentation>
+    </xsd:annotation>
+  </xsd:complexType>
+  <!-- ************************************************************************************************************* -->
+  <xsd:element name="modlets" type="modlet:Modlets">
+    <xsd:key name="modlet-identifier-key">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">Identifier key of a modlet.</xsd:documentation>
+      </xsd:annotation>
+      <xsd:selector xpath="modlet:modlet"/>
+      <xsd:field xpath="@identifier"/>
+    </xsd:key>
+  </xsd:element>
+  <xsd:complexType name="Modlets">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en">List of modlets.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="modlet:ModletObject">
+        <xsd:sequence>
+          <xsd:element ref="modlet:modlet" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!-- ************************************************************************************************************* -->
+  <xsd:element name="modlet" type="modlet:Modlet"/>
+  <xsd:complexType name="Modlet">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en">
+Modlet.
+
+The 'Modlet' type defines attributes 'identifier', 'model', 'name', 'vendor' and 'version'. Attribute 'identifier'
+holds an identifier uniquely identifying the modlet in a set of modlets. Attribute 'model' holds an identifier of the
+model the modlet is part of. Attribute 'name' holds the name of the modlet. Attribute 'vendor' holds information
+regarding the vendor of the modlet. Attribute 'version' holds the version of the modlet.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="modlet:ModletObject">
+        <xsd:sequence>
+          <xsd:element ref="modlet:schemas" minOccurs="0" maxOccurs="1"/>
+          <xsd:element ref="modlet:services" minOccurs="0" maxOccurs="1"/>
+          <xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <xsd:attribute name="identifier" type="modlet:Identifier" use="required"/>
+        <xsd:attribute name="model" type="modlet:Identifier" use="required"/>
+        <xsd:attribute name="name" type="modlet:String" use="required"/>
+        <xsd:attribute name="vendor" type="modlet:String" use="optional"/>
+        <xsd:attribute name="version" type="modlet:Version" use="optional"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!-- ************************************************************************************************************* -->
+  <xsd:element name="schemas" type="modlet:Schemas">
+    <xsd:key name="schema-system-id-key">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">System id key of a schema.</xsd:documentation>
+      </xsd:annotation>
+      <xsd:selector xpath="modlet:schema"/>
+      <xsd:field xpath="@system-id"/>
+    </xsd:key>
+    <xsd:key name="schema-public-id-key">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">Public id key of a schema.</xsd:documentation>
+      </xsd:annotation>
+      <xsd:selector xpath="modlet:schema"/>
+      <xsd:field xpath="@public-id"/>
+    </xsd:key>
+  </xsd:element>
+  <xsd:complexType name="Schemas">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en">List of schemas.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="modlet:ModletObject">
+        <xsd:sequence>
+          <xsd:element ref="modlet:schema" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!-- ************************************************************************************************************* -->
+  <xsd:element name="schema" type="modlet:Schema"/>
+  <xsd:complexType name="Schema">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en">
+Reference to a schema.
+
+The 'Schema' type defines attributes 'public-id', 'system-id', 'context-id' and 'classpath-id'. Attribute 'public-id'
+holds the public identifier of the referenced schema. Attribute 'system-id' holds the system identifier of the
+referenced schema. Attribute 'context-id' holds the name of the Java package containing JAXB classes of the referenced
+schema. Attribute 'classpath-id' holds the Java classpath location of the referenced schema.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="modlet:ModletObject">
+        <xsd:sequence>
+          <xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <xsd:attribute name="public-id" type="modlet:Identifier" use="required"/>
+        <xsd:attribute name="system-id" type="modlet:Identifier" use="required"/>
+        <xsd:attribute name="context-id" type="modlet:Identifier" use="optional"/>
+        <xsd:attribute name="classpath-id" type="modlet:Identifier" use="optional"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!-- ************************************************************************************************************* -->
+  <xsd:element name="services" type="modlet:Services">
+    <xsd:key name="service-key">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">Key of a service.</xsd:documentation>
+      </xsd:annotation>
+      <xsd:selector xpath="modlet:service"/>
+      <xsd:field xpath="@identifier"/>
+      <xsd:field xpath="@class"/>
+    </xsd:key>
+  </xsd:element>
+  <xsd:complexType name="Services">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en">List of services.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="modlet:ModletObject">
+        <xsd:sequence>
+          <xsd:element ref="modlet:service" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!-- ************************************************************************************************************* -->
+  <xsd:element name="service" type="modlet:Service"/>
+  <xsd:complexType name="Service">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en">Service.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="modlet:ModletObject">
+        <xsd:sequence>
+          <xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <xsd:attribute name="ordinal" type="xsd:int" use="optional" default="1000"/>
+        <xsd:attribute name="identifier" type="modlet:Identifier" use="required"/>
+        <xsd:attribute name="class" type="modlet:Identifier" use="required"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!-- ************************************************************************************************************* -->
+  <xsd:simpleType name="Identifier">
+    <xsd:restriction base="xsd:token"/>
+  </xsd:simpleType>
+  <!-- ************************************************************************************************************* -->
+  <xsd:simpleType name="String">
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+  <!-- ************************************************************************************************************* -->
+  <xsd:simpleType name="Version">
+    <xsd:restriction base="xsd:token"/>
+  </xsd:simpleType>
+</xsd:schema>

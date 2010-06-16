@@ -66,11 +66,13 @@ import javax.xml.transform.sax.SAXSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
-import org.jomc.model.bootstrap.BootstrapContext;
-import org.jomc.model.bootstrap.BootstrapException;
-import org.jomc.model.bootstrap.Schemas;
-import org.jomc.model.bootstrap.Service;
-import org.jomc.model.bootstrap.Services;
+import org.jomc.model.modlet.Modlet;
+import org.jomc.model.modlet.ModletContext;
+import org.jomc.model.modlet.ModletException;
+import org.jomc.model.modlet.Modlets;
+import org.jomc.model.modlet.Schemas;
+import org.jomc.model.modlet.Service;
+import org.jomc.model.modlet.Services;
 import org.w3c.dom.ls.LSInput;
 import org.w3c.dom.ls.LSResourceResolver;
 import org.xml.sax.EntityResolver;
@@ -95,11 +97,11 @@ public class DefaultModelContext extends ModelContext
         "xsd"
     };
 
-    /** Cached {@code Services}. */
-    private Reference<Services> cachedServices = new SoftReference<Services>( null );
+    /** Constant for the identifier of the object management and configuration model. */
+    private static final String MODEL_IDENTIFIER = "http://jomc.org/model";
 
-    /** Cached {@code Schemas}. */
-    private Reference<Schemas> cachedSchemas = new SoftReference<Schemas>( null );
+    /** Cached {@code Modlets}. */
+    private Reference<Modlets> cachedModlets = new SoftReference<Modlets>( null );
 
     /** Cached schema resources. */
     private Reference<Set<URI>> cachedSchemaResources = new SoftReference<Set<URI>>( null );
@@ -121,7 +123,8 @@ public class DefaultModelContext extends ModelContext
      *
      * @throws ModelException if searching modules fails.
      *
-     * @see BootstrapContext#findServices()
+     * @see ModletContext#findModlets()
+     * @see Modlets#getServices(java.lang.String)
      * @see ModelProvider#findModules(org.jomc.model.ModelContext)
      */
     @Override
@@ -138,7 +141,8 @@ public class DefaultModelContext extends ModelContext
             modules.getDocumentation().setDefaultLanguage( "en" );
             modules.getDocumentation().getText().add( text );
 
-            final List<Service> providers = this.getServices().getServices( ModelProvider.class );
+            final Services services = this.getModlets().getServices( MODEL_IDENTIFIER );
+            final List<Service> providers = services != null ? services.getServices( ModelProvider.class ) : null;
 
             if ( providers != null )
             {
@@ -194,7 +198,7 @@ public class DefaultModelContext extends ModelContext
 
             return modules;
         }
-        catch ( final BootstrapException e )
+        catch ( final ModletException e )
         {
             throw new ModelException( e.getMessage(), e );
         }
@@ -212,7 +216,14 @@ public class DefaultModelContext extends ModelContext
         }
         catch ( final JAXBException e )
         {
-            throw new ModelException( e.getMessage(), e );
+            if ( e.getLinkedException() != null )
+            {
+                throw new ModelException( e.getLinkedException().getMessage(), e.getLinkedException() );
+            }
+            else
+            {
+                throw new ModelException( e.getMessage(), e );
+            }
         }
     }
 
@@ -226,7 +237,8 @@ public class DefaultModelContext extends ModelContext
      * @throws NullPointerException if {@code modules} is {@code null}.
      * @throws ModelException if processing modules fails.
      *
-     * @see BootstrapContext#findServices()
+     * @see ModletContext#findModlets()
+     * @see Modlets#getServices(java.lang.String)
      * @see ModelProcessor#processModules(org.jomc.model.ModelContext, org.jomc.model.Modules)
      */
     @Override
@@ -240,7 +252,8 @@ public class DefaultModelContext extends ModelContext
         try
         {
             Modules processed = modules;
-            final List<Service> processors = this.getServices().getServices( ModelProcessor.class );
+            final Services services = this.getModlets().getServices( MODEL_IDENTIFIER );
+            final List<Service> processors = services != null ? services.getServices( ModelProcessor.class ) : null;
 
             if ( processors != null )
             {
@@ -298,7 +311,7 @@ public class DefaultModelContext extends ModelContext
 
             return processed;
         }
-        catch ( final BootstrapException e )
+        catch ( final ModletException e )
         {
             throw new ModelException( e.getMessage(), e );
         }
@@ -316,7 +329,14 @@ public class DefaultModelContext extends ModelContext
         }
         catch ( final JAXBException e )
         {
-            throw new ModelException( e.getMessage(), e );
+            if ( e.getLinkedException() != null )
+            {
+                throw new ModelException( e.getLinkedException().getMessage(), e.getLinkedException() );
+            }
+            else
+            {
+                throw new ModelException( e.getMessage(), e );
+            }
         }
     }
 
@@ -379,7 +399,8 @@ public class DefaultModelContext extends ModelContext
      * @throws NullPointerException if {@code modules} is {@code null}.
      * @throws ModelException if validating the modules fails.
      *
-     * @see BootstrapContext#findServices()
+     * @see ModletContext#findModlets()
+     * @see Modlets#getServices(java.lang.String)
      * @see ModelValidator#validateModel(org.jomc.model.ModelContext, org.jomc.model.Modules)
      */
     @Override
@@ -392,7 +413,8 @@ public class DefaultModelContext extends ModelContext
 
         try
         {
-            final List<Service> validators = this.getServices().getServices( ModelValidator.class );
+            final Services services = this.getModlets().getServices( MODEL_IDENTIFIER );
+            final List<Service> validators = services != null ? services.getServices( ModelValidator.class ) : null;
             final ModelValidationReport report = new ModelValidationReport();
 
             if ( validators != null )
@@ -430,7 +452,7 @@ public class DefaultModelContext extends ModelContext
 
             return report;
         }
-        catch ( final BootstrapException e )
+        catch ( final ModletException e )
         {
             throw new ModelException( e.getMessage(), e );
         }
@@ -447,7 +469,8 @@ public class DefaultModelContext extends ModelContext
     /**
      * {@inheritDoc}
      *
-     * @see BootstrapContext#findSchemas()
+     * @see ModletContext#findModlets()
+     * @see Modlets#getSchemas(java.lang.String)
      */
     @Override
     public EntityResolver createEntityResolver() throws ModelException
@@ -468,16 +491,19 @@ public class DefaultModelContext extends ModelContext
 
                 try
                 {
-                    org.jomc.model.bootstrap.Schema s = null;
-                    final Schemas classpathSchemas = getSchemas();
+                    org.jomc.model.modlet.Schema s = null;
+                    final Schemas classpathSchemas = getModlets().getSchemas( MODEL_IDENTIFIER );
 
-                    if ( publicId != null )
+                    if ( classpathSchemas != null )
                     {
-                        s = classpathSchemas.getSchemaByPublicId( publicId );
-                    }
-                    if ( s == null )
-                    {
-                        s = classpathSchemas.getSchemaBySystemId( systemId );
+                        if ( publicId != null )
+                        {
+                            s = classpathSchemas.getSchemaByPublicId( publicId );
+                        }
+                        if ( s == null )
+                        {
+                            s = classpathSchemas.getSchemaBySystemId( systemId );
+                        }
                     }
 
                     if ( s != null )
@@ -565,7 +591,7 @@ public class DefaultModelContext extends ModelContext
 
                     schemaSource = null;
                 }
-                catch ( final BootstrapException e )
+                catch ( final ModletException e )
                 {
                     throw (IOException) new IOException( getMessage( "failedResolvingSchemas" ) ).initCause( e );
                 }
@@ -585,7 +611,8 @@ public class DefaultModelContext extends ModelContext
     /**
      * {@inheritDoc}
      *
-     * @see BootstrapContext#findSchemas()
+     * @see ModletContext#findModlets()
+     * @see Modlets#getSchemas(java.lang.String)
      */
     @Override
     public LSResourceResolver createResourceResolver() throws ModelException
@@ -762,7 +789,8 @@ public class DefaultModelContext extends ModelContext
     /**
      * {@inheritDoc}
      *
-     * @see BootstrapContext#findSchemas()
+     * @see ModletContext#findModlets()
+     * @see Modlets#getSchemas(java.lang.String)
      */
     @Override
     public Schema createSchema() throws ModelException
@@ -770,17 +798,20 @@ public class DefaultModelContext extends ModelContext
         try
         {
             final SchemaFactory f = SchemaFactory.newInstance( XMLConstants.W3C_XML_SCHEMA_NS_URI );
-            final Schemas schemas = this.getSchemas();
-            final List<Source> sources = new ArrayList<Source>( schemas.getSchema().size() );
+            final Schemas schemas = this.getModlets().getSchemas( MODEL_IDENTIFIER );
             final EntityResolver entityResolver = this.createEntityResolver();
+            final List<Source> sources = new ArrayList<Source>( schemas != null ? schemas.getSchema().size() : 0 );
 
-            for ( org.jomc.model.bootstrap.Schema s : schemas.getSchema() )
+            if ( schemas != null )
             {
-                final InputSource inputSource = entityResolver.resolveEntity( s.getPublicId(), s.getSystemId() );
-
-                if ( inputSource != null )
+                for ( org.jomc.model.modlet.Schema s : schemas.getSchema() )
                 {
-                    sources.add( new SAXSource( inputSource ) );
+                    final InputSource inputSource = entityResolver.resolveEntity( s.getPublicId(), s.getSystemId() );
+
+                    if ( inputSource != null )
+                    {
+                        sources.add( new SAXSource( inputSource ) );
+                    }
                 }
             }
 
@@ -792,7 +823,7 @@ public class DefaultModelContext extends ModelContext
             f.setResourceResolver( this.createResourceResolver() );
             return f.newSchema( sources.toArray( new Source[ sources.size() ] ) );
         }
-        catch ( final BootstrapException e )
+        catch ( final ModletException e )
         {
             throw new ModelException( e.getMessage(), e );
         }
@@ -809,7 +840,8 @@ public class DefaultModelContext extends ModelContext
     /**
      * {@inheritDoc}
      *
-     * @see BootstrapContext#findSchemas()
+     * @see ModletContext#findModlets()
+     * @see Modlets#getSchemas(java.lang.String)
      */
     @Override
     public JAXBContext createContext() throws ModelException
@@ -817,17 +849,20 @@ public class DefaultModelContext extends ModelContext
         try
         {
             final StringBuilder packageNames = new StringBuilder();
+            final Schemas schemas = this.getModlets().getSchemas( MODEL_IDENTIFIER );
 
-            for ( final Iterator<org.jomc.model.bootstrap.Schema> s = this.getSchemas().getSchema().iterator();
-                  s.hasNext(); )
+            if ( schemas != null )
             {
-                final org.jomc.model.bootstrap.Schema schema = s.next();
-                if ( schema.getContextId() != null )
+                for ( final Iterator<org.jomc.model.modlet.Schema> s = schemas.getSchema().iterator(); s.hasNext(); )
                 {
-                    packageNames.append( ':' ).append( schema.getContextId() );
-                    if ( this.isLoggable( Level.CONFIG ) )
+                    final org.jomc.model.modlet.Schema schema = s.next();
+                    if ( schema.getContextId() != null )
                     {
-                        this.log( Level.CONFIG, getMessage( "foundContext", schema.getContextId() ), null );
+                        packageNames.append( ':' ).append( schema.getContextId() );
+                        if ( this.isLoggable( Level.CONFIG ) )
+                        {
+                            this.log( Level.CONFIG, getMessage( "foundContext", schema.getContextId() ), null );
+                        }
                     }
                 }
             }
@@ -839,20 +874,28 @@ public class DefaultModelContext extends ModelContext
 
             return JAXBContext.newInstance( packageNames.toString().substring( 1 ), this.getClassLoader() );
         }
-        catch ( final BootstrapException e )
+        catch ( final ModletException e )
         {
             throw new ModelException( e.getMessage(), e );
         }
         catch ( final JAXBException e )
         {
-            throw new ModelException( e.getMessage(), e );
+            if ( e.getLinkedException() != null )
+            {
+                throw new ModelException( e.getLinkedException().getMessage(), e.getLinkedException() );
+            }
+            else
+            {
+                throw new ModelException( e.getMessage(), e );
+            }
         }
     }
 
     /**
      * {@inheritDoc}
      *
-     * @see BootstrapContext#findSchemas()
+     * @see ModletContext#findModlets()
+     * @see Modlets#getSchemas(java.lang.String)
      */
     @Override
     public Marshaller createMarshaller() throws ModelException
@@ -861,20 +904,24 @@ public class DefaultModelContext extends ModelContext
         {
             final StringBuilder packageNames = new StringBuilder();
             final StringBuilder schemaLocation = new StringBuilder();
+            final Schemas schemas = this.getModlets().getSchemas( MODEL_IDENTIFIER );
 
-            for ( final Iterator<org.jomc.model.bootstrap.Schema> s = this.getSchemas().getSchema().iterator();
-                  s.hasNext(); )
+            if ( schemas != null )
             {
-                final org.jomc.model.bootstrap.Schema schema = s.next();
-                if ( schema.getContextId() != null )
+                for ( final Iterator<org.jomc.model.modlet.Schema> s = schemas.getSchema().iterator(); s.hasNext(); )
                 {
-                    packageNames.append( ':' ).append( schema.getContextId() );
-                }
-                if ( schema.getPublicId() != null && schema.getSystemId() != null )
-                {
-                    schemaLocation.append( ' ' ).append( schema.getPublicId() ).append( ' ' ).
-                        append( schema.getSystemId() );
+                    final org.jomc.model.modlet.Schema schema = s.next();
 
+                    if ( schema.getContextId() != null )
+                    {
+                        packageNames.append( ':' ).append( schema.getContextId() );
+                    }
+                    if ( schema.getPublicId() != null && schema.getSystemId() != null )
+                    {
+                        schemaLocation.append( ' ' ).append( schema.getPublicId() ).append( ' ' ).
+                            append( schema.getSystemId() );
+
+                    }
                 }
             }
 
@@ -894,20 +941,28 @@ public class DefaultModelContext extends ModelContext
 
             return m;
         }
-        catch ( final BootstrapException e )
+        catch ( final ModletException e )
         {
             throw new ModelException( e.getMessage(), e );
         }
         catch ( final JAXBException e )
         {
-            throw new ModelException( e.getMessage(), e );
+            if ( e.getLinkedException() != null )
+            {
+                throw new ModelException( e.getLinkedException().getMessage(), e.getLinkedException() );
+            }
+            else
+            {
+                throw new ModelException( e.getMessage(), e );
+            }
         }
     }
 
     /**
      * {@inheritDoc}
      *
-     * @see BootstrapContext#findSchemas()
+     * @see ModletContext#findModlets()
+     * @see Modlets#getSchemas(java.lang.String)
      */
     @Override
     public Unmarshaller createUnmarshaller() throws ModelException
@@ -918,78 +973,76 @@ public class DefaultModelContext extends ModelContext
         }
         catch ( final JAXBException e )
         {
-            throw new ModelException( e.getMessage(), e );
+            if ( e.getLinkedException() != null )
+            {
+                throw new ModelException( e.getLinkedException().getMessage(), e.getLinkedException() );
+            }
+            else
+            {
+                throw new ModelException( e.getMessage(), e );
+            }
         }
     }
 
     /**
-     * Gets the services of the instance.
+     * Gets the modlets of the instance.
      *
-     * @return The services of the instance.
+     * @return The modlets of the instance.
      *
-     * @throws BootstrapException if getting the services fails.
+     * @throws ModletException if getting the modlets fails.
      *
-     * @see BootstrapContext#findServices()
+     * @see ModletContext#findModlets()
      */
-    private Services getServices() throws BootstrapException
+    private Modlets getModlets() throws ModletException
     {
-        Services services = this.cachedServices.get();
+        Modlets modlets = this.cachedModlets.get();
 
-        if ( services == null || System.getProperty( this.getClass().getName() + ".disableCaching" ) != null )
+        if ( modlets == null || System.getProperty( this.getClass().getName() + ".disableCaching" ) != null )
         {
-            services = BootstrapContext.createBootstrapContext( this.getClassLoader() ).findServices();
+            modlets = ModletContext.createModletContext( this.getClassLoader() ).findModlets();
 
-            if ( services != null && this.isLoggable( Level.CONFIG ) )
+            if ( modlets != null && this.isLoggable( Level.CONFIG ) )
             {
-                for ( org.jomc.model.bootstrap.Service s : services.getService() )
+                for ( Modlet m : modlets.getModlet() )
                 {
-                    this.log( Level.CONFIG, getMessage(
-                        "foundService", s.getOrdinal(), s.getIdentifier(), s.getClazz() ), null );
+                    this.log( Level.CONFIG, getMessage( "foundModlet", m.getIdentifier(), m.getModel(), m.getName(),
+                                                        m.getVendor(), m.getVersion() ), null );
 
+                    if ( this.isLoggable( Level.FINE ) )
+                    {
+                        if ( m.getSchemas() != null )
+                        {
+                            for ( org.jomc.model.modlet.Schema s : m.getSchemas().getSchema() )
+                            {
+                                this.log( Level.FINE, getMessage(
+                                    "foundSchema", m.getIdentifier(), s.getPublicId(), s.getSystemId(),
+                                    s.getContextId(), s.getClasspathId() ), null );
+
+                            }
+                        }
+
+                        if ( m.getServices() != null )
+                        {
+                            for ( Service s : m.getServices().getService() )
+                            {
+                                this.log( Level.FINE, getMessage(
+                                    "foundService", m.getIdentifier(), s.getOrdinal(), s.getIdentifier(),
+                                    s.getClazz() ), null );
+
+                            }
+                        }
+                    }
                 }
             }
 
-            this.cachedServices = new SoftReference<Services>( services );
+            this.cachedModlets = new SoftReference<Modlets>( modlets );
         }
 
-        return services;
+        return modlets;
     }
 
     /**
-     * Gets the schemas of the instance.
-     *
-     * @return The schemas of the instance.
-     *
-     * @throws BootstrapException if getting the schemas fails.
-     *
-     * @see BootstrapContext#findSchemas()
-     */
-    private Schemas getSchemas() throws BootstrapException
-    {
-        Schemas schemas = this.cachedSchemas.get();
-
-        if ( schemas == null || System.getProperty( this.getClass().getName() + ".disableCaching" ) != null )
-        {
-            schemas = BootstrapContext.createBootstrapContext( this.getClassLoader() ).findSchemas();
-
-            if ( schemas != null && this.isLoggable( Level.CONFIG ) )
-            {
-                for ( org.jomc.model.bootstrap.Schema s : schemas.getSchema() )
-                {
-                    this.log( Level.CONFIG, getMessage( "foundSchema", s.getPublicId(), s.getSystemId(),
-                                                        s.getContextId(), s.getClasspathId() ), null );
-
-                }
-            }
-
-            this.cachedSchemas = new SoftReference<Schemas>( schemas );
-        }
-
-        return schemas;
-    }
-
-    /**
-     * Searches the context for {@code META-INF/MANIFEST.MF} resources and returns a set of URIs of entries whose name
+     * Searches the context for {@code META-INF/MANIFEST.MF} resources and returns a set of URIs of entries whose names
      * end with a known schema extension.
      *
      * @return Set of URIs of any matching entries.
