@@ -346,7 +346,7 @@ public class DefaultModelProvider implements ModelProvider
             if ( found != null )
             {
                 final Model copy = new Model( model );
-                JAXBElement<Modules> modules = copy.getAnyElement( Modules.MODEL_PUBLIC_ID, "modules" );
+                final JAXBElement<Modules> modules = copy.getAnyElement( Modules.MODEL_PUBLIC_ID, "modules" );
 
                 if ( modules != null )
                 {
