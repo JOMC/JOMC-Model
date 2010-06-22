@@ -53,13 +53,17 @@ import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamSource;
+import org.jomc.modlet.Model;
+import org.jomc.modlet.ModelContext;
+import org.jomc.modlet.ModelProcessor;
+import org.jomc.modlet.ModelException;
 
 /**
- * Default {@code ModelProcessor} implementation.
+ * Default object management and configuration {@code ModelProcessor} implementation.
  *
  * @author <a href="mailto:schulte2005@users.sourceforge.net">Christian Schulte</a>
  * @version $Id$
- * @see ModelContext#processModules(org.jomc.model.Modules)
+ * @see ModelContext#processModel(org.jomc.modlet.Model)
  */
 public class DefaultModelProcessor implements ModelProcessor
 {
@@ -76,10 +80,81 @@ public class DefaultModelProcessor implements ModelProcessor
     /** Transformer location of the instance. */
     private String transformerLocation;
 
+    /** Flag indicating the processor is enabled by default. */
+    private static volatile Boolean defaultEnabled;
+
+    /** Flag indicating the processor is enabled. */
+    private Boolean enabled;
+
     /** Creates a new {@code DefaultModelProcessor} instance. */
     public DefaultModelProcessor()
     {
         super();
+    }
+
+    /**
+     * Gets a flag indicating the processor is enabled by default.
+     * <p>The default enabled flag is controlled by system property
+     * {@code org.jomc.model.DefaultModelProcessor.defaultEnabled} holding a value indicating the processor is enabled
+     * by default. If that property is not set, the {@code true} default is returned.</p>
+     *
+     * @return {@code true} if the processor is enabled by default; {@code false} if the processor is disabled by
+     * default.
+     *
+     * @see #setDefaultEnabled(java.lang.Boolean)
+     */
+    public static boolean isDefaultEnabled()
+    {
+        if ( defaultEnabled == null )
+        {
+            defaultEnabled = Boolean.valueOf( System.getProperty(
+                "org.jomc.model.DefaultModelProcessor.defaultEnabled", Boolean.toString( true ) ) );
+
+        }
+
+        return defaultEnabled;
+    }
+
+    /**
+     * Sets the flag indicating the processor is enabled by default.
+     *
+     * @param value The new value of the flag indicating the processor is enabled by default or {@code null}.
+     *
+     * @see #isDefaultEnabled()
+     */
+    public static void setDefaultEnabled( final Boolean value )
+    {
+        defaultEnabled = value;
+    }
+
+    /**
+     * Gets a flag indicating the processor is enabled.
+     *
+     * @return {@code true} if the processor is enabled; {@code false} if the processor is disabled.
+     *
+     * @see #isDefaultEnabled()
+     * @see #setEnabled(java.lang.Boolean)
+     */
+    public boolean isEnabled()
+    {
+        if ( this.enabled == null )
+        {
+            this.enabled = isDefaultEnabled();
+        }
+
+        return this.enabled;
+    }
+
+    /**
+     * Sets the flag indicating the processor is enabled.
+     *
+     * @param value The new value of the flag indicating the processor is enabled or {@code null}.
+     *
+     * @see #isEnabled()
+     */
+    public void setEnabled( final Boolean value )
+    {
+        this.enabled = value;
     }
 
     /**
@@ -219,10 +294,8 @@ public class DefaultModelProcessor implements ModelProcessor
 
                 if ( context.isLoggable( Level.FINE ) )
                 {
-                    context.log( Level.FINE, this.getMessage( "processing", new Object[]
-                        {
-                            url.toExternalForm()
-                        } ), null );
+                    context.log( Level.FINE, this.getMessage( "processing", this.getClass().getName(),
+                                                              url.toExternalForm() ), null );
 
                 }
 
@@ -236,10 +309,8 @@ public class DefaultModelProcessor implements ModelProcessor
 
             if ( context.isLoggable( Level.FINE ) )
             {
-                context.log( Level.FINE, this.getMessage( "contextReport", new Object[]
-                    {
-                        count, location, Long.valueOf( System.currentTimeMillis() - t0 )
-                    } ), null );
+                context.log( Level.FINE, this.getMessage( "contextReport", this.getClass().getName(), count, location,
+                                                          Long.valueOf( System.currentTimeMillis() - t0 ) ), null );
 
             }
 
@@ -258,37 +329,57 @@ public class DefaultModelProcessor implements ModelProcessor
     /**
      * {@inheritDoc}
      *
+     * @see #isEnabled()
      * @see #getTransformerLocation()
-     * @see #findTransformers(org.jomc.model.ModelContext, java.lang.String)
+     * @see #findTransformers(org.jomc.modlet.ModelContext, java.lang.String)
      */
-    public Modules processModules( final ModelContext context, final Modules modules ) throws ModelException
+    public Model processModel( final ModelContext context, final Model model ) throws ModelException
     {
         if ( context == null )
         {
             throw new NullPointerException( "context" );
         }
-        if ( modules == null )
+        if ( model == null )
         {
-            throw new NullPointerException( "modules" );
+            throw new NullPointerException( "model" );
         }
 
         try
         {
-            final ObjectFactory objectFactory = new ObjectFactory();
-            final JAXBContext jaxbContext = context.createContext();
-            final List<Transformer> transformers = this.findTransformers( context, this.getTransformerLocation() );
-            Modules processed = new Modules( modules );
+            Model processed = null;
 
-            if ( transformers != null )
+            if ( this.isEnabled() )
             {
-                for ( Transformer t : transformers )
+                if ( context.isLoggable( Level.FINE ) )
                 {
-                    final JAXBElement<Modules> e = objectFactory.createModules( processed );
-                    final JAXBSource source = new JAXBSource( jaxbContext, e );
-                    final JAXBResult result = new JAXBResult( jaxbContext );
-                    t.transform( source, result );
-                    processed = ( (JAXBElement<Modules>) result.getResult() ).getValue();
+                    context.log( Level.FINE, getMessage( "processingModel", this.getClass().getName(),
+                                                         model.getIdentifier() ), null );
+
                 }
+
+                final org.jomc.modlet.ObjectFactory objectFactory = new org.jomc.modlet.ObjectFactory();
+                final JAXBContext jaxbContext = context.createContext( model.getIdentifier() );
+                final List<Transformer> transformers =
+                    this.findTransformers( context, this.getTransformerLocation() );
+                processed = new Model( model );
+
+                if ( transformers != null )
+                {
+                    for ( Transformer t : transformers )
+                    {
+                        final JAXBElement<Model> e = objectFactory.createModel( processed );
+                        final JAXBSource source = new JAXBSource( jaxbContext, e );
+                        final JAXBResult result = new JAXBResult( jaxbContext );
+                        t.transform( source, result );
+                        processed = ( (JAXBElement<Model>) result.getResult() ).getValue();
+                    }
+                }
+            }
+            else if ( context.isLoggable( Level.FINE ) )
+            {
+                context.log( Level.FINE, getMessage( "disabled", this.getClass().getName(),
+                                                     model.getIdentifier() ), null );
+
             }
 
             return processed;
@@ -310,11 +401,10 @@ public class DefaultModelProcessor implements ModelProcessor
         }
     }
 
-    private String getMessage( final String key, final Object args )
+    private String getMessage( final String key, final Object... args )
     {
-        return new MessageFormat(
-            ResourceBundle.getBundle( DefaultModelProcessor.class.getName().replace( '.', '/' ), Locale.getDefault() ).
-            getString( key ) ).format( args );
+        return MessageFormat.format( ResourceBundle.getBundle(
+            DefaultModelProcessor.class.getName().replace( '.', '/' ), Locale.getDefault() ).getString( key ), args );
 
     }
 

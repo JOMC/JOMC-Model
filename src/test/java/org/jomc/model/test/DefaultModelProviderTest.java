@@ -32,9 +32,16 @@
  */
 package org.jomc.model.test;
 
-import junit.framework.Assert;
+import org.jomc.modlet.Model;
+import org.jomc.model.Modules;
 import org.jomc.model.DefaultModelProvider;
-import org.jomc.model.ModelContext;
+import org.jomc.modlet.ModelContext;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertNull;
+import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
 
 /**
  * Test cases for class {@code org.jomc.model.DefaultModelProcessor}.
@@ -42,7 +49,7 @@ import org.jomc.model.ModelContext;
  * @author <a href="mailto:schulte2005@users.sourceforge.net">Christian Schulte</a> 1.0
  * @version $Id$
  */
-public class DefaultModelProviderTest extends ModelProviderTest
+public class DefaultModelProviderTest
 {
 
     private DefaultModelProvider defaultModelProvider;
@@ -54,11 +61,10 @@ public class DefaultModelProviderTest extends ModelProviderTest
 
     public DefaultModelProviderTest( final DefaultModelProvider defaultModelProvider )
     {
-        super( defaultModelProvider );
+        super();
         this.defaultModelProvider = defaultModelProvider;
     }
 
-    @Override
     public DefaultModelProvider getModelProvider()
     {
         if ( this.defaultModelProvider == null )
@@ -69,82 +75,149 @@ public class DefaultModelProviderTest extends ModelProviderTest
         return this.defaultModelProvider;
     }
 
-    @Override
     public void testFindModules() throws Exception
     {
-        super.testFindModules();
-
         final ModelContext context = ModelContext.createModelContext( this.getClass().getClassLoader() );
 
         try
         {
-            this.getModelProvider().findModules( context, null );
-            Assert.fail( "Expected NullPointerException not thrown." );
+            this.getModelProvider().findModules( null, null, null );
+            fail( "Expected NullPointerException not thrown." );
         }
         catch ( final NullPointerException e )
         {
-            Assert.assertNotNull( e.getMessage() );
+            assertNotNull( e.getMessage() );
             System.out.println( e );
         }
 
         try
         {
-            this.getModelProvider().findModules( null, "" );
-            Assert.fail( "Expected NullPointerException not thrown." );
+            this.getModelProvider().findModules( context, null, null );
+            fail( "Expected NullPointerException not thrown." );
         }
         catch ( final NullPointerException e )
         {
-            Assert.assertNotNull( e.getMessage() );
+            assertNotNull( e.getMessage() );
+            System.out.println( e );
+        }
+
+        try
+        {
+            this.getModelProvider().findModules( context, "TEST", null );
+            fail( "Expected NullPointerException not thrown." );
+        }
+        catch ( final NullPointerException e )
+        {
+            assertNotNull( e.getMessage() );
             System.out.println( e );
         }
 
         DefaultModelProvider.setDefaultModuleLocation( null );
         this.getModelProvider().setModuleLocation( null );
-        Assert.assertEquals( 1, this.getModelProvider().findModules( context ).getModule().size() );
-        Assert.assertEquals( 1, this.getModelProvider().findModules(
-            context, DefaultModelProvider.getDefaultModuleLocation() ).getModule().size() );
+        assertEquals( 1, this.getModelProvider().findModules(
+            context, Modules.MODEL_PUBLIC_ID, DefaultModelProvider.getDefaultModuleLocation() ).getModule().size() );
 
-        Assert.assertEquals( 1, this.getModelProvider().findModules(
-            context, this.getModelProvider().getModuleLocation() ).getModule().size() );
+        assertEquals( 1, this.getModelProvider().findModules(
+            context, Modules.MODEL_PUBLIC_ID, this.getModelProvider().getModuleLocation() ).getModule().size() );
 
         DefaultModelProvider.setDefaultModuleLocation( "DOES_NOT_EXIST" );
         this.getModelProvider().setModuleLocation( "DOES_NOT_EXIST" );
 
-        Assert.assertNull( this.getModelProvider().findModules( context ) );
-        Assert.assertNull( this.getModelProvider().findModules(
-            context, DefaultModelProvider.getDefaultModuleLocation() ) );
+        assertNull( this.getModelProvider().findModules(
+            context, Modules.MODEL_PUBLIC_ID, DefaultModelProvider.getDefaultModuleLocation() ) );
 
-        Assert.assertNull( this.getModelProvider().findModules(
-            context, this.getModelProvider().getModuleLocation() ) );
+        assertNull( this.getModelProvider().findModules(
+            context, Modules.MODEL_PUBLIC_ID, this.getModelProvider().getModuleLocation() ) );
 
         DefaultModelProvider.setDefaultModuleLocation( null );
         this.getModelProvider().setModuleLocation( null );
     }
 
-    public void testGetDefaultModuleLocation() throws Exception
+    public void testFindModel() throws Exception
     {
-        Assert.assertNotNull( DefaultModelProvider.getDefaultModuleLocation() );
-        System.setProperty( "org.jomc.model.DefaultModelProvider.defaultModuleLocation", "TEST" );
-        DefaultModelProvider.setDefaultModuleLocation( null );
-        Assert.assertEquals( "TEST", DefaultModelProvider.getDefaultModuleLocation() );
-        System.clearProperty( "org.jomc.model.DefaultModelProvider.defaultModuleLocation" );
-        DefaultModelProvider.setDefaultModuleLocation( null );
+        final ModelContext context = ModelContext.createModelContext( this.getClass().getClassLoader() );
+        final Model model = new Model();
+        model.setIdentifier( Modules.MODEL_PUBLIC_ID );
+
+        try
+        {
+            this.getModelProvider().findModel( null, model );
+            fail( "Expected NullPointerException not thrown." );
+        }
+        catch ( final NullPointerException e )
+        {
+            assertNotNull( e.getMessage() );
+            System.out.println( e.toString() );
+        }
+
+        try
+        {
+            this.getModelProvider().findModel( context, null );
+            fail( "Expected NullPointerException not thrown." );
+        }
+        catch ( final NullPointerException e )
+        {
+            assertNotNull( e.getMessage() );
+            System.out.println( e.toString() );
+        }
+
+        assertNotNull( this.getModelProvider().findModel( context, model ) );
     }
 
-    public void testGetModuleLocation() throws Exception
+    public void testDefaultEnabled() throws Exception
     {
-        final DefaultModelProvider provider = this.getModelProvider();
+        assertTrue( DefaultModelProvider.isDefaultEnabled() );
+        System.setProperty( "org.jomc.model.DefaultModelProvider.defaultEnabled", Boolean.toString( false ) );
+        DefaultModelProvider.setDefaultEnabled( null );
+        assertFalse( DefaultModelProvider.isDefaultEnabled() );
+        System.clearProperty( "org.jomc.model.DefaultModelProvider.defaultEnabled" );
+        DefaultModelProvider.setDefaultEnabled( null );
+    }
 
+    public void testEnabled() throws Exception
+    {
+        final Model model = new Model();
+        model.setIdentifier( Modules.MODEL_PUBLIC_ID );
+
+        DefaultModelProvider.setDefaultEnabled( null );
+        this.getModelProvider().setEnabled( null );
+        assertTrue( this.getModelProvider().isEnabled() );
+
+        this.getModelProvider().findModel( ModelContext.createModelContext( this.getClass().getClassLoader() ), model );
+
+        DefaultModelProvider.setDefaultEnabled( false );
+        this.getModelProvider().setEnabled( null );
+        assertFalse( this.getModelProvider().isEnabled() );
+
+        this.getModelProvider().findModel( ModelContext.createModelContext( this.getClass().getClassLoader() ), model );
+
+        DefaultModelProvider.setDefaultEnabled( null );
+        this.getModelProvider().setEnabled( null );
+    }
+
+    public void testDefaultModuleLocation() throws Exception
+    {
+        assertNotNull( DefaultModelProvider.getDefaultModuleLocation() );
+        System.setProperty( "org.jomc.model.DefaultModelProvider.defaultModuleLocation", "TEST" );
         DefaultModelProvider.setDefaultModuleLocation( null );
-        provider.setModuleLocation( null );
-        Assert.assertNotNull( provider.getModuleLocation() );
+        assertEquals( "TEST", DefaultModelProvider.getDefaultModuleLocation() );
+        System.clearProperty( "org.jomc.model.DefaultModelProvider.defaultModuleLocation" );
+        DefaultModelProvider.setDefaultModuleLocation( null );
+        assertNotNull( DefaultModelProvider.getDefaultModuleLocation() );
+    }
+
+    public void testModuleLocation() throws Exception
+    {
+        DefaultModelProvider.setDefaultModuleLocation( null );
+        this.getModelProvider().setModuleLocation( null );
+        assertNotNull( this.getModelProvider().getModuleLocation() );
 
         DefaultModelProvider.setDefaultModuleLocation( "TEST" );
-        provider.setModuleLocation( null );
-        Assert.assertEquals( "TEST", provider.getModuleLocation() );
+        this.getModelProvider().setModuleLocation( null );
+        assertEquals( "TEST", this.getModelProvider().getModuleLocation() );
 
         DefaultModelProvider.setDefaultModuleLocation( null );
-        provider.setModuleLocation( null );
+        this.getModelProvider().setModuleLocation( null );
     }
 
 }

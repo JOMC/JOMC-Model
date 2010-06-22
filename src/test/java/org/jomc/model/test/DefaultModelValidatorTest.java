@@ -33,52 +33,83 @@
 package org.jomc.model.test;
 
 import java.util.List;
+import java.util.logging.Level;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.util.JAXBSource;
-import junit.framework.Assert;
 import org.jomc.model.DefaultModelValidator;
-import org.jomc.model.ModelContext;
-import org.jomc.model.ModelException;
+import org.jomc.model.PropertyException;
 import org.jomc.model.ModelObject;
-import org.jomc.model.ModelValidationReport;
-import org.jomc.model.ModelValidator;
 import org.jomc.model.Modules;
+import org.jomc.modlet.Model;
+import org.jomc.modlet.ModelContext;
+import org.jomc.modlet.ModelValidationReport;
+import org.jomc.modlet.ModelException;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
 
 /**
- * Test cases for class {@code org.jomc.model.ModelValidator} implementations.
+ * Test cases for class {@code org.jomc.model.DefaultModelValidator} implementations.
  *
  * @author <a href="mailto:schulte2005@users.sourceforge.net">Christian Schulte</a> 1.0
  * @version $Id$
  */
-public class ModelValidatorTest
+public class DefaultModelValidatorTest
 {
 
-    private ModelValidator modelValidator;
+    private DefaultModelValidator defaultModelValidator;
 
     private TestSuite testSuite;
 
-    public ModelValidatorTest()
+    private ModelContext modelContext;
+
+    public DefaultModelValidatorTest()
     {
         this( null, null );
     }
 
-    public ModelValidatorTest( final ModelValidator modelValidator, final TestSuite testSuite )
+    public DefaultModelValidatorTest( final DefaultModelValidator defaultModelValidator, final TestSuite testSuite )
     {
         super();
-        this.modelValidator = modelValidator;
+        this.defaultModelValidator = defaultModelValidator;
         this.testSuite = testSuite;
     }
 
-    public ModelValidator getModelValidator() throws ModelException
+    public DefaultModelValidator getModelValidator() throws PropertyException
     {
-        if ( this.modelValidator == null )
+        if ( this.defaultModelValidator == null )
         {
-            this.modelValidator = new DefaultModelValidator();
+            this.defaultModelValidator = new DefaultModelValidator();
         }
 
-        return this.modelValidator;
+        return this.defaultModelValidator;
+    }
+
+    public ModelContext getModelContext() throws ModelException
+    {
+        if ( this.modelContext == null )
+        {
+            this.modelContext = ModelContext.createModelContext( this.getClass().getClassLoader() );
+            this.modelContext.getListeners().add( new ModelContext.Listener()
+            {
+
+                @Override
+                public void onLog( final Level level, String message, Throwable t )
+                {
+                    System.out.println( "[" + level.getLocalizedName() + "] " + message );
+                    if ( t != null )
+                    {
+                        t.printStackTrace( System.out );
+                    }
+                }
+
+            } );
+        }
+
+        return this.modelContext;
     }
 
     public TestSuite getTestSuite() throws ModelException
@@ -87,9 +118,9 @@ public class ModelValidatorTest
         {
             if ( this.testSuite == null )
             {
-                final ModelContext context = ModelContext.createModelContext( this.getClass().getClassLoader() );
-                final JAXBElement<TestSuite> e = (JAXBElement<TestSuite>) context.createUnmarshaller().unmarshal(
-                    this.getClass().getResource( "testsuite.xml" ) );
+                final JAXBElement<TestSuite> e =
+                    (JAXBElement<TestSuite>) this.getModelContext().createUnmarshaller( Modules.MODEL_PUBLIC_ID ).
+                    unmarshal( this.getClass().getResource( "testsuite.xml" ) );
 
                 this.testSuite = e.getValue();
             }
@@ -113,39 +144,38 @@ public class ModelValidatorTest
     {
         try
         {
-            this.getModelValidator().validateModel(
-                ModelContext.createModelContext( this.getClass().getClassLoader() ), null );
-
-            Assert.fail( "Expected NullPointerException not thrown." );
+            this.getModelValidator().validateModel( this.getModelContext(), null );
+            fail( "Expected NullPointerException not thrown." );
         }
         catch ( final NullPointerException e )
         {
-            Assert.assertNotNull( e.getMessage() );
+            assertNotNull( e.getMessage() );
             System.out.println( e.toString() );
         }
 
         try
         {
-            this.getModelValidator().validateModel( null, new Modules() );
-            Assert.fail( "Expected NullPointerException not thrown." );
+            this.getModelValidator().validateModel( null, new Model() );
+            fail( "Expected NullPointerException not thrown." );
         }
         catch ( final NullPointerException e )
         {
-            Assert.assertNotNull( e.getMessage() );
+            assertNotNull( e.getMessage() );
             System.out.println( e.toString() );
         }
     }
 
     public void testLegalArguments() throws Exception
     {
-        final ModelContext context = ModelContext.createModelContext( this.getClass().getClassLoader() );
-        Assert.assertNotNull( this.getModelValidator().validateModel( context, new Modules() ) );
+        assertNotNull( this.getModelValidator().validateModel(
+            this.getModelContext(), this.getModelContext().findModel( Modules.MODEL_PUBLIC_ID ) ) );
+
     }
 
     public void testSchemaConstraints() throws Exception
     {
-        final ModelContext context = ModelContext.createModelContext( this.getClass().getClassLoader() );
-        final JAXBContext jaxbContext = context.createContext();
+        final ModelContext context = this.getModelContext();
+        final JAXBContext jaxbContext = context.createContext( Modules.MODEL_PUBLIC_ID );
 
         for ( SchemaConstraintsTest test : this.getTestSuite().getSchemaConstraintsTest() )
         {
@@ -155,26 +185,28 @@ public class ModelValidatorTest
                 (JAXBElement<? extends ModelObject>) test.getModelObject().getAny();
 
             final JAXBSource source = new JAXBSource( jaxbContext, modelObject );
-            final ModelValidationReport report = context.validateModel( source );
+            final ModelValidationReport report = context.validateModel( Modules.MODEL_PUBLIC_ID, source );
 
             log( report );
 
-            Assert.assertEquals( "[" + test.getIdentifier() + "]",
-                                 test.getModelObject().isValid(), report.isModelValid() );
-
+            assertEquals( "[" + test.getIdentifier() + "]", test.getModelObject().isValid(), report.isModelValid() );
         }
     }
 
     public void testModulesConstraints() throws Exception
     {
-        final ModelContext context = ModelContext.createModelContext( this.getClass().getClassLoader() );
+        final ModelContext context = this.getModelContext();
 
         for ( ModulesConstraintsTest test : this.getTestSuite().getModulesConstraintsTest() )
         {
             System.out.println( "ModulesConstraintsTest: " + test.getIdentifier() );
 
             final JAXBElement<Modules> modules = (JAXBElement<Modules>) test.getModules().getAny();
-            final ModelValidationReport report = this.getModelValidator().validateModel( context, modules.getValue() );
+            final Model model = new Model();
+            model.setIdentifier( Modules.MODEL_PUBLIC_ID );
+            model.getAny().add( modules );
+
+            final ModelValidationReport report = this.getModelValidator().validateModel( context, model );
 
             log( report );
 
@@ -182,14 +214,14 @@ public class ModelValidatorTest
             {
                 if ( !report.isModelValid() )
                 {
-                    Assert.fail( "[" + test.getIdentifier() + "] Unexpected invalid model object." );
+                    fail( "[" + test.getIdentifier() + "] Unexpected invalid model object." );
                 }
             }
             else
             {
                 if ( report.isModelValid() )
                 {
-                    Assert.fail( "[" + test.getIdentifier() + "] Unexpected valid model object." );
+                    fail( "[" + test.getIdentifier() + "] Unexpected valid model object." );
                 }
 
                 for ( ModelValidationReportDetail expectedDetail : test.getDetail() )
@@ -197,9 +229,9 @@ public class ModelValidatorTest
                     final List<ModelValidationReport.Detail> reportedDetails =
                         report.getDetails( expectedDetail.getIdentifier() );
 
-                    Assert.assertTrue( "[" + test.getIdentifier() + "] Expected " + expectedDetail.getCount() + " "
-                                       + expectedDetail.getIdentifier() + " details but got " + reportedDetails.size()
-                                       + ".", expectedDetail.getCount() == reportedDetails.size() );
+                    assertTrue( "[" + test.getIdentifier() + "] Expected " + expectedDetail.getCount() + " "
+                                + expectedDetail.getIdentifier() + " details but got " + reportedDetails.size()
+                                + ".", expectedDetail.getCount() == reportedDetails.size() );
 
                     report.getDetails().removeAll( reportedDetails );
                 }
@@ -208,7 +240,7 @@ public class ModelValidatorTest
                 {
                     for ( ModelValidationReport.Detail d : report.getDetails() )
                     {
-                        Assert.fail( "[" + test.getIdentifier() + "] Unexpected " + d.getIdentifier() + " detail." );
+                        fail( "[" + test.getIdentifier() + "] Unexpected " + d.getIdentifier() + " detail." );
                     }
                 }
             }

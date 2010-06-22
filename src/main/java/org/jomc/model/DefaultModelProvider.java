@@ -41,13 +41,17 @@ import java.util.logging.Level;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import org.jomc.modlet.Model;
+import org.jomc.modlet.ModelContext;
+import org.jomc.modlet.ModelProvider;
+import org.jomc.modlet.ModelException;
 
 /**
- * Default {@code ModelProvider} implementation.
+ * Default object management and configuration {@code ModelProvider} implementation.
  *
  * @author <a href="mailto:schulte2005@users.sourceforge.net">Christian Schulte</a>
  * @version $Id$
- * @see ModelContext#findModules()
+ * @see ModelContext#findModel(java.lang.String)
  */
 public class DefaultModelProvider implements ModelProvider
 {
@@ -64,10 +68,80 @@ public class DefaultModelProvider implements ModelProvider
     /** Module location of the instance. */
     private String moduleLocation;
 
+    /** Flag indicating the provider is enabled by default. */
+    private static volatile Boolean defaultEnabled;
+
+    /** Flag indicating the provider is enabled. */
+    private Boolean enabled;
+
     /** Creates a new {@code DefaultModelProvider} instance. */
     public DefaultModelProvider()
     {
         super();
+    }
+
+    /**
+     * Gets a flag indicating the provider is enabled by default.
+     * <p>The default enabled flag is controlled by system property
+     * {@code org.jomc.model.DefaultModelProvider.defaultEnabled} holding a value indicating the provider is enabled
+     * by default. If that property is not set, the {@code true} default is returned.</p>
+     *
+     * @return {@code true} if the provider is enabled by default; {@code false} if the provider is disabled by default.
+     *
+     * @see #setDefaultEnabled(java.lang.Boolean)
+     */
+    public static boolean isDefaultEnabled()
+    {
+        if ( defaultEnabled == null )
+        {
+            defaultEnabled = Boolean.valueOf( System.getProperty(
+                "org.jomc.model.DefaultModelProvider.defaultEnabled", Boolean.toString( true ) ) );
+
+        }
+
+        return defaultEnabled;
+    }
+
+    /**
+     * Sets the flag indicating the provider is enabled by default.
+     *
+     * @param value The new value of the flag indicating the provider is enabled by default or {@code null}.
+     *
+     * @see #isDefaultEnabled()
+     */
+    public static void setDefaultEnabled( final Boolean value )
+    {
+        defaultEnabled = value;
+    }
+
+    /**
+     * Gets a flag indicating the provider is enabled.
+     *
+     * @return {@code true} if the provider is enabled; {@code false} if the provider is disabled.
+     *
+     * @see #isDefaultEnabled()
+     * @see #setEnabled(java.lang.Boolean)
+     */
+    public boolean isEnabled()
+    {
+        if ( this.enabled == null )
+        {
+            this.enabled = isDefaultEnabled();
+        }
+
+        return this.enabled;
+    }
+
+    /**
+     * Sets the flag indicating the provider is enabled.
+     *
+     * @param value The new value of the flag indicating the provider is enabled or {@code null}.
+     *
+     * @see #isEnabled()
+     */
+    public void setEnabled( final Boolean value )
+    {
+        this.enabled = value;
     }
 
     /**
@@ -138,18 +212,24 @@ public class DefaultModelProvider implements ModelProvider
      * Searches a given context for modules.
      *
      * @param context The context to search for modules.
+     * @param model The identifier of the model to search for modules.
      * @param location The location to search at.
      *
-     * @return The modules found at {@code location} in {@code context} or {@code null} of no modules are found.
+     * @return The modules found at {@code location} in {@code context} or {@code null} if no modules are found.
      *
-     * @throws NullPointerException if {@code context} or {@code location} is {@code null}.
+     * @throws NullPointerException if {@code context}, {@code model} or {@code location} is {@code null}.
      * @throws ModelException if searching the context fails.
      */
-    public Modules findModules( final ModelContext context, final String location ) throws ModelException
+    public Modules findModules( final ModelContext context, final String model, final String location )
+        throws ModelException
     {
         if ( context == null )
         {
             throw new NullPointerException( "context" );
+        }
+        if ( model == null )
+        {
+            throw new NullPointerException( "model" );
         }
         if ( location == null )
         {
@@ -161,17 +241,14 @@ public class DefaultModelProvider implements ModelProvider
             final long t0 = System.currentTimeMillis();
             final Text text = new Text();
             text.setLanguage( "en" );
-            text.setValue( this.getMessage( "contextModulesInfo", new Object[]
-                {
-                    location
-                } ) );
+            text.setValue( getMessage( "contextModulesInfo", location ) );
 
             final Modules modules = new Modules();
             modules.setDocumentation( new Texts() );
             modules.getDocumentation().setDefaultLanguage( "en" );
             modules.getDocumentation().getText().add( text );
 
-            final Unmarshaller u = context.createUnmarshaller();
+            final Unmarshaller u = context.createUnmarshaller( model );
             final Enumeration<URL> resources = context.findResources( location );
 
             int count = 0;
@@ -182,10 +259,8 @@ public class DefaultModelProvider implements ModelProvider
 
                 if ( context.isLoggable( Level.FINE ) )
                 {
-                    context.log( Level.FINE, this.getMessage( "processing", new Object[]
-                        {
-                            url.toExternalForm()
-                        } ), null );
+                    context.log( Level.FINE, getMessage( "processing", this.getClass().getName(),
+                                                         url.toExternalForm() ), null );
 
                 }
 
@@ -200,10 +275,8 @@ public class DefaultModelProvider implements ModelProvider
                     final Module m = (Module) content;
                     if ( context.isLoggable( Level.CONFIG ) )
                     {
-                        context.log( Level.CONFIG, this.getMessage( "foundModule", new Object[]
-                            {
-                                m.getName(), m.getVersion() == null ? "" : m.getVersion()
-                            } ), null );
+                        context.log( Level.CONFIG, getMessage( "foundModule", this.getClass().getName(), m.getName(),
+                                                               m.getVersion() == null ? "" : m.getVersion() ), null );
 
                     }
 
@@ -211,20 +284,18 @@ public class DefaultModelProvider implements ModelProvider
                 }
                 else if ( context.isLoggable( Level.WARNING ) )
                 {
-                    context.log( Level.WARNING, this.getMessage( "ignoringDocument", new Object[]
-                        {
-                            content == null ? "<>" : content.toString(), url.toExternalForm()
-                        } ), null );
+                    context.log( Level.WARNING, getMessage( "ignoringDocument", this.getClass().getName(),
+                                                            content == null
+                                                            ? "<>"
+                                                            : content.toString(), url.toExternalForm() ), null );
 
                 }
             }
 
             if ( context.isLoggable( Level.FINE ) )
             {
-                context.log( Level.FINE, this.getMessage( "contextReport", new Object[]
-                    {
-                        count, location, Long.valueOf( System.currentTimeMillis() - t0 )
-                    } ), null );
+                context.log( Level.FINE, getMessage( "contextReport", this.getClass().getName(), count, location,
+                                                     Long.valueOf( System.currentTimeMillis() - t0 ) ), null );
 
             }
 
@@ -246,24 +317,61 @@ public class DefaultModelProvider implements ModelProvider
     /**
      * {@inheritDoc}
      *
+     * @see #isEnabled()
      * @see #getModuleLocation()
-     * @see #findModules(org.jomc.model.ModelContext, java.lang.String)
+     * @see #findModules(org.jomc.modlet.ModelContext, java.lang.String, java.lang.String)
      */
-    public Modules findModules( final ModelContext context ) throws ModelException
+    public Model findModel( final ModelContext context, final Model model ) throws ModelException
     {
         if ( context == null )
         {
             throw new NullPointerException( "context" );
         }
+        if ( model == null )
+        {
+            throw new NullPointerException( "model" );
+        }
 
-        return this.findModules( context, this.getModuleLocation() );
+        if ( this.isEnabled() )
+        {
+            if ( context.isLoggable( Level.FINE ) )
+            {
+                context.log( Level.FINE, getMessage( "providingModel", this.getClass().getName(),
+                                                     model.getIdentifier() ), null );
+
+            }
+
+            final Modules found = this.findModules( context, model.getIdentifier(), this.getModuleLocation() );
+
+            if ( found != null )
+            {
+                final Model copy = new Model( model );
+                JAXBElement<Modules> modules = copy.getAnyElement( Modules.MODEL_PUBLIC_ID, "modules" );
+
+                if ( modules != null )
+                {
+                    modules.getValue().getModule().addAll( found.getModule() );
+                }
+                else
+                {
+                    copy.getAny().add( new ObjectFactory().createModules( found ) );
+                }
+
+                return copy;
+            }
+        }
+        else if ( context.isLoggable( Level.FINE ) )
+        {
+            context.log( Level.FINE, getMessage( "disabled", this.getClass().getName(), model.getIdentifier() ), null );
+        }
+
+        return null;
     }
 
-    private String getMessage( final String key, final Object args )
+    private static String getMessage( final String key, final Object... args )
     {
-        return new MessageFormat(
-            ResourceBundle.getBundle( DefaultModelProvider.class.getName().replace( '.', '/' ), Locale.getDefault() ).
-            getString( key ) ).format( args );
+        return MessageFormat.format( ResourceBundle.getBundle(
+            DefaultModelProvider.class.getName().replace( '.', '/' ), Locale.getDefault() ).getString( key ), args );
 
     }
 

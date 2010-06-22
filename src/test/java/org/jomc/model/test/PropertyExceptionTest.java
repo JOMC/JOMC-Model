@@ -30,32 +30,36 @@
  *   $Id$
  *
  */
-package org.jomc.model;
+package org.jomc.model.test;
+
+import java.io.ObjectInputStream;
+import org.jomc.model.PropertyException;
+import static junit.framework.Assert.assertEquals;
 
 /**
- * Object management and configuration model validator interface.
+ * Test cases for class {@code org.jomc.model.PropertyException}.
  *
- * @author <a href="mailto:schulte2005@users.sourceforge.net">Christian Schulte</a>
+ * @author <a href="mailto:schulte2005@users.sourceforge.net">Christian Schulte</a> 1.0
  * @version $Id$
- * @see ModelContext#validateModel(org.jomc.model.Modules)
  */
-public interface ModelValidator
+public class PropertyExceptionTest
 {
 
-    /**
-     * Validates a given list of modules.
-     *
-     * @param context The context to use for validating {@code modules}.
-     * @param modules The list of modules to validate.
-     *
-     * @return Validation report.
-     *
-     * @throws NullPointerException if {@code context} or {@code modules} is {@code null}.
-     * @throws ModelException if validation fails.
-     *
-     * @see ModelValidationReport#isModelValid()
-     */
-    ModelValidationReport validateModel( ModelContext context, Modules modules )
-        throws NullPointerException, ModelException;
+    public PropertyExceptionTest()
+    {
+        super();
+    }
+
+    public void testSerializabe() throws Exception
+    {
+        final ObjectInputStream objectStream =
+            new ObjectInputStream( this.getClass().getResourceAsStream( "PropertyException.ser" ) );
+
+        final PropertyException e = (PropertyException) objectStream.readObject();
+        objectStream.close();
+
+        assertEquals( "PropertyException", e.getMessage() );
+        System.out.println( e );
+    }
 
 }

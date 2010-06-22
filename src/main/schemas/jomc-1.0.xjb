@@ -1277,9 +1277,9 @@
      *
      * @return The Java value of the property or {@code null}.
      *
-     * @throws ModelException if getting the Java value of the property fails.
+     * @throws PropertyException if getting the Java value of the property fails unexpectedly.
      */
-    public Object getJavaValue( final ClassLoader classLoader ) throws ModelException
+    public Object getJavaValue( final ClassLoader classLoader ) throws PropertyException
     {
         try
         {
@@ -1287,7 +1287,7 @@
             {
                 if ( this.getType() == null )
                 {
-                    throw new ModelException( getMessage( "mandatoryType", this.getName() ) );
+                    throw new PropertyException( getMessage( "mandatoryType", this.getName() ) );
                 }
 
                 String typeName = this.getType();
@@ -1364,19 +1364,19 @@
 
             if ( this.getValue() == null && primitive )
             {
-                throw new ModelException( getMessage( "mandatoryPrimitiveValue", this.getName(), this.getType() ) );
+                throw new PropertyException( getMessage( "mandatoryPrimitiveValue", this.getName(), this.getType() ) );
             }
 
             return this.getJavaValue( javaType, this.getValue() );
         }
         catch ( final ClassNotFoundException e )
         {
-            throw new ModelException( getMessage( "classNotFound", this.getName(), this.getType() ), e );
+            throw new PropertyException( getMessage( "classNotFound", this.getName(), this.getType() ), e );
         }
     }
 
     private Object getJavaValue( final ClassLoader classLoader, final Object any, final Class<?> returnType )
-        throws ModelException
+        throws PropertyException
     {
         if ( any != null )
         {
@@ -1389,9 +1389,9 @@
 
                 if ( result != null && !returnType.isAssignableFrom( result.getClass() ) )
                 {
-                    throw new ModelException( getMessage( "illegalMethodInvocationResult", methodName,
-                                                          any.getClass().getName(), result.getClass().getName(),
-                                                          returnType.getName() ) );
+                    throw new PropertyException( getMessage( "illegalMethodInvocationResult", methodName,
+                                                             any.getClass().getName(), result.getClass().getName(),
+                                                             returnType.getName() ) );
 
                 }
 
@@ -1399,7 +1399,9 @@
             }
             catch ( final IllegalAccessException e )
             {
-                throw new ModelException( getMessage( "methodAccessDenied", methodName, any.getClass().getName() ), e );
+                throw new PropertyException( getMessage( "methodAccessDenied", methodName,
+                                                         any.getClass().getName() ), e );
+
             }
             catch ( final IllegalArgumentException e )
             {
@@ -1407,13 +1409,15 @@
             }
             catch ( final InvocationTargetException e )
             {
-                throw new ModelException( getMessage( "methodInvocationFailure", methodName,
-                                                      any.getClass().getName() ), e );
+                throw new PropertyException( getMessage( "methodInvocationFailure", methodName,
+                                                         any.getClass().getName() ), e );
 
             }
             catch ( final SecurityException e )
             {
-                throw new ModelException( getMessage( "methodAccessDenied", methodName, any.getClass().getName() ), e );
+                throw new PropertyException( getMessage( "methodAccessDenied", methodName,
+                                                         any.getClass().getName() ), e );
+
             }
             catch ( final NoSuchMethodException e )
             {
@@ -1424,7 +1428,7 @@
         return any;
     }
 
-    private Object getJavaValue( final Class<?> type, final String value ) throws ModelException
+    private Object getJavaValue( final Class<?> type, final String value ) throws PropertyException
     {
         if ( value != null )
         {
@@ -1434,7 +1438,7 @@
                 {
                     if ( value.length() != 1 )
                     {
-                        throw new ModelException( getMessage( "illegalValue", value, Character.class.getName() ) );
+                        throw new PropertyException( getMessage( "illegalValue", value, Character.class.getName() ) );
                     }
 
                     return type.getConstructor( new Class[]
@@ -1461,11 +1465,11 @@
             }
             catch ( final InstantiationException e )
             {
-                throw new ModelException( getMessage( "instantiationException", type.getName() ), e );
+                throw new PropertyException( getMessage( "instantiationException", type.getName() ), e );
             }
             catch ( final IllegalAccessException e )
             {
-                throw new ModelException( getMessage( "constructorAccessDenied", type.getName() ), e );
+                throw new PropertyException( getMessage( "constructorAccessDenied", type.getName() ), e );
             }
             catch ( final IllegalArgumentException e )
             {
@@ -1473,11 +1477,11 @@
             }
             catch ( final InvocationTargetException e )
             {
-                throw new ModelException( getMessage( "constructorInvocationFailure", type.getName() ), e );
+                throw new PropertyException( getMessage( "constructorInvocationFailure", type.getName() ), e );
             }
             catch ( final NoSuchMethodException e )
             {
-                throw new ModelException( getMessage( "constructorNotFound", type.getName() ), e );
+                throw new PropertyException( getMessage( "constructorNotFound", type.getName() ), e );
             }
         }
 
@@ -2177,6 +2181,8 @@
     <!-- *********************************************************************************************************** -->
     <jaxb:bindings node="xs:complexType[@name='Modules']">
       <ci:code><![CDATA[
+    /** Public identifier of the object management and configuration model. */
+    public static final String MODEL_PUBLIC_ID = "http://jomc.org/model";
 
     /**
      * Constant for the default name of the classpath module.
@@ -3030,12 +3036,22 @@
     /**
      * Merges this list of modules to a single module.
      *
+     * @param name The name of the module to return.
+     *
      * @return A module holding all model objects from the list.
+     *
+     * @throws NullPointerException if {@code name} is {@code null}.
      */
-    public Module getMergedModule()
+    public Module getMergedModule( final String name )
     {
+        if ( name == null )
+        {
+            throw new NullPointerException( "name" );
+        }
+
         final Modules copy = this.clone();
         final Module mergedModule = new Module();
+        mergedModule.setName( name );
 
         for ( Module m : copy.getModule() )
         {

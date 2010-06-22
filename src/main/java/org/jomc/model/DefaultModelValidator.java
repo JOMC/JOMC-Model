@@ -43,16 +43,22 @@ import java.util.logging.Level;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.util.JAXBSource;
+import javax.xml.transform.Source;
+import org.jomc.modlet.Model;
+import org.jomc.modlet.ModelContext;
+import org.jomc.modlet.ModelValidationReport;
+import org.jomc.modlet.ModelValidator;
+import org.jomc.modlet.ModelException;
 import org.jomc.util.ParseException;
 import org.jomc.util.TokenMgrError;
 import org.jomc.util.VersionParser;
 
 /**
- * Default {@code ModelValidator} implementation.
+ * Default object management and configuration {@code ModelValidator} implementation.
  *
  * @author <a href="mailto:schulte2005@users.sourceforge.net">Christian Schulte</a>
  * @version $Id$
- * @see ModelContext#validateModel(org.jomc.model.Modules)
+ * @see ModelContext#validateModel(org.jomc.modlet.Model)
  */
 public class DefaultModelValidator implements ModelValidator
 {
@@ -63,26 +69,40 @@ public class DefaultModelValidator implements ModelValidator
         super();
     }
 
-    public ModelValidationReport validateModel(
-        final ModelContext context, final Modules modules ) throws ModelException
+    public ModelValidationReport validateModel( final ModelContext context, final Model model ) throws ModelException
     {
         if ( context == null )
         {
             throw new NullPointerException( "context" );
         }
-        if ( modules == null )
+        if ( model == null )
         {
-            throw new NullPointerException( "modules" );
+            throw new NullPointerException( "model" );
         }
 
         try
         {
-            final ModelValidationReport report = context.validateModel(
-                new JAXBSource( context.createContext(), new ObjectFactory().createModules( modules ) ) );
+            if ( context.isLoggable( Level.FINE ) )
+            {
+                context.log( Level.FINE, getMessage( "validatingModel", new Object[]
+                    {
+                        this.getClass().getName(), model.getIdentifier()
+                    } ), null );
 
-            this.assertModulesValid( context, modules, report );
-            this.assertSpecificationsValid( context, modules, report );
-            this.assertImplementationsValid( context, modules, report );
+            }
+
+            final Source source = new JAXBSource( context.createContext( model.getIdentifier() ),
+                                                  new org.jomc.modlet.ObjectFactory().createModel( model ) );
+
+            final ModelValidationReport report = context.validateModel( model.getIdentifier(), source );
+            final JAXBElement<Modules> modules = model.getAnyElement( Modules.MODEL_PUBLIC_ID, "modules" );
+
+            if ( modules != null )
+            {
+                this.assertModulesValid( context, modules.getValue(), report );
+                this.assertSpecificationsValid( context, modules.getValue(), report );
+                this.assertImplementationsValid( context, modules.getValue(), report );
+            }
 
             return report;
         }
@@ -238,7 +258,7 @@ public class DefaultModelValidator implements ModelValidator
                     {
                         p.getJavaValue( context.getClassLoader() );
                     }
-                    catch ( final ModelException e )
+                    catch ( final PropertyException e )
                     {
                         if ( context.isLoggable( Level.FINE ) )
                         {
@@ -547,7 +567,7 @@ public class DefaultModelValidator implements ModelValidator
                         {
                             p.getJavaValue( context.getClassLoader() );
                         }
-                        catch ( final ModelException e )
+                        catch ( final PropertyException e )
                         {
                             if ( context.isLoggable( Level.FINE ) )
                             {
@@ -788,7 +808,7 @@ public class DefaultModelValidator implements ModelValidator
                         {
                             p.getJavaValue( context.getClassLoader() );
                         }
-                        catch ( final ModelException e )
+                        catch ( final PropertyException e )
                         {
                             if ( context.isLoggable( Level.FINE ) )
                             {
@@ -1011,7 +1031,7 @@ public class DefaultModelValidator implements ModelValidator
                 {
                     p.getJavaValue( context.getClassLoader() );
                 }
-                catch ( final ModelException e )
+                catch ( final PropertyException e )
                 {
                     if ( context.isLoggable( Level.FINE ) )
                     {

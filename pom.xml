@@ -56,25 +56,20 @@
           <include>jomc-1.0.xsd</include>
         </includes>
       </resource>
-      <resource>
-        <filtering>false</filtering>
-        <directory>src/main/schemas</directory>
-        <targetPath>org/jomc/model/modlet</targetPath>
-        <includes>
-          <include>jomc-modlet-1.0.xsd</include>
-        </includes>
-      </resource>
     </resources>
     <testResources>
       <testResource>
-        <filtering>false</filtering>
-        <directory>src/test/resources</directory>
-      </testResource>
-      <testResource>
         <filtering>true</filtering>
         <directory>src/test/resources</directory>
+        <excludes>
+          <exclude>**/*.ser</exclude>
+        </excludes>
+      </testResource>
+      <testResource>
+        <filtering>false</filtering>
+        <directory>src/test/resources</directory>
         <includes>
-          <include>**/jomc.xml</include>
+          <include>**/*.ser</include>
         </includes>
       </testResource>
       <testResource>
@@ -167,6 +162,11 @@
     <dependency>
       <groupId>org.jomc</groupId>
       <artifactId>jomc-util</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jomc</groupId>
+      <artifactId>jomc-modlet</artifactId>
       <scope>compile</scope>
     </dependency>
     <dependency>

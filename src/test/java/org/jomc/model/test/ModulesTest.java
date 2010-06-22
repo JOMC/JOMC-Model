@@ -32,6 +32,7 @@
  */
 package org.jomc.model.test;
 
+import java.util.logging.Level;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -44,10 +45,7 @@ import org.jomc.model.Implementations;
 import org.jomc.model.Instance;
 import org.jomc.model.Message;
 import org.jomc.model.Messages;
-import org.jomc.model.ModelContext;
-import org.jomc.model.ModelException;
 import org.jomc.model.ModelObject;
-import org.jomc.model.ModelValidationReport;
 import org.jomc.model.Modules;
 import org.jomc.model.Properties;
 import org.jomc.model.Property;
@@ -56,6 +54,10 @@ import org.jomc.model.SpecificationReference;
 import org.jomc.model.Specifications;
 import org.jomc.model.Text;
 import org.jomc.model.Texts;
+import org.jomc.modlet.Model;
+import org.jomc.modlet.ModelContext;
+import org.jomc.modlet.ModelValidationReport;
+import org.jomc.modlet.ModelException;
 
 /**
  * Test cases for class {@code org.jomc.model.Modules}.
@@ -67,6 +69,8 @@ public class ModulesTest
 {
 
     private TestSuite testSuite;
+
+    private ModelContext modelContext;
 
     public ModulesTest()
     {
@@ -86,8 +90,9 @@ public class ModulesTest
             if ( this.testSuite == null )
             {
                 final ModelContext context = ModelContext.createModelContext( this.getClass().getClassLoader() );
-                final JAXBElement<TestSuite> e = (JAXBElement<TestSuite>) context.createUnmarshaller().unmarshal(
-                    this.getClass().getResource( "testsuite.xml" ) );
+                final JAXBElement<TestSuite> e =
+                    (JAXBElement<TestSuite>) context.createUnmarshaller( Modules.MODEL_PUBLIC_ID ).
+                    unmarshal( this.getClass().getResource( "testsuite.xml" ) );
 
                 this.testSuite = e.getValue();
             }
@@ -107,17 +112,45 @@ public class ModulesTest
         }
     }
 
+    public ModelContext getModelContext() throws ModelException
+    {
+        if ( this.modelContext == null )
+        {
+            this.modelContext = ModelContext.createModelContext( this.getClass().getClassLoader() );
+            this.modelContext.getListeners().add( new ModelContext.Listener()
+            {
+
+                @Override
+                public void onLog( final Level level, String message, Throwable t )
+                {
+                    System.out.println( "[" + level.getLocalizedName() + "] " + message );
+                    if ( t != null )
+                    {
+                        t.printStackTrace( System.out );
+                    }
+                }
+
+            } );
+        }
+
+        return this.modelContext;
+    }
+
     public void testImplementations() throws Exception
     {
         final ModelContext context = ModelContext.createModelContext( this.getClass().getClassLoader() );
-        final JAXBContext jaxbContext = context.createContext();
+        final JAXBContext jaxbContext = context.createContext( Modules.MODEL_PUBLIC_ID );
 
         for ( ImplementationTest test : this.getTestSuite().getImplementationTest() )
         {
             System.out.println( "ImplementationTest: " + test.getIdentifier() );
 
             final JAXBElement<Modules> modules = (JAXBElement<Modules>) test.getModules().getAny();
-            final ModelValidationReport modulesReport = context.validateModel( modules.getValue() );
+            final Model model = new Model();
+            model.setIdentifier( Modules.MODEL_PUBLIC_ID );
+            model.getAny().add( modules );
+
+            final ModelValidationReport modulesReport = context.validateModel( model );
 
             if ( !modulesReport.isModelValid() )
             {
@@ -131,7 +164,7 @@ public class ModulesTest
                 (JAXBElement<Implementation>) test.getImplementation().getAny();
 
             final ModelValidationReport implementationReport =
-                context.validateModel( new JAXBSource( jaxbContext, expected ) );
+                context.validateModel( Modules.MODEL_PUBLIC_ID, new JAXBSource( jaxbContext, expected ) );
 
             if ( !implementationReport.isModelValid() )
             {
@@ -169,7 +202,11 @@ public class ModulesTest
             System.out.println( "InstanceTest: " + test.getIdentifier() );
 
             final JAXBElement<Modules> modules = (JAXBElement<Modules>) test.getModules().getAny();
-            ModelValidationReport validationReport = context.validateModel( modules.getValue() );
+            final Model model = new Model();
+            model.setIdentifier( Modules.MODEL_PUBLIC_ID );
+            model.getAny().add( modules );
+
+            ModelValidationReport validationReport = context.validateModel( model );
 
             if ( !validationReport.isModelValid() )
             {
@@ -180,7 +217,8 @@ public class ModulesTest
                                validationReport.isModelValid() );
 
             final JAXBElement<Instance> expected = (JAXBElement<Instance>) test.getInstance().getAny();
-            validationReport = context.validateModel( new JAXBSource( context.createContext(), expected ) );
+            validationReport = context.validateModel(
+                Modules.MODEL_PUBLIC_ID, new JAXBSource( context.createContext( Modules.MODEL_PUBLIC_ID ), expected ) );
 
             if ( !validationReport.isModelValid() )
             {
@@ -487,8 +525,8 @@ public class ModulesTest
         if ( expected != null )
         {
             Assert.assertNotNull( computed );
-            Assert.assertEquals( expected.getJavaValue( ModelValidatorTest.class.getClassLoader() ),
-                                 computed.getJavaValue( ModelValidatorTest.class.getClassLoader() ) );
+            Assert.assertEquals( expected.getJavaValue( ModulesTest.class.getClassLoader() ),
+                                 computed.getJavaValue( ModulesTest.class.getClassLoader() ) );
 
             Assert.assertEquals( expected.getName(), computed.getName() );
             Assert.assertEquals( expected.getType(), computed.getType() );

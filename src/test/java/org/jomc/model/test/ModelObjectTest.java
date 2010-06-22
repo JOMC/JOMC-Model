@@ -36,8 +36,9 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
-import junit.framework.Assert;
 import org.jomc.model.ModelObject;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.fail;
 
 /**
  * Test cases for class {@code org.jomc.model.ModelObject}.
@@ -77,11 +78,11 @@ public class ModelObjectTest
         try
         {
             modelObject.getAnyElement( any, "http://jomc.org/model", "test" );
-            Assert.fail( "Expected 'IllegalStateException' not thrown." );
+            fail( "Expected 'IllegalStateException' not thrown." );
         }
         catch ( final IllegalStateException e )
         {
-            Assert.assertNotNull( e.getMessage() );
+            assertNotNull( e.getMessage() );
             System.out.println( e );
         }
     }
@@ -96,11 +97,11 @@ public class ModelObjectTest
         try
         {
             modelObject.getAnyObject( any, String.class );
-            Assert.fail( "Expected 'IllegalStateException' not thrown." );
+            fail( "Expected 'IllegalStateException' not thrown." );
         }
         catch ( final IllegalStateException e )
         {
-            Assert.assertNotNull( e.getMessage() );
+            assertNotNull( e.getMessage() );
             System.out.println( e );
         }
     }

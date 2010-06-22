@@ -32,20 +32,19 @@
   $Id$
 
 -->
-<modlet xmlns="http://jomc.org/model/modlet"
+<modlet xmlns="http://jomc.org/modlet"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://jomc.org/model/modlet http://jomc.sourceforge.net/model/modlet/jomc-modlet-1.0.xsd"
-        identifier="${project.name}" model="http://jomc.org/model" name="${project.name}"
-        vendor="${project.organization.name}" version="${project.version}">
-          
+        xsi:schemaLocation="http://jomc.org/modlet http://jomc.sourceforge.net/modlet/jomc-modlet-1.0.xsd"
+        name="${project.name}" model="http://jomc.org/model" vendor="${project.organization.name}" version="${project.version}">
+
   <schemas>
     <schema public-id="http://jomc.org/model" system-id="http://jomc.sourceforge.net/model/jomc-1.0.xsd"
             context-id="org.jomc.model" classpath-id="org/jomc/model/jomc-1.0.xsd"/>
 
   </schemas>
   <services>
-    <service identifier="org.jomc.model.ModelProcessor" class="org.jomc.model.DefaultModelProcessor"/>
-    <service identifier="org.jomc.model.ModelProvider" class="org.jomc.model.DefaultModelProvider"/>
-    <service identifier="org.jomc.model.ModelValidator" class="org.jomc.model.DefaultModelValidator"/>
+    <service identifier="org.jomc.modlet.ModelProcessor" class="org.jomc.model.DefaultModelProcessor"/>
+    <service identifier="org.jomc.modlet.ModelProvider" class="org.jomc.model.DefaultModelProvider"/>
+    <service identifier="org.jomc.modlet.ModelValidator" class="org.jomc.model.DefaultModelValidator"/>
   </services>
 </modlet>

@@ -30,40 +30,57 @@
  *   $Id$
  *
  */
-package org.jomc.model.test;
-
-import org.jomc.model.ModelContext;
-import org.jomc.model.ModelException;
-import org.jomc.model.ModelProcessor;
-import org.jomc.model.Module;
-import org.jomc.model.Modules;
+package org.jomc.model;
 
 /**
- * {@code ModelProcessor} test implementation.
+ * Gets thrown whenever getting a {@code Property}'s value fails unexpectedly.
  *
- * @author <a href="mailto:schulte2005@users.sourceforge.net">Christian Schulte</a> 1.0
+ * @author <a href="mailto:schulte2005@users.sourceforge.net">Christian Schulte</a>
  * @version $Id$
+ *
+ * @see Property#getJavaValue(java.lang.ClassLoader)
  */
-public class TestModelProcessor implements ModelProcessor
+public class PropertyException extends Exception
 {
 
-    public TestModelProcessor()
+    /** Serial version UID for backwards compatibility with 1.0.x object streams. */
+    private static final long serialVersionUID = 399942023584965406L;
+
+    /** Creates a new {@code PropertyException} instance. */
+    public PropertyException()
     {
         super();
     }
 
-    public Modules processModules( final ModelContext context, final Modules modules ) throws ModelException
+    /**
+     * Creates a new {@code PropertyException} instance taking a message.
+     *
+     * @param message The message of the exception.
+     */
+    public PropertyException( final String message )
     {
-        if ( context == null )
-        {
-            throw new NullPointerException( "context" );
-        }
+        super( message );
+    }
 
-        final Modules processed = modules != null ? new Modules( modules ) : new Modules();
-        final Module module = new Module();
-        module.setName( "TestModelProcessor" );
-        processed.getModule().add( module );
-        return processed;
+    /**
+     * Creates a new {@code PropertyException} instance taking a cause.
+     *
+     * @param cause The cause of the exception.
+     */
+    public PropertyException( final Throwable cause )
+    {
+        super( cause );
+    }
+
+    /**
+     * Creates a new {@code PropertyException} instance taking a message and a cause.
+     *
+     * @param message The message of the exception.
+     * @param cause The cause of the exception.
+     */
+    public PropertyException( final String message, final Throwable cause )
+    {
+        super( message, cause );
     }
 
 }

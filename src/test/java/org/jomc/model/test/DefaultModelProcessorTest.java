@@ -32,9 +32,16 @@
  */
 package org.jomc.model.test;
 
-import junit.framework.Assert;
+import org.jomc.model.Modules;
+import org.jomc.modlet.Model;
 import org.jomc.model.DefaultModelProcessor;
-import org.jomc.model.ModelContext;
+import org.jomc.modlet.ModelContext;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertNull;
+import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
 
 /**
  * Test cases for class {@code org.jomc.model.DefaultModelProcessor}.
@@ -42,7 +49,7 @@ import org.jomc.model.ModelContext;
  * @author <a href="mailto:schulte2005@users.sourceforge.net">Christian Schulte</a> 1.0
  * @version $Id$
  */
-public class DefaultModelProcessorTest extends ModelProcessorTest
+public class DefaultModelProcessorTest
 {
 
     private DefaultModelProcessor defaultModelProcessor;
@@ -54,11 +61,10 @@ public class DefaultModelProcessorTest extends ModelProcessorTest
 
     public DefaultModelProcessorTest( final DefaultModelProcessor defaultModelProcessor )
     {
-        super( defaultModelProcessor );
+        super();
         this.defaultModelProcessor = defaultModelProcessor;
     }
 
-    @Override
     public DefaultModelProcessor getModelProcessor()
     {
         if ( this.defaultModelProcessor == null )
@@ -76,67 +82,130 @@ public class DefaultModelProcessorTest extends ModelProcessorTest
         try
         {
             this.getModelProcessor().findTransformers( context, null );
-            Assert.fail( "Expected NullPointerException not thrown." );
+            fail( "Expected NullPointerException not thrown." );
         }
         catch ( final NullPointerException e )
         {
-            Assert.assertNotNull( e.getMessage() );
+            assertNotNull( e.getMessage() );
             System.out.println( e );
         }
 
         try
         {
             this.getModelProcessor().findTransformers( null, "" );
-            Assert.fail( "Expected NullPointerException not thrown." );
+            fail( "Expected NullPointerException not thrown." );
         }
         catch ( final NullPointerException e )
         {
-            Assert.assertNotNull( e.getMessage() );
+            assertNotNull( e.getMessage() );
             System.out.println( e );
         }
 
         DefaultModelProcessor.setDefaultTransformerLocation( null );
         this.getModelProcessor().setTransformerLocation( null );
-        Assert.assertEquals( 1, this.getModelProcessor().findTransformers(
+        assertEquals( 1, this.getModelProcessor().findTransformers(
             context, DefaultModelProcessor.getDefaultTransformerLocation() ).size() );
 
         DefaultModelProcessor.setDefaultTransformerLocation( "DOES_NOT_EXIST" );
         this.getModelProcessor().setTransformerLocation( "DOES_NOT_EXIST" );
 
-        Assert.assertNull( this.getModelProcessor().findTransformers(
+        assertNull( this.getModelProcessor().findTransformers(
             context, DefaultModelProcessor.getDefaultTransformerLocation() ) );
 
-        Assert.assertNull( this.getModelProcessor().findTransformers(
+        assertNull( this.getModelProcessor().findTransformers(
             context, this.getModelProcessor().getTransformerLocation() ) );
 
         DefaultModelProcessor.setDefaultTransformerLocation( null );
         this.getModelProcessor().setTransformerLocation( null );
     }
 
-    public void testGetDefaultTransformerLocation() throws Exception
+    public void testProcessModel() throws Exception
     {
-        Assert.assertNotNull( DefaultModelProcessor.getDefaultTransformerLocation() );
-        System.setProperty( "org.jomc.model.DefaultModelProcessor.defaultTransformerLocation", "TEST" );
-        DefaultModelProcessor.setDefaultTransformerLocation( null );
-        Assert.assertEquals( "TEST", DefaultModelProcessor.getDefaultTransformerLocation() );
-        System.clearProperty( "org.jomc.model.DefaultModelProcessor.defaultTransformerLocation" );
-        DefaultModelProcessor.setDefaultTransformerLocation( null );
+        final ModelContext context = ModelContext.createModelContext( this.getClass().getClassLoader() );
+        final Model model = new Model();
+        model.setIdentifier( Modules.MODEL_PUBLIC_ID );
+
+        try
+        {
+            this.getModelProcessor().processModel( null, model );
+            fail( "Expected NullPointerException not thrown." );
+        }
+        catch ( final NullPointerException e )
+        {
+            assertNotNull( e.getMessage() );
+            System.out.println( e.toString() );
+        }
+
+        try
+        {
+            this.getModelProcessor().processModel( context, null );
+            fail( "Expected NullPointerException not thrown." );
+        }
+        catch ( final NullPointerException e )
+        {
+            assertNotNull( e.getMessage() );
+            System.out.println( e.toString() );
+        }
+
+        assertNotNull( this.getModelProcessor().processModel( context, model ) );
     }
 
-    public void testGetTransformerLocation() throws Exception
+    public void testDefaultEnabled() throws Exception
     {
-        final DefaultModelProcessor processor = this.getModelProcessor();
+        assertTrue( DefaultModelProcessor.isDefaultEnabled() );
+        System.setProperty( "org.jomc.model.DefaultModelProcessor.defaultEnabled", Boolean.toString( false ) );
+        DefaultModelProcessor.setDefaultEnabled( null );
+        assertFalse( DefaultModelProcessor.isDefaultEnabled() );
+        System.clearProperty( "org.jomc.model.DefaultModelProcessor.defaultEnabled" );
+        DefaultModelProcessor.setDefaultEnabled( null );
+    }
 
+    public void testEnabled() throws Exception
+    {
+        final Model model = new Model();
+        model.setIdentifier( Modules.MODEL_PUBLIC_ID );
+
+        DefaultModelProcessor.setDefaultEnabled( null );
+        this.getModelProcessor().setEnabled( null );
+        assertTrue( this.getModelProcessor().isEnabled() );
+
+        this.getModelProcessor().processModel(
+            ModelContext.createModelContext( this.getClass().getClassLoader() ), model );
+
+        DefaultModelProcessor.setDefaultEnabled( false );
+        this.getModelProcessor().setEnabled( null );
+        assertFalse( this.getModelProcessor().isEnabled() );
+
+        this.getModelProcessor().processModel(
+            ModelContext.createModelContext( this.getClass().getClassLoader() ), model );
+
+        DefaultModelProcessor.setDefaultEnabled( null );
+        this.getModelProcessor().setEnabled( null );
+    }
+
+    public void testDefaultTransformerLocation() throws Exception
+    {
+        assertNotNull( DefaultModelProcessor.getDefaultTransformerLocation() );
+        System.setProperty( "org.jomc.model.DefaultModelProcessor.defaultTransformerLocation", "TEST" );
         DefaultModelProcessor.setDefaultTransformerLocation( null );
-        processor.setTransformerLocation( null );
-        Assert.assertNotNull( processor.getTransformerLocation() );
+        assertEquals( "TEST", DefaultModelProcessor.getDefaultTransformerLocation() );
+        System.clearProperty( "org.jomc.model.DefaultModelProcessor.defaultTransformerLocation" );
+        DefaultModelProcessor.setDefaultTransformerLocation( null );
+        assertNotNull( DefaultModelProcessor.getDefaultTransformerLocation() );
+    }
+
+    public void testTransformerLocation() throws Exception
+    {
+        DefaultModelProcessor.setDefaultTransformerLocation( null );
+        this.getModelProcessor().setTransformerLocation( null );
+        assertNotNull( this.getModelProcessor().getTransformerLocation() );
 
         DefaultModelProcessor.setDefaultTransformerLocation( "TEST" );
-        processor.setTransformerLocation( null );
-        Assert.assertEquals( "TEST", processor.getTransformerLocation() );
+        this.getModelProcessor().setTransformerLocation( null );
+        assertEquals( "TEST", this.getModelProcessor().getTransformerLocation() );
 
         DefaultModelProcessor.setDefaultTransformerLocation( null );
-        processor.setTransformerLocation( null );
+        this.getModelProcessor().setTransformerLocation( null );
     }
 
 }
