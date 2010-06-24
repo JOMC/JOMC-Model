@@ -35,5 +35,21 @@
 <html>
   <body>
     Object management and configuration modlet classes.
+    <p>
+      The object management and configuration model is identified by the {@code http://jomc.org/model} public id in
+      a {@code ModelContext}. The {@code any} property of a {@code Model} instance searched using that public id will
+      hold a {@code JAXBElement<Modules>} instance to access using the {@code getAnyElement} method of class
+      {@code Model}.<blockquote><pre>
+final ModelContext modelContext = ModelContext.createModelContext( a class loader );
+final Model model = modelContext.findModel( Modules.MODEL_PUBLIC_ID );
+final Model processed = modelContext.processModel( model );
+final ModelValidationReport validationReport = modelContext.validateModel( processed );
+final JAXBElement&lt;Modules&gt; modules = model.getAnyElement( Modules.MODEL_PUBLIC_ID, "modules" );
+
+final Model model = new Model();
+model.setIdentifier( Modules.MODEL_PUBLIC_ID );
+model.getAny().add( new ObjectFactory().createModules( new Modules() ) );
+      </pre></blockquote>
+    </p>
   </body>
 </html>
