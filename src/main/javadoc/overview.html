@@ -42,7 +42,13 @@
       {@code Model}.<blockquote><pre>
 final ModelContext modelContext = ModelContext.createModelContext( a class loader );
 final Model model = modelContext.findModel( Modules.MODEL_PUBLIC_ID );
+final Model processed = modelContext.processModel( model );
+final ModelValidationReport validationReport = modelContext.validateModel( processed );
 final JAXBElement&lt;Modules&gt; modules = model.getAnyElement( Modules.MODEL_PUBLIC_ID, "modules" );
+
+final Model model = new Model();
+model.setIdentifier( Modules.MODEL_PUBLIC_ID );
+model.getAny().add( new ObjectFactory().createModules( new Modules() ) );
       </pre></blockquote>
     </p>
     @see org.jomc.model.Modules
