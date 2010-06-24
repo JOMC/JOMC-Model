@@ -1822,37 +1822,34 @@ public class DefaultModelValidator implements ModelValidator
                                         final Specifications specifications, final Implementations seen,
                                         final boolean includeDeclared )
     {
-        if ( implementation != null )
+        if ( implementation != null && seen.getImplementation( implementation.getIdentifier() ) == null )
         {
-            if ( seen.getImplementation( implementation.getIdentifier() ) == null )
+            seen.getImplementation().add( implementation );
+
+            if ( includeDeclared && implementation.getSpecifications() != null )
             {
-                seen.getImplementation().add( implementation );
-
-                if ( includeDeclared && implementation.getSpecifications() != null )
+                for ( SpecificationReference r : implementation.getSpecifications().getReference() )
                 {
-                    for ( SpecificationReference r : implementation.getSpecifications().getReference() )
+                    if ( specifications.getReference( r.getIdentifier() ) == null )
                     {
-                        if ( specifications.getReference( r.getIdentifier() ) == null )
-                        {
-                            specifications.getReference().add( r );
+                        specifications.getReference().add( r );
 
-                            final Specification s = modules.getSpecification( r.getIdentifier() );
-                            if ( s != null && specifications.getSpecification( s.getIdentifier() ) == null )
-                            {
-                                specifications.getSpecification().add( s );
-                            }
+                        final Specification s = modules.getSpecification( r.getIdentifier() );
+                        if ( s != null && specifications.getSpecification( s.getIdentifier() ) == null )
+                        {
+                            specifications.getSpecification().add( s );
                         }
                     }
                 }
+            }
 
-                if ( implementation.getImplementations() != null )
+            if ( implementation.getImplementations() != null )
+            {
+                for ( ImplementationReference r : implementation.getImplementations().getReference() )
                 {
-                    for ( ImplementationReference r : implementation.getImplementations().getReference() )
-                    {
-                        this.collectSpecifications( modules, modules.getImplementation( r.getIdentifier() ),
-                                                    specifications, seen, true );
+                    this.collectSpecifications( modules, modules.getImplementation( r.getIdentifier() ),
+                                                specifications, seen, true );
 
-                    }
                 }
             }
         }
@@ -1862,37 +1859,34 @@ public class DefaultModelValidator implements ModelValidator
                                       final Dependencies dependencies, final Implementations seen,
                                       final boolean includeDeclared )
     {
-        if ( implementation != null )
+        if ( implementation != null && seen.getImplementation( implementation.getIdentifier() ) == null )
         {
-            if ( seen.getImplementation( implementation.getIdentifier() ) == null )
+            seen.getImplementation().add( implementation );
+
+            if ( includeDeclared && implementation.getDependencies() != null )
             {
-                seen.getImplementation().add( implementation );
-
-                if ( includeDeclared && implementation.getDependencies() != null )
+                for ( Dependency d : implementation.getDependencies().getDependency() )
                 {
-                    for ( Dependency d : implementation.getDependencies().getDependency() )
-                    {
-                        Dependency dependency = dependencies.getDependency( d.getName() );
+                    Dependency dependency = dependencies.getDependency( d.getName() );
 
-                        if ( dependency == null )
-                        {
-                            dependencies.getDependency().add( d );
-                        }
-                        else
-                        {
-                            this.collectDependencies( d, dependency );
-                        }
+                    if ( dependency == null )
+                    {
+                        dependencies.getDependency().add( d );
+                    }
+                    else
+                    {
+                        this.collectDependencies( d, dependency );
                     }
                 }
+            }
 
-                if ( implementation.getImplementations() != null )
+            if ( implementation.getImplementations() != null )
+            {
+                for ( ImplementationReference r : implementation.getImplementations().getReference() )
                 {
-                    for ( ImplementationReference r : implementation.getImplementations().getReference() )
-                    {
-                        this.collectDependencies( modules, modules.getImplementation( r.getIdentifier() ), dependencies,
-                                                  seen, true );
+                    this.collectDependencies( modules, modules.getImplementation( r.getIdentifier() ), dependencies,
+                                              seen, true );
 
-                    }
                 }
             }
         }
@@ -1959,54 +1953,51 @@ public class DefaultModelValidator implements ModelValidator
                                     final Properties properties, final Implementations seen,
                                     final boolean includeDeclared )
     {
-        if ( implementation != null )
+        if ( implementation != null && seen.getImplementation( implementation.getIdentifier() ) == null )
         {
-            if ( seen.getImplementation( implementation.getIdentifier() ) == null )
+            seen.getImplementation().add( implementation );
+
+            if ( includeDeclared && implementation.getProperties() != null )
             {
-                seen.getImplementation().add( implementation );
-
-                if ( includeDeclared && implementation.getProperties() != null )
+                for ( Property p : implementation.getProperties().getProperty() )
                 {
-                    for ( Property p : implementation.getProperties().getProperty() )
+                    if ( properties.getProperty( p.getName() ) == null )
                     {
-                        if ( properties.getProperty( p.getName() ) == null )
-                        {
-                            properties.getProperty().add( p );
-                        }
+                        properties.getProperty().add( p );
                     }
-                    if ( !implementation.getProperties().getReference().isEmpty() )
-                    {
-                        final Module m = modules.getModuleOfImplementation( implementation.getIdentifier() );
+                }
+                if ( !implementation.getProperties().getReference().isEmpty() )
+                {
+                    final Module m = modules.getModuleOfImplementation( implementation.getIdentifier() );
 
-                        if ( m != null )
+                    if ( m != null )
+                    {
+                        for ( PropertyReference ref : implementation.getProperties().getReference() )
                         {
-                            for ( PropertyReference ref : implementation.getProperties().getReference() )
+                            if ( properties.getProperty( ref.getName() ) == null )
                             {
-                                if ( properties.getProperty( ref.getName() ) == null )
+                                Property referenced = m.getProperties().getProperty( ref.getName() );
+                                if ( referenced != null )
                                 {
-                                    Property referenced = m.getProperties().getProperty( ref.getName() );
-                                    if ( referenced != null )
-                                    {
-                                        referenced = new Property( referenced );
-                                        referenced.setDeprecated( ref.isDeprecated() );
-                                        referenced.setFinal( ref.isFinal() );
-                                        referenced.setOverride( ref.isOverride() );
-                                        properties.getProperty().add( referenced );
-                                    }
+                                    referenced = new Property( referenced );
+                                    referenced.setDeprecated( ref.isDeprecated() );
+                                    referenced.setFinal( ref.isFinal() );
+                                    referenced.setOverride( ref.isOverride() );
+                                    properties.getProperty().add( referenced );
                                 }
                             }
                         }
                     }
                 }
+            }
 
-                if ( implementation.getImplementations() != null )
+            if ( implementation.getImplementations() != null )
+            {
+                for ( ImplementationReference r : implementation.getImplementations().getReference() )
                 {
-                    for ( ImplementationReference r : implementation.getImplementations().getReference() )
-                    {
-                        this.collectProperties( modules, modules.getImplementation( r.getIdentifier() ), properties,
-                                                seen, true );
+                    this.collectProperties( modules, modules.getImplementation( r.getIdentifier() ), properties,
+                                            seen, true );
 
-                    }
                 }
             }
         }
@@ -2015,54 +2006,51 @@ public class DefaultModelValidator implements ModelValidator
     private void collectMessages( final Modules modules, final Implementation implementation, final Messages messages,
                                   final Implementations seen, boolean includeDeclared )
     {
-        if ( implementation != null )
+        if ( implementation != null && seen.getImplementation( implementation.getIdentifier() ) == null )
         {
-            if ( seen.getImplementation( implementation.getIdentifier() ) == null )
+            seen.getImplementation().add( implementation );
+
+            if ( includeDeclared && implementation.getMessages() != null )
             {
-                seen.getImplementation().add( implementation );
-
-                if ( includeDeclared && implementation.getMessages() != null )
+                for ( Message msg : implementation.getMessages().getMessage() )
                 {
-                    for ( Message msg : implementation.getMessages().getMessage() )
+                    if ( messages.getMessage( msg.getName() ) == null )
                     {
-                        if ( messages.getMessage( msg.getName() ) == null )
-                        {
-                            messages.getMessage().add( msg );
-                        }
+                        messages.getMessage().add( msg );
                     }
-                    if ( !implementation.getMessages().getReference().isEmpty() )
-                    {
-                        final Module m = modules.getModuleOfImplementation( implementation.getIdentifier() );
+                }
+                if ( !implementation.getMessages().getReference().isEmpty() )
+                {
+                    final Module m = modules.getModuleOfImplementation( implementation.getIdentifier() );
 
-                        if ( m != null )
+                    if ( m != null )
+                    {
+                        for ( MessageReference ref : implementation.getMessages().getReference() )
                         {
-                            for ( MessageReference ref : implementation.getMessages().getReference() )
+                            if ( messages.getMessage( ref.getName() ) == null )
                             {
-                                if ( messages.getMessage( ref.getName() ) == null )
+                                Message referenced = m.getMessages().getMessage( ref.getName() );
+                                if ( referenced != null )
                                 {
-                                    Message referenced = m.getMessages().getMessage( ref.getName() );
-                                    if ( referenced != null )
-                                    {
-                                        referenced = new Message( referenced );
-                                        referenced.setDeprecated( ref.isDeprecated() );
-                                        referenced.setFinal( ref.isFinal() );
-                                        referenced.setOverride( ref.isOverride() );
-                                        messages.getMessage().add( referenced );
-                                    }
+                                    referenced = new Message( referenced );
+                                    referenced.setDeprecated( ref.isDeprecated() );
+                                    referenced.setFinal( ref.isFinal() );
+                                    referenced.setOverride( ref.isOverride() );
+                                    messages.getMessage().add( referenced );
                                 }
                             }
                         }
                     }
                 }
+            }
 
-                if ( implementation.getImplementations() != null )
+            if ( implementation.getImplementations() != null )
+            {
+                for ( ImplementationReference r : implementation.getImplementations().getReference() )
                 {
-                    for ( ImplementationReference r : implementation.getImplementations().getReference() )
-                    {
-                        this.collectMessages( modules, modules.getImplementation( r.getIdentifier() ), messages, seen,
-                                              true );
+                    this.collectMessages( modules, modules.getImplementation( r.getIdentifier() ), messages, seen,
+                                          true );
 
-                    }
                 }
             }
         }
