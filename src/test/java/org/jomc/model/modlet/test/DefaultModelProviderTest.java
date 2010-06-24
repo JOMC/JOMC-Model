@@ -30,11 +30,11 @@
  *   $Id$
  *
  */
-package org.jomc.model.test;
+package org.jomc.model.modlet.test;
 
 import org.jomc.modlet.Model;
 import org.jomc.model.Modules;
-import org.jomc.model.DefaultModelProvider;
+import org.jomc.model.modlet.DefaultModelProvider;
 import org.jomc.modlet.ModelContext;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
@@ -44,7 +44,7 @@ import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
 
 /**
- * Test cases for class {@code org.jomc.model.DefaultModelProcessor}.
+ * Test cases for class {@code org.jomc.model.modlet.DefaultModelProcessor}.
  *
  * @author <a href="mailto:schulte2005@users.sourceforge.net">Christian Schulte</a> 1.0
  * @version $Id$

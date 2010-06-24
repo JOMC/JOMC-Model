@@ -30,7 +30,7 @@
  *   $Id$
  *
  */
-package org.jomc.model;
+package org.jomc.model.modlet;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -44,6 +44,27 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.util.JAXBSource;
 import javax.xml.transform.Source;
+import org.jomc.model.Dependencies;
+import org.jomc.model.Dependency;
+import org.jomc.model.Implementation;
+import org.jomc.model.ImplementationReference;
+import org.jomc.model.Implementations;
+import org.jomc.model.Message;
+import org.jomc.model.MessageReference;
+import org.jomc.model.Messages;
+import org.jomc.model.ModelObject;
+import org.jomc.model.Module;
+import org.jomc.model.Modules;
+import org.jomc.model.Multiplicity;
+import org.jomc.model.ObjectFactory;
+import org.jomc.model.Properties;
+import org.jomc.model.Property;
+import org.jomc.model.PropertyException;
+import org.jomc.model.PropertyReference;
+import org.jomc.model.Specification;
+import org.jomc.model.SpecificationReference;
+import org.jomc.model.Specifications;
+import org.jomc.model.Text;
 import org.jomc.modlet.Model;
 import org.jomc.modlet.ModelContext;
 import org.jomc.modlet.ModelValidationReport;
@@ -1305,10 +1326,10 @@ public class DefaultModelValidator implements ModelValidator
 
                 if ( current != null )
                 {
-                    modules.collectSpecifications( current, currentSpecs, new Implementations(), true );
-                    modules.collectDependencies( current, currentDependencies, new Implementations(), true );
-                    modules.collectMessages( current, currentMessages, new Implementations(), true );
-                    modules.collectProperties( current, currentProperties, new Implementations(), true );
+                    this.collectSpecifications( modules, current, currentSpecs, new Implementations(), true );
+                    this.collectDependencies( modules, current, currentDependencies, new Implementations(), true );
+                    this.collectMessages( modules, current, currentMessages, new Implementations(), true );
+                    this.collectProperties( modules, current, currentProperties, new Implementations(), true );
 
                     for ( SpecificationReference ref : currentSpecs.getReference() )
                     {
@@ -1792,6 +1813,256 @@ public class DefaultModelValidator implements ModelValidator
                     this.collectParentProperties( modules, modules.getImplementation( r.getIdentifier() ),
                                                   properties, seen, true );
 
+                }
+            }
+        }
+    }
+
+    private void collectSpecifications( final Modules modules, final Implementation implementation,
+                                        final Specifications specifications, final Implementations seen,
+                                        final boolean includeDeclared )
+    {
+        if ( implementation != null )
+        {
+            if ( seen.getImplementation( implementation.getIdentifier() ) == null )
+            {
+                seen.getImplementation().add( implementation );
+
+                if ( includeDeclared && implementation.getSpecifications() != null )
+                {
+                    for ( SpecificationReference r : implementation.getSpecifications().getReference() )
+                    {
+                        if ( specifications.getReference( r.getIdentifier() ) == null )
+                        {
+                            specifications.getReference().add( r );
+
+                            final Specification s = modules.getSpecification( r.getIdentifier() );
+                            if ( s != null && specifications.getSpecification( s.getIdentifier() ) == null )
+                            {
+                                specifications.getSpecification().add( s );
+                            }
+                        }
+                    }
+                }
+
+                if ( implementation.getImplementations() != null )
+                {
+                    for ( ImplementationReference r : implementation.getImplementations().getReference() )
+                    {
+                        this.collectSpecifications( modules, modules.getImplementation( r.getIdentifier() ),
+                                                    specifications, seen, true );
+
+                    }
+                }
+            }
+        }
+    }
+
+    private void collectDependencies( final Modules modules, final Implementation implementation,
+                                      final Dependencies dependencies, final Implementations seen,
+                                      final boolean includeDeclared )
+    {
+        if ( implementation != null )
+        {
+            if ( seen.getImplementation( implementation.getIdentifier() ) == null )
+            {
+                seen.getImplementation().add( implementation );
+
+                if ( includeDeclared && implementation.getDependencies() != null )
+                {
+                    for ( Dependency d : implementation.getDependencies().getDependency() )
+                    {
+                        Dependency dependency = dependencies.getDependency( d.getName() );
+
+                        if ( dependency == null )
+                        {
+                            dependencies.getDependency().add( d );
+                        }
+                        else
+                        {
+                            this.collectDependencies( d, dependency );
+                        }
+                    }
+                }
+
+                if ( implementation.getImplementations() != null )
+                {
+                    for ( ImplementationReference r : implementation.getImplementations().getReference() )
+                    {
+                        this.collectDependencies( modules, modules.getImplementation( r.getIdentifier() ), dependencies,
+                                                  seen, true );
+
+                    }
+                }
+            }
+        }
+    }
+
+    private void collectDependencies( final Dependency source, final Dependency target )
+    {
+        if ( source.getMessages() != null )
+        {
+            if ( target.getMessages() == null )
+            {
+                target.setMessages( new Messages() );
+            }
+
+            for ( Message m : source.getMessages().getMessage() )
+            {
+                if ( target.getMessages().getMessage( m.getName() ) == null )
+                {
+                    target.getMessages().getMessage().add( m );
+                }
+            }
+        }
+
+        if ( source.getProperties() != null )
+        {
+            if ( target.getProperties() == null )
+            {
+                target.setProperties( new Properties() );
+            }
+
+            for ( Property p : source.getProperties().getProperty() )
+            {
+                if ( target.getProperties().getProperty( p.getName() ) == null )
+                {
+                    target.getProperties().getProperty().add( p );
+                }
+            }
+        }
+
+        if ( source.getDependencies() != null )
+        {
+            if ( target.getDependencies() == null )
+            {
+                target.setDependencies( new Dependencies() );
+            }
+
+            for ( Dependency sd : source.getDependencies().getDependency() )
+            {
+                Dependency td = target.getDependencies().getDependency( sd.getName() );
+
+                if ( td == null )
+                {
+                    target.getDependencies().getDependency().add( sd );
+                }
+                else
+                {
+                    this.collectDependencies( sd, td );
+                }
+            }
+        }
+    }
+
+    private void collectProperties( final Modules modules, final Implementation implementation,
+                                    final Properties properties, final Implementations seen,
+                                    final boolean includeDeclared )
+    {
+        if ( implementation != null )
+        {
+            if ( seen.getImplementation( implementation.getIdentifier() ) == null )
+            {
+                seen.getImplementation().add( implementation );
+
+                if ( includeDeclared && implementation.getProperties() != null )
+                {
+                    for ( Property p : implementation.getProperties().getProperty() )
+                    {
+                        if ( properties.getProperty( p.getName() ) == null )
+                        {
+                            properties.getProperty().add( p );
+                        }
+                    }
+                    if ( !implementation.getProperties().getReference().isEmpty() )
+                    {
+                        final Module m = modules.getModuleOfImplementation( implementation.getIdentifier() );
+
+                        if ( m != null )
+                        {
+                            for ( PropertyReference ref : implementation.getProperties().getReference() )
+                            {
+                                if ( properties.getProperty( ref.getName() ) == null )
+                                {
+                                    Property referenced = m.getProperties().getProperty( ref.getName() );
+                                    if ( referenced != null )
+                                    {
+                                        referenced = new Property( referenced );
+                                        referenced.setDeprecated( ref.isDeprecated() );
+                                        referenced.setFinal( ref.isFinal() );
+                                        referenced.setOverride( ref.isOverride() );
+                                        properties.getProperty().add( referenced );
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if ( implementation.getImplementations() != null )
+                {
+                    for ( ImplementationReference r : implementation.getImplementations().getReference() )
+                    {
+                        this.collectProperties( modules, modules.getImplementation( r.getIdentifier() ), properties,
+                                                seen, true );
+
+                    }
+                }
+            }
+        }
+    }
+
+    private void collectMessages( final Modules modules, final Implementation implementation, final Messages messages,
+                                  final Implementations seen, boolean includeDeclared )
+    {
+        if ( implementation != null )
+        {
+            if ( seen.getImplementation( implementation.getIdentifier() ) == null )
+            {
+                seen.getImplementation().add( implementation );
+
+                if ( includeDeclared && implementation.getMessages() != null )
+                {
+                    for ( Message msg : implementation.getMessages().getMessage() )
+                    {
+                        if ( messages.getMessage( msg.getName() ) == null )
+                        {
+                            messages.getMessage().add( msg );
+                        }
+                    }
+                    if ( !implementation.getMessages().getReference().isEmpty() )
+                    {
+                        final Module m = modules.getModuleOfImplementation( implementation.getIdentifier() );
+
+                        if ( m != null )
+                        {
+                            for ( MessageReference ref : implementation.getMessages().getReference() )
+                            {
+                                if ( messages.getMessage( ref.getName() ) == null )
+                                {
+                                    Message referenced = m.getMessages().getMessage( ref.getName() );
+                                    if ( referenced != null )
+                                    {
+                                        referenced = new Message( referenced );
+                                        referenced.setDeprecated( ref.isDeprecated() );
+                                        referenced.setFinal( ref.isFinal() );
+                                        referenced.setOverride( ref.isOverride() );
+                                        messages.getMessage().add( referenced );
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if ( implementation.getImplementations() != null )
+                {
+                    for ( ImplementationReference r : implementation.getImplementations().getReference() )
+                    {
+                        this.collectMessages( modules, modules.getImplementation( r.getIdentifier() ), messages, seen,
+                                              true );
+
+                    }
                 }
             }
         }

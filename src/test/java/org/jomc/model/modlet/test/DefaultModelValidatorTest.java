@@ -30,7 +30,7 @@
  *   $Id$
  *
  */
-package org.jomc.model.test;
+package org.jomc.model.modlet.test;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -38,10 +38,14 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.util.JAXBSource;
-import org.jomc.model.DefaultModelValidator;
+import org.jomc.model.modlet.DefaultModelValidator;
 import org.jomc.model.PropertyException;
 import org.jomc.model.ModelObject;
 import org.jomc.model.Modules;
+import org.jomc.model.test.ModelValidationReportDetail;
+import org.jomc.model.test.ModulesConstraintsTest;
+import org.jomc.model.test.SchemaConstraintsTest;
+import org.jomc.model.test.TestSuite;
 import org.jomc.modlet.Model;
 import org.jomc.modlet.ModelContext;
 import org.jomc.modlet.ModelValidationReport;
@@ -52,7 +56,7 @@ import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
 
 /**
- * Test cases for class {@code org.jomc.model.DefaultModelValidator} implementations.
+ * Test cases for class {@code org.jomc.model.modlet.DefaultModelValidator} implementations.
  *
  * @author <a href="mailto:schulte2005@users.sourceforge.net">Christian Schulte</a> 1.0
  * @version $Id$

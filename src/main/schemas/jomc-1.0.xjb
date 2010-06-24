@@ -2199,7 +2199,8 @@
     };
 
     /** Maps objects to {@code Instance}s. */
-    @javax.xml.bind.annotation.XmlTransient private java.util.Map<Object,Instance> objects = new org.jomc.util.WeakIdentityHashMap();
+    @javax.xml.bind.annotation.XmlTransient private java.util.Map<Object, Instance> objects =
+        new org.jomc.util.WeakIdentityHashMap();
 
     /**
      * Creates a new {@code Modules} instance taking a map backing the instance.
@@ -2305,10 +2306,10 @@
 
         this.resolveClasspath( classpathModule, classLoader );
 
-        final boolean resolved = ( classpathModule.getSpecifications() != null &&
-                                   !classpathModule.getSpecifications().getSpecification().isEmpty() ) ||
-                                 ( classpathModule.getImplementations() != null &&
-                                   !classpathModule.getImplementations().getImplementation().isEmpty() );
+        final boolean resolved = ( classpathModule.getSpecifications() != null
+                                   && !classpathModule.getSpecifications().getSpecification().isEmpty() )
+                                 || ( classpathModule.getImplementations() != null
+                                      && !classpathModule.getImplementations().getImplementation().isEmpty() );
 
         return resolved ? classpathModule : null;
     }
@@ -2547,8 +2548,7 @@
                 {
                     for ( Implementation i : m.getImplementations().getImplementation() )
                     {
-                        if ( i.getClazz() != null && i.getClazz().equals( impl.getClazz() ) &&
-                             i.isClassDeclaration() )
+                        if ( i.getClazz() != null && i.getClazz().equals( impl.getClazz() ) && i.isClassDeclaration() )
                         {
                             declaration = i;
                             break;
@@ -2753,8 +2753,7 @@
                 {
                     for ( Implementation i : m.getImplementations().getImplementation() )
                     {
-                        if ( i.getClazz() != null && i.getClazz().equals( impl.getClazz() ) &&
-                             i.isClassDeclaration() )
+                        if ( i.getClazz() != null && i.getClazz().equals( impl.getClazz() ) && i.isClassDeclaration() )
                         {
                             declaration = i;
                             break;
@@ -2825,8 +2824,7 @@
                 {
                     for ( Implementation i : m.getImplementations().getImplementation() )
                     {
-                        if ( i.getClazz() != null && i.getClazz().equals( i.getClazz() ) &&
-                             i.isClassDeclaration() )
+                        if ( i.getClazz() != null && i.getClazz().equals( i.getClazz() ) && i.isClassDeclaration() )
                         {
                             declaration = i;
                             break;
@@ -2955,8 +2953,7 @@
                 {
                     for ( Implementation i : m.getImplementations().getImplementation() )
                     {
-                        if ( i.getClazz() != null && i.getClazz().equals( impl.getClazz() ) &&
-                             i.isClassDeclaration() )
+                        if ( i.getClazz() != null && i.getClazz().equals( impl.getClazz() ) && i.isClassDeclaration() )
                         {
                             declaration = i;
                             break;
@@ -3465,7 +3462,7 @@
                     if ( factoryMethod == null )
                     {
                         throw new InstantiationException( getMessage( "failedCreatingObject", instance.getIdentifier(),
-                            clazz.getName(), methodName ) );
+                                                                      clazz.getName(), methodName ) );
 
                     }
 
@@ -3497,7 +3494,7 @@
                     else
                     {
                         throw new InstantiationException( getMessage( "failedCreatingObject", instance.getIdentifier(),
-                            clazz.getName(), methodName ) );
+                                                                      clazz.getName(), methodName ) );
 
                     }
                 }
@@ -3508,26 +3505,26 @@
         catch ( final java.lang.reflect.InvocationTargetException e )
         {
             final Throwable target = e.getTargetException() != null ? e.getTargetException() : e;
-            throw (InstantiationException) new InstantiationException( getMessage( "exceptionCreatingObject",
-                instance.getIdentifier() ) ).initCause( target );
+            throw (InstantiationException) new InstantiationException(
+                getMessage( "exceptionCreatingObject", instance.getIdentifier() ) ).initCause( target );
 
         }
         catch ( final IllegalAccessException e )
         {
-            throw (InstantiationException) new InstantiationException( getMessage( "exceptionCreatingObject",
-                instance.getIdentifier() ) ).initCause( e );
+            throw (InstantiationException) new InstantiationException(
+                getMessage( "exceptionCreatingObject", instance.getIdentifier() ) ).initCause( e );
 
         }
         catch ( final ClassNotFoundException e )
         {
-            throw (InstantiationException) new InstantiationException( getMessage( "exceptionCreatingObject",
-                instance.getIdentifier() ) ).initCause( e );
+            throw (InstantiationException) new InstantiationException(
+                getMessage( "exceptionCreatingObject", instance.getIdentifier() ) ).initCause( e );
 
         }
     }
 
-    void collectSpecifications( final Implementation implementation, final Specifications specifications,
-                                final Implementations seen, final boolean includeDeclared )
+    private void collectSpecifications( final Implementation implementation, final Specifications specifications,
+                                        final Implementations seen, final boolean includeDeclared )
     {
         if ( implementation != null )
         {
@@ -3565,8 +3562,8 @@
         }
     }
 
-    void collectDependencies( final Implementation implementation, final Dependencies dependencies,
-                              final Implementations seen, final boolean includeDeclared )
+    private void collectDependencies( final Implementation implementation, final Dependencies dependencies,
+                                      final Implementations seen, final boolean includeDeclared )
     {
         if ( implementation != null )
         {
@@ -3661,8 +3658,8 @@
         }
     }
 
-    void collectProperties( final Implementation implementation, final Properties properties,
-                            final Implementations seen, final boolean includeDeclared )
+    private void collectProperties( final Implementation implementation, final Properties properties,
+                                    final Implementations seen, final boolean includeDeclared )
     {
         if ( implementation != null )
         {
@@ -3715,8 +3712,8 @@
         }
     }
 
-    void collectMessages( final Implementation implementation, final Messages messages,
-                          final Implementations seen, boolean includeDeclared )
+    private void collectMessages( final Implementation implementation, final Messages messages,
+                                  final Implementations seen, boolean includeDeclared )
     {
         if ( implementation != null )
         {
@@ -3769,8 +3766,8 @@
         }
     }
 
-    void collectAny( final Implementation implementation, final List<Object> any, final Implementations seen,
-                     final boolean includeDeclared )
+    private void collectAny( final Implementation implementation, final List<Object> any, final Implementations seen,
+                             final boolean includeDeclared )
     {
         if ( implementation != null )
         {
@@ -4083,8 +4080,8 @@
         try
         {
             final java.lang.reflect.Method m = clazz.getMethod( methodName, (Class[]) null );
-            factoryMethod = java.lang.reflect.Modifier.isStatic( m.getModifiers() ) &&
-                            type.isAssignableFrom( m.getReturnType() );
+            factoryMethod = java.lang.reflect.Modifier.isStatic( m.getModifiers() )
+                            && type.isAssignableFrom( m.getReturnType() );
 
         }
         catch ( final NoSuchMethodException e )

@@ -30,7 +30,7 @@
  *   $Id$
  *
  */
-package org.jomc.model;
+package org.jomc.model.modlet;
 
 import java.io.IOException;
 import java.io.InputStream;

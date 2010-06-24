@@ -30,7 +30,7 @@
  *   $Id$
  *
  */
-package org.jomc.model;
+package org.jomc.model.modlet;
 
 import java.net.URL;
 import java.text.MessageFormat;
@@ -41,6 +41,11 @@ import java.util.logging.Level;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import org.jomc.model.Module;
+import org.jomc.model.Modules;
+import org.jomc.model.ObjectFactory;
+import org.jomc.model.Text;
+import org.jomc.model.Texts;
 import org.jomc.modlet.Model;
 import org.jomc.modlet.ModelContext;
 import org.jomc.modlet.ModelProvider;
