@@ -288,10 +288,9 @@ public class DefaultModelProvider implements ModelProvider
                 }
                 else if ( context.isLoggable( Level.WARNING ) )
                 {
-                    context.log( Level.WARNING, getMessage( "ignoringDocument", this.getClass().getName(),
-                                                            content == null
-                                                            ? "<>"
-                                                            : content.toString(), url.toExternalForm() ), null );
+                    context.log( Level.WARNING, getMessage( "ignoringDocument",
+                                                            content == null ? "<>" : content.toString(),
+                                                            url.toExternalForm() ), null );
 
                 }
             }
