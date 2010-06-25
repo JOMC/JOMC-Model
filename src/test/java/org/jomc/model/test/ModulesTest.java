@@ -54,6 +54,7 @@ import org.jomc.model.SpecificationReference;
 import org.jomc.model.Specifications;
 import org.jomc.model.Text;
 import org.jomc.model.Texts;
+import org.jomc.model.modlet.ModelHelper;
 import org.jomc.modlet.Model;
 import org.jomc.modlet.ModelContext;
 import org.jomc.modlet.ModelValidationReport;
@@ -91,7 +92,7 @@ public class ModulesTest
             {
                 final ModelContext context = ModelContext.createModelContext( this.getClass().getClassLoader() );
                 final JAXBElement<TestSuite> e =
-                    (JAXBElement<TestSuite>) context.createUnmarshaller( Modules.MODEL_PUBLIC_ID ).
+                    (JAXBElement<TestSuite>) context.createUnmarshaller( ModelObject.MODEL_PUBLIC_ID ).
                     unmarshal( this.getClass().getResource( "testsuite.xml" ) );
 
                 this.testSuite = e.getValue();
@@ -139,7 +140,7 @@ public class ModulesTest
     public void testImplementations() throws Exception
     {
         final ModelContext context = ModelContext.createModelContext( this.getClass().getClassLoader() );
-        final JAXBContext jaxbContext = context.createContext( Modules.MODEL_PUBLIC_ID );
+        final JAXBContext jaxbContext = context.createContext( ModelObject.MODEL_PUBLIC_ID );
 
         for ( ImplementationTest test : this.getTestSuite().getImplementationTest() )
         {
@@ -147,8 +148,8 @@ public class ModulesTest
 
             final JAXBElement<Modules> modules = (JAXBElement<Modules>) test.getModules().getAny();
             final Model model = new Model();
-            model.setIdentifier( Modules.MODEL_PUBLIC_ID );
-            model.getAny().add( modules );
+            model.setIdentifier( ModelObject.MODEL_PUBLIC_ID );
+            ModelHelper.setModules( model, modules.getValue() );
 
             final ModelValidationReport modulesReport = context.validateModel( model );
 
@@ -164,7 +165,7 @@ public class ModulesTest
                 (JAXBElement<Implementation>) test.getImplementation().getAny();
 
             final ModelValidationReport implementationReport =
-                context.validateModel( Modules.MODEL_PUBLIC_ID, new JAXBSource( jaxbContext, expected ) );
+                context.validateModel( ModelObject.MODEL_PUBLIC_ID, new JAXBSource( jaxbContext, expected ) );
 
             if ( !implementationReport.isModelValid() )
             {
@@ -203,8 +204,8 @@ public class ModulesTest
 
             final JAXBElement<Modules> modules = (JAXBElement<Modules>) test.getModules().getAny();
             final Model model = new Model();
-            model.setIdentifier( Modules.MODEL_PUBLIC_ID );
-            model.getAny().add( modules );
+            model.setIdentifier( ModelObject.MODEL_PUBLIC_ID );
+            ModelHelper.setModules( model, modules.getValue() );
 
             ModelValidationReport validationReport = context.validateModel( model );
 
@@ -217,8 +218,8 @@ public class ModulesTest
                                validationReport.isModelValid() );
 
             final JAXBElement<Instance> expected = (JAXBElement<Instance>) test.getInstance().getAny();
-            validationReport = context.validateModel(
-                Modules.MODEL_PUBLIC_ID, new JAXBSource( context.createContext( Modules.MODEL_PUBLIC_ID ), expected ) );
+            validationReport = context.validateModel( ModelObject.MODEL_PUBLIC_ID, new JAXBSource(
+                context.createContext( ModelObject.MODEL_PUBLIC_ID ), expected ) );
 
             if ( !validationReport.isModelValid() )
             {

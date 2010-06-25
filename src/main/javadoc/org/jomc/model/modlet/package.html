@@ -44,12 +44,13 @@ final ModelContext modelContext = ModelContext.createModelContext( a class loade
 final Model model = modelContext.findModel( ModelObject.MODEL_PUBLIC_ID );
 final Model processed = modelContext.processModel( model );
 final ModelValidationReport validationReport = modelContext.validateModel( processed );
-final JAXBElement&lt;Modules&gt; modules = model.getAnyElement( ModelObject.MODEL_PUBLIC_ID, "modules" );
+final Modules modules = ModelHelper.getModules( model );
 
 final Model model = new Model();
 model.setIdentifier( ModelObject.MODEL_PUBLIC_ID );
-model.getAny().add( new ObjectFactory().createModules( new Modules() ) );
+ModelHelper.setModules( model, new Modules() );
       </pre></blockquote>
     </p>
+    @see org.jomc.model.modlet.ModelHelper
   </body>
 </html>

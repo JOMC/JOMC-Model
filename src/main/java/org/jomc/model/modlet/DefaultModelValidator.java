@@ -67,9 +67,9 @@ import org.jomc.model.Specifications;
 import org.jomc.model.Text;
 import org.jomc.modlet.Model;
 import org.jomc.modlet.ModelContext;
+import org.jomc.modlet.ModelException;
 import org.jomc.modlet.ModelValidationReport;
 import org.jomc.modlet.ModelValidator;
-import org.jomc.modlet.ModelException;
 import org.jomc.util.ParseException;
 import org.jomc.util.TokenMgrError;
 import org.jomc.util.VersionParser;
@@ -116,13 +116,13 @@ public class DefaultModelValidator implements ModelValidator
                                                   new org.jomc.modlet.ObjectFactory().createModel( model ) );
 
             final ModelValidationReport report = context.validateModel( model.getIdentifier(), source );
-            final JAXBElement<Modules> modules = model.getAnyElement( ModelObject.MODEL_PUBLIC_ID, "modules" );
+            final Modules modules = ModelHelper.getModules( model );
 
             if ( modules != null )
             {
-                this.assertModulesValid( context, modules.getValue(), report );
-                this.assertSpecificationsValid( context, modules.getValue(), report );
-                this.assertImplementationsValid( context, modules.getValue(), report );
+                this.assertModulesValid( context, modules, report );
+                this.assertSpecificationsValid( context, modules, report );
+                this.assertImplementationsValid( context, modules, report );
             }
 
             return report;

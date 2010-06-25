@@ -32,9 +32,9 @@
  */
 package org.jomc.model.modlet.test;
 
-import org.jomc.model.Modules;
-import org.jomc.modlet.Model;
+import org.jomc.model.ModelObject;
 import org.jomc.model.modlet.DefaultModelProcessor;
+import org.jomc.modlet.Model;
 import org.jomc.modlet.ModelContext;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
@@ -123,7 +123,7 @@ public class DefaultModelProcessorTest
     {
         final ModelContext context = ModelContext.createModelContext( this.getClass().getClassLoader() );
         final Model model = new Model();
-        model.setIdentifier( Modules.MODEL_PUBLIC_ID );
+        model.setIdentifier( ModelObject.MODEL_PUBLIC_ID );
 
         try
         {
@@ -163,7 +163,7 @@ public class DefaultModelProcessorTest
     public void testEnabled() throws Exception
     {
         final Model model = new Model();
-        model.setIdentifier( Modules.MODEL_PUBLIC_ID );
+        model.setIdentifier( ModelObject.MODEL_PUBLIC_ID );
 
         DefaultModelProcessor.setDefaultEnabled( null );
         this.getModelProcessor().setEnabled( null );

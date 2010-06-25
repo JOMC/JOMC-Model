@@ -32,9 +32,9 @@
  */
 package org.jomc.model.modlet.test;
 
-import org.jomc.modlet.Model;
-import org.jomc.model.Modules;
+import org.jomc.model.ModelObject;
 import org.jomc.model.modlet.DefaultModelProvider;
+import org.jomc.modlet.Model;
 import org.jomc.modlet.ModelContext;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
@@ -114,20 +114,21 @@ public class DefaultModelProviderTest
 
         DefaultModelProvider.setDefaultModuleLocation( null );
         this.getModelProvider().setModuleLocation( null );
-        assertEquals( 1, this.getModelProvider().findModules(
-            context, Modules.MODEL_PUBLIC_ID, DefaultModelProvider.getDefaultModuleLocation() ).getModule().size() );
+        assertEquals( 1,
+                      this.getModelProvider().findModules(
+            context, ModelObject.MODEL_PUBLIC_ID, DefaultModelProvider.getDefaultModuleLocation() ).getModule().size() );
 
         assertEquals( 1, this.getModelProvider().findModules(
-            context, Modules.MODEL_PUBLIC_ID, this.getModelProvider().getModuleLocation() ).getModule().size() );
+            context, ModelObject.MODEL_PUBLIC_ID, this.getModelProvider().getModuleLocation() ).getModule().size() );
 
         DefaultModelProvider.setDefaultModuleLocation( "DOES_NOT_EXIST" );
         this.getModelProvider().setModuleLocation( "DOES_NOT_EXIST" );
 
         assertNull( this.getModelProvider().findModules(
-            context, Modules.MODEL_PUBLIC_ID, DefaultModelProvider.getDefaultModuleLocation() ) );
+            context, ModelObject.MODEL_PUBLIC_ID, DefaultModelProvider.getDefaultModuleLocation() ) );
 
         assertNull( this.getModelProvider().findModules(
-            context, Modules.MODEL_PUBLIC_ID, this.getModelProvider().getModuleLocation() ) );
+            context, ModelObject.MODEL_PUBLIC_ID, this.getModelProvider().getModuleLocation() ) );
 
         DefaultModelProvider.setDefaultModuleLocation( null );
         this.getModelProvider().setModuleLocation( null );
@@ -137,7 +138,7 @@ public class DefaultModelProviderTest
     {
         final ModelContext context = ModelContext.createModelContext( this.getClass().getClassLoader() );
         final Model model = new Model();
-        model.setIdentifier( Modules.MODEL_PUBLIC_ID );
+        model.setIdentifier( ModelObject.MODEL_PUBLIC_ID );
 
         try
         {
@@ -177,7 +178,7 @@ public class DefaultModelProviderTest
     public void testEnabled() throws Exception
     {
         final Model model = new Model();
-        model.setIdentifier( Modules.MODEL_PUBLIC_ID );
+        model.setIdentifier( ModelObject.MODEL_PUBLIC_ID );
 
         DefaultModelProvider.setDefaultEnabled( null );
         this.getModelProvider().setEnabled( null );

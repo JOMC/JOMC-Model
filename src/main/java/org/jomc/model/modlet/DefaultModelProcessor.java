@@ -55,8 +55,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamSource;
 import org.jomc.modlet.Model;
 import org.jomc.modlet.ModelContext;
-import org.jomc.modlet.ModelProcessor;
 import org.jomc.modlet.ModelException;
+import org.jomc.modlet.ModelProcessor;
 
 /**
  * Default object management and configuration {@code ModelProcessor} implementation.

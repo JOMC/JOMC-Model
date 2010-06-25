@@ -38,18 +38,19 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.util.JAXBSource;
-import org.jomc.model.modlet.DefaultModelValidator;
-import org.jomc.model.PropertyException;
 import org.jomc.model.ModelObject;
 import org.jomc.model.Modules;
+import org.jomc.model.PropertyException;
+import org.jomc.model.modlet.DefaultModelValidator;
+import org.jomc.model.modlet.ModelHelper;
 import org.jomc.model.test.ModelValidationReportDetail;
 import org.jomc.model.test.ModulesConstraintsTest;
 import org.jomc.model.test.SchemaConstraintsTest;
 import org.jomc.model.test.TestSuite;
 import org.jomc.modlet.Model;
 import org.jomc.modlet.ModelContext;
-import org.jomc.modlet.ModelValidationReport;
 import org.jomc.modlet.ModelException;
+import org.jomc.modlet.ModelValidationReport;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
@@ -122,9 +123,8 @@ public class DefaultModelValidatorTest
         {
             if ( this.testSuite == null )
             {
-                final JAXBElement<TestSuite> e =
-                    (JAXBElement<TestSuite>) this.getModelContext().createUnmarshaller( Modules.MODEL_PUBLIC_ID ).
-                    unmarshal( this.getClass().getResource( "testsuite.xml" ) );
+                final JAXBElement<TestSuite> e = (JAXBElement<TestSuite>) this.getModelContext().createUnmarshaller(
+                    ModelObject.MODEL_PUBLIC_ID ).unmarshal( this.getClass().getResource( "testsuite.xml" ) );
 
                 this.testSuite = e.getValue();
             }
@@ -172,14 +172,14 @@ public class DefaultModelValidatorTest
     public void testLegalArguments() throws Exception
     {
         assertNotNull( this.getModelValidator().validateModel(
-            this.getModelContext(), this.getModelContext().findModel( Modules.MODEL_PUBLIC_ID ) ) );
+            this.getModelContext(), this.getModelContext().findModel( ModelObject.MODEL_PUBLIC_ID ) ) );
 
     }
 
     public void testSchemaConstraints() throws Exception
     {
         final ModelContext context = this.getModelContext();
-        final JAXBContext jaxbContext = context.createContext( Modules.MODEL_PUBLIC_ID );
+        final JAXBContext jaxbContext = context.createContext( ModelObject.MODEL_PUBLIC_ID );
 
         for ( SchemaConstraintsTest test : this.getTestSuite().getSchemaConstraintsTest() )
         {
@@ -189,7 +189,7 @@ public class DefaultModelValidatorTest
                 (JAXBElement<? extends ModelObject>) test.getModelObject().getAny();
 
             final JAXBSource source = new JAXBSource( jaxbContext, modelObject );
-            final ModelValidationReport report = context.validateModel( Modules.MODEL_PUBLIC_ID, source );
+            final ModelValidationReport report = context.validateModel( ModelObject.MODEL_PUBLIC_ID, source );
 
             log( report );
 
@@ -207,8 +207,8 @@ public class DefaultModelValidatorTest
 
             final JAXBElement<Modules> modules = (JAXBElement<Modules>) test.getModules().getAny();
             final Model model = new Model();
-            model.setIdentifier( Modules.MODEL_PUBLIC_ID );
-            model.getAny().add( modules );
+            model.setIdentifier( ModelObject.MODEL_PUBLIC_ID );
+            ModelHelper.setModules( model, modules.getValue() );
 
             final ModelValidationReport report = this.getModelValidator().validateModel( context, model );
 

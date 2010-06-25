@@ -41,16 +41,14 @@ import java.util.logging.Level;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import org.jomc.model.ModelObject;
 import org.jomc.model.Module;
 import org.jomc.model.Modules;
-import org.jomc.model.ObjectFactory;
 import org.jomc.model.Text;
 import org.jomc.model.Texts;
 import org.jomc.modlet.Model;
 import org.jomc.modlet.ModelContext;
-import org.jomc.modlet.ModelProvider;
 import org.jomc.modlet.ModelException;
+import org.jomc.modlet.ModelProvider;
 
 /**
  * Default object management and configuration {@code ModelProvider} implementation.
@@ -338,6 +336,8 @@ public class DefaultModelProvider implements ModelProvider
             throw new NullPointerException( "model" );
         }
 
+        Model found = null;
+
         if ( this.isEnabled() )
         {
             if ( context.isLoggable( Level.FINE ) )
@@ -347,23 +347,12 @@ public class DefaultModelProvider implements ModelProvider
 
             }
 
-            final Modules found = this.findModules( context, model.getIdentifier(), this.getModuleLocation() );
+            final Modules modules = this.findModules( context, model.getIdentifier(), this.getModuleLocation() );
 
-            if ( found != null )
+            if ( modules != null )
             {
-                final Model copy = new Model( model );
-                final JAXBElement<Modules> modules = copy.getAnyElement( ModelObject.MODEL_PUBLIC_ID, "modules" );
-
-                if ( modules != null )
-                {
-                    modules.getValue().getModule().addAll( found.getModule() );
-                }
-                else
-                {
-                    copy.getAny().add( new ObjectFactory().createModules( found ) );
-                }
-
-                return copy;
+                found = new Model( model );
+                ModelHelper.addModules( found, modules );
             }
         }
         else if ( context.isLoggable( Level.FINE ) )
@@ -371,7 +360,7 @@ public class DefaultModelProvider implements ModelProvider
             context.log( Level.FINE, getMessage( "disabled", this.getClass().getName(), model.getIdentifier() ), null );
         }
 
-        return null;
+        return found;
     }
 
     private static String getMessage( final String key, final Object... args )
