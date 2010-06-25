@@ -359,8 +359,7 @@ public class DefaultModelProcessor implements ModelProcessor
 
                 final org.jomc.modlet.ObjectFactory objectFactory = new org.jomc.modlet.ObjectFactory();
                 final JAXBContext jaxbContext = context.createContext( model.getIdentifier() );
-                final List<Transformer> transformers =
-                    this.findTransformers( context, this.getTransformerLocation() );
+                final List<Transformer> transformers = this.findTransformers( context, this.getTransformerLocation() );
                 processed = new Model( model );
 
                 if ( transformers != null )

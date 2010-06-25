@@ -116,7 +116,7 @@ public class DefaultModelValidator implements ModelValidator
                                                   new org.jomc.modlet.ObjectFactory().createModel( model ) );
 
             final ModelValidationReport report = context.validateModel( model.getIdentifier(), source );
-            final JAXBElement<Modules> modules = model.getAnyElement( Modules.MODEL_PUBLIC_ID, "modules" );
+            final JAXBElement<Modules> modules = model.getAnyElement( ModelObject.MODEL_PUBLIC_ID, "modules" );
 
             if ( modules != null )
             {

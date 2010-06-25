@@ -41,6 +41,7 @@ import java.util.logging.Level;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import org.jomc.model.ModelObject;
 import org.jomc.model.Module;
 import org.jomc.model.Modules;
 import org.jomc.model.ObjectFactory;
@@ -351,7 +352,7 @@ public class DefaultModelProvider implements ModelProvider
             if ( found != null )
             {
                 final Model copy = new Model( model );
-                final JAXBElement<Modules> modules = copy.getAnyElement( Modules.MODEL_PUBLIC_ID, "modules" );
+                final JAXBElement<Modules> modules = copy.getAnyElement( ModelObject.MODEL_PUBLIC_ID, "modules" );
 
                 if ( modules != null )
                 {

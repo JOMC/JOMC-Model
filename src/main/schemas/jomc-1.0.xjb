@@ -117,6 +117,9 @@
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='ModelObject']">
       <ci:code><![CDATA[
+    /** Public identifier of the object management and configuration model. */
+    public static final String MODEL_PUBLIC_ID = "http://jomc.org/model";
+
     /**
      * Gets a single {@code JAXBElement} matching a namespace URI and local part from a given list of objects.
      *
@@ -2181,9 +2184,6 @@
     <!-- *********************************************************************************************************** -->
     <jaxb:bindings node="xs:complexType[@name='Modules']">
       <ci:code><![CDATA[
-    /** Public identifier of the object management and configuration model. */
-    public static final String MODEL_PUBLIC_ID = "http://jomc.org/model";
-
     /**
      * Constant for the default name of the classpath module.
      * @see #getClasspathModuleName()
