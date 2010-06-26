@@ -1867,7 +1867,7 @@ public class DefaultModelValidator implements ModelValidator
             {
                 for ( Dependency d : implementation.getDependencies().getDependency() )
                 {
-                    Dependency dependency = dependencies.getDependency( d.getName() );
+                    final Dependency dependency = dependencies.getDependency( d.getName() );
 
                     if ( dependency == null )
                     {
@@ -1935,7 +1935,7 @@ public class DefaultModelValidator implements ModelValidator
 
             for ( Dependency sd : source.getDependencies().getDependency() )
             {
-                Dependency td = target.getDependencies().getDependency( sd.getName() );
+                final Dependency td = target.getDependencies().getDependency( sd.getName() );
 
                 if ( td == null )
                 {
@@ -2004,7 +2004,7 @@ public class DefaultModelValidator implements ModelValidator
     }
 
     private void collectMessages( final Modules modules, final Implementation implementation, final Messages messages,
-                                  final Implementations seen, boolean includeDeclared )
+                                  final Implementations seen, final boolean includeDeclared )
     {
         if ( implementation != null && seen.getImplementation( implementation.getIdentifier() ) == null )
         {
