@@ -40,14 +40,12 @@ import org.jomc.model.ModelObject;
 import org.jomc.model.Modules;
 import org.jomc.model.ObjectFactory;
 import org.jomc.modlet.Model;
-import org.jomc.modlet.ModelContext;
 
 /**
  * Object management and configuration {@code Model} helper.
  *
  * @author <a href="mailto:schulte2005@users.sourceforge.net">Christian Schulte</a>
  * @version $Id$
- * @see ModelContext#processModel(org.jomc.modlet.Model)
  */
 public abstract class ModelHelper
 {
