@@ -307,10 +307,10 @@ public class DefaultModelProcessor implements ModelProcessor
                 transformers.add( transformer );
             }
 
-            if ( context.isLoggable( Level.FINE ) )
+            if ( context.isLoggable( Level.CONFIG ) )
             {
-                context.log( Level.FINE, this.getMessage( "contextReport", this.getClass().getName(), count, location,
-                                                          Long.valueOf( System.currentTimeMillis() - t0 ) ), null );
+                context.log( Level.CONFIG, this.getMessage( "contextReport", this.getClass().getName(), count, location,
+                                                            Long.valueOf( System.currentTimeMillis() - t0 ) ), null );
 
             }
 

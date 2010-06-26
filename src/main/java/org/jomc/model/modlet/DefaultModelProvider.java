@@ -277,10 +277,10 @@ public class DefaultModelProvider implements ModelProvider
                 if ( content instanceof Module )
                 {
                     final Module m = (Module) content;
-                    if ( context.isLoggable( Level.CONFIG ) )
+                    if ( context.isLoggable( Level.FINE ) )
                     {
-                        context.log( Level.CONFIG, getMessage( "foundModule", this.getClass().getName(), m.getName(),
-                                                               m.getVersion() == null ? "" : m.getVersion() ), null );
+                        context.log( Level.FINE, getMessage( "foundModule", this.getClass().getName(), m.getName(),
+                                                             m.getVersion() == null ? "" : m.getVersion() ), null );
 
                     }
 
@@ -295,10 +295,10 @@ public class DefaultModelProvider implements ModelProvider
                 }
             }
 
-            if ( context.isLoggable( Level.FINE ) )
+            if ( context.isLoggable( Level.CONFIG ) )
             {
-                context.log( Level.FINE, getMessage( "contextReport", this.getClass().getName(), count, location,
-                                                     Long.valueOf( System.currentTimeMillis() - t0 ) ), null );
+                context.log( Level.CONFIG, getMessage( "contextReport", this.getClass().getName(), count, location,
+                                                       Long.valueOf( System.currentTimeMillis() - t0 ) ), null );
 
             }
 
