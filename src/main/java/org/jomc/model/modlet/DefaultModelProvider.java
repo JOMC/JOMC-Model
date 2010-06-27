@@ -306,14 +306,13 @@ public class DefaultModelProvider implements ModelProvider
         }
         catch ( final JAXBException e )
         {
-            if ( e.getLinkedException() != null )
+            String message = e.getMessage();
+            if ( message == null && e.getLinkedException() != null )
             {
-                throw new ModelException( e.getLinkedException().getMessage(), e.getLinkedException() );
+                message = e.getLinkedException().getMessage();
             }
-            else
-            {
-                throw new ModelException( e.getMessage(), e );
-            }
+
+            throw new ModelException( message, e );
         }
     }
 
