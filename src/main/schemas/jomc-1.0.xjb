@@ -2186,7 +2186,7 @@
       <ci:code><![CDATA[
     /**
      * Constant for the default name of the classpath module.
-     * @see #getClasspathModuleName()
+     * @see #getDefaultClasspathModuleName()
      */
     private static final String DEFAULT_CLASSPATH_MODULE_NAME = "Java Classpath";
 
