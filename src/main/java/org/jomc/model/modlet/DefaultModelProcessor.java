@@ -135,7 +135,7 @@ public class DefaultModelProcessor implements ModelProcessor
      * @see #isDefaultEnabled()
      * @see #setEnabled(java.lang.Boolean)
      */
-    public boolean isEnabled()
+    public final boolean isEnabled()
     {
         if ( this.enabled == null )
         {
@@ -152,7 +152,7 @@ public class DefaultModelProcessor implements ModelProcessor
      *
      * @see #isEnabled()
      */
-    public void setEnabled( final Boolean value )
+    public final void setEnabled( final Boolean value )
     {
         this.enabled = value;
     }
@@ -200,7 +200,7 @@ public class DefaultModelProcessor implements ModelProcessor
      * @see #getDefaultTransformerLocation()
      * @see #setTransformerLocation(java.lang.String)
      */
-    public String getTransformerLocation()
+    public final String getTransformerLocation()
     {
         if ( this.transformerLocation == null )
         {
@@ -217,7 +217,7 @@ public class DefaultModelProcessor implements ModelProcessor
      *
      * @see #getTransformerLocation()
      */
-    public void setTransformerLocation( final String value )
+    public final void setTransformerLocation( final String value )
     {
         this.transformerLocation = value;
     }

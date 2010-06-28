@@ -126,7 +126,7 @@ public class DefaultModelProvider implements ModelProvider
      * @see #isDefaultEnabled()
      * @see #setEnabled(java.lang.Boolean)
      */
-    public boolean isEnabled()
+    public final boolean isEnabled()
     {
         if ( this.enabled == null )
         {
@@ -143,7 +143,7 @@ public class DefaultModelProvider implements ModelProvider
      *
      * @see #isEnabled()
      */
-    public void setEnabled( final Boolean value )
+    public final void setEnabled( final Boolean value )
     {
         this.enabled = value;
     }
@@ -190,7 +190,7 @@ public class DefaultModelProvider implements ModelProvider
      * @see #getDefaultModuleLocation()
      * @see #setModuleLocation(java.lang.String)
      */
-    public String getModuleLocation()
+    public final String getModuleLocation()
     {
         if ( this.moduleLocation == null )
         {
@@ -207,7 +207,7 @@ public class DefaultModelProvider implements ModelProvider
      *
      * @see #getModuleLocation()
      */
-    public void setModuleLocation( final String value )
+    public final void setModuleLocation( final String value )
     {
         this.moduleLocation = value;
     }
