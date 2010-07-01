@@ -108,7 +108,7 @@ public abstract class ModelHelper
     /**
      * Adds {@code Modules} to a {@code Model}.
      *
-     * @param model The {@code Model} to a {@code modules} to.
+     * @param model The {@code Model} to add {@code modules} to.
      * @param modules The {@code Modules} to add to {@code model}.
      *
      * @throws NullPointerException if {@code model} or {@code modules} is {@code null}.
