@@ -112,7 +112,7 @@
         <executions>
           <execution>
             <id>copy-schemas</id>
-            <phase>process-resources</phase>
+            <phase>package</phase>
             <goals>
               <goal>copy-resources</goal>
             </goals>
