@@ -92,9 +92,10 @@
             <configuration>
               <arguments>-copy-constructor -mark-generated -Xinject-code</arguments>
               <bindingDirectory>src/test/schemas</bindingDirectory>
-              <schemaDirectory>src/test/schemas</schemaDirectory>
               <extension>true</extension>
+              <npa>true</npa>
               <outputDirectory>${xjcTestOutputDirectory}</outputDirectory>
+              <schemaDirectory>src/test/schemas</schemaDirectory>
               <staleFile>${project.build.directory}/testXjc.staleFile</staleFile> <!-- See http://jira.codehaus.org/browse/MJAXB-34 -->
             </configuration>
           </execution>
