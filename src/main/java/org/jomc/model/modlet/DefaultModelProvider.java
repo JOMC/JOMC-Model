@@ -269,9 +269,9 @@ public class DefaultModelProvider implements ModelProvider
                 }
 
                 Object content = u.unmarshal( url );
-                if ( content instanceof JAXBElement )
+                if ( content instanceof JAXBElement<?> )
                 {
-                    content = ( (JAXBElement) content ).getValue();
+                    content = ( (JAXBElement<?>) content ).getValue();
                 }
 
                 if ( content instanceof Module )
