@@ -31,7 +31,7 @@
 
   $Id$
 
-  Location: http://jomc.sourceforge.net/model/jomc-1.0.xsd
+  Location: http://jomc.sourceforge.net/model/jomc-1.1.xsd
 
 -->
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
@@ -72,7 +72,7 @@
 
   $Id$
 
-  Location: http://jomc.sourceforge.net/model/jomc-1.0.xsd
+  Location: http://jomc.sourceforge.net/model/jomc-1.1.xsd
 
 ]]>
     </xsd:documentation>
@@ -148,7 +148,7 @@ text in a set of texts. Attribute 'value' holds the text corresponding to that l
       <xsd:element ref="jomc:documentation" minOccurs="0" maxOccurs="1"/>
       <xsd:element ref="jomc:authors" minOccurs="0" maxOccurs="1"/>
     </xsd:sequence>
-    <xsd:attribute name="modelVersion" type="jomc:Version" use="optional" default="1.0"/>
+    <xsd:attribute name="modelVersion" type="jomc:Version" use="optional" default="1.1"/>
     <xsd:attribute name="createDate" type="jomc:DateTime" use="optional"/>
     <xsd:attribute name="deprecated" type="jomc:Flag" use="optional" default="false"/>
   </xsd:complexType>

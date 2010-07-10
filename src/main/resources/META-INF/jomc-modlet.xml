@@ -38,8 +38,8 @@
         name="${project.name}" model="http://jomc.org/model" vendor="${project.organization.name}" version="${project.version}">
 
   <schemas>
-    <schema public-id="http://jomc.org/model" system-id="http://jomc.sourceforge.net/model/jomc-1.0.xsd"
-            context-id="org.jomc.model" classpath-id="org/jomc/model/jomc-1.0.xsd"/>
+    <schema public-id="http://jomc.org/model" system-id="http://jomc.sourceforge.net/model/jomc-1.1.xsd"
+            context-id="org.jomc.model" classpath-id="org/jomc/model/jomc-1.1.xsd"/>
 
   </schemas>
   <services>
