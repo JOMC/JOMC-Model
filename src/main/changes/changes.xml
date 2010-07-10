@@ -46,6 +46,10 @@
       <code>@XmlSchema</code> annotation of the <code>org.jomc.model</code> package. Added a <code>@XmlNs</code>
       annotation to the <code>@XmlSchema</code> annotation of the <code>org.jomc.model</code> package.]]>
       </action>
+      <action dev="schulte2005" type="add"><![CDATA[Added methods <code>getAnyElement</code> and
+      <code>getAnyElements</code> taking a type.
+      See the <a href="http://jomc.sourceforge.net/jomc/1.1.x/jomc-model/clirr-report.html">CLIRR report</a>.]]>
+      </action>
     </release>
   </body>
 </document>

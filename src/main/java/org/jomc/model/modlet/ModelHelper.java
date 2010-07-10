@@ -72,7 +72,7 @@ public abstract class ModelHelper
             throw new NullPointerException( "model" );
         }
 
-        final JAXBElement<Modules> e = model.getAnyElement( ModelObject.MODEL_PUBLIC_ID, "modules" );
+        final JAXBElement<Modules> e = model.getAnyElement( ModelObject.MODEL_PUBLIC_ID, "modules", Modules.class );
         return e != null ? e.getValue() : null;
     }
 
@@ -154,11 +154,11 @@ public abstract class ModelHelper
             throw new NullPointerException( "model" );
         }
 
-        final JAXBElement<Modules> modules = model.getAnyElement( ModelObject.MODEL_PUBLIC_ID, "modules" );
+        final JAXBElement<Modules> e = model.getAnyElement( ModelObject.MODEL_PUBLIC_ID, "modules", Modules.class );
 
-        if ( modules != null )
+        if ( e != null )
         {
-            model.getAny().remove( modules );
+            model.getAny().remove( e );
         }
     }
 
