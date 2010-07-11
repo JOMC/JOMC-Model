@@ -31,7 +31,7 @@
  *
  */
 @XmlSchema( namespace = "http://jomc.org/model", elementFormDefault = XmlNsForm.QUALIFIED,
-            location = "http://jomc.sourceforge.net/model/jomc-1.1.xsd", xmlns =
+            location = "http://jomc.sourceforge.net/model/jomc-1.0.xsd", xmlns =
 {
     @XmlNs( prefix = "model", namespaceURI = "http://jomc.org/model" )
 } )
