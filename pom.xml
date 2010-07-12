@@ -42,6 +42,7 @@
   <artifactId>jomc-model</artifactId>
   <name>JOMC Model</name>
   <description>Object management and configuration model.</description>
+  <url>${jomc.artifacts.url}/${project.artifactId}-${project.version}</url>
   <build>
     <resources>
       <resource>
@@ -181,6 +182,13 @@
       </plugin>
     </plugins>
   </reporting>
+  <distributionManagement>
+    <site>
+      <id>jomc.sourceforge.net</id>
+      <name>JOMC Site</name>
+      <url>${jomc.artifacts.distribution.url}/${project.artifactId}-${project.version}</url>
+    </site>
+  </distributionManagement>
   <profiles>
     <profile>
       <id>jdk15</id>
