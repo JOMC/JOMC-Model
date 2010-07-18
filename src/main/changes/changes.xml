@@ -48,7 +48,7 @@
       </action>
       <action dev="schulte2005" type="add"><![CDATA[Added methods <code>getAnyElement</code> and
       <code>getAnyElements</code> taking a type.
-      See the <a href="http://jomc.sourceforge.net/jomc/1.1.x/jomc-model/clirr-report.html">CLIRR report</a>.]]>
+      See the <a href="http://jomc.sourceforge.net/jomc/1.1/jomc-model-1.1/clirr-report.html">CLIRR report</a>.]]>
       </action>
     </release>
   </body>
