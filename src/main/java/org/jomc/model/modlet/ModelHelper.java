@@ -64,6 +64,9 @@ public abstract class ModelHelper
      * @return The {@code Modules} of {@code Model} or {@code null}.
      *
      * @throws NullPointerException if {@code model} is {@code null}.
+     *
+     * @see #addModules(org.jomc.modlet.Model, org.jomc.model.Modules)
+     * @see #setModules(org.jomc.modlet.Model, org.jomc.model.Modules)
      */
     public static Modules getModules( final Model model )
     {
@@ -86,6 +89,7 @@ public abstract class ModelHelper
      * @throws IllegalStateException if {@code model} already holds {@code Modules}.
      *
      * @see #addModules(org.jomc.modlet.Model, org.jomc.model.Modules)
+     * @see #removeModules(org.jomc.modlet.Model)
      */
     public static void setModules( final Model model, final Modules modules )
     {
@@ -114,6 +118,7 @@ public abstract class ModelHelper
      * @throws NullPointerException if {@code model} or {@code modules} is {@code null}.
      *
      * @see #removeModules(org.jomc.modlet.Model)
+     * @see #setModules(org.jomc.modlet.Model, org.jomc.model.Modules)
      */
     public static void addModules( final Model model, final Modules modules )
     {
@@ -146,6 +151,7 @@ public abstract class ModelHelper
      * @throws NullPointerException if {@code model} is {@code null}.
      *
      * @see #addModules(org.jomc.modlet.Model, org.jomc.model.Modules)
+     * @see #setModules(org.jomc.modlet.Model, org.jomc.model.Modules)
      */
     public static void removeModules( final Model model )
     {
