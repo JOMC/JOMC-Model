@@ -109,6 +109,17 @@ public class ModelHelperTest
             System.out.println( e.toString() );
         }
 
+        try
+        {
+            ModelHelper.removeModules( null );
+            fail( "Expected NullPointerException not thrown." );
+        }
+        catch ( final NullPointerException e )
+        {
+            assertNotNull( e.getMessage() );
+            System.out.println( e.toString() );
+        }
+
         final Model model = new Model();
         model.setIdentifier( ModelObject.MODEL_PUBLIC_ID );
 
