@@ -292,11 +292,9 @@ public class DefaultModelProcessor implements ModelProcessor
                 count++;
                 final URL url = resources.nextElement();
 
-                if ( context.isLoggable( Level.FINE ) )
+                if ( context.isLoggable( Level.FINER ) )
                 {
-                    context.log( Level.FINE, this.getMessage( "processing", this.getClass().getName(),
-                                                              url.toExternalForm() ), null );
-
+                    context.log( Level.FINER, getMessage( "processing", url.toExternalForm() ), null );
                 }
 
                 final InputStream in = url.openStream();
@@ -307,10 +305,10 @@ public class DefaultModelProcessor implements ModelProcessor
                 transformers.add( transformer );
             }
 
-            if ( context.isLoggable( Level.CONFIG ) )
+            if ( context.isLoggable( Level.FINE ) )
             {
-                context.log( Level.CONFIG, this.getMessage( "contextReport", this.getClass().getName(), count, location,
-                                                            Long.valueOf( System.currentTimeMillis() - t0 ) ), null );
+                context.log( Level.FINE, getMessage( "contextReport", count, location,
+                                                     Long.valueOf( System.currentTimeMillis() - t0 ) ), null );
 
             }
 
@@ -356,13 +354,6 @@ public class DefaultModelProcessor implements ModelProcessor
 
             if ( this.isEnabled() )
             {
-                if ( context.isLoggable( Level.FINE ) )
-                {
-                    context.log( Level.FINE, getMessage( "processingModel", this.getClass().getName(),
-                                                         model.getIdentifier() ), null );
-
-                }
-
                 final org.jomc.modlet.ObjectFactory objectFactory = new org.jomc.modlet.ObjectFactory();
                 final JAXBContext jaxbContext = context.createContext( model.getIdentifier() );
                 final List<Transformer> transformers = this.findTransformers( context, this.getTransformerLocation() );
@@ -380,10 +371,10 @@ public class DefaultModelProcessor implements ModelProcessor
                     }
                 }
             }
-            else if ( context.isLoggable( Level.FINE ) )
+            else if ( context.isLoggable( Level.FINER ) )
             {
-                context.log( Level.FINE, getMessage( "disabled", this.getClass().getName(),
-                                                     model.getIdentifier() ), null );
+                context.log( Level.FINER, getMessage( "disabled", this.getClass().getSimpleName(),
+                                                      model.getIdentifier() ), null );
 
             }
 
@@ -411,7 +402,7 @@ public class DefaultModelProcessor implements ModelProcessor
         }
     }
 
-    private String getMessage( final String key, final Object... args )
+    private static String getMessage( final String key, final Object... args )
     {
         return MessageFormat.format( ResourceBundle.getBundle(
             DefaultModelProcessor.class.getName().replace( '.', '/' ), Locale.getDefault() ).getString( key ), args );

@@ -261,11 +261,9 @@ public class DefaultModelProvider implements ModelProvider
                 count++;
                 final URL url = resources.nextElement();
 
-                if ( context.isLoggable( Level.FINE ) )
+                if ( context.isLoggable( Level.FINER ) )
                 {
-                    context.log( Level.FINE, getMessage( "processing", this.getClass().getName(),
-                                                         url.toExternalForm() ), null );
-
+                    context.log( Level.FINER, getMessage( "processing", url.toExternalForm() ), null );
                 }
 
                 Object content = u.unmarshal( url );
@@ -277,10 +275,10 @@ public class DefaultModelProvider implements ModelProvider
                 if ( content instanceof Module )
                 {
                     final Module m = (Module) content;
-                    if ( context.isLoggable( Level.FINE ) )
+                    if ( context.isLoggable( Level.FINEST ) )
                     {
-                        context.log( Level.FINE, getMessage( "foundModule", this.getClass().getName(), m.getName(),
-                                                             m.getVersion() == null ? "" : m.getVersion() ), null );
+                        context.log( Level.FINEST, getMessage(
+                            "foundModule", m.getName(), m.getVersion() == null ? "" : m.getVersion() ), null );
 
                     }
 
@@ -295,10 +293,10 @@ public class DefaultModelProvider implements ModelProvider
                 }
             }
 
-            if ( context.isLoggable( Level.CONFIG ) )
+            if ( context.isLoggable( Level.FINE ) )
             {
-                context.log( Level.CONFIG, getMessage( "contextReport", this.getClass().getName(), count, location,
-                                                       Long.valueOf( System.currentTimeMillis() - t0 ) ), null );
+                context.log( Level.FINE, getMessage( "contextReport", count, location,
+                                                     Long.valueOf( System.currentTimeMillis() - t0 ) ), null );
 
             }
 
@@ -338,13 +336,6 @@ public class DefaultModelProvider implements ModelProvider
 
         if ( this.isEnabled() )
         {
-            if ( context.isLoggable( Level.FINE ) )
-            {
-                context.log( Level.FINE, getMessage( "providingModel", this.getClass().getName(),
-                                                     model.getIdentifier() ), null );
-
-            }
-
             final Modules modules = this.findModules( context, model.getIdentifier(), this.getModuleLocation() );
 
             if ( modules != null )
@@ -353,9 +344,11 @@ public class DefaultModelProvider implements ModelProvider
                 ModelHelper.addModules( found, modules );
             }
         }
-        else if ( context.isLoggable( Level.FINE ) )
+        else if ( context.isLoggable( Level.FINER ) )
         {
-            context.log( Level.FINE, getMessage( "disabled", this.getClass().getName(), model.getIdentifier() ), null );
+            context.log( Level.FINER, getMessage( "disabled", this.getClass().getSimpleName(),
+                                                  model.getIdentifier() ), null );
+
         }
 
         return found;

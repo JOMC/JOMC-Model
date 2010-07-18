@@ -103,15 +103,6 @@ public class DefaultModelValidator implements ModelValidator
 
         try
         {
-            if ( context.isLoggable( Level.FINE ) )
-            {
-                context.log( Level.FINE, getMessage( "validatingModel", new Object[]
-                    {
-                        this.getClass().getName(), model.getIdentifier()
-                    } ), null );
-
-            }
-
             final Source source = new JAXBSource( context.createContext( model.getIdentifier() ),
                                                   new org.jomc.modlet.ObjectFactory().createModel( model ) );
 
