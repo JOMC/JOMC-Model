@@ -261,9 +261,9 @@ public class DefaultModelProvider implements ModelProvider
                 count++;
                 final URL url = resources.nextElement();
 
-                if ( context.isLoggable( Level.FINER ) )
+                if ( context.isLoggable( Level.FINEST ) )
                 {
-                    context.log( Level.FINER, getMessage( "processing", url.toExternalForm() ), null );
+                    context.log( Level.FINEST, getMessage( "processing", url.toExternalForm() ), null );
                 }
 
                 Object content = u.unmarshal( url );
