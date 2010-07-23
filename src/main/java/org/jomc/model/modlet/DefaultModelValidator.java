@@ -120,10 +120,10 @@ public class DefaultModelValidator implements ModelValidator
         }
         catch ( final JAXBException e )
         {
-            String message = e.getMessage();
+            String message = getMessage( e );
             if ( message == null && e.getLinkedException() != null )
             {
-                message = e.getLinkedException().getMessage();
+                message = getMessage( e.getLinkedException() );
             }
 
             if ( context.isLoggable( Level.FINE ) )
@@ -190,16 +190,18 @@ public class DefaultModelValidator implements ModelValidator
                             }
                             catch ( final IllegalArgumentException e )
                             {
+                                final String message = getMessage( e );
+
                                 if ( context.isLoggable( Level.FINE ) )
                                 {
-                                    context.log( Level.FINE, e.getMessage(), e );
+                                    context.log( Level.FINE, message, e );
                                 }
 
                                 report.getDetails().add( this.createDetail(
                                     "MODULE_MESSAGE_TEMPLATE_CONSTRAINT", Level.SEVERE,
                                     "moduleMessageTemplateConstraint", new Object[]
                                     {
-                                        m.getName(), msg.getName(), t.getValue(), e.getMessage()
+                                        m.getName(), msg.getName(), t.getValue(), message
                                     }, new ObjectFactory().createModule( m ) ) );
 
                             }
@@ -271,16 +273,18 @@ public class DefaultModelValidator implements ModelValidator
                     }
                     catch ( final PropertyException e )
                     {
+                        final String message = getMessage( e );
+
                         if ( context.isLoggable( Level.FINE ) )
                         {
-                            context.log( Level.FINE, e.getMessage(), e );
+                            context.log( Level.FINE, message, e );
                         }
 
                         report.getDetails().add( this.createDetail(
                             "MODULE_PROPERTY_JAVA_VALUE_CONSTRAINT", Level.SEVERE,
                             "modulePropertyJavaValueConstraint", new Object[]
                             {
-                                m.getName(), p.getName(), e.getMessage()
+                                m.getName(), p.getName(), message
                             }, new ObjectFactory().createModule( m ) ) );
 
                     }
@@ -461,16 +465,18 @@ public class DefaultModelValidator implements ModelValidator
                                 }
                                 catch ( final IllegalArgumentException e )
                                 {
+                                    final String message = getMessage( e );
+
                                     if ( context.isLoggable( Level.FINE ) )
                                     {
-                                        context.log( Level.FINE, e.getMessage(), e );
+                                        context.log( Level.FINE, message, e );
                                     }
 
                                     report.getDetails().add( this.createDetail(
                                         "IMPLEMENTATION_MESSAGE_TEMPLATE_CONSTRAINT", Level.SEVERE,
                                         "implementationMessageTemplateConstraint", new Object[]
                                         {
-                                            i.getIdentifier(), m.getName(), t.getValue(), e.getMessage()
+                                            i.getIdentifier(), m.getName(), t.getValue(), message
                                         }, new ObjectFactory().createImplementation( i ) ) );
 
                                 }
@@ -580,16 +586,18 @@ public class DefaultModelValidator implements ModelValidator
                         }
                         catch ( final PropertyException e )
                         {
+                            final String message = getMessage( e );
+
                             if ( context.isLoggable( Level.FINE ) )
                             {
-                                context.log( Level.FINE, e.getMessage(), e );
+                                context.log( Level.FINE, message, e );
                             }
 
                             report.getDetails().add( this.createDetail(
                                 "IMPLEMENTATION_PROPERTY_JAVA_VALUE_CONSTRAINT", Level.SEVERE,
                                 "implementationPropertyJavaValueConstraint", new Object[]
                                 {
-                                    i.getIdentifier(), p.getName(), e.getMessage()
+                                    i.getIdentifier(), p.getName(), message
                                 }, new ObjectFactory().createImplementation( i ) ) );
 
                         }
@@ -821,16 +829,18 @@ public class DefaultModelValidator implements ModelValidator
                         }
                         catch ( final PropertyException e )
                         {
+                            final String message = getMessage( e );
+
                             if ( context.isLoggable( Level.FINE ) )
                             {
-                                context.log( Level.FINE, e.getMessage(), e );
+                                context.log( Level.FINE, message, e );
                             }
 
                             report.getDetails().add( this.createDetail(
                                 "SPECIFICATION_PROPERTY_JAVA_VALUE_CONSTRAINT", Level.SEVERE,
                                 "specificationPropertyJavaValueConstraint", new Object[]
                                 {
-                                    s.getIdentifier(), p.getName(), e.getMessage()
+                                    s.getIdentifier(), p.getName(), message
                                 }, new ObjectFactory().createSpecification( s ) ) );
 
                         }
@@ -922,27 +932,31 @@ public class DefaultModelValidator implements ModelValidator
                     }
                     catch ( final ParseException e )
                     {
+                        final String message = getMessage( e );
+
                         if ( context.isLoggable( Level.FINE ) )
                         {
-                            context.log( Level.FINE, e.getMessage(), e );
+                            context.log( Level.FINE, message, e );
                         }
 
                         final ModelValidationReport.Detail detail = new ModelValidationReport.Detail(
                             "IMPLEMENTATION_DEPENDENCY_SPECIFICATION_COMPATIBILITY_VERSIONING_PARSE_EXCEPTION",
-                            Level.SEVERE, e.getMessage(), new ObjectFactory().createImplementation( implementation ) );
+                            Level.SEVERE, message, new ObjectFactory().createImplementation( implementation ) );
 
                         report.getDetails().add( detail );
                     }
                     catch ( final TokenMgrError e )
                     {
+                        final String message = getMessage( e );
+
                         if ( context.isLoggable( Level.FINE ) )
                         {
-                            context.log( Level.FINE, e.getMessage(), e );
+                            context.log( Level.FINE, message, e );
                         }
 
                         final ModelValidationReport.Detail detail = new ModelValidationReport.Detail(
                             "IMPLEMENTATION_DEPENDENCY_SPECIFICATION_COMPATIBILITY_VERSIONING_TOKEN_MANAGER_ERROR",
-                            Level.SEVERE, e.getMessage(), new ObjectFactory().createImplementation( implementation ) );
+                            Level.SEVERE, message, new ObjectFactory().createImplementation( implementation ) );
 
                         report.getDetails().add( detail );
                     }
@@ -1044,16 +1058,18 @@ public class DefaultModelValidator implements ModelValidator
                 }
                 catch ( final PropertyException e )
                 {
+                    final String message = getMessage( e );
+
                     if ( context.isLoggable( Level.FINE ) )
                     {
-                        context.log( Level.FINE, e.getMessage(), e );
+                        context.log( Level.FINE, message, e );
                     }
 
                     report.getDetails().add( this.createDetail(
                         "IMPLEMENTATION_DEPENDENCY_PROPERTY_JAVA_VALUE_CONSTRAINT", Level.SEVERE,
                         "implementationDependencyPropertyJavaValueConstraint", new Object[]
                         {
-                            implementation.getIdentifier(), dependency.getName(), p.getName(), e.getMessage()
+                            implementation.getIdentifier(), dependency.getName(), p.getName(), message
                         }, new ObjectFactory().createImplementation( implementation ) ) );
 
                 }
@@ -1399,29 +1415,31 @@ public class DefaultModelValidator implements ModelValidator
                             }
                             catch ( final ParseException e )
                             {
+                                final String message = getMessage( e );
+
                                 if ( context.isLoggable( Level.FINE ) )
                                 {
-                                    context.log( Level.FINE, e.getMessage(), e );
+                                    context.log( Level.FINE, message, e );
                                 }
 
                                 final ModelValidationReport.Detail detail = new ModelValidationReport.Detail(
                                     "IMPLEMENTATION_INHERITANCE_COMPATIBILITY_VERSIONING_PARSE_EXCEPTION",
-                                    Level.SEVERE, e.getMessage(),
-                                    new ObjectFactory().createImplementation( implementation ) );
+                                    Level.SEVERE, message, new ObjectFactory().createImplementation( implementation ) );
 
                                 report.getDetails().add( detail );
                             }
                             catch ( final TokenMgrError e )
                             {
+                                final String message = getMessage( e );
+
                                 if ( context.isLoggable( Level.FINE ) )
                                 {
-                                    context.log( Level.FINE, e.getMessage(), e );
+                                    context.log( Level.FINE, message, e );
                                 }
 
                                 final ModelValidationReport.Detail detail = new ModelValidationReport.Detail(
                                     "IMPLEMENTATION_INHERITANCE_COMPATIBILITY_VERSIONING_TOKEN_MANAGER_ERROR",
-                                    Level.SEVERE, e.getMessage(),
-                                    new ObjectFactory().createImplementation( implementation ) );
+                                    Level.SEVERE, message, new ObjectFactory().createImplementation( implementation ) );
 
                                 report.getDetails().add( detail );
                             }
@@ -1582,29 +1600,31 @@ public class DefaultModelValidator implements ModelValidator
                         }
                         catch ( final ParseException e )
                         {
+                            final String message = getMessage( e );
+
                             if ( context.isLoggable( Level.FINE ) )
                             {
-                                context.log( Level.FINE, e.getMessage(), e );
+                                context.log( Level.FINE, message, e );
                             }
 
                             final ModelValidationReport.Detail d = new ModelValidationReport.Detail(
                                 "IMPLEMENTATION_SPECIFICATION_COMPATIBILITY_VERSIONING_PARSE_EXCEPTION",
-                                Level.SEVERE, e.getMessage(),
-                                new ObjectFactory().createImplementation( implementation ) );
+                                Level.SEVERE, message, new ObjectFactory().createImplementation( implementation ) );
 
                             report.getDetails().add( d );
                         }
                         catch ( final TokenMgrError e )
                         {
+                            final String message = getMessage( e );
+
                             if ( context.isLoggable( Level.FINE ) )
                             {
-                                context.log( Level.FINE, e.getMessage(), e );
+                                context.log( Level.FINE, message, e );
                             }
 
                             final ModelValidationReport.Detail d = new ModelValidationReport.Detail(
                                 "IMPLEMENTATION_SPECIFICATION_COMPATIBILITY_VERSIONING_TOKEN_MANAGER_ERROR",
-                                Level.SEVERE, e.getMessage(),
-                                new ObjectFactory().createImplementation( implementation ) );
+                                Level.SEVERE, message, new ObjectFactory().createImplementation( implementation ) );
 
                             report.getDetails().add( d );
                         }
@@ -2061,6 +2081,11 @@ public class DefaultModelValidator implements ModelValidator
             DefaultModelValidator.class.getName().replace( '.', '/' ),
             Locale.getDefault() ).getString( key ) ).format( args );
 
+    }
+
+    private static String getMessage( final Throwable t )
+    {
+        return t != null ? t.getMessage() != null ? t.getMessage() : getMessage( t.getCause() ) : null;
     }
 
 }

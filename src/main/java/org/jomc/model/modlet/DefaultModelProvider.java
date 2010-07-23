@@ -304,10 +304,10 @@ public class DefaultModelProvider implements ModelProvider
         }
         catch ( final JAXBException e )
         {
-            String message = e.getMessage();
+            String message = getMessage( e );
             if ( message == null && e.getLinkedException() != null )
             {
-                message = e.getLinkedException().getMessage();
+                message = getMessage( e.getLinkedException() );
             }
 
             throw new ModelException( message, e );
@@ -359,6 +359,11 @@ public class DefaultModelProvider implements ModelProvider
         return MessageFormat.format( ResourceBundle.getBundle(
             DefaultModelProvider.class.getName().replace( '.', '/' ), Locale.getDefault() ).getString( key ), args );
 
+    }
+
+    private static String getMessage( final Throwable t )
+    {
+        return t != null ? t.getMessage() != null ? t.getMessage() : getMessage( t.getCause() ) : null;
     }
 
 }

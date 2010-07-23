@@ -316,14 +316,14 @@ public class DefaultModelProcessor implements ModelProcessor
         }
         catch ( final IOException e )
         {
-            throw new ModelException( e.getMessage(), e );
+            throw new ModelException( getMessage( e ), e );
         }
         catch ( final TransformerConfigurationException e )
         {
-            String message = e.getMessage();
+            String message = getMessage( e );
             if ( message == null && e.getException() != null )
             {
-                message = e.getException().getMessage();
+                message = getMessage( e.getException() );
             }
 
             throw new ModelException( message, e );
@@ -382,20 +382,20 @@ public class DefaultModelProcessor implements ModelProcessor
         }
         catch ( final TransformerException e )
         {
-            String message = e.getMessage();
+            String message = getMessage( e );
             if ( message == null && e.getException() != null )
             {
-                message = e.getException().getMessage();
+                message = getMessage( e.getException() );
             }
 
             throw new ModelException( message, e );
         }
         catch ( final JAXBException e )
         {
-            String message = e.getMessage();
+            String message = getMessage( e );
             if ( message == null && e.getLinkedException() != null )
             {
-                message = e.getLinkedException().getMessage();
+                message = getMessage( e.getLinkedException() );
             }
 
             throw new ModelException( message, e );
@@ -407,6 +407,11 @@ public class DefaultModelProcessor implements ModelProcessor
         return MessageFormat.format( ResourceBundle.getBundle(
             DefaultModelProcessor.class.getName().replace( '.', '/' ), Locale.getDefault() ).getString( key ), args );
 
+    }
+
+    private static String getMessage( final Throwable t )
+    {
+        return t != null ? t.getMessage() != null ? t.getMessage() : getMessage( t.getCause() ) : null;
     }
 
 }
