@@ -258,7 +258,7 @@ public class DefaultModelProcessor implements ModelProcessor
                 {
                     if ( context.isLoggable( Level.WARNING ) )
                     {
-                        context.log( Level.WARNING, exception.getMessage(), exception );
+                        context.log( Level.WARNING, getMessage( exception ), exception );
                     }
                 }
 
@@ -266,7 +266,7 @@ public class DefaultModelProcessor implements ModelProcessor
                 {
                     if ( context.isLoggable( Level.SEVERE ) )
                     {
-                        context.log( Level.SEVERE, exception.getMessage(), exception );
+                        context.log( Level.SEVERE, getMessage( exception ), exception );
                     }
 
                     throw exception;
@@ -276,7 +276,7 @@ public class DefaultModelProcessor implements ModelProcessor
                 {
                     if ( context.isLoggable( Level.SEVERE ) )
                     {
-                        context.log( Level.SEVERE, exception.getMessage(), exception );
+                        context.log( Level.SEVERE, getMessage( exception ), exception );
                     }
 
                     throw exception;
@@ -367,7 +367,18 @@ public class DefaultModelProcessor implements ModelProcessor
                         final JAXBSource source = new JAXBSource( jaxbContext, e );
                         final JAXBResult result = new JAXBResult( jaxbContext );
                         t.transform( source, result );
-                        processed = ( (JAXBElement<Model>) result.getResult() ).getValue();
+
+                        if ( result.getResult() instanceof JAXBElement<?>
+                             && ( (JAXBElement<?>) result.getResult() ).getValue() instanceof Model )
+                        {
+                            processed = (Model) ( (JAXBElement<?>) result.getResult() ).getValue();
+                        }
+                        else
+                        {
+                            throw new ModelException( getMessage(
+                                "illegalTransformationResult", model.getIdentifier() ) );
+
+                        }
                     }
                 }
             }

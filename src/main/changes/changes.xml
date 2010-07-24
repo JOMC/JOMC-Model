@@ -50,6 +50,10 @@
       <code>getAnyElements</code> taking a type.
       See the <a href="http://jomc.sourceforge.net/jomc/1.1/jomc-model-1.1/clirr-report.html">CLIRR report</a>.]]>
       </action>
+      <action dev="schulte2005" type="fix"><![CDATA[Corrected a <code>ClassCastExpcetion</code> thrown by class
+      <code>org.jomc.model.modlet.DefaultModelProcessor</code> when transforming models using stylesheets producing
+      illegal transformation results.]]>
+      </action>
     </release>
   </body>
 </document>
