@@ -4079,8 +4079,16 @@
                         {
                             final Object o = ctor.newInstance();
                             this.objects.put( o, instance );
-                            object = factoryMethod.invoke( o, (Object[]) null );
-                            this.objects.remove( o );
+
+                            try
+                            {
+                                object = factoryMethod.invoke( o, (Object[]) null );
+                            }
+                            finally
+                            {
+                                this.objects.remove( o );
+                            }
+
                             if ( object != null )
                             {
                                 this.objects.put( object, instance );
