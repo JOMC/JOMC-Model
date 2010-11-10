@@ -55,5 +55,16 @@
       illegal transformation results.]]>
       </action>
     </release>
+    <!-- *********************************************************************************************************** -->
+    <release version="1.2">
+      <action dev="schulte2005" type="update"><![CDATA[Updated method <code>findTransformers</code> of class
+      <code>org.jomc.model.modlet.DefaultModelProcessor</code> to add system properties to transformers as
+      parameters.]]>
+      </action>
+      <action dev="schulte2005" type="fix"><![CDATA[Corrected method <code>findTransformers</code> of class
+      <code>org.jomc.model.modlet.DefaultModelProcessor</code> to create <code>Transformers</code> supporting resolution
+      of relative URIs based on the system id of found transformations.]]>
+      </action>
+    </release>
   </body>
 </document>

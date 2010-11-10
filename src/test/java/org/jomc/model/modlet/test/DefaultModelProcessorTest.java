@@ -32,6 +32,8 @@
  */
 package org.jomc.model.modlet.test;
 
+import org.jomc.model.Modules;
+import org.jomc.model.modlet.ModelHelper;
 import org.jomc.model.ModelObject;
 import org.jomc.model.modlet.DefaultModelProcessor;
 import org.jomc.modlet.Model;
@@ -148,6 +150,18 @@ public class DefaultModelProcessorTest
         }
 
         assertNotNull( this.getModelProcessor().processModel( context, model ) );
+
+        this.getModelProcessor().setTransformerLocation(
+            this.getClass().getPackage().getName().replace( '.', '/' ) + "/system-property-test.xsl" );
+
+        final Model processed = this.getModelProcessor().processModel( context, model );
+        assertNotNull( processed );
+
+        final Modules modules = ModelHelper.getModules( processed );
+        assertNotNull( modules );
+        assertNotNull( modules.getModule( System.getProperty( "user.home" ) ) );
+
+        this.getModelProcessor().setTransformerLocation( null );
     }
 
     public void testDefaultEnabled() throws Exception

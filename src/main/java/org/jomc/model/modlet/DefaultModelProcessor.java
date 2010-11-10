@@ -32,14 +32,14 @@
  */
 package org.jomc.model.modlet;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import javax.xml.bind.JAXBContext;
@@ -297,11 +297,16 @@ public class DefaultModelProcessor implements ModelProcessor
                     context.log( Level.FINEST, getMessage( "processing", url.toExternalForm() ), null );
                 }
 
-                final InputStream in = url.openStream();
-                final Transformer transformer = transformerFactory.newTransformer( new StreamSource( in ) );
-                in.close();
+                final Transformer transformer =
+                    transformerFactory.newTransformer( new StreamSource( url.toURI().toASCIIString() ) );
 
                 transformer.setErrorListener( errorListener );
+
+                for ( Map.Entry<Object, Object> e : System.getProperties().entrySet() )
+                {
+                    transformer.setParameter( e.getKey().toString(), e.getValue() );
+                }
+
                 transformers.add( transformer );
             }
 
@@ -314,7 +319,7 @@ public class DefaultModelProcessor implements ModelProcessor
 
             return transformers.isEmpty() ? null : transformers;
         }
-        catch ( final IOException e )
+        catch ( final URISyntaxException e )
         {
             throw new ModelException( getMessage( e ), e );
         }
