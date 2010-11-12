@@ -69,6 +69,34 @@ public class DefaultModelProcessor implements ModelProcessor
 {
 
     /**
+     * Constant for the name of the system property controlling property {@code defaultEnabled}.
+     * @see #isDefaultEnabled()
+     */
+    private static final String DEFAULT_ENABLED_PROPERTY_NAME =
+        "org.jomc.model.modlet.DefaultModelProcessor.defaultEnabled";
+
+    /**
+     * Constant for the name of the system property controlling property {@code defaultTransformerLocation}.
+     * @see #getDefaultTransformerLocation()
+     */
+    private static final String DEFAULT_TRANSFORMER_LOCATION_PROPERTY_NAME =
+        "org.jomc.model.modlet.DefaultModelProcessor.defaultTransformerLocation";
+
+    /**
+     * Constant for the name of the deprecated system property controlling property {@code defaultEnabled}.
+     * @see #isDefaultEnabled()
+     */
+    private static final String DEPRECATED_DEFAULT_ENABLED_PROPERTY_NAME =
+        "org.jomc.model.DefaultModelProcessor.defaultEnabled";
+
+    /**
+     * Constant for the name of the deprecated system property controlling property {@code defaultTransformerLocation}.
+     * @see #getDefaultTransformerLocation()
+     */
+    private static final String DEPRECATED_DEFAULT_TRANSFORMER_LOCATION_PROPERTY_NAME =
+        "org.jomc.model.DefaultModelProcessor.defaultTransformerLocation";
+
+    /**
      * Classpath location searched for transformers by default.
      * @see #getDefaultTransformerLocation()
      */
@@ -95,8 +123,8 @@ public class DefaultModelProcessor implements ModelProcessor
     /**
      * Gets a flag indicating the processor is enabled by default.
      * <p>The default enabled flag is controlled by system property
-     * {@code org.jomc.model.DefaultModelProcessor.defaultEnabled} holding a value indicating the processor is enabled
-     * by default. If that property is not set, the {@code true} default is returned.</p>
+     * {@code org.jomc.model.modlet.DefaultModelProcessor.defaultEnabled} holding a value indicating the processor is
+     * enabled by default. If that property is not set, the {@code true} default is returned.</p>
      *
      * @return {@code true} if the processor is enabled by default; {@code false} if the processor is disabled by
      * default.
@@ -107,8 +135,10 @@ public class DefaultModelProcessor implements ModelProcessor
     {
         if ( defaultEnabled == null )
         {
-            defaultEnabled = Boolean.valueOf( System.getProperty(
-                "org.jomc.model.DefaultModelProcessor.defaultEnabled", Boolean.toString( true ) ) );
+            defaultEnabled =
+                Boolean.valueOf( System.getProperty( DEFAULT_ENABLED_PROPERTY_NAME,
+                                                     System.getProperty( DEPRECATED_DEFAULT_ENABLED_PROPERTY_NAME,
+                                                                         Boolean.toString( true ) ) ) );
 
         }
 
@@ -160,7 +190,7 @@ public class DefaultModelProcessor implements ModelProcessor
     /**
      * Gets the default location searched for transformer resources.
      * <p>The default transformer location is controlled by system property
-     * {@code org.jomc.model.DefaultModelProcessor.defaultTransformerLocation} holding the location to search for
+     * {@code org.jomc.model.modlet.DefaultModelProcessor.defaultTransformerLocation} holding the location to search for
      * transformer resources by default. If that property is not set, the {@code META-INF/jomc.xsl} default is
      * returned.</p>
      *
@@ -172,8 +202,10 @@ public class DefaultModelProcessor implements ModelProcessor
     {
         if ( defaultTransformerLocation == null )
         {
-            defaultTransformerLocation = System.getProperty(
-                "org.jomc.model.DefaultModelProcessor.defaultTransformerLocation", DEFAULT_TRANSFORMER_LOCATION );
+            defaultTransformerLocation =
+                System.getProperty( DEFAULT_TRANSFORMER_LOCATION_PROPERTY_NAME,
+                                    System.getProperty( DEPRECATED_DEFAULT_TRANSFORMER_LOCATION_PROPERTY_NAME,
+                                                        DEFAULT_TRANSFORMER_LOCATION ) );
 
         }
 

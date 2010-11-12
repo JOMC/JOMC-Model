@@ -166,12 +166,35 @@ public class DefaultModelProcessorTest
 
     public void testDefaultEnabled() throws Exception
     {
+        System.clearProperty( "org.jomc.model.DefaultModelProcessor.defaultEnabled" );
+        System.clearProperty( "org.jomc.model.modlet.DefaultModelProcessor.defaultEnabled" );
+        DefaultModelProcessor.setDefaultEnabled( null );
         assertTrue( DefaultModelProcessor.isDefaultEnabled() );
+
         System.setProperty( "org.jomc.model.DefaultModelProcessor.defaultEnabled", Boolean.toString( false ) );
         DefaultModelProcessor.setDefaultEnabled( null );
         assertFalse( DefaultModelProcessor.isDefaultEnabled() );
         System.clearProperty( "org.jomc.model.DefaultModelProcessor.defaultEnabled" );
         DefaultModelProcessor.setDefaultEnabled( null );
+        assertTrue( DefaultModelProcessor.isDefaultEnabled() );
+
+        System.setProperty( "org.jomc.model.modlet.DefaultModelProcessor.defaultEnabled", Boolean.toString( false ) );
+        DefaultModelProcessor.setDefaultEnabled( null );
+        assertFalse( DefaultModelProcessor.isDefaultEnabled() );
+        System.clearProperty( "org.jomc.model.modlet.DefaultModelProcessor.defaultEnabled" );
+        DefaultModelProcessor.setDefaultEnabled( null );
+        assertTrue( DefaultModelProcessor.isDefaultEnabled() );
+
+        System.setProperty( "org.jomc.model.DefaultModelProcessor.defaultEnabled", Boolean.toString( true ) );
+        System.setProperty( "org.jomc.model.modlet.DefaultModelProcessor.defaultEnabled", Boolean.toString( false ) );
+        DefaultModelProcessor.setDefaultEnabled( null );
+        assertFalse( DefaultModelProcessor.isDefaultEnabled() );
+        System.clearProperty( "org.jomc.model.modlet.DefaultModelProcessor.defaultEnabled" );
+        DefaultModelProcessor.setDefaultEnabled( null );
+        assertTrue( DefaultModelProcessor.isDefaultEnabled() );
+        System.clearProperty( "org.jomc.model.DefaultModelProcessor.defaultEnabled" );
+        DefaultModelProcessor.setDefaultEnabled( null );
+        assertTrue( DefaultModelProcessor.isDefaultEnabled() );
     }
 
     public void testEnabled() throws Exception
@@ -199,13 +222,35 @@ public class DefaultModelProcessorTest
 
     public void testDefaultTransformerLocation() throws Exception
     {
-        assertNotNull( DefaultModelProcessor.getDefaultTransformerLocation() );
+        System.clearProperty( "org.jomc.model.DefaultModelProcessor.defaultTransformerLocation" );
+        System.clearProperty( "org.jomc.model.modlet.DefaultModelProcessor.defaultTransformerLocation" );
+        DefaultModelProcessor.setDefaultTransformerLocation( null );
+        assertEquals( "META-INF/jomc.xsl", DefaultModelProcessor.getDefaultTransformerLocation() );
+
         System.setProperty( "org.jomc.model.DefaultModelProcessor.defaultTransformerLocation", "TEST" );
         DefaultModelProcessor.setDefaultTransformerLocation( null );
         assertEquals( "TEST", DefaultModelProcessor.getDefaultTransformerLocation() );
         System.clearProperty( "org.jomc.model.DefaultModelProcessor.defaultTransformerLocation" );
         DefaultModelProcessor.setDefaultTransformerLocation( null );
-        assertNotNull( DefaultModelProcessor.getDefaultTransformerLocation() );
+        assertEquals( "META-INF/jomc.xsl", DefaultModelProcessor.getDefaultTransformerLocation() );
+
+        System.setProperty( "org.jomc.model.modlet.DefaultModelProcessor.defaultTransformerLocation", "TEST" );
+        DefaultModelProcessor.setDefaultTransformerLocation( null );
+        assertEquals( "TEST", DefaultModelProcessor.getDefaultTransformerLocation() );
+        System.clearProperty( "org.jomc.model.modlet.DefaultModelProcessor.defaultTransformerLocation" );
+        DefaultModelProcessor.setDefaultTransformerLocation( null );
+        assertEquals( "META-INF/jomc.xsl", DefaultModelProcessor.getDefaultTransformerLocation() );
+
+        System.setProperty( "org.jomc.model.DefaultModelProcessor.defaultTransformerLocation", "DEPRECATED" );
+        System.setProperty( "org.jomc.model.modlet.DefaultModelProcessor.defaultTransformerLocation", "TEST" );
+        DefaultModelProcessor.setDefaultTransformerLocation( null );
+        assertEquals( "TEST", DefaultModelProcessor.getDefaultTransformerLocation() );
+        System.clearProperty( "org.jomc.model.modlet.DefaultModelProcessor.defaultTransformerLocation" );
+        DefaultModelProcessor.setDefaultTransformerLocation( null );
+        assertEquals( "DEPRECATED", DefaultModelProcessor.getDefaultTransformerLocation() );
+        System.clearProperty( "org.jomc.model.DefaultModelProcessor.defaultTransformerLocation" );
+        DefaultModelProcessor.setDefaultTransformerLocation( null );
+        assertEquals( "META-INF/jomc.xsl", DefaultModelProcessor.getDefaultTransformerLocation() );
     }
 
     public void testTransformerLocation() throws Exception

@@ -57,6 +57,20 @@
     </release>
     <!-- *********************************************************************************************************** -->
     <release version="1.2">
+      <action dev="schulte2005" type="update"><![CDATA[Updated methods <code>isDefaultEnabled</code> and
+      <code>getDefaultTransformerLocation</code> of class <code>org.jomc.model.modlet.DefaultModelProcessor</code>
+      to support system properties <code>org.jomc.model.modlet.DefaultModelProcessor.defaultEnabled</code> and
+      <code>org.jomc.model.modlet.DefaultModelProcessor.defaultTransformerLocation</code> deprecating system properties
+      <code>org.jomc.model.DefaultModelProcessor.defaultEnabled</code> and
+      <code>org.jomc.model.DefaultModelProcessor.defaultTransformerLocation</code>.]]>
+      </action>
+      <action dev="schulte2005" type="update"><![CDATA[Updated methods <code>isDefaultEnabled</code> and
+      <code>getDefaultModuleLocation</code> of class <code>org.jomc.model.modlet.DefaultModelProvider</code>
+      to support system properties <code>org.jomc.model.modlet.DefaultModelProvider.defaultEnabled</code> and
+      <code>org.jomc.model.modlet.DefaultModelProvider.defaultModuleLocation</code> deprecating system properties
+      <code>org.jomc.model.DefaultModelProvider.defaultEnabled</code> and
+      <code>org.jomc.model.DefaultModelProvider.defaultModuleLocation</code>.]]>
+      </action>
       <action dev="schulte2005" type="update"><![CDATA[Updated method <code>findTransformers</code> of class
       <code>org.jomc.model.modlet.DefaultModelProcessor</code> to add system properties to transformers as
       parameters.]]>

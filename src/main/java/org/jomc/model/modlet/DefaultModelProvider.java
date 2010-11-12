@@ -61,6 +61,34 @@ public class DefaultModelProvider implements ModelProvider
 {
 
     /**
+     * Constant for the name of the system property controlling property {@code defaultEnabled}.
+     * @see #isDefaultEnabled()
+     */
+    private static final String DEFAULT_ENABLED_PROPERTY_NAME =
+        "org.jomc.model.modlet.DefaultModelProvider.defaultEnabled";
+
+    /**
+     * Constant for the name of the system property controlling property {@code defaultModuleLocation}.
+     * @see #getDefaultModuleLocation()
+     */
+    private static final String DEFAULT_MODULE_LOCATION_PROPERTY_NAME =
+        "org.jomc.model.modlet.DefaultModelProvider.defaultModuleLocation";
+
+    /**
+     * Constant for the name of the deprecated system property controlling property {@code defaultEnabled}.
+     * @see #isDefaultEnabled()
+     */
+    private static final String DEPRECATED_DEFAULT_ENABLED_PROPERTY_NAME =
+        "org.jomc.model.DefaultModelProvider.defaultEnabled";
+
+    /**
+     * Constant for the name of the deprecated system property controlling property {@code defaultModuleLocation}.
+     * @see #getDefaultModuleLocation()
+     */
+    private static final String DEPRECATED_DEFAULT_MODULE_LOCATION_PROPERTY_NAME =
+        "org.jomc.model.DefaultModelProvider.defaultModuleLocation";
+
+    /**
      * Classpath location searched for modules by default.
      * @see #getDefaultModuleLocation()
      */
@@ -87,8 +115,8 @@ public class DefaultModelProvider implements ModelProvider
     /**
      * Gets a flag indicating the provider is enabled by default.
      * <p>The default enabled flag is controlled by system property
-     * {@code org.jomc.model.DefaultModelProvider.defaultEnabled} holding a value indicating the provider is enabled
-     * by default. If that property is not set, the {@code true} default is returned.</p>
+     * {@code org.jomc.model.modlet.DefaultModelProvider.defaultEnabled} holding a value indicating the provider is
+     * enabled by default. If that property is not set, the {@code true} default is returned.</p>
      *
      * @return {@code true} if the provider is enabled by default; {@code false} if the provider is disabled by default.
      *
@@ -98,8 +126,10 @@ public class DefaultModelProvider implements ModelProvider
     {
         if ( defaultEnabled == null )
         {
-            defaultEnabled = Boolean.valueOf( System.getProperty(
-                "org.jomc.model.DefaultModelProvider.defaultEnabled", Boolean.toString( true ) ) );
+            defaultEnabled =
+                Boolean.valueOf( System.getProperty( DEFAULT_ENABLED_PROPERTY_NAME,
+                                                     System.getProperty( DEPRECATED_DEFAULT_ENABLED_PROPERTY_NAME,
+                                                                         Boolean.toString( true ) ) ) );
 
         }
 
@@ -151,8 +181,8 @@ public class DefaultModelProvider implements ModelProvider
     /**
      * Gets the default location searched for module resources.
      * <p>The default module location is controlled by system property
-     * {@code org.jomc.model.DefaultModelProvider.defaultModuleLocation} holding the location to search for module
-     * resources by default. If that property is not set, the {@code META-INF/jomc.xml} default is returned.</p>
+     * {@code org.jomc.model.modlet.DefaultModelProvider.defaultModuleLocation} holding the location to search for
+     * module resources by default. If that property is not set, the {@code META-INF/jomc.xml} default is returned.</p>
      *
      * @return The location searched for module resources by default.
      *
@@ -162,8 +192,10 @@ public class DefaultModelProvider implements ModelProvider
     {
         if ( defaultModuleLocation == null )
         {
-            defaultModuleLocation = System.getProperty( "org.jomc.model.DefaultModelProvider.defaultModuleLocation",
-                                                        DEFAULT_MODULE_LOCATION );
+            defaultModuleLocation =
+                System.getProperty( DEFAULT_MODULE_LOCATION_PROPERTY_NAME,
+                                    System.getProperty( DEPRECATED_DEFAULT_MODULE_LOCATION_PROPERTY_NAME,
+                                                        DEFAULT_MODULE_LOCATION ) );
 
         }
 
