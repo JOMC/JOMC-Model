@@ -154,12 +154,22 @@ public class DefaultModelProcessorTest
         this.getModelProcessor().setTransformerLocation(
             this.getClass().getPackage().getName().replace( '.', '/' ) + "/system-property-test.xsl" );
 
-        final Model processed = this.getModelProcessor().processModel( context, model );
-        assertNotNull( processed );
+        final Model processedSystemProperty = this.getModelProcessor().processModel( context, model );
+        assertNotNull( processedSystemProperty );
 
-        final Modules modules = ModelHelper.getModules( processed );
-        assertNotNull( modules );
-        assertNotNull( modules.getModule( System.getProperty( "user.home" ) ) );
+        final Modules processedSystemPropertyModules = ModelHelper.getModules( processedSystemProperty );
+        assertNotNull( processedSystemPropertyModules );
+        assertNotNull( processedSystemPropertyModules.getModule( System.getProperty( "user.home" ) ) );
+
+        this.getModelProcessor().setTransformerLocation(
+            this.getClass().getPackage().getName().replace( '.', '/' ) + "/relative-uri-test.xsl" );
+
+        final Model processedRelativeUri = this.getModelProcessor().processModel( context, model );
+        assertNotNull( processedRelativeUri );
+
+        final Modules processedRelativeUriModules = ModelHelper.getModules( processedRelativeUri );
+        assertNotNull( processedRelativeUriModules );
+        assertNotNull( processedRelativeUriModules.getModule( System.getProperty( "os.name" ) ) );
 
         this.getModelProcessor().setTransformerLocation( null );
     }
