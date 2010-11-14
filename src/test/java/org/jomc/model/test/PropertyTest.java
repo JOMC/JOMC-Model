@@ -32,13 +32,14 @@
  */
 package org.jomc.model.test;
 
+import org.junit.Test;
 import java.lang.reflect.InvocationTargetException;
 import org.jomc.model.PropertyException;
 import org.jomc.model.Property;
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertNull;
-import static junit.framework.Assert.assertTrue;
-import static junit.framework.Assert.fail;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Test cases for class {@code org.jomc.model.Property}.
@@ -105,12 +106,14 @@ public class PropertyTest
 
     }
 
+    /** Creates a new {@code PropertyTest} instance. */
     public PropertyTest()
     {
         super();
     }
 
-    public void testGetJavaValue() throws Exception
+    @Test
+    public final void testGetJavaValue() throws Exception
     {
         final Property p = new Property();
         assertNull( p.getJavaValue( this.getClass().getClassLoader() ) );

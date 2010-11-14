@@ -32,18 +32,19 @@
  */
 package org.jomc.model.modlet.test;
 
+import org.junit.Test;
 import org.jomc.model.Modules;
 import org.jomc.model.modlet.ModelHelper;
 import org.jomc.model.ModelObject;
 import org.jomc.model.modlet.DefaultModelProcessor;
 import org.jomc.modlet.Model;
 import org.jomc.modlet.ModelContext;
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertNull;
-import static junit.framework.Assert.assertTrue;
-import static junit.framework.Assert.fail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Test cases for class {@code org.jomc.model.modlet.DefaultModelProcessor}.
@@ -54,30 +55,46 @@ import static junit.framework.Assert.fail;
 public class DefaultModelProcessorTest
 {
 
+    /** The {@code DefaultModelProcessor} instance tests are performed with. */
     private DefaultModelProcessor defaultModelProcessor;
 
+    /** Creates a new {@code DefaultModelProcessorTest} instance. */
     public DefaultModelProcessorTest()
     {
-        this( null );
-    }
-
-    public DefaultModelProcessorTest( final DefaultModelProcessor defaultModelProcessor )
-    {
         super();
-        this.defaultModelProcessor = defaultModelProcessor;
     }
 
+    /**
+     * Gets the {@code DefaultModelProcessor} instance tests are performed with.
+     *
+     * @return The {@code DefaultModelProcessor} instance tests are performed with.
+     *
+     * @see #newModelProcessor()
+     */
     public DefaultModelProcessor getModelProcessor()
     {
         if ( this.defaultModelProcessor == null )
         {
-            this.defaultModelProcessor = new DefaultModelProcessor();
+            this.defaultModelProcessor = this.newModelProcessor();
         }
 
         return this.defaultModelProcessor;
     }
 
-    public void testFindTransformers() throws Exception
+    /**
+     * Creates a new {@code DefaultModelProcessor} instance to test.
+     *
+     * @return A new {@code DefaultModelProcessor} instance to test.
+     *
+     * @see #getModelProcessor()
+     */
+    public DefaultModelProcessor newModelProcessor()
+    {
+        return new DefaultModelProcessor();
+    }
+
+    @Test
+    public final void testFindTransformers() throws Exception
     {
         final ModelContext context = ModelContext.createModelContext( this.getClass().getClassLoader() );
 
@@ -121,7 +138,8 @@ public class DefaultModelProcessorTest
         this.getModelProcessor().setTransformerLocation( null );
     }
 
-    public void testProcessModel() throws Exception
+    @Test
+    public final void testProcessModel() throws Exception
     {
         final ModelContext context = ModelContext.createModelContext( this.getClass().getClassLoader() );
         final Model model = new Model();
@@ -174,7 +192,8 @@ public class DefaultModelProcessorTest
         this.getModelProcessor().setTransformerLocation( null );
     }
 
-    public void testDefaultEnabled() throws Exception
+    @Test
+    public final void testDefaultEnabled() throws Exception
     {
         System.clearProperty( "org.jomc.model.DefaultModelProcessor.defaultEnabled" );
         System.clearProperty( "org.jomc.model.modlet.DefaultModelProcessor.defaultEnabled" );
@@ -207,7 +226,8 @@ public class DefaultModelProcessorTest
         assertTrue( DefaultModelProcessor.isDefaultEnabled() );
     }
 
-    public void testEnabled() throws Exception
+    @Test
+    public final void testEnabled() throws Exception
     {
         final Model model = new Model();
         model.setIdentifier( ModelObject.MODEL_PUBLIC_ID );
@@ -230,7 +250,8 @@ public class DefaultModelProcessorTest
         this.getModelProcessor().setEnabled( null );
     }
 
-    public void testDefaultTransformerLocation() throws Exception
+    @Test
+    public final void testDefaultTransformerLocation() throws Exception
     {
         System.clearProperty( "org.jomc.model.DefaultModelProcessor.defaultTransformerLocation" );
         System.clearProperty( "org.jomc.model.modlet.DefaultModelProcessor.defaultTransformerLocation" );
@@ -263,7 +284,8 @@ public class DefaultModelProcessorTest
         assertEquals( "META-INF/jomc.xsl", DefaultModelProcessor.getDefaultTransformerLocation() );
     }
 
-    public void testTransformerLocation() throws Exception
+    @Test
+    public final void testTransformerLocation() throws Exception
     {
         DefaultModelProcessor.setDefaultTransformerLocation( null );
         this.getModelProcessor().setTransformerLocation( null );

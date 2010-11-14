@@ -32,13 +32,14 @@
  */
 package org.jomc.model.test;
 
+import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import org.jomc.model.ModelObject;
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.fail;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 /**
  * Test cases for class {@code org.jomc.model.ModelObject}.
@@ -48,6 +49,12 @@ import static junit.framework.Assert.fail;
  */
 public class ModelObjectTest
 {
+
+    /** Creates a new {@code ModelObjectTest} instance. */
+    public ModelObjectTest()
+    {
+        super();
+    }
 
     public static class TestModelObject extends ModelObject
     {
@@ -74,7 +81,8 @@ public class ModelObjectTest
 
     }
 
-    public void testGetAnyElement() throws Exception
+    @Test
+    public final void testGetAnyElement() throws Exception
     {
         final TestModelObject modelObject = new TestModelObject();
         final List<Object> any = new ArrayList<Object>( 10 );
@@ -106,7 +114,8 @@ public class ModelObjectTest
         }
     }
 
-    public void testGetAnyObject() throws Exception
+    @Test
+    public final void testGetAnyObject() throws Exception
     {
         final TestModelObject modelObject = new TestModelObject();
         final List<Object> any = new ArrayList<Object>( 10 );

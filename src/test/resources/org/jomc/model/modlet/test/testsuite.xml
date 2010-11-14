@@ -2889,19 +2889,19 @@
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
           <properties>
-            <property name="Property 1" value="Value 1" type="org.jomc.model.test.ModulesConstraintsTest">
+            <property name="Property 1" value="Value 1" type="org.jomc.model.test.ModulesConstraintsTestType">
               <modules-constraints-test xmlns="http://jomc.org/model/test" identifier="Any Value 1"/>
             </property>
-            <property name="Property 2" value="Value 2" type="org.jomc.model.test.ModulesConstraintsTest">
+            <property name="Property 2" value="Value 2" type="org.jomc.model.test.ModulesConstraintsTestType">
               <modules-constraints-test xmlns="http://jomc.org/model/test" identifier="Any Value 2"/>
             </property>
-            <property name="Property 3" value="Value 3" type="org.jomc.model.test.ModulesConstraintsTest">
+            <property name="Property 3" value="Value 3" type="org.jomc.model.test.ModulesConstraintsTestType">
               <modules-constraints-test xmlns="http://jomc.org/model/test" identifier="Any Value 3"/>
             </property>
-            <property name="Property 4" value="Value 4" type="org.jomc.model.test.ModulesConstraintsTest">
+            <property name="Property 4" value="Value 4" type="org.jomc.model.test.ModulesConstraintsTestType">
               <modules-constraints-test xmlns="http://jomc.org/model/test" identifier="Any Value 4"/>
             </property>
-            <property name="Property 5" value="Value 5" type="org.jomc.model.test.ModulesConstraintsTest">
+            <property name="Property 5" value="Value 5" type="org.jomc.model.test.ModulesConstraintsTestType">
               <modules-constraints-test xmlns="http://jomc.org/model/test" identifier="Any Value 5"/>
             </property>
           </properties>
@@ -2973,57 +2973,57 @@
                   <dependencies>
                     <dependency name="Override Dependency 1" identifier="Specification" optional="true">
                       <properties>
-                        <property name="Override Dependency Property 1" value="Value 1" type="org.jomc.model.test.ModulesConstraintsTest">
+                        <property name="Override Dependency Property 1" value="Value 1" type="org.jomc.model.test.ModulesConstraintsTestType">
                           <modules-constraints-test xmlns="http://jomc.org/model/test" identifier="Any Value 1"/>
                         </property>
-                        <property name="Override Dependency Property 2" value="Value 2" type="org.jomc.model.test.ModulesConstraintsTest">
+                        <property name="Override Dependency Property 2" value="Value 2" type="org.jomc.model.test.ModulesConstraintsTestType">
                           <modules-constraints-test xmlns="http://jomc.org/model/test" identifier="Any Value 2"/>
                         </property>
-                        <property name="Override Dependency Property 3" value="Value 3" type="org.jomc.model.test.ModulesConstraintsTest">
+                        <property name="Override Dependency Property 3" value="Value 3" type="org.jomc.model.test.ModulesConstraintsTestType">
                           <modules-constraints-test xmlns="http://jomc.org/model/test" identifier="Any Value 3"/>
                         </property>
-                        <property name="Override Dependency Property 4" value="Value 4" type="org.jomc.model.test.ModulesConstraintsTest">
+                        <property name="Override Dependency Property 4" value="Value 4" type="org.jomc.model.test.ModulesConstraintsTestType">
                           <modules-constraints-test xmlns="http://jomc.org/model/test" identifier="Any Value 4"/>
                         </property>
-                        <property name="Override Dependency Property 5" value="Value 5" type="org.jomc.model.test.ModulesConstraintsTest">
+                        <property name="Override Dependency Property 5" value="Value 5" type="org.jomc.model.test.ModulesConstraintsTestType">
                           <modules-constraints-test xmlns="http://jomc.org/model/test" identifier="Any Value 5"/>
                         </property>
                       </properties>
                     </dependency>
                   </dependencies>
                   <properties>
-                    <property name="Dependency Property 1" value="Value 1" type="org.jomc.model.test.ModulesConstraintsTest">
+                    <property name="Dependency Property 1" value="Value 1" type="org.jomc.model.test.ModulesConstraintsTestType">
                       <modules-constraints-test xmlns="http://jomc.org/model/test" identifier="Any Value 1"/>
                     </property>
-                    <property name="Dependency Property 2" value="Value 2" type="org.jomc.model.test.ModulesConstraintsTest">
+                    <property name="Dependency Property 2" value="Value 2" type="org.jomc.model.test.ModulesConstraintsTestType">
                       <modules-constraints-test xmlns="http://jomc.org/model/test" identifier="Any Value 2"/>
                     </property>
-                    <property name="Dependency Property 3" value="Value 3" type="org.jomc.model.test.ModulesConstraintsTest">
+                    <property name="Dependency Property 3" value="Value 3" type="org.jomc.model.test.ModulesConstraintsTestType">
                       <modules-constraints-test xmlns="http://jomc.org/model/test" identifier="Any Value 3"/>
                     </property>
-                    <property name="Dependency Property 4" value="Value 4" type="org.jomc.model.test.ModulesConstraintsTest">
+                    <property name="Dependency Property 4" value="Value 4" type="org.jomc.model.test.ModulesConstraintsTestType">
                       <modules-constraints-test xmlns="http://jomc.org/model/test" identifier="Any Value 4"/>
                     </property>
-                    <property name="Dependency Property 5" value="Value 5" type="org.jomc.model.test.ModulesConstraintsTest">
+                    <property name="Dependency Property 5" value="Value 5" type="org.jomc.model.test.ModulesConstraintsTestType">
                       <modules-constraints-test xmlns="http://jomc.org/model/test" identifier="Any Value 5"/>
                     </property>
                   </properties>
                 </dependency>
               </dependencies>
               <properties>
-                <property name="Property 1" value="Value 1" type="org.jomc.model.test.ModulesConstraintsTest">
+                <property name="Property 1" value="Value 1" type="org.jomc.model.test.ModulesConstraintsTestType">
                   <modules-constraints-test xmlns="http://jomc.org/model/test" identifier="Any Value 1"/>
                 </property>
-                <property name="Property 2" value="Value 2" type="org.jomc.model.test.ModulesConstraintsTest">
+                <property name="Property 2" value="Value 2" type="org.jomc.model.test.ModulesConstraintsTestType">
                   <modules-constraints-test xmlns="http://jomc.org/model/test" identifier="Any Value 2"/>
                 </property>
-                <property name="Property 3" value="Value 3" type="org.jomc.model.test.ModulesConstraintsTest">
+                <property name="Property 3" value="Value 3" type="org.jomc.model.test.ModulesConstraintsTestType">
                   <modules-constraints-test xmlns="http://jomc.org/model/test" identifier="Any Value 3"/>
                 </property>
-                <property name="Property 4" value="Value 4" type="org.jomc.model.test.ModulesConstraintsTest">
+                <property name="Property 4" value="Value 4" type="org.jomc.model.test.ModulesConstraintsTestType">
                   <modules-constraints-test xmlns="http://jomc.org/model/test" identifier="Any Value 4"/>
                 </property>
-                <property name="Property 5" value="Value 5" type="org.jomc.model.test.ModulesConstraintsTest">
+                <property name="Property 5" value="Value 5" type="org.jomc.model.test.ModulesConstraintsTestType">
                   <modules-constraints-test xmlns="http://jomc.org/model/test" identifier="Any Value 5"/>
                 </property>
               </properties>
@@ -3146,19 +3146,19 @@
           <specifications>
             <specification identifier="Specification">
               <properties>
-                <property name="Property 1" value="Value 1" type="org.jomc.model.test.ModulesConstraintsTest">
+                <property name="Property 1" value="Value 1" type="org.jomc.model.test.ModulesConstraintsTestType">
                   <modules-constraints-test xmlns="http://jomc.org/model/test" identifier="Any Value 1"/>
                 </property>
-                <property name="Property 2" value="Value 2" type="org.jomc.model.test.ModulesConstraintsTest">
+                <property name="Property 2" value="Value 2" type="org.jomc.model.test.ModulesConstraintsTestType">
                   <modules-constraints-test xmlns="http://jomc.org/model/test" identifier="Any Value 2"/>
                 </property>
-                <property name="Property 3" value="Value 3" type="org.jomc.model.test.ModulesConstraintsTest">
+                <property name="Property 3" value="Value 3" type="org.jomc.model.test.ModulesConstraintsTestType">
                   <modules-constraints-test xmlns="http://jomc.org/model/test" identifier="Any Value 3"/>
                 </property>
-                <property name="Property 4" value="Value 4" type="org.jomc.model.test.ModulesConstraintsTest">
+                <property name="Property 4" value="Value 4" type="org.jomc.model.test.ModulesConstraintsTestType">
                   <modules-constraints-test xmlns="http://jomc.org/model/test" identifier="Any Value 4"/>
                 </property>
-                <property name="Property 5" value="Value 5" type="org.jomc.model.test.ModulesConstraintsTest">
+                <property name="Property 5" value="Value 5" type="org.jomc.model.test.ModulesConstraintsTestType">
                   <modules-constraints-test xmlns="http://jomc.org/model/test" identifier="Any Value 5"/>
                 </property>
               </properties>

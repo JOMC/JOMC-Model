@@ -72,7 +72,7 @@
         <directory>src/test/schemas</directory>
         <targetPath>org/jomc/model/test</targetPath>
         <includes>
-          <include>jomc-test-1.0.xsd</include>
+          <include>jomc-test-1.2.xsd</include>
         </includes>
       </testResource>
     </testResources>

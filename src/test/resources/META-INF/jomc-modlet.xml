@@ -38,8 +38,8 @@
         name="${project.name} Tests" model="http://jomc.org/model" vendor="${project.organization.name}" version="${project.version}">
 
   <schemas>
-    <schema public-id="http://jomc.org/model/test" system-id="http://jomc.sourceforge.net/model/test/jomc-test-1.0.xsd"
-            context-id="org.jomc.model.test" classpath-id="org/jomc/model/test/jomc-test-1.0.xsd"/>
+    <schema public-id="http://jomc.org/model/test" system-id="http://jomc.sourceforge.net/model/test/jomc-test-1.2.xsd"
+            context-id="org.jomc.model.test" classpath-id="org/jomc/model/test/jomc-test-1.2.xsd"/>
 
   </schemas>
 </modlet>

@@ -32,9 +32,10 @@
  */
 package org.jomc.model.test;
 
+import org.junit.Test;
 import java.io.ObjectInputStream;
 import org.jomc.model.PropertyException;
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Test cases for class {@code org.jomc.model.PropertyException}.
@@ -45,12 +46,14 @@ import static junit.framework.Assert.assertEquals;
 public class PropertyExceptionTest
 {
 
+    /** Creates a new {@code PropertyExceptionTest} instance. */
     public PropertyExceptionTest()
     {
         super();
     }
 
-    public void testSerializabe() throws Exception
+    @Test
+    public final void testSerializabe() throws Exception
     {
         final ObjectInputStream objectStream =
             new ObjectInputStream( this.getClass().getResourceAsStream( "PropertyException.ser" ) );

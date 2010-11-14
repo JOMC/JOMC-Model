@@ -32,16 +32,17 @@
  */
 package org.jomc.model.modlet.test;
 
+import org.junit.Test;
 import org.jomc.model.Module;
 import org.jomc.model.ModelObject;
 import org.jomc.model.Modules;
 import org.jomc.modlet.Model;
 import org.jomc.model.modlet.ModelHelper;
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertNull;
-import static junit.framework.Assert.assertTrue;
-import static junit.framework.Assert.fail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Test cases for class {@code org.jomc.model.modlet.ModelHelper}.
@@ -52,7 +53,14 @@ import static junit.framework.Assert.fail;
 public class ModelHelperTest
 {
 
-    public void testModelHelper() throws Exception
+    /** Creates a new {@code ModelHelperTest} instance. */
+    public ModelHelperTest()
+    {
+        super();
+    }
+
+    @Test
+    public final void testModelHelper() throws Exception
     {
         try
         {

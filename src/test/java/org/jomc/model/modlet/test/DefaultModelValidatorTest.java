@@ -32,6 +32,9 @@
  */
 package org.jomc.model.modlet.test;
 
+import org.jomc.model.test.ModulesConstraintsTestType;
+import org.jomc.model.test.SchemaConstraintsTestType;
+import org.junit.Test;
 import java.util.List;
 import java.util.logging.Level;
 import javax.xml.bind.JAXBContext;
@@ -40,21 +43,18 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.util.JAXBSource;
 import org.jomc.model.ModelObject;
 import org.jomc.model.Modules;
-import org.jomc.model.PropertyException;
 import org.jomc.model.modlet.DefaultModelValidator;
 import org.jomc.model.modlet.ModelHelper;
 import org.jomc.model.test.ModelValidationReportDetail;
-import org.jomc.model.test.ModulesConstraintsTest;
-import org.jomc.model.test.SchemaConstraintsTest;
 import org.jomc.model.test.TestSuite;
 import org.jomc.modlet.Model;
 import org.jomc.modlet.ModelContext;
 import org.jomc.modlet.ModelException;
 import org.jomc.modlet.ModelValidationReport;
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertTrue;
-import static junit.framework.Assert.fail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Test cases for class {@code org.jomc.model.modlet.DefaultModelValidator} implementations.
@@ -65,39 +65,62 @@ import static junit.framework.Assert.fail;
 public class DefaultModelValidatorTest
 {
 
+    /** The {@code DefaultModelValidator} instance tests are performed with. */
     private DefaultModelValidator defaultModelValidator;
 
+    /** The {@code TestSuite} holding module tests to run. */
     private TestSuite testSuite;
 
+    /** The {@code ModelContext} tests are performed with. */
     private ModelContext modelContext;
 
+    /** Creates a new {@code DefaultModelValidatorTest} instance. */
     public DefaultModelValidatorTest()
     {
-        this( null, null );
-    }
-
-    public DefaultModelValidatorTest( final DefaultModelValidator defaultModelValidator, final TestSuite testSuite )
-    {
         super();
-        this.defaultModelValidator = defaultModelValidator;
-        this.testSuite = testSuite;
     }
 
-    public DefaultModelValidator getModelValidator() throws PropertyException
+    /**
+     * Gets the {@code DefaultModelValidator} instance tests are performed with.
+     *
+     * @return The {@code DefaultModelValidator} instance tests are performed with.
+     *
+     * @see #newModelValidator()
+     */
+    public DefaultModelValidator getModelValidator()
     {
         if ( this.defaultModelValidator == null )
         {
-            this.defaultModelValidator = new DefaultModelValidator();
+            this.defaultModelValidator = this.newModelValidator();
         }
 
         return this.defaultModelValidator;
     }
 
-    public ModelContext getModelContext() throws ModelException
+    /**
+     * Create a new {@code DefaultModelValidator} instance to test.
+     *
+     * @return A new {@code DefaultModelValidator} instance to test.
+     *
+     * @see #getModelValidator()
+     */
+    public DefaultModelValidator newModelValidator()
+    {
+        return new DefaultModelValidator();
+    }
+
+    /**
+     * Gets the {@code ModelContext} instance tests are performed with.
+     *
+     * @return The {@code ModelContext} instance tests are performed with.
+     *
+     * @see #newModelContext()
+     */
+    public ModelContext getModelContext()
     {
         if ( this.modelContext == null )
         {
-            this.modelContext = ModelContext.createModelContext( this.getClass().getClassLoader() );
+            this.modelContext = this.newModelContext();
             this.modelContext.getListeners().add( new ModelContext.Listener()
             {
 
@@ -117,33 +140,65 @@ public class DefaultModelValidatorTest
         return this.modelContext;
     }
 
-    public TestSuite getTestSuite() throws ModelException
+    /**
+     * Creates a new {@code ModelContext} instance to perform tests with.
+     *
+     * @return A new {@code ModelContext} instance to perform tests with.
+     */
+    public ModelContext newModelContext()
     {
         try
         {
-            if ( this.testSuite == null )
-            {
-                final JAXBElement<TestSuite> e = (JAXBElement<TestSuite>) this.getModelContext().createUnmarshaller(
-                    ModelObject.MODEL_PUBLIC_ID ).unmarshal( this.getClass().getResource( "testsuite.xml" ) );
-
-                this.testSuite = e.getValue();
-            }
-
-            return this.testSuite;
+            return ModelContext.createModelContext( this.getClass().getClassLoader() );
         }
-        catch ( final JAXBException e )
+        catch ( final ModelException e )
         {
-            String message = getMessage( e );
-            if ( message == null && e.getLinkedException() != null )
-            {
-                message = getMessage( e.getLinkedException() );
-            }
-
-            throw new ModelException( message, e );
+            throw new AssertionError( e );
         }
     }
 
-    public void testIllegalArguments() throws Exception
+    /**
+     * Gets the {@code TestSuite} instance holding module tests to run.
+     *
+     * @return The {@code TestSuite} instance holding module tests to run.
+     *
+     * @see #newTestSuite()
+     */
+    public TestSuite getTestSuite()
+    {
+        if ( this.testSuite == null )
+        {
+            this.testSuite = this.newTestSuite();
+        }
+
+        return this.testSuite;
+    }
+
+    /**
+     * Creates a new {@code TestSuite} instance holding module tests to run.
+     *
+     * @return A new {@code TestSuite} instance holding module tests to run.
+     */
+    public TestSuite newTestSuite()
+    {
+        try
+        {
+            return ( (JAXBElement<TestSuite>) this.getModelContext().createUnmarshaller(
+                    ModelObject.MODEL_PUBLIC_ID ).unmarshal( this.getClass().getResource( "testsuite.xml" ) ) ).getValue();
+
+        }
+        catch ( final JAXBException e )
+        {
+            throw new AssertionError( e );
+        }
+        catch ( final ModelException e )
+        {
+            throw new AssertionError( e );
+        }
+    }
+
+    @Test
+    public final void testIllegalArguments() throws Exception
     {
         try
         {
@@ -168,19 +223,21 @@ public class DefaultModelValidatorTest
         }
     }
 
-    public void testLegalArguments() throws Exception
+    @Test
+    public final void testLegalArguments() throws Exception
     {
         assertNotNull( this.getModelValidator().validateModel(
             this.getModelContext(), this.getModelContext().findModel( ModelObject.MODEL_PUBLIC_ID ) ) );
 
     }
 
-    public void testSchemaConstraints() throws Exception
+    @Test
+    public final void testSchemaConstraints() throws Exception
     {
         final ModelContext context = this.getModelContext();
         final JAXBContext jaxbContext = context.createContext( ModelObject.MODEL_PUBLIC_ID );
 
-        for ( SchemaConstraintsTest test : this.getTestSuite().getSchemaConstraintsTest() )
+        for ( SchemaConstraintsTestType test : this.getTestSuite().getSchemaConstraintsTest() )
         {
             System.out.println( "SchemaConstraintsTest: " + test.getIdentifier() );
 
@@ -196,11 +253,12 @@ public class DefaultModelValidatorTest
         }
     }
 
-    public void testModulesConstraints() throws Exception
+    @Test
+    public final void testModulesConstraints() throws Exception
     {
         final ModelContext context = this.getModelContext();
 
-        for ( ModulesConstraintsTest test : this.getTestSuite().getModulesConstraintsTest() )
+        for ( ModulesConstraintsTestType test : this.getTestSuite().getModulesConstraintsTest() )
         {
             System.out.println( "ModulesConstraintsTest: " + test.getIdentifier() );
 
@@ -256,11 +314,6 @@ public class DefaultModelValidatorTest
         {
             System.out.println( "\t" + d.toString() );
         }
-    }
-
-    private static String getMessage( final Throwable t )
-    {
-        return t != null ? t.getMessage() != null ? t.getMessage() : getMessage( t.getCause() ) : null;
     }
 
 }

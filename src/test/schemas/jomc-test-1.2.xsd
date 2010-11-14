@@ -124,16 +124,16 @@
       </xsd:appinfo>
     </xsd:annotation>
     <xsd:sequence>
-      <xsd:element name="schema-constraints-test" type="test:SchemaConstraintsTest" minOccurs="0" maxOccurs="unbounded"/>
-      <xsd:element name="modules-constraints-test" type="test:ModulesConstraintsTest" minOccurs="0" maxOccurs="unbounded"/>
-      <xsd:element name="implementation-test" type="test:ImplementationTest" minOccurs="0" maxOccurs="unbounded"/>
-      <xsd:element name="instance-test" type="test:InstanceTest" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="schema-constraints-test" type="test:SchemaConstraintsTestType" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="modules-constraints-test" type="test:ModulesConstraintsTestType" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="implementation-test" type="test:ImplementationTestType" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="instance-test" type="test:InstanceTestType" minOccurs="0" maxOccurs="unbounded"/>
     </xsd:sequence>
   </xsd:complexType>
   <!--                                                                                                               -->
   <!-- SchemaConstraintTest                                                                                          -->
   <!--                                                                                                               -->
-  <xsd:complexType name="SchemaConstraintsTest">
+  <xsd:complexType name="SchemaConstraintsTestType">
     <xsd:annotation>
       <xsd:appinfo>
         <jaxb:class>
@@ -158,7 +158,7 @@
   <!--                                                                                                               -->
   <!-- ModulesConstraintsTest                                                                                        -->
   <!--                                                                                                               -->
-  <xsd:complexType name="ModulesConstraintsTest">
+  <xsd:complexType name="ModulesConstraintsTestType">
     <xsd:annotation>
       <xsd:appinfo>
         <jaxb:class>
@@ -185,7 +185,7 @@
   <!--                                                                                                               -->
   <!-- ImplementationTest                                                                                            -->
   <!--                                                                                                               -->
-  <xsd:complexType name="ImplementationTest">
+  <xsd:complexType name="ImplementationTestType">
     <xsd:annotation>
       <xsd:appinfo>
         <jaxb:class>
@@ -212,7 +212,7 @@
   <!--                                                                                                               -->
   <!-- InstanceTest                                                                                            -->
   <!--                                                                                                               -->
-  <xsd:complexType name="InstanceTest">
+  <xsd:complexType name="InstanceTestType">
     <xsd:annotation>
       <xsd:appinfo>
         <jaxb:class>

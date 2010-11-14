@@ -32,16 +32,17 @@
  */
 package org.jomc.model.modlet.test;
 
+import org.junit.Test;
 import org.jomc.model.ModelObject;
 import org.jomc.model.modlet.DefaultModelProvider;
 import org.jomc.modlet.Model;
 import org.jomc.modlet.ModelContext;
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertNull;
-import static junit.framework.Assert.assertTrue;
-import static junit.framework.Assert.fail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Test cases for class {@code org.jomc.model.modlet.DefaultModelProcessor}.
@@ -52,30 +53,46 @@ import static junit.framework.Assert.fail;
 public class DefaultModelProviderTest
 {
 
+    /** The {@code DefaultModelProvider} instance tests are performed with. */
     private DefaultModelProvider defaultModelProvider;
 
+    /** Creates a new {@code DefaultModelProviderTest} instance. */
     public DefaultModelProviderTest()
     {
-        this( null );
-    }
-
-    public DefaultModelProviderTest( final DefaultModelProvider defaultModelProvider )
-    {
         super();
-        this.defaultModelProvider = defaultModelProvider;
     }
 
+    /**
+     * Gets the {@code DefaultModelProvider} instance tests are performed with.
+     *
+     * @return The {@code DefaultModelProvider} instance tests are performed with.
+     *
+     * @see #newModelProvider()
+     */
     public DefaultModelProvider getModelProvider()
     {
         if ( this.defaultModelProvider == null )
         {
-            this.defaultModelProvider = new DefaultModelProvider();
+            this.defaultModelProvider = this.newModelProvider();
         }
 
         return this.defaultModelProvider;
     }
 
-    public void testFindModules() throws Exception
+    /**
+     * Creates a new {@code DefaultModelProvider} instance to test.
+     *
+     * @return A new {@code DefaultModelProvider} instance to test.
+     *
+     * @see #getModelProvider()
+     */
+    public DefaultModelProvider newModelProvider()
+    {
+        return new DefaultModelProvider();
+    }
+
+    @Test
+    public final void testFindModules() throws Exception
     {
         final ModelContext context = ModelContext.createModelContext( this.getClass().getClassLoader() );
 
@@ -134,7 +151,8 @@ public class DefaultModelProviderTest
         this.getModelProvider().setModuleLocation( null );
     }
 
-    public void testFindModel() throws Exception
+    @Test
+    public final void testFindModel() throws Exception
     {
         final ModelContext context = ModelContext.createModelContext( this.getClass().getClassLoader() );
         final Model model = new Model();
@@ -165,7 +183,8 @@ public class DefaultModelProviderTest
         assertNotNull( this.getModelProvider().findModel( context, model ) );
     }
 
-    public void testDefaultEnabled() throws Exception
+    @Test
+    public final void testDefaultEnabled() throws Exception
     {
         System.clearProperty( "org.jomc.model.DefaultModelProvider.defaultEnabled" );
         System.clearProperty( "org.jomc.model.modlet.DefaultModelProvider.defaultEnabled" );
@@ -198,7 +217,8 @@ public class DefaultModelProviderTest
         assertTrue( DefaultModelProvider.isDefaultEnabled() );
     }
 
-    public void testEnabled() throws Exception
+    @Test
+    public final void testEnabled() throws Exception
     {
         final Model model = new Model();
         model.setIdentifier( ModelObject.MODEL_PUBLIC_ID );
@@ -219,7 +239,8 @@ public class DefaultModelProviderTest
         this.getModelProvider().setEnabled( null );
     }
 
-    public void testDefaultModuleLocation() throws Exception
+    @Test
+    public final void testDefaultModuleLocation() throws Exception
     {
         System.clearProperty( "org.jomc.model.DefaultModelProvider.defaultModuleLocation" );
         System.clearProperty( "org.jomc.model.modlet.DefaultModelProvider.defaultModuleLocation" );
@@ -252,7 +273,8 @@ public class DefaultModelProviderTest
         assertEquals( "META-INF/jomc.xml", DefaultModelProvider.getDefaultModuleLocation() );
     }
 
-    public void testModuleLocation() throws Exception
+    @Test
+    public final void testModuleLocation() throws Exception
     {
         DefaultModelProvider.setDefaultModuleLocation( null );
         this.getModelProvider().setModuleLocation( null );

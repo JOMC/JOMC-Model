@@ -37,7 +37,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.util.JAXBSource;
-import junit.framework.Assert;
 import org.jomc.model.Dependencies;
 import org.jomc.model.Dependency;
 import org.jomc.model.Implementation;
@@ -59,6 +58,8 @@ import org.jomc.modlet.Model;
 import org.jomc.modlet.ModelContext;
 import org.jomc.modlet.ModelValidationReport;
 import org.jomc.modlet.ModelException;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Test cases for class {@code org.jomc.model.Modules}.
@@ -69,54 +70,72 @@ import org.jomc.modlet.ModelException;
 public class ModulesTest
 {
 
+    /** The {@code TestSuite} holding the module tests to run. */
     private TestSuite testSuite;
 
+    /** The {@code ModelContext} instance tests are performed with. */
     private ModelContext modelContext;
 
+    /** Creates a new {@code ModulesTest} instance. */
     public ModulesTest()
     {
-        this( null );
-    }
-
-    public ModulesTest( final TestSuite testSuite )
-    {
         super();
-        this.testSuite = testSuite;
     }
 
-    public TestSuite getTestSuite() throws ModelException
+    /**
+     * Gets the {@code TestSuite} holding the module tests to run.
+     *
+     * @return The {@code TestSuite} holding the module tests to run.
+     *
+     * @see #newTestSuite()
+     */
+    public TestSuite getTestSuite()
+    {
+        if ( this.testSuite == null )
+        {
+            this.testSuite = this.newTestSuite();
+        }
+
+        return this.testSuite;
+    }
+
+    /**
+     * Creates a new {@code TestSuite} holding module tests to run.
+     *
+     * @return A new {@code TestSuite} holding module tests to run.
+     *
+     * @see #getTestSuite()
+     */
+    public TestSuite newTestSuite()
     {
         try
         {
-            if ( this.testSuite == null )
-            {
-                final ModelContext context = ModelContext.createModelContext( this.getClass().getClassLoader() );
-                final JAXBElement<TestSuite> e =
-                    (JAXBElement<TestSuite>) context.createUnmarshaller( ModelObject.MODEL_PUBLIC_ID ).
-                    unmarshal( this.getClass().getResource( "testsuite.xml" ) );
+            return ( (JAXBElement<TestSuite>) this.getModelContext().createUnmarshaller( ModelObject.MODEL_PUBLIC_ID ).
+                    unmarshal( this.getClass().getResource( "testsuite.xml" ) ) ).getValue();
 
-                this.testSuite = e.getValue();
-            }
-
-            return this.testSuite;
         }
         catch ( final JAXBException e )
         {
-            String message = getMessage( e );
-            if ( message == null && e.getLinkedException() != null )
-            {
-                message = getMessage( e.getLinkedException() );
-            }
-
-            throw new ModelException( message, e );
+            throw new AssertionError( e );
+        }
+        catch ( final ModelException e )
+        {
+            throw new AssertionError( e );
         }
     }
 
-    public ModelContext getModelContext() throws ModelException
+    /**
+     * Gets the {@code ModelContext} instance tests are performed with.
+     *
+     * @return The {@code ModelContext} instance tests are performed with.
+     *
+     * @see #newModelContext()
+     */
+    public ModelContext getModelContext()
     {
         if ( this.modelContext == null )
         {
-            this.modelContext = ModelContext.createModelContext( this.getClass().getClassLoader() );
+            this.modelContext = this.newModelContext();
             this.modelContext.getListeners().add( new ModelContext.Listener()
             {
 
@@ -136,12 +155,29 @@ public class ModulesTest
         return this.modelContext;
     }
 
-    public void testImplementations() throws Exception
+    /**
+     * Creates a new {@code ModelContext} instance tests are performed with.
+     *
+     * @return A new {@code ModelContext} instance tests are performed with.
+     */
+    public ModelContext newModelContext()
     {
-        final ModelContext context = ModelContext.createModelContext( this.getClass().getClassLoader() );
-        final JAXBContext jaxbContext = context.createContext( ModelObject.MODEL_PUBLIC_ID );
+        try
+        {
+            return ModelContext.createModelContext( this.getClass().getClassLoader() );
+        }
+        catch ( final ModelException e )
+        {
+            throw new AssertionError( e );
+        }
+    }
 
-        for ( ImplementationTest test : this.getTestSuite().getImplementationTest() )
+    @Test
+    public final void testImplementations() throws Exception
+    {
+        final JAXBContext jaxbContext = this.getModelContext().createContext( ModelObject.MODEL_PUBLIC_ID );
+
+        for ( ImplementationTestType test : this.getTestSuite().getImplementationTest() )
         {
             System.out.println( "ImplementationTest: " + test.getIdentifier() );
 
@@ -150,7 +186,7 @@ public class ModulesTest
             model.setIdentifier( ModelObject.MODEL_PUBLIC_ID );
             ModelHelper.setModules( model, modules.getValue() );
 
-            final ModelValidationReport modulesReport = context.validateModel( model );
+            final ModelValidationReport modulesReport = this.getModelContext().validateModel( model );
 
             if ( !modulesReport.isModelValid() )
             {
@@ -163,8 +199,8 @@ public class ModulesTest
             final JAXBElement<Implementation> expected =
                 (JAXBElement<Implementation>) test.getImplementation().getAny();
 
-            final ModelValidationReport implementationReport =
-                context.validateModel( ModelObject.MODEL_PUBLIC_ID, new JAXBSource( jaxbContext, expected ) );
+            final ModelValidationReport implementationReport = this.getModelContext().validateModel(
+                ModelObject.MODEL_PUBLIC_ID, new JAXBSource( jaxbContext, expected ) );
 
             if ( !implementationReport.isModelValid() )
             {
@@ -193,11 +229,10 @@ public class ModulesTest
         }
     }
 
-    public void testInstances() throws Exception
+    @Test
+    public final void testInstances() throws Exception
     {
-        final ModelContext context = ModelContext.createModelContext( this.getClass().getClassLoader() );
-
-        for ( InstanceTest test : this.getTestSuite().getInstanceTest() )
+        for ( InstanceTestType test : this.getTestSuite().getInstanceTest() )
         {
             System.out.println( "InstanceTest: " + test.getIdentifier() );
 
@@ -206,7 +241,7 @@ public class ModulesTest
             model.setIdentifier( ModelObject.MODEL_PUBLIC_ID );
             ModelHelper.setModules( model, modules.getValue() );
 
-            ModelValidationReport validationReport = context.validateModel( model );
+            ModelValidationReport validationReport = this.getModelContext().validateModel( model );
 
             if ( !validationReport.isModelValid() )
             {
@@ -217,8 +252,9 @@ public class ModulesTest
                                validationReport.isModelValid() );
 
             final JAXBElement<Instance> expected = (JAXBElement<Instance>) test.getInstance().getAny();
-            validationReport = context.validateModel( ModelObject.MODEL_PUBLIC_ID, new JAXBSource(
-                context.createContext( ModelObject.MODEL_PUBLIC_ID ), expected ) );
+            validationReport = this.getModelContext().validateModel(
+                ModelObject.MODEL_PUBLIC_ID,
+                new JAXBSource( this.getModelContext().createContext( ModelObject.MODEL_PUBLIC_ID ), expected ) );
 
             if ( !validationReport.isModelValid() )
             {
@@ -547,11 +583,6 @@ public class ModulesTest
         {
             System.out.println( "\t" + d.toString() );
         }
-    }
-
-    private static String getMessage( final Throwable t )
-    {
-        return t != null ? t.getMessage() != null ? t.getMessage() : getMessage( t.getCause() ) : null;
     }
 
 }
