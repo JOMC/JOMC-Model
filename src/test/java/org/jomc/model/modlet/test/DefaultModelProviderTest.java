@@ -86,7 +86,7 @@ public class DefaultModelProviderTest
      *
      * @see #getModelProvider()
      */
-    public DefaultModelProvider newModelProvider()
+    protected DefaultModelProvider newModelProvider()
     {
         return new DefaultModelProvider();
     }

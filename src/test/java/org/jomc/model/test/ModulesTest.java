@@ -106,7 +106,7 @@ public class ModulesTest
      *
      * @see #getTestSuite()
      */
-    public TestSuite newTestSuite()
+    protected TestSuite newTestSuite()
     {
         try
         {
@@ -159,8 +159,10 @@ public class ModulesTest
      * Creates a new {@code ModelContext} instance tests are performed with.
      *
      * @return A new {@code ModelContext} instance tests are performed with.
+     *
+     * @see #getModelContext()
      */
-    public ModelContext newModelContext()
+    protected ModelContext newModelContext()
     {
         try
         {
@@ -577,7 +579,7 @@ public class ModulesTest
         }
     }
 
-    public static void log( final ModelValidationReport report )
+    private static void log( final ModelValidationReport report )
     {
         for ( ModelValidationReport.Detail d : report.getDetails() )
         {

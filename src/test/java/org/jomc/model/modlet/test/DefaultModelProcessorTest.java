@@ -88,7 +88,7 @@ public class DefaultModelProcessorTest
      *
      * @see #getModelProcessor()
      */
-    public DefaultModelProcessor newModelProcessor()
+    protected DefaultModelProcessor newModelProcessor()
     {
         return new DefaultModelProcessor();
     }

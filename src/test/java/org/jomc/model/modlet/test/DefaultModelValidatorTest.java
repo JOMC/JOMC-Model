@@ -104,7 +104,7 @@ public class DefaultModelValidatorTest
      *
      * @see #getModelValidator()
      */
-    public DefaultModelValidator newModelValidator()
+    protected DefaultModelValidator newModelValidator()
     {
         return new DefaultModelValidator();
     }
@@ -145,7 +145,7 @@ public class DefaultModelValidatorTest
      *
      * @return A new {@code ModelContext} instance to perform tests with.
      */
-    public ModelContext newModelContext()
+    protected ModelContext newModelContext()
     {
         try
         {
@@ -179,7 +179,7 @@ public class DefaultModelValidatorTest
      *
      * @return A new {@code TestSuite} instance holding module tests to run.
      */
-    public TestSuite newTestSuite()
+    protected TestSuite newTestSuite()
     {
         try
         {
@@ -308,7 +308,7 @@ public class DefaultModelValidatorTest
         }
     }
 
-    public static void log( final ModelValidationReport report )
+    private static void log( final ModelValidationReport report )
     {
         for ( ModelValidationReport.Detail d : report.getDetails() )
         {
