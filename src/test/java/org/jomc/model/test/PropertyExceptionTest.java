@@ -46,6 +46,9 @@ import static org.junit.Assert.assertEquals;
 public class PropertyExceptionTest
 {
 
+    /** Constant to prefix relative resource names with. */
+    private static final String ABSOLUTE_RESOURCE_NAME_PREFIX = "/org/jomc/model/test/";
+
     /** Creates a new {@code PropertyExceptionTest} instance. */
     public PropertyExceptionTest()
     {
@@ -55,8 +58,8 @@ public class PropertyExceptionTest
     @Test
     public final void testSerializabe() throws Exception
     {
-        final ObjectInputStream objectStream =
-            new ObjectInputStream( this.getClass().getResourceAsStream( "PropertyException.ser" ) );
+        final ObjectInputStream objectStream = new ObjectInputStream( this.getClass().getResourceAsStream(
+            ABSOLUTE_RESOURCE_NAME_PREFIX + "PropertyException.ser" ) );
 
         final PropertyException e = (PropertyException) objectStream.readObject();
         objectStream.close();

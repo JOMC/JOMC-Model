@@ -65,6 +65,9 @@ import static org.junit.Assert.fail;
 public class DefaultModelValidatorTest
 {
 
+    /** Constant to prefix relative resource names with. */
+    private static final String ABSOLUTE_RESOURCE_NAME_PREFIX = "/org/jomc/model/modlet/test/";
+
     /** The {@code DefaultModelValidator} instance tests are performed with. */
     private DefaultModelValidator defaultModelValidator;
 
@@ -184,7 +187,8 @@ public class DefaultModelValidatorTest
         try
         {
             return ( (JAXBElement<TestSuite>) this.getModelContext().createUnmarshaller(
-                    ModelObject.MODEL_PUBLIC_ID ).unmarshal( this.getClass().getResource( "testsuite.xml" ) ) ).getValue();
+                    ModelObject.MODEL_PUBLIC_ID ).unmarshal( this.getClass().getResource(
+                    ABSOLUTE_RESOURCE_NAME_PREFIX + "testsuite.xml" ) ) ).getValue();
 
         }
         catch ( final JAXBException e )

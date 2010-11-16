@@ -70,6 +70,9 @@ import org.junit.Test;
 public class ModulesTest
 {
 
+    /** Constant to prefix relative resource names with. */
+    private static final String ABSOLUTE_RESOURCE_NAME_PREFIX = "/org/jomc/model/test/";
+
     /** The {@code TestSuite} holding the module tests to run. */
     private TestSuite testSuite;
 
@@ -110,8 +113,9 @@ public class ModulesTest
     {
         try
         {
-            return ( (JAXBElement<TestSuite>) this.getModelContext().createUnmarshaller( ModelObject.MODEL_PUBLIC_ID ).
-                    unmarshal( this.getClass().getResource( "testsuite.xml" ) ) ).getValue();
+            return ( (JAXBElement<TestSuite>) this.getModelContext().createUnmarshaller(
+                    ModelObject.MODEL_PUBLIC_ID ).unmarshal( this.getClass().getResource(
+                    ABSOLUTE_RESOURCE_NAME_PREFIX + "testsuite.xml" ) ) ).getValue();
 
         }
         catch ( final JAXBException e )
