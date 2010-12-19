@@ -79,6 +79,9 @@
       <code>org.jomc.model.modlet.DefaultModelProcessor</code> to create <code>Transformers</code> supporting resolution
       of relative URIs based on the system id of found transformations.]]>
       </action>
+      <action dev="schulte2005" type="fix"><![CDATA[Corrected method <code>getMergedModule</code> of class
+      <code>org.jomc.model.Modules</code> to preserve <code>any</code> module objects.]]>
+      </action>
     </release>
   </body>
 </document>

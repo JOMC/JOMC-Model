@@ -3756,6 +3756,8 @@
 
                 mergedModule.getMessages().getMessage().addAll( m.getMessages().getMessage() );
             }
+
+            mergedModule.getAny().addAll( m.getAny() );
         }
 
         return mergedModule;
