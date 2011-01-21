@@ -56,6 +56,7 @@ public class ModelObjectTest
         super();
     }
 
+    /** Test {@code ModelObject}. */
     public static class TestModelObject extends ModelObject
     {
 
