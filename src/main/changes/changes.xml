@@ -57,6 +57,8 @@
     </release>
     <!-- *********************************************************************************************************** -->
     <release version="1.2">
+      <action dev="schulte2005" type="add"><![CDATA[Added a <code>META-INF/sun-jaxb.episode</code> file.]]>
+      </action>
       <action dev="schulte2005" type="update"><![CDATA[Updated methods <code>isDefaultEnabled</code> and
       <code>getDefaultTransformerLocation</code> of class <code>org.jomc.model.modlet.DefaultModelProcessor</code>
       to support system properties <code>org.jomc.model.modlet.DefaultModelProcessor.defaultEnabled</code> and
