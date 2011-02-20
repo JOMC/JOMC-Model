@@ -39,7 +39,7 @@
                xmlns:ci="http://jaxb.dev.java.net/plugin/code-injector"
                version="2.0">
 
-  <jaxb:bindings schemaLocation="jomc-1.0.xsd">
+  <jaxb:bindings schemaLocation="jomc-1.2.xsd">
     <!-- *********************************************************************************************************** -->
     <jaxb:bindings node="xs:complexType[@name='Text']/xs:simpleContent/xs:extension/xs:attribute[@name='language']">
       <jaxb:property>
