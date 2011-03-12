@@ -57,6 +57,14 @@
           <include>jomc-1.2.xsd</include>
         </includes>
       </resource>
+      <resource>
+        <filtering>false</filtering>
+        <directory>${project.build.directory}/deprecated-schemas</directory>
+        <targetPath>org/jomc/model</targetPath>
+        <includes>
+          <include>jomc-1.0.xsd</include>
+        </includes>
+      </resource>
     </resources>
     <testResources>
       <testResource>
@@ -77,6 +85,30 @@
       </testResource>
     </testResources>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpack-deprecated-schemas</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.jomc</groupId>
+                  <artifactId>jomc-model</artifactId>
+                  <version>1.0</version>
+                  <classifier>schemas</classifier>
+                  <outputDirectory>${project.build.directory}/deprecated-schemas</outputDirectory>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.jvnet.jaxb2.maven2</groupId>
         <artifactId>maven-jaxb21-plugin</artifactId>
