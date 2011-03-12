@@ -92,7 +92,7 @@ as defined in RFC 2045 and 2046. Attribute 'value' holds the text of the type co
     <xsd:simpleContent>
       <xsd:extension base="jomc:String">
         <xsd:attribute name="language" type="jomc:Language" use="required"/>
-        <xsd:attribute name="type" type="jomc:MimeType" use="optional"/>
+        <xsd:attribute name="type" type="jomc:MimeType" use="optional" default="text/plain"/>
       </xsd:extension>
     </xsd:simpleContent>
   </xsd:complexType>
