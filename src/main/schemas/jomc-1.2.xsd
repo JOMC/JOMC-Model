@@ -805,7 +805,7 @@ The 'Author' type extends the 'Person' type adding attribute 'version' holding a
   <xsd:simpleType name="MimeType">
     <xsd:restriction base="xsd:token">
       <xsd:whiteSpace value="collapse"/>
-      <xsd:pattern value="[0-9A-Za-z!#$%&amp;'\*\+\.\-\\\^_`\{\}\|~]+/[0-9A-Za-z!#$%&amp;'\*\+\.\-\\\^_`\{\}\|~]+(;[0-9A-Za-z!#$%&amp;'\*\+\.\-\\\^_`\{\}\|~]+|;[0-9A-Za-z!#$%&amp;'\*\+\.\-\\\^_`\{\}\|~]+=[0-9A-Za-z!#$%&amp;'\*\+\.\-\\\^_`\{\}\|~]+|;[0-9A-Za-z!#$%&amp;'\*\+\.\-\\\^_`\{\}\|~]+=&quot;([0-9A-Za-z!#$%&amp;'\*\+\.\-\^_`\{\}\|~\(\)&lt;&gt;@,;:/\[\]\?=]|\\\\|\\&quot;)*&quot;)*"/>
+      <xsd:pattern value="[0-9A-Za-z!#$%&amp;'\*\+\.\-\\\^_`\{\}\|~]+/[0-9A-Za-z!#$%&amp;'\*\+\.\-\\\^_`\{\}\|~]+(;[0-9A-Za-z!#$%&amp;'\*\+\.\-\\\^_`\{\}\|~]+(=([0-9A-Za-z!#$%&amp;'\*\+\.\-\\\^_`\{\}\|~]+|&quot;([0-9A-Za-z!#$%&amp;'\*\+\.\-\^_`\{\}\|~\(\)&lt;&gt;@,;:/\[\]\?=]|\\\\|\\&quot;)*&quot;)+)?)*"/>
     </xsd:restriction>
   </xsd:simpleType>
   <!-- ************************************************************************************************************* -->
