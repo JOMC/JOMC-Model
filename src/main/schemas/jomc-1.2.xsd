@@ -84,13 +84,15 @@
       <xsd:documentation xml:lang="en">
 Model of text.
 
-The 'Text' type defines attributes 'language' and 'value'. Attribute 'language' holds the language key identifying the
-text in a set of texts. Attribute 'value' holds the text corresponding to that language.
+The 'Text' type defines attributes 'language', 'type' and 'value'. Attribute 'language' holds the language key
+identifying the text in a set of texts. Attribute 'type' specifies a Multipurpose Internet Mail Extension (MIME) type,
+as defined in RFC 2045 and 2046. Attribute 'value' holds the text of the type corresponding to the language.
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
       <xsd:extension base="jomc:String">
         <xsd:attribute name="language" type="jomc:Language" use="required"/>
+        <xsd:attribute name="type" type="jomc:MimeType" use="optional"/>
       </xsd:extension>
     </xsd:simpleContent>
   </xsd:complexType>
@@ -148,7 +150,7 @@ text in a set of texts. Attribute 'value' holds the text corresponding to that l
       <xsd:element ref="jomc:documentation" minOccurs="0" maxOccurs="1"/>
       <xsd:element ref="jomc:authors" minOccurs="0" maxOccurs="1"/>
     </xsd:sequence>
-    <xsd:attribute name="modelVersion" type="jomc:Version" use="optional" default="1.0"/>
+    <xsd:attribute name="modelVersion" type="jomc:Version" use="optional" default="1.2"/>
     <xsd:attribute name="createDate" type="jomc:DateTime" use="optional"/>
     <xsd:attribute name="deprecated" type="jomc:Flag" use="optional" default="false"/>
   </xsd:complexType>
@@ -798,6 +800,13 @@ The 'Author' type extends the 'Person' type adding attribute 'version' holding a
   <!-- ************************************************************************************************************* -->
   <xsd:simpleType name="Identifier">
     <xsd:restriction base="xsd:token"/>
+  </xsd:simpleType>
+  <!-- ************************************************************************************************************* -->
+  <xsd:simpleType name="MimeType">
+    <xsd:restriction base="xsd:token">
+      <xsd:whiteSpace value="collapse"/>
+      <xsd:pattern value="[0-9A-Za-z!#$%&amp;'\*\+\.\-\\\^_`\{\}\|~]+/[0-9A-Za-z!#$%&amp;'\*\+\.\-\\\^_`\{\}\|~]+(; ?[0-9A-Za-z!#$%&amp;'\*\+\.\-\\\^_`\{\}\|~]+|; ?[0-9A-Za-z!#$%&amp;'\*\+\.\-\\\^_`\{\}\|~]+=[0-9A-Za-z!#$%&amp;'\*\+\.\-\\\^_`\{\}\|~]+|; ?[0-9A-Za-z!#$%&amp;'\*\+\.\-\\\^_`\{\}\|~]+=&quot;([0-9A-Za-z!#$%&amp;'\*\+\.\-\^_`\{\}\|~\(\)&lt;&gt;@,;:/\[\]\?=]|\\\\|\\&quot;)*&quot;)*"/>
+    </xsd:restriction>
   </xsd:simpleType>
   <!-- ************************************************************************************************************* -->
   <xsd:simpleType name="ArgumentType">

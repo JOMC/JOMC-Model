@@ -46,6 +46,11 @@
         <jaxb:javadoc>The language key of this text.</jaxb:javadoc>
       </jaxb:property>
     </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Text']/xs:simpleContent/xs:extension/xs:attribute[@name='type']">
+      <jaxb:property>
+        <jaxb:javadoc>The Multipurpose Internet Mail Extension (MIME) type, as defined in RFC 2045 and 2046.</jaxb:javadoc>
+      </jaxb:property>
+    </jaxb:bindings>
     <!-- *********************************************************************************************************** -->
     <jaxb:bindings node="xs:complexType[@name='Texts']">
       <ci:code><![CDATA[

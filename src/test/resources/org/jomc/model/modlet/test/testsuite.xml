@@ -254,6 +254,99 @@
   </schema-constraints-test>
 
   <!-- ********************************************************************* -->
+  <schema-constraints-test identifier="SCT0021">
+    <model-object valid="true">
+      <texts xmlns="http://jomc.org/model" defaultLanguage="en">
+        <text language="en" type="text/plain">Test</text>
+        <text language="de" type="text/plain;charset=US-ASCII">Test</text>
+        <text language="fr" type="text/plain;parameter-without-value;parameter-with-value=test">Test</text>
+        <text language="es" type="text/plain;parameter-without-value;parameter-with-quoted-value=&quot;\&quot;test()&lt;&gt;\&quot;&quot;">Test</text>
+      </texts>
+    </model-object>
+  </schema-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <schema-constraints-test identifier="SCT0022">
+    <model-object valid="false">
+      <texts xmlns="http://jomc.org/model" defaultLanguage="en">
+        <text language="en" type="text">Test</text>
+      </texts>
+    </model-object>
+  </schema-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <schema-constraints-test identifier="SCT0023">
+    <model-object valid="false">
+      <texts xmlns="http://jomc.org/model" defaultLanguage="en">
+        <text language="en" type="text/">Test</text>
+      </texts>
+    </model-object>
+  </schema-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <schema-constraints-test identifier="SCT0024">
+    <model-object valid="false">
+      <texts xmlns="http://jomc.org/model" defaultLanguage="en">
+        <text language="en" type="text/;parameter">Test</text>
+      </texts>
+    </model-object>
+  </schema-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <schema-constraints-test identifier="SCT0025">
+    <model-object valid="false">
+      <texts xmlns="http://jomc.org/model" defaultLanguage="en">
+        <text language="en" type="text/;parameter=value">Test</text>
+      </texts>
+    </model-object>
+  </schema-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <schema-constraints-test identifier="SCT0026">
+    <model-object valid="false">
+      <texts xmlns="http://jomc.org/model" defaultLanguage="en">
+        <text language="en" type="text/plain:parameter=value">Test</text>
+      </texts>
+    </model-object>
+  </schema-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <schema-constraints-test identifier="SCT0027">
+    <model-object valid="false">
+      <texts xmlns="http://jomc.org/model" defaultLanguage="en">
+        <text language="en" type="text/plain;">Test</text>
+      </texts>
+    </model-object>
+  </schema-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <schema-constraints-test identifier="SCT0028">
+    <model-object valid="false">
+      <texts xmlns="http://jomc.org/model" defaultLanguage="en">
+        <text language="en" type="text/plain;;">Test</text>
+      </texts>
+    </model-object>
+  </schema-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <schema-constraints-test identifier="SCT0029">
+    <model-object valid="false">
+      <texts xmlns="http://jomc.org/model" defaultLanguage="en">
+        <text language="en" type="text/plain;param;param=value;">Test</text>
+      </texts>
+    </model-object>
+  </schema-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <schema-constraints-test identifier="SCT0030">
+    <model-object valid="false">
+      <texts xmlns="http://jomc.org/model" defaultLanguage="en">
+        <text language="en" type="text/plain;parameter-with-unclosed-quoted-value=&quot;\&quot;test()&lt;&gt;\&quot;">Test</text>
+      </texts>
+    </model-object>
+  </schema-constraints-test>
+
+  <!-- ********************************************************************* -->
   <modules-constraints-test identifier="MCT0001">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">

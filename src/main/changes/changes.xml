@@ -59,6 +59,16 @@
     <release version="1.2">
       <action dev="schulte2005" type="add"><![CDATA[Added a <code>META-INF/sun-jaxb.episode</code> file.]]>
       </action>
+      <action dev="schulte2005" type="add"><![CDATA[Added <code>type</code> attribute to <code>Text</code> complex type
+      of the <code>jomc-1.2.xsd</code> schema.]]>
+      </action>
+      <action dev="schulte2005" type="fix"><![CDATA[Corrected method <code>findTransformers</code> of class
+      <code>org.jomc.model.modlet.DefaultModelProcessor</code> to create <code>Transformers</code> supporting resolution
+      of relative URIs based on the system id of found transformations.]]>
+      </action>
+      <action dev="schulte2005" type="remove"><![CDATA[Removed the <code>jomc-1.0.xsd</code> schema deprecated by the
+      <code>jomc-1.2.xsd</code> schema.]]>
+      </action>
       <action dev="schulte2005" type="update"><![CDATA[Updated methods <code>isDefaultEnabled</code> and
       <code>getDefaultTransformerLocation</code> of class <code>org.jomc.model.modlet.DefaultModelProcessor</code>
       to support system properties <code>org.jomc.model.modlet.DefaultModelProcessor.defaultEnabled</code> and
@@ -76,10 +86,6 @@
       <action dev="schulte2005" type="update"><![CDATA[Updated method <code>findTransformers</code> of class
       <code>org.jomc.model.modlet.DefaultModelProcessor</code> to add system properties to transformers as
       parameters.]]>
-      </action>
-      <action dev="schulte2005" type="fix"><![CDATA[Corrected method <code>findTransformers</code> of class
-      <code>org.jomc.model.modlet.DefaultModelProcessor</code> to create <code>Transformers</code> supporting resolution
-      of relative URIs based on the system id of found transformations.]]>
       </action>
     </release>
   </body>
