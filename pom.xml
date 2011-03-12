@@ -220,6 +220,11 @@
           <optional>true</optional>
         </dependency>
         <dependency>
+          <groupId>javax.activation</groupId>
+          <artifactId>activation</artifactId>
+          <scope>compile</scope>
+        </dependency>
+        <dependency>
           <groupId>javax.xml.bind</groupId>
           <artifactId>jaxb-api</artifactId>
           <scope>compile</scope>
