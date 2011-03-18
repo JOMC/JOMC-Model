@@ -57,14 +57,6 @@
           <include>jomc-1.2.xsd</include>
         </includes>
       </resource>
-      <resource>
-        <filtering>false</filtering>
-        <directory>${project.build.directory}/deprecated-schemas</directory>
-        <targetPath>org/jomc/model</targetPath>
-        <includes>
-          <include>jomc-1.0.xsd</include>
-        </includes>
-      </resource>
     </resources>
     <testResources>
       <testResource>
@@ -170,6 +162,26 @@
                   <filtering>false</filtering>
                   <includes>
                     <include>**/*.txt</include>
+                  </includes>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
+            <id>copy-deprecated-schemas</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${project.build.directory}/deprecated-schemas</directory>
+                  <filtering>false</filtering>
+                  <targetPath>org/jomc/model</targetPath>
+                  <includes>
+                    <include>*.xsd</include>
                   </includes>
                 </resource>
               </resources>
