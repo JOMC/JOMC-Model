@@ -138,12 +138,16 @@ public class DefaultModelValidator implements ModelValidator
     private void assertModulesValid( final ModelContext context, final Modules modules,
                                      final ModelValidationReport report )
     {
-        for ( Module m : modules.getModule() )
+        for ( int i = modules.getModule().size() - 1; i >= 0; i-- )
         {
+            final Module m = modules.getModule().get( i );
+
             if ( m.getImplementations() != null )
             {
-                for ( ImplementationReference r : m.getImplementations().getReference() )
+                for ( int j = m.getImplementations().getReference().size() - 1; j >= 0; j-- )
                 {
+                    final ImplementationReference r = m.getImplementations().getReference().get( j );
+
                     report.getDetails().add( this.createDetail(
                         "MODULE_IMPLEMENTATION_REFERENCE_DECLARATION_CONSTRAINT", Level.SEVERE,
                         "moduleImplementationReferenceDeclarationConstraint", new Object[]
@@ -156,8 +160,10 @@ public class DefaultModelValidator implements ModelValidator
 
             if ( m.getMessages() != null )
             {
-                for ( Message msg : m.getMessages().getMessage() )
+                for ( int j = m.getMessages().getMessage().size() - 1; j >= 0; j-- )
                 {
+                    final Message msg = m.getMessages().getMessage().get( j );
+
                     if ( msg.isFinal() )
                     {
                         report.getDetails().add( this.createDetail(
@@ -182,8 +188,10 @@ public class DefaultModelValidator implements ModelValidator
 
                     if ( msg.getTemplate() != null )
                     {
-                        for ( Text t : msg.getTemplate().getText() )
+                        for ( int k = msg.getTemplate().getText().size() - 1; k >= 0; k-- )
                         {
+                            final Text t = msg.getTemplate().getText().get( k );
+
                             try
                             {
                                 new MessageFormat( t.getValue(), new Locale( t.getLanguage() ) );
@@ -209,8 +217,10 @@ public class DefaultModelValidator implements ModelValidator
                     }
                 }
 
-                for ( MessageReference r : m.getMessages().getReference() )
+                for ( int j = m.getMessages().getReference().size() - 1; j >= 0; j-- )
                 {
+                    final MessageReference r = m.getMessages().getReference().get( j );
+
                     report.getDetails().add( this.createDetail(
                         "MODULE_MESSAGE_REFERENCE_DECLARATION_CONSTRAINT", Level.SEVERE,
                         "moduleMessageReferenceDeclarationConstraint", new Object[]
@@ -223,8 +233,10 @@ public class DefaultModelValidator implements ModelValidator
 
             if ( m.getProperties() != null )
             {
-                for ( Property p : m.getProperties().getProperty() )
+                for ( int j = m.getProperties().getProperty().size() - 1; j >= 0; j-- )
                 {
+                    final Property p = m.getProperties().getProperty().get( j );
+
                     if ( p.isFinal() )
                     {
                         report.getDetails().add( this.createDetail(
@@ -290,8 +302,10 @@ public class DefaultModelValidator implements ModelValidator
                     }
                 }
 
-                for ( PropertyReference r : m.getProperties().getReference() )
+                for ( int j = m.getProperties().getReference().size() - 1; j >= 0; j-- )
                 {
+                    final PropertyReference r = m.getProperties().getReference().get( j );
+
                     report.getDetails().add( this.createDetail(
                         "MODULE_PROPERTY_REFERENCE_DECLARATION_CONSTRAINT", Level.SEVERE,
                         "modulePropertyReferenceDeclarationConstraint", new Object[]
@@ -304,8 +318,10 @@ public class DefaultModelValidator implements ModelValidator
 
             if ( m.getSpecifications() != null )
             {
-                for ( SpecificationReference r : m.getSpecifications().getReference() )
+                for ( int j = m.getSpecifications().getReference().size() - 1; j >= 0; j-- )
                 {
+                    final SpecificationReference r = m.getSpecifications().getReference().get( j );
+
                     report.getDetails().add( this.createDetail(
                         "MODULE_SPECIFICATION_REFERENCE_DECLARATION_CONSTRAINT", Level.SEVERE,
                         "moduleSpecificationReferenceDeclarationConstraint", new Object[]
@@ -327,9 +343,10 @@ public class DefaultModelValidator implements ModelValidator
         {
             final Map<String, Implementation> implementationClassDeclarations = new HashMap<String, Implementation>();
 
-            for ( Implementation i : implementations.getImplementation() )
+            for ( int i = implementations.getImplementation().size() - 1; i >= 0; i-- )
             {
-                final Implementation cycle = this.findInheritanceCycle( modules, i, i, new Implementations() );
+                final Implementation impl = implementations.getImplementation().get( i );
+                final Implementation cycle = this.findInheritanceCycle( modules, impl, impl, new Implementations() );
 
                 if ( cycle != null )
                 {
@@ -337,26 +354,26 @@ public class DefaultModelValidator implements ModelValidator
                         "IMPLEMENTATION_INHERITANCE_CYCLE_CONSTRAINT", Level.SEVERE,
                         "implementationInheritanceCycleConstraint", new Object[]
                         {
-                            i.getIdentifier(), cycle.getIdentifier()
-                        }, new ObjectFactory().createImplementation( i ) ) );
+                            impl.getIdentifier(), cycle.getIdentifier()
+                        }, new ObjectFactory().createImplementation( impl ) ) );
 
                 }
 
-                if ( i.isClassDeclaration() )
+                if ( impl.isClassDeclaration() )
                 {
-                    if ( i.getClazz() == null )
+                    if ( impl.getClazz() == null )
                     {
                         report.getDetails().add( this.createDetail(
                             "IMPLEMENTATION_CLASS_CONSTRAINT", Level.SEVERE,
                             "implementationClassConstraint", new Object[]
                             {
-                                i.getIdentifier()
-                            }, new ObjectFactory().createImplementation( i ) ) );
+                                impl.getIdentifier()
+                            }, new ObjectFactory().createImplementation( impl ) ) );
 
                     }
                     else
                     {
-                        final Implementation prev = implementationClassDeclarations.get( i.getClazz() );
+                        final Implementation prev = implementationClassDeclarations.get( impl.getClazz() );
 
                         if ( prev != null )
                         {
@@ -364,35 +381,36 @@ public class DefaultModelValidator implements ModelValidator
                                 "IMPLEMENTATION_CLASS_DECLARATION_CONSTRAINT",
                                 Level.SEVERE, "implementationClassDeclarationConstraint", new Object[]
                                 {
-                                    i.getIdentifier(), i.getClazz(), prev.getIdentifier()
-                                }, new ObjectFactory().createImplementation( i ) ) );
+                                    impl.getIdentifier(), impl.getClazz(), prev.getIdentifier()
+                                }, new ObjectFactory().createImplementation( impl ) ) );
 
                         }
                         else
                         {
-                            implementationClassDeclarations.put( i.getClazz(), i );
+                            implementationClassDeclarations.put( impl.getClazz(), impl );
                         }
                     }
                 }
 
-                if ( i.isAbstract() && i.getLocation() != null )
+                if ( impl.isAbstract() && impl.getLocation() != null )
                 {
                     report.getDetails().add( this.createDetail(
                         "IMPLEMENTATION_ABSTRACT_LOCATION_DECLARATION_CONSTRAINT", Level.SEVERE,
                         "implementationAbstractLocationDeclarationConstraint", new Object[]
                         {
-                            i.getIdentifier(), i.getLocation()
-                        }, new ObjectFactory().createImplementation( i ) ) );
+                            impl.getIdentifier(), impl.getLocation()
+                        }, new ObjectFactory().createImplementation( impl ) ) );
 
                 }
 
-                if ( i.getDependencies() != null )
+                if ( impl.getDependencies() != null )
                 {
                     final Dependencies parentDependencies = new Dependencies();
-                    this.collectParentDependencies( modules, i, parentDependencies, new Implementations(), false );
+                    this.collectParentDependencies( modules, impl, parentDependencies, new Implementations(), false );
 
-                    for ( Dependency d : i.getDependencies().getDependency() )
+                    for ( int j = impl.getDependencies().getDependency().size() - 1; j >= 0; j-- )
                     {
+                        final Dependency d = impl.getDependencies().getDependency().get( j );
                         final Dependency parent = parentDependencies.getDependency( d.getName() );
 
                         if ( d.isOverride() && parent == null )
@@ -401,8 +419,8 @@ public class DefaultModelValidator implements ModelValidator
                                 "IMPLEMENTATION_DEPENDENCY_OVERRIDE_CONSTRAINT", Level.SEVERE,
                                 "implementationDependencyOverrideConstraint", new Object[]
                                 {
-                                    i.getIdentifier(), d.getName(),
-                                }, new ObjectFactory().createImplementation( i ) ) );
+                                    impl.getIdentifier(), d.getName(),
+                                }, new ObjectFactory().createImplementation( impl ) ) );
 
                         }
                         if ( parent != null && parent.isFinal() )
@@ -411,54 +429,59 @@ public class DefaultModelValidator implements ModelValidator
                                 "IMPLEMENTATION_DEPENDENCY_INHERITANCE_CONSTRAINT", Level.SEVERE,
                                 "implementationDependencyFinalConstraint", new Object[]
                                 {
-                                    i.getIdentifier(), d.getName(),
-                                }, new ObjectFactory().createImplementation( i ) ) );
+                                    impl.getIdentifier(), d.getName(),
+                                }, new ObjectFactory().createImplementation( impl ) ) );
 
                         }
 
-                        this.assertDependencyValid( context, modules, i, d, report );
+                        this.assertDependencyValid( context, modules, impl, d, report );
                     }
                 }
 
-                if ( i.getImplementations() != null )
+                if ( impl.getImplementations() != null )
                 {
-                    for ( Implementation pi : i.getImplementations().getImplementation() )
+                    for ( int j = impl.getImplementations().getImplementation().size() - 1; j >= 0; j-- )
                     {
+                        final Implementation pi = impl.getImplementations().getImplementation().get( j );
+
                         report.getDetails().add( this.createDetail(
                             "IMPLEMENTATION_IMPLEMENTATION_DECLARATION_CONSTRAINT", Level.SEVERE,
                             "implementationImplementationDeclarationConstraint", new Object[]
                             {
-                                i.getIdentifier(), pi.getIdentifier()
-                            }, new ObjectFactory().createImplementation( i ) ) );
+                                impl.getIdentifier(), pi.getIdentifier()
+                            }, new ObjectFactory().createImplementation( impl ) ) );
 
                     }
                 }
 
-                if ( i.getMessages() != null )
+                if ( impl.getMessages() != null )
                 {
                     final Messages parentMessages = new Messages();
-                    this.collectParentMessages( modules, i, parentMessages, new Implementations(), false );
+                    this.collectParentMessages( modules, impl, parentMessages, new Implementations(), false );
 
-                    for ( Message m : i.getMessages().getMessage() )
+                    for ( int j = impl.getMessages().getMessage().size() - 1; j >= 0; j-- )
                     {
+                        final Message m = impl.getMessages().getMessage().get( j );
                         final Message parentMessage = parentMessages.getMessage( m.getName() );
                         final MessageReference parentReference = parentMessages.getReference( m.getName() );
 
-                        if ( i.getMessages().getReference( m.getName() ) != null )
+                        if ( impl.getMessages().getReference( m.getName() ) != null )
                         {
                             report.getDetails().add( this.createDetail(
                                 "IMPLEMENTATION_MESSAGES_UNIQUENESS_CONSTRAINT", Level.SEVERE,
                                 "implementationMessagesUniquenessConstraint", new Object[]
                                 {
-                                    i.getIdentifier(), m.getName(),
-                                }, new ObjectFactory().createImplementation( i ) ) );
+                                    impl.getIdentifier(), m.getName(),
+                                }, new ObjectFactory().createImplementation( impl ) ) );
 
                         }
 
                         if ( m.getTemplate() != null )
                         {
-                            for ( Text t : m.getTemplate().getText() )
+                            for ( int k = m.getTemplate().getText().size() - 1; k >= 0; k-- )
                             {
+                                final Text t = m.getTemplate().getText().get( k );
+
                                 try
                                 {
                                     new MessageFormat( t.getValue(), new Locale( t.getLanguage() ) );
@@ -476,8 +499,8 @@ public class DefaultModelValidator implements ModelValidator
                                         "IMPLEMENTATION_MESSAGE_TEMPLATE_CONSTRAINT", Level.SEVERE,
                                         "implementationMessageTemplateConstraint", new Object[]
                                         {
-                                            i.getIdentifier(), m.getName(), t.getValue(), message
-                                        }, new ObjectFactory().createImplementation( i ) ) );
+                                            impl.getIdentifier(), m.getName(), t.getValue(), message
+                                        }, new ObjectFactory().createImplementation( impl ) ) );
 
                                 }
                             }
@@ -489,8 +512,8 @@ public class DefaultModelValidator implements ModelValidator
                                 "IMPLEMENTATION_MESSAGE_OVERRIDE_CONSTRAINT", Level.SEVERE,
                                 "implementationMessageOverrideConstraint", new Object[]
                                 {
-                                    i.getIdentifier(), m.getName(),
-                                }, new ObjectFactory().createImplementation( i ) ) );
+                                    impl.getIdentifier(), m.getName(),
+                                }, new ObjectFactory().createImplementation( impl ) ) );
 
                         }
 
@@ -501,14 +524,15 @@ public class DefaultModelValidator implements ModelValidator
                                 "IMPLEMENTATION_MESSAGE_INHERITANCE_CONSTRAINT", Level.SEVERE,
                                 "implementationMessageFinalConstraint", new Object[]
                                 {
-                                    i.getIdentifier(), m.getName(),
-                                }, new ObjectFactory().createImplementation( i ) ) );
+                                    impl.getIdentifier(), m.getName(),
+                                }, new ObjectFactory().createImplementation( impl ) ) );
 
                         }
                     }
 
-                    for ( MessageReference r : i.getMessages().getReference() )
+                    for ( int j = impl.getMessages().getReference().size() - 1; j >= 0; j-- )
                     {
+                        final MessageReference r = impl.getMessages().getReference().get( j );
                         final Message parentMessage = parentMessages.getMessage( r.getName() );
                         final MessageReference parentReference = parentMessages.getReference( r.getName() );
 
@@ -518,8 +542,8 @@ public class DefaultModelValidator implements ModelValidator
                                 "IMPLEMENTATION_MESSAGE_OVERRIDE_CONSTRAINT", Level.SEVERE,
                                 "implementationMessageOverrideConstraint", new Object[]
                                 {
-                                    i.getIdentifier(), r.getName(),
-                                }, new ObjectFactory().createImplementation( i ) ) );
+                                    impl.getIdentifier(), r.getName(),
+                                }, new ObjectFactory().createImplementation( impl ) ) );
 
                         }
 
@@ -530,31 +554,32 @@ public class DefaultModelValidator implements ModelValidator
                                 "IMPLEMENTATION_MESSAGE_INHERITANCE_CONSTRAINT", Level.SEVERE,
                                 "implementationMessageFinalConstraint", new Object[]
                                 {
-                                    i.getIdentifier(), r.getName(),
-                                }, new ObjectFactory().createImplementation( i ) ) );
+                                    impl.getIdentifier(), r.getName(),
+                                }, new ObjectFactory().createImplementation( impl ) ) );
 
                         }
                     }
                 }
 
-                if ( i.getProperties() != null )
+                if ( impl.getProperties() != null )
                 {
                     final Properties parentProperties = new Properties();
-                    this.collectParentProperties( modules, i, parentProperties, new Implementations(), false );
+                    this.collectParentProperties( modules, impl, parentProperties, new Implementations(), false );
 
-                    for ( Property p : i.getProperties().getProperty() )
+                    for ( int j = impl.getProperties().getProperty().size() - 1; j >= 0; j-- )
                     {
+                        final Property p = impl.getProperties().getProperty().get( j );
                         final Property parentProperty = parentProperties.getProperty( p.getName() );
                         final PropertyReference parentReference = parentProperties.getReference( p.getName() );
 
-                        if ( i.getProperties().getReference( p.getName() ) != null )
+                        if ( impl.getProperties().getReference( p.getName() ) != null )
                         {
                             report.getDetails().add( this.createDetail(
                                 "IMPLEMENTATION_PROPERTIES_UNIQUENESS_CONSTRAINT", Level.SEVERE,
                                 "implementationPropertiesUniquenessConstraint", new Object[]
                                 {
-                                    i.getIdentifier(), p.getName(),
-                                }, new ObjectFactory().createImplementation( i ) ) );
+                                    impl.getIdentifier(), p.getName(),
+                                }, new ObjectFactory().createImplementation( impl ) ) );
 
                         }
 
@@ -564,8 +589,8 @@ public class DefaultModelValidator implements ModelValidator
                                 "IMPLEMENTATION_PROPERTY_VALUE_CONSTRAINT", Level.SEVERE,
                                 "implementationPropertyValueConstraint", new Object[]
                                 {
-                                    i.getIdentifier(), p.getName()
-                                }, new ObjectFactory().createImplementation( i ) ) );
+                                    impl.getIdentifier(), p.getName()
+                                }, new ObjectFactory().createImplementation( impl ) ) );
 
                         }
 
@@ -575,8 +600,8 @@ public class DefaultModelValidator implements ModelValidator
                                 "IMPLEMENTATION_PROPERTY_TYPE_CONSTRAINT", Level.SEVERE,
                                 "implementationPropertyTypeConstraint", new Object[]
                                 {
-                                    i.getIdentifier(), p.getName()
-                                }, new ObjectFactory().createImplementation( i ) ) );
+                                    impl.getIdentifier(), p.getName()
+                                }, new ObjectFactory().createImplementation( impl ) ) );
 
                         }
 
@@ -597,8 +622,8 @@ public class DefaultModelValidator implements ModelValidator
                                 "IMPLEMENTATION_PROPERTY_JAVA_VALUE_CONSTRAINT", Level.SEVERE,
                                 "implementationPropertyJavaValueConstraint", new Object[]
                                 {
-                                    i.getIdentifier(), p.getName(), message
-                                }, new ObjectFactory().createImplementation( i ) ) );
+                                    impl.getIdentifier(), p.getName(), message
+                                }, new ObjectFactory().createImplementation( impl ) ) );
 
                         }
 
@@ -608,8 +633,8 @@ public class DefaultModelValidator implements ModelValidator
                                 "IMPLEMENTATION_PROPERTY_OVERRIDE_CONSTRAINT", Level.SEVERE,
                                 "implementationPropertyOverrideConstraint", new Object[]
                                 {
-                                    i.getIdentifier(), p.getName(),
-                                }, new ObjectFactory().createImplementation( i ) ) );
+                                    impl.getIdentifier(), p.getName(),
+                                }, new ObjectFactory().createImplementation( impl ) ) );
 
                         }
                         if ( ( parentProperty != null && parentProperty.isFinal() )
@@ -619,14 +644,15 @@ public class DefaultModelValidator implements ModelValidator
                                 "IMPLEMENTATION_PROPERTY_INHERITANCE_CONSTRAINT", Level.SEVERE,
                                 "implementationPropertyFinalConstraint", new Object[]
                                 {
-                                    i.getIdentifier(), p.getName(),
-                                }, new ObjectFactory().createImplementation( i ) ) );
+                                    impl.getIdentifier(), p.getName(),
+                                }, new ObjectFactory().createImplementation( impl ) ) );
 
                         }
                     }
 
-                    for ( PropertyReference r : i.getProperties().getReference() )
+                    for ( int j = impl.getProperties().getReference().size() - 1; j >= 0; j-- )
                     {
+                        final PropertyReference r = impl.getProperties().getReference().get( j );
                         final Property parentProperty = parentProperties.getProperty( r.getName() );
                         final PropertyReference parentReference = parentProperties.getReference( r.getName() );
 
@@ -636,8 +662,8 @@ public class DefaultModelValidator implements ModelValidator
                                 "IMPLEMENTATION_PROPERTY_OVERRIDE_CONSTRAINT", Level.SEVERE,
                                 "implementationPropertyOverrideConstraint", new Object[]
                                 {
-                                    i.getIdentifier(), r.getName(),
-                                }, new ObjectFactory().createImplementation( i ) ) );
+                                    impl.getIdentifier(), r.getName(),
+                                }, new ObjectFactory().createImplementation( impl ) ) );
 
                         }
 
@@ -648,31 +674,34 @@ public class DefaultModelValidator implements ModelValidator
                                 "IMPLEMENTATION_PROPERTY_INHERITANCE_CONSTRAINT", Level.SEVERE,
                                 "implementationPropertyFinalConstraint", new Object[]
                                 {
-                                    i.getIdentifier(), r.getName(),
-                                }, new ObjectFactory().createImplementation( i ) ) );
+                                    impl.getIdentifier(), r.getName(),
+                                }, new ObjectFactory().createImplementation( impl ) ) );
 
                         }
                     }
                 }
 
-                if ( i.getSpecifications() != null )
+                if ( impl.getSpecifications() != null )
                 {
                     final Specifications parentSpecifications = new Specifications();
-                    this.collectParentSpecifications( modules, i, parentSpecifications, new Implementations(), false );
+                    this.collectParentSpecifications(
+                        modules, impl, parentSpecifications, new Implementations(), false );
 
-                    for ( Specification s : i.getSpecifications().getSpecification() )
+                    for ( int j = impl.getSpecifications().getSpecification().size() - 1; j >= 0; j-- )
                     {
+                        final Specification s = impl.getSpecifications().getSpecification().get( j );
                         report.getDetails().add( this.createDetail(
                             "IMPLEMENTATION_SPECIFICATION_DECLARATION_CONSTRAINT", Level.SEVERE,
                             "implementationSpecificationDeclarationConstraint", new Object[]
                             {
-                                i.getIdentifier(), s.getIdentifier()
-                            }, new ObjectFactory().createImplementation( i ) ) );
+                                impl.getIdentifier(), s.getIdentifier()
+                            }, new ObjectFactory().createImplementation( impl ) ) );
 
                     }
 
-                    for ( SpecificationReference r : i.getSpecifications().getReference() )
+                    for ( int j = impl.getSpecifications().getReference().size() - 1; j >= 0; j-- )
                     {
+                        final SpecificationReference r = impl.getSpecifications().getReference().get( j );
                         final SpecificationReference parent = parentSpecifications.getReference( r.getIdentifier() );
 
                         if ( r.isOverride() && parent == null )
@@ -681,8 +710,8 @@ public class DefaultModelValidator implements ModelValidator
                                 "IMPLEMENTATION_SPECIFICATION_OVERRIDE_CONSTRAINT", Level.SEVERE,
                                 "implementationSpecificationOverrideConstraint", new Object[]
                                 {
-                                    i.getIdentifier(), r.getIdentifier(),
-                                }, new ObjectFactory().createImplementation( i ) ) );
+                                    impl.getIdentifier(), r.getIdentifier(),
+                                }, new ObjectFactory().createImplementation( impl ) ) );
 
                         }
 
@@ -692,15 +721,15 @@ public class DefaultModelValidator implements ModelValidator
                                 "IMPLEMENTATION_SPECIFICATION_INHERITANCE_CONSTRAINT", Level.SEVERE,
                                 "implementationSpecificationFinalConstraint", new Object[]
                                 {
-                                    i.getIdentifier(), r.getIdentifier(),
-                                }, new ObjectFactory().createImplementation( i ) ) );
+                                    impl.getIdentifier(), r.getIdentifier(),
+                                }, new ObjectFactory().createImplementation( impl ) ) );
 
                         }
                     }
                 }
 
-                this.assertValidImplementationInheritanceConstraints( context, modules, i, report );
-                this.assertImplementationSpecificationCompatibility( context, modules, i, report );
+                this.assertValidImplementationInheritanceConstraints( context, modules, impl, report );
+                this.assertImplementationSpecificationCompatibility( context, modules, impl, report );
             }
         }
     }
@@ -713,8 +742,9 @@ public class DefaultModelValidator implements ModelValidator
 
         if ( specifications != null )
         {
-            for ( Specification s : specifications.getSpecification() )
+            for ( int i = specifications.getSpecification().size() - 1; i >= 0; i-- )
             {
+                final Specification s = specifications.getSpecification().get( i );
                 final Implementations impls = modules.getImplementations( s.getIdentifier() );
 
                 if ( s.isClassDeclaration() )
@@ -753,30 +783,32 @@ public class DefaultModelValidator implements ModelValidator
                 {
                     final Map<String, Implementations> map = new HashMap<String, Implementations>();
 
-                    for ( Implementation i : impls.getImplementation() )
+                    for ( int j = impls.getImplementation().size() - 1; j >= 0; j-- )
                     {
-                        Implementations implementations = map.get( i.getName() );
+                        final Implementation impl = impls.getImplementation().get( j );
+                        Implementations implementations = map.get( impl.getName() );
                         if ( implementations == null )
                         {
                             implementations = new Implementations();
-                            map.put( i.getName(), implementations );
+                            map.put( impl.getName(), implementations );
                         }
 
-                        implementations.getImplementation().add( i );
+                        implementations.getImplementation().add( impl );
                     }
 
                     for ( Map.Entry<String, Implementations> e : map.entrySet() )
                     {
                         if ( e.getValue().getImplementation().size() > 1 )
                         {
-                            for ( Implementation i : e.getValue().getImplementation() )
+                            for ( int j = e.getValue().getImplementation().size() - 1; j >= 0; j-- )
                             {
+                                final Implementation impl = e.getValue().getImplementation().get( j );
                                 report.getDetails().add( this.createDetail(
                                     "SPECIFICATION_IMPLEMENTATION_NAME_UNIQUENESS_CONSTRAINT", Level.SEVERE,
                                     "specificationImplementationNameConstraint", new Object[]
                                     {
-                                        i.getIdentifier(), s.getIdentifier(), i.getName()
-                                    }, new ObjectFactory().createImplementation( i ) ) );
+                                        impl.getIdentifier(), s.getIdentifier(), impl.getName()
+                                    }, new ObjectFactory().createImplementation( impl ) ) );
 
                             }
                         }
@@ -784,14 +816,15 @@ public class DefaultModelValidator implements ModelValidator
 
                     if ( s.getMultiplicity() == Multiplicity.ONE && impls.getImplementation().size() > 1 )
                     {
-                        for ( Implementation i : impls.getImplementation() )
+                        for ( int j = impls.getImplementation().size() - 1; j >= 0; j-- )
                         {
+                            final Implementation impl = impls.getImplementation().get( j );
                             report.getDetails().add( this.createDetail(
                                 "SPECIFICATION_IMPLEMENTATION_MULTIPLICITY_CONSTRAINT", Level.SEVERE,
                                 "specificationMultiplicityConstraint", new Object[]
                                 {
-                                    i.getIdentifier(), s.getIdentifier(), s.getMultiplicity()
-                                }, new ObjectFactory().createImplementation( i ) ) );
+                                    impl.getIdentifier(), s.getIdentifier(), s.getMultiplicity()
+                                }, new ObjectFactory().createImplementation( impl ) ) );
 
                         }
                     }
@@ -799,8 +832,10 @@ public class DefaultModelValidator implements ModelValidator
 
                 if ( s.getProperties() != null )
                 {
-                    for ( Property p : s.getProperties().getProperty() )
+                    for ( int j = s.getProperties().getProperty().size() - 1; j >= 0; j-- )
                     {
+                        final Property p = s.getProperties().getProperty().get( j );
+
                         if ( p.getValue() != null && p.getAny() != null )
                         {
                             report.getDetails().add( this.createDetail(
@@ -846,8 +881,9 @@ public class DefaultModelValidator implements ModelValidator
                         }
                     }
 
-                    for ( PropertyReference r : s.getProperties().getReference() )
+                    for ( int j = s.getProperties().getReference().size() - 1; j >= 0; j-- )
                     {
+                        final PropertyReference r = s.getProperties().getReference().get( j );
                         report.getDetails().add( this.createDetail(
                             "SPECIFICATION_PROPERTY_REFERENCE_DECLARATION_CONSTRAINT", Level.SEVERE,
                             "specificationPropertyReferenceDeclarationConstraint", new Object[]
@@ -967,8 +1003,9 @@ public class DefaultModelValidator implements ModelValidator
             {
                 if ( dependency.getDependencies() != null )
                 {
-                    for ( Dependency d : dependency.getDependencies().getDependency() )
+                    for ( int i = dependency.getDependencies().getDependency().size() - 1; i >= 0; i-- )
                     {
+                        final Dependency d = dependency.getDependencies().getDependency().get( i );
                         report.getDetails().add( this.createDetail(
                             "IMPLEMENTATION_DEPENDENCY_DEPENDENCIES_OVERRIDE_CONSTRAINT", Level.SEVERE,
                             "implementationDependencyDependenciesOverrideConstraint", new Object[]
@@ -982,8 +1019,9 @@ public class DefaultModelValidator implements ModelValidator
 
                 if ( dependency.getMessages() != null )
                 {
-                    for ( Message m : dependency.getMessages().getMessage() )
+                    for ( int i = dependency.getMessages().getMessage().size() - 1; i >= 0; i-- )
                     {
+                        final Message m = dependency.getMessages().getMessage().get( i );
                         report.getDetails().add( this.createDetail(
                             "IMPLEMENTATION_DEPENDENCY_MESSAGES_OVERRIDE_CONSTRAINT", Level.SEVERE,
                             "implementationDependencyMessagesOverrideConstraint", new Object[]
@@ -997,8 +1035,9 @@ public class DefaultModelValidator implements ModelValidator
 
                 if ( dependency.getProperties() != null )
                 {
-                    for ( Property p : dependency.getProperties().getProperty() )
+                    for ( int i = dependency.getProperties().getProperty().size() - 1; i >= 0; i-- )
                     {
+                        final Property p = dependency.getProperties().getProperty().get( i );
                         report.getDetails().add( this.createDetail(
                             "IMPLEMENTATION_DEPENDENCY_PROPERTIES_OVERRIDE_CONSTRAINT", Level.SEVERE,
                             "implementationDependencyPropertiesOverrideConstraint", new Object[]
@@ -1014,8 +1053,9 @@ public class DefaultModelValidator implements ModelValidator
 
         if ( dependency.getMessages() != null )
         {
-            for ( MessageReference r : dependency.getMessages().getReference() )
+            for ( int i = dependency.getMessages().getReference().size() - 1; i >= 0; i-- )
             {
+                final MessageReference r = dependency.getMessages().getReference().get( i );
                 report.getDetails().add( this.createDetail(
                     "IMPLEMENTATION_DEPENDENCY_MESSAGE_REFERENCE_DECLARATION_CONSTRAINT", Level.SEVERE,
                     "implementationDependencyMessageReferenceDeclarationConstraint", new Object[]
@@ -1028,8 +1068,10 @@ public class DefaultModelValidator implements ModelValidator
 
         if ( dependency.getProperties() != null )
         {
-            for ( Property p : dependency.getProperties().getProperty() )
+            for ( int i = dependency.getProperties().getProperty().size() - 1; i >= 0; i-- )
             {
+                final Property p = dependency.getProperties().getProperty().get( i );
+
                 if ( p.getValue() != null && p.getAny() != null )
                 {
                     report.getDetails().add( this.createDetail(
@@ -1075,8 +1117,9 @@ public class DefaultModelValidator implements ModelValidator
                 }
             }
 
-            for ( PropertyReference r : dependency.getProperties().getReference() )
+            for ( int i = dependency.getProperties().getReference().size() - 1; i >= 0; i-- )
             {
+                final PropertyReference r = dependency.getProperties().getReference().get( i );
                 report.getDetails().add( this.createDetail(
                     "IMPLEMENTATION_DEPENDENCY_PROPERTY_REFERENCE_DECLARATION_CONSTRAINT", Level.SEVERE,
                     "implementationDependencyPropertyReferenceDeclarationConstraint", new Object[]
@@ -1089,8 +1132,10 @@ public class DefaultModelValidator implements ModelValidator
 
         if ( available != null )
         {
-            for ( Implementation a : available.getImplementation() )
+            for ( int i = available.getImplementation().size() - 1; i >= 0; i-- )
             {
+                final Implementation a = available.getImplementation().get( i );
+
                 if ( dependency.getImplementationName() != null
                      && !dependency.getImplementationName().equals( a.getName() ) )
                 {
@@ -1103,8 +1148,9 @@ public class DefaultModelValidator implements ModelValidator
 
                     if ( dependencies != null )
                     {
-                        for ( Dependency override : dependency.getDependencies().getDependency() )
+                        for ( int j = dependency.getDependencies().getDependency().size() - 1; j >= 0; j-- )
                         {
+                            final Dependency override = dependency.getDependencies().getDependency().get( j );
                             final Dependency overriden = dependencies.getDependency( override.getName() );
 
                             if ( overriden == null && override.isOverride() )
@@ -1228,8 +1274,9 @@ public class DefaultModelValidator implements ModelValidator
 
                     if ( messages != null )
                     {
-                        for ( Message override : dependency.getMessages().getMessage() )
+                        for ( int j = dependency.getMessages().getMessage().size() - 1; j >= 0; j-- )
                         {
+                            final Message override = dependency.getMessages().getMessage().get( j );
                             final Message overriden = messages.getMessage( override.getName() );
 
                             if ( overriden != null && overriden.isFinal() )
@@ -1264,8 +1311,9 @@ public class DefaultModelValidator implements ModelValidator
 
                     if ( properties != null )
                     {
-                        for ( Property override : dependency.getProperties().getProperty() )
+                        for ( int j = dependency.getProperties().getProperty().size() - 1; j >= 0; j-- )
                         {
+                            final Property override = dependency.getProperties().getProperty().get( j );
                             final Property overriden = properties.getProperty( override.getName() );
 
                             if ( overriden != null && overriden.isFinal() )
@@ -1298,8 +1346,9 @@ public class DefaultModelValidator implements ModelValidator
 
         if ( dependency.getDependencies() != null )
         {
-            for ( Dependency d : dependency.getDependencies().getDependency() )
+            for ( int i = dependency.getDependencies().getDependency().size() - 1; i >= 0; i-- )
             {
+                final Dependency d = dependency.getDependencies().getDependency().get( i );
                 this.assertDependencyValid( context, modules, implementation, d, report );
             }
         }
@@ -1321,8 +1370,9 @@ public class DefaultModelValidator implements ModelValidator
             this.collectParentImplementations(
                 modules, implementation, parentImplementations, new Implementations(), false );
 
-            for ( ImplementationReference r : implementation.getImplementations().getReference() )
+            for ( int i = implementation.getImplementations().getReference().size() - 1; i >= 0; i-- )
             {
+                final ImplementationReference r = implementation.getImplementations().getReference().get( i );
                 final Specifications currentSpecs = new Specifications();
                 final Dependencies currentDependencies = new Dependencies();
                 final Properties currentProperties = new Properties();
@@ -1337,8 +1387,9 @@ public class DefaultModelValidator implements ModelValidator
                     this.collectMessages( modules, current, currentMessages, new Implementations(), true );
                     this.collectProperties( modules, current, currentProperties, new Implementations(), true );
 
-                    for ( SpecificationReference ref : currentSpecs.getReference() )
+                    for ( int j = currentSpecs.getReference().size() - 1; j >= 0; j-- )
                     {
+                        final SpecificationReference ref = currentSpecs.getReference().get( j );
                         List<SpecificationReference> list = specMap.get( ref.getIdentifier() );
                         if ( list == null )
                         {
@@ -1349,8 +1400,9 @@ public class DefaultModelValidator implements ModelValidator
                         list.add( ref );
                     }
 
-                    for ( Dependency d : currentDependencies.getDependency() )
+                    for ( int j = currentDependencies.getDependency().size() - 1; j >= 0; j-- )
                     {
+                        final Dependency d = currentDependencies.getDependency().get( j );
                         List<Dependency> list = dependencyMap.get( d.getName() );
                         if ( list == null )
                         {
@@ -1361,8 +1413,9 @@ public class DefaultModelValidator implements ModelValidator
                         list.add( d );
                     }
 
-                    for ( Message msg : currentMessages.getMessage() )
+                    for ( int j = currentMessages.getMessage().size() - 1; j >= 0; j-- )
                     {
+                        final Message msg = currentMessages.getMessage().get( j );
                         List<Message> list = messageMap.get( msg.getName() );
                         if ( list == null )
                         {
@@ -1373,8 +1426,9 @@ public class DefaultModelValidator implements ModelValidator
                         list.add( msg );
                     }
 
-                    for ( Property p : currentProperties.getProperty() )
+                    for ( int j = currentProperties.getProperty().size() - 1; j >= 0; j-- )
                     {
+                        final Property p = currentProperties.getProperty().get( j );
                         List<Property> list = propertyMap.get( p.getName() );
                         if ( list == null )
                         {
@@ -1557,8 +1611,9 @@ public class DefaultModelValidator implements ModelValidator
 
         if ( specs != null )
         {
-            for ( SpecificationReference r : specs.getReference() )
+            for ( int i = specs.getReference().size() - 1; i >= 0; i-- )
             {
+                final SpecificationReference r = specs.getReference().get( i );
                 final Specification s = specs.getSpecification( r.getIdentifier() );
 
                 if ( s != null && r.getVersion() != null )
@@ -1648,8 +1703,9 @@ public class DefaultModelValidator implements ModelValidator
 
             if ( current.getImplementations() != null )
             {
-                for ( ImplementationReference r : current.getImplementations().getReference() )
+                for ( int i = current.getImplementations().getReference().size() - 1; i >= 0; i-- )
                 {
+                    final ImplementationReference r = current.getImplementations().getReference().get( i );
                     return this.findInheritanceCycle( modules, modules.getImplementation( r.getIdentifier() ),
                                                       current, implementations );
 
@@ -1675,8 +1731,10 @@ public class DefaultModelValidator implements ModelValidator
 
             if ( implementation.getImplementations() != null )
             {
-                for ( ImplementationReference r : implementation.getImplementations().getReference() )
+                for ( int i = implementation.getImplementations().getReference().size() - 1; i >= 0; i-- )
                 {
+                    final ImplementationReference r = implementation.getImplementations().getReference().get( i );
+
                     if ( includeImplementation && implementations.getReference( r.getIdentifier() ) == null )
                     {
                         implementations.getReference().add( r );
@@ -1700,8 +1758,9 @@ public class DefaultModelValidator implements ModelValidator
 
             if ( includeImplementation && implementation.getSpecifications() != null )
             {
-                for ( SpecificationReference r : implementation.getSpecifications().getReference() )
+                for ( int i = implementation.getSpecifications().getReference().size() - 1; i >= 0; i-- )
                 {
+                    final SpecificationReference r = implementation.getSpecifications().getReference().get( i );
                     if ( specifications.getReference( r.getIdentifier() ) == null )
                     {
                         specifications.getReference().add( r );
@@ -1711,8 +1770,9 @@ public class DefaultModelValidator implements ModelValidator
 
             if ( implementation.getImplementations() != null )
             {
-                for ( ImplementationReference r : implementation.getImplementations().getReference() )
+                for ( int i = implementation.getImplementations().getReference().size() - 1; i >= 0; i-- )
                 {
+                    final ImplementationReference r = implementation.getImplementations().getReference().get( i );
                     this.collectParentSpecifications( modules, modules.getImplementation( r.getIdentifier() ),
                                                       specifications, seen, true );
 
@@ -1731,8 +1791,10 @@ public class DefaultModelValidator implements ModelValidator
 
             if ( includeImplementation && implementation.getDependencies() != null )
             {
-                for ( Dependency d : implementation.getDependencies().getDependency() )
+                for ( int i = implementation.getDependencies().getDependency().size() - 1; i >= 0; i-- )
                 {
+                    final Dependency d = implementation.getDependencies().getDependency().get( i );
+
                     if ( dependencies.getDependency( d.getName() ) == null )
                     {
                         dependencies.getDependency().add( d );
@@ -1742,8 +1804,9 @@ public class DefaultModelValidator implements ModelValidator
 
             if ( implementation.getImplementations() != null )
             {
-                for ( ImplementationReference r : implementation.getImplementations().getReference() )
+                for ( int i = implementation.getImplementations().getReference().size() - 1; i >= 0; i-- )
                 {
+                    final ImplementationReference r = implementation.getImplementations().getReference().get( i );
                     this.collectParentDependencies( modules, modules.getImplementation( r.getIdentifier() ),
                                                     dependencies, seen, true );
 
@@ -1762,15 +1825,17 @@ public class DefaultModelValidator implements ModelValidator
 
             if ( includeImplementation && implementation.getMessages() != null )
             {
-                for ( Message m : implementation.getMessages().getMessage() )
+                for ( int i = implementation.getMessages().getMessage().size() - 1; i >= 0; i-- )
                 {
+                    final Message m = implementation.getMessages().getMessage().get( i );
                     if ( messages.getMessage( m.getName() ) == null )
                     {
                         messages.getMessage().add( m );
                     }
                 }
-                for ( MessageReference r : implementation.getMessages().getReference() )
+                for ( int i = implementation.getMessages().getReference().size() - 1; i >= 0; i-- )
                 {
+                    final MessageReference r = implementation.getMessages().getReference().get( i );
                     if ( messages.getReference( r.getName() ) == null )
                     {
                         messages.getReference().add( r );
@@ -1780,8 +1845,9 @@ public class DefaultModelValidator implements ModelValidator
 
             if ( implementation.getImplementations() != null )
             {
-                for ( ImplementationReference r : implementation.getImplementations().getReference() )
+                for ( int i = implementation.getImplementations().getReference().size() - 1; i >= 0; i-- )
                 {
+                    final ImplementationReference r = implementation.getImplementations().getReference().get( i );
                     this.collectParentMessages( modules, modules.getImplementation( r.getIdentifier() ),
                                                 messages, seen, true );
 
@@ -1800,15 +1866,17 @@ public class DefaultModelValidator implements ModelValidator
 
             if ( includeImplementation && implementation.getProperties() != null )
             {
-                for ( Property p : implementation.getProperties().getProperty() )
+                for ( int i = implementation.getProperties().getProperty().size() - 1; i >= 0; i-- )
                 {
+                    final Property p = implementation.getProperties().getProperty().get( i );
                     if ( properties.getProperty( p.getName() ) == null )
                     {
                         properties.getProperty().add( p );
                     }
                 }
-                for ( PropertyReference r : implementation.getProperties().getReference() )
+                for ( int i = implementation.getProperties().getReference().size() - 1; i >= 0; i-- )
                 {
+                    final PropertyReference r = implementation.getProperties().getReference().get( i );
                     if ( properties.getReference( r.getName() ) == null )
                     {
                         properties.getReference().add( r );
@@ -1818,8 +1886,9 @@ public class DefaultModelValidator implements ModelValidator
 
             if ( implementation.getImplementations() != null )
             {
-                for ( ImplementationReference r : implementation.getImplementations().getReference() )
+                for ( int i = implementation.getImplementations().getReference().size() - 1; i >= 0; i-- )
                 {
+                    final ImplementationReference r = implementation.getImplementations().getReference().get( i );
                     this.collectParentProperties( modules, modules.getImplementation( r.getIdentifier() ),
                                                   properties, seen, true );
 
@@ -1838,8 +1907,10 @@ public class DefaultModelValidator implements ModelValidator
 
             if ( includeDeclared && implementation.getSpecifications() != null )
             {
-                for ( SpecificationReference r : implementation.getSpecifications().getReference() )
+                for ( int i = implementation.getSpecifications().getReference().size() - 1; i >= 0; i-- )
                 {
+                    final SpecificationReference r = implementation.getSpecifications().getReference().get( i );
+
                     if ( specifications.getReference( r.getIdentifier() ) == null )
                     {
                         specifications.getReference().add( r );
@@ -1855,8 +1926,9 @@ public class DefaultModelValidator implements ModelValidator
 
             if ( implementation.getImplementations() != null )
             {
-                for ( ImplementationReference r : implementation.getImplementations().getReference() )
+                for ( int i = implementation.getImplementations().getReference().size() - 1; i >= 0; i-- )
                 {
+                    final ImplementationReference r = implementation.getImplementations().getReference().get( i );
                     this.collectSpecifications( modules, modules.getImplementation( r.getIdentifier() ),
                                                 specifications, seen, true );
 
@@ -1875,8 +1947,9 @@ public class DefaultModelValidator implements ModelValidator
 
             if ( includeDeclared && implementation.getDependencies() != null )
             {
-                for ( Dependency d : implementation.getDependencies().getDependency() )
+                for ( int i = implementation.getDependencies().getDependency().size() - 1; i >= 0; i-- )
                 {
+                    final Dependency d = implementation.getDependencies().getDependency().get( i );
                     final Dependency dependency = dependencies.getDependency( d.getName() );
 
                     if ( dependency == null )
@@ -1892,8 +1965,9 @@ public class DefaultModelValidator implements ModelValidator
 
             if ( implementation.getImplementations() != null )
             {
-                for ( ImplementationReference r : implementation.getImplementations().getReference() )
+                for ( int i = implementation.getImplementations().getReference().size() - 1; i >= 0; i-- )
                 {
+                    final ImplementationReference r = implementation.getImplementations().getReference().get( i );
                     this.collectDependencies( modules, modules.getImplementation( r.getIdentifier() ), dependencies,
                                               seen, true );
 
@@ -1911,8 +1985,9 @@ public class DefaultModelValidator implements ModelValidator
                 target.setMessages( new Messages() );
             }
 
-            for ( Message m : source.getMessages().getMessage() )
+            for ( int i = source.getMessages().getMessage().size() - 1; i >= 0; i-- )
             {
+                final Message m = source.getMessages().getMessage().get( i );
                 if ( target.getMessages().getMessage( m.getName() ) == null )
                 {
                     target.getMessages().getMessage().add( m );
@@ -1927,8 +2002,9 @@ public class DefaultModelValidator implements ModelValidator
                 target.setProperties( new Properties() );
             }
 
-            for ( Property p : source.getProperties().getProperty() )
+            for ( int i = source.getProperties().getProperty().size() - 1; i >= 0; i-- )
             {
+                final Property p = source.getProperties().getProperty().get( i );
                 if ( target.getProperties().getProperty( p.getName() ) == null )
                 {
                     target.getProperties().getProperty().add( p );
@@ -1943,8 +2019,9 @@ public class DefaultModelValidator implements ModelValidator
                 target.setDependencies( new Dependencies() );
             }
 
-            for ( Dependency sd : source.getDependencies().getDependency() )
+            for ( int i = source.getDependencies().getDependency().size() - 1; i >= 0; i-- )
             {
+                final Dependency sd = source.getDependencies().getDependency().get( i );
                 final Dependency td = target.getDependencies().getDependency( sd.getName() );
 
                 if ( td == null )
@@ -1969,21 +2046,25 @@ public class DefaultModelValidator implements ModelValidator
 
             if ( includeDeclared && implementation.getProperties() != null )
             {
-                for ( Property p : implementation.getProperties().getProperty() )
+                for ( int i = implementation.getProperties().getProperty().size() - 1; i >= 0; i-- )
                 {
+                    final Property p = implementation.getProperties().getProperty().get( i );
                     if ( properties.getProperty( p.getName() ) == null )
                     {
                         properties.getProperty().add( p );
                     }
                 }
+
                 if ( !implementation.getProperties().getReference().isEmpty() )
                 {
                     final Module m = modules.getModuleOfImplementation( implementation.getIdentifier() );
 
                     if ( m != null )
                     {
-                        for ( PropertyReference ref : implementation.getProperties().getReference() )
+                        for ( int i = implementation.getProperties().getReference().size() - 1; i >= 0; i-- )
                         {
+                            final PropertyReference ref = implementation.getProperties().getReference().get( i );
+
                             if ( properties.getProperty( ref.getName() ) == null )
                             {
                                 Property referenced = m.getProperties().getProperty( ref.getName() );
@@ -2003,8 +2084,9 @@ public class DefaultModelValidator implements ModelValidator
 
             if ( implementation.getImplementations() != null )
             {
-                for ( ImplementationReference r : implementation.getImplementations().getReference() )
+                for ( int i = implementation.getImplementations().getReference().size() - 1; i >= 0; i-- )
                 {
+                    final ImplementationReference r = implementation.getImplementations().getReference().get( i );
                     this.collectProperties( modules, modules.getImplementation( r.getIdentifier() ), properties,
                                             seen, true );
 
@@ -2022,21 +2104,25 @@ public class DefaultModelValidator implements ModelValidator
 
             if ( includeDeclared && implementation.getMessages() != null )
             {
-                for ( Message msg : implementation.getMessages().getMessage() )
+                for ( int i = implementation.getMessages().getMessage().size() - 1; i >= 0; i-- )
                 {
+                    final Message msg = implementation.getMessages().getMessage().get( i );
                     if ( messages.getMessage( msg.getName() ) == null )
                     {
                         messages.getMessage().add( msg );
                     }
                 }
+
                 if ( !implementation.getMessages().getReference().isEmpty() )
                 {
                     final Module m = modules.getModuleOfImplementation( implementation.getIdentifier() );
 
                     if ( m != null )
                     {
-                        for ( MessageReference ref : implementation.getMessages().getReference() )
+                        for ( int i = implementation.getMessages().getReference().size() - 1; i >= 0; i-- )
                         {
+                            final MessageReference ref = implementation.getMessages().getReference().get( i );
+
                             if ( messages.getMessage( ref.getName() ) == null )
                             {
                                 Message referenced = m.getMessages().getMessage( ref.getName() );
@@ -2056,8 +2142,9 @@ public class DefaultModelValidator implements ModelValidator
 
             if ( implementation.getImplementations() != null )
             {
-                for ( ImplementationReference r : implementation.getImplementations().getReference() )
+                for ( int i = implementation.getImplementations().getReference().size() - 1; i >= 0; i-- )
                 {
+                    final ImplementationReference r = implementation.getImplementations().getReference().get( i );
                     this.collectMessages( modules, modules.getImplementation( r.getIdentifier() ), messages, seen,
                                           true );
 
