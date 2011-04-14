@@ -138,13 +138,13 @@ public class DefaultModelValidator implements ModelValidator
     private void assertModulesValid( final ModelContext context, final Modules modules,
                                      final ModelValidationReport report )
     {
-        for ( int i = modules.getModule().size() - 1; i >= 0; i-- )
+        for ( int i = 0, s0 = modules.getModule().size(); i < s0; i++ )
         {
             final Module m = modules.getModule().get( i );
 
             if ( m.getImplementations() != null )
             {
-                for ( int j = m.getImplementations().getReference().size() - 1; j >= 0; j-- )
+                for ( int j = 0, s1 = m.getImplementations().getReference().size(); j < s1; j++ )
                 {
                     final ImplementationReference r = m.getImplementations().getReference().get( j );
 
@@ -160,7 +160,7 @@ public class DefaultModelValidator implements ModelValidator
 
             if ( m.getMessages() != null )
             {
-                for ( int j = m.getMessages().getMessage().size() - 1; j >= 0; j-- )
+                for ( int j = 0, s1 = m.getMessages().getMessage().size(); j < s1; j++ )
                 {
                     final Message msg = m.getMessages().getMessage().get( j );
 
@@ -188,7 +188,7 @@ public class DefaultModelValidator implements ModelValidator
 
                     if ( msg.getTemplate() != null )
                     {
-                        for ( int k = msg.getTemplate().getText().size() - 1; k >= 0; k-- )
+                        for ( int k = 0, s2 = msg.getTemplate().getText().size(); k < s2; k++ )
                         {
                             final Text t = msg.getTemplate().getText().get( k );
 
@@ -217,7 +217,7 @@ public class DefaultModelValidator implements ModelValidator
                     }
                 }
 
-                for ( int j = m.getMessages().getReference().size() - 1; j >= 0; j-- )
+                for ( int j = 0, s1 = m.getMessages().getReference().size(); j < s1; j++ )
                 {
                     final MessageReference r = m.getMessages().getReference().get( j );
 
@@ -233,7 +233,7 @@ public class DefaultModelValidator implements ModelValidator
 
             if ( m.getProperties() != null )
             {
-                for ( int j = m.getProperties().getProperty().size() - 1; j >= 0; j-- )
+                for ( int j = 0, s1 = m.getProperties().getProperty().size(); j < s1; j++ )
                 {
                     final Property p = m.getProperties().getProperty().get( j );
 
@@ -302,7 +302,7 @@ public class DefaultModelValidator implements ModelValidator
                     }
                 }
 
-                for ( int j = m.getProperties().getReference().size() - 1; j >= 0; j-- )
+                for ( int j = 0, s1 = m.getProperties().getReference().size(); j < s1; j++ )
                 {
                     final PropertyReference r = m.getProperties().getReference().get( j );
 
@@ -318,7 +318,7 @@ public class DefaultModelValidator implements ModelValidator
 
             if ( m.getSpecifications() != null )
             {
-                for ( int j = m.getSpecifications().getReference().size() - 1; j >= 0; j-- )
+                for ( int j = 0, s1 = m.getSpecifications().getReference().size(); j < s1; j++ )
                 {
                     final SpecificationReference r = m.getSpecifications().getReference().get( j );
 
@@ -343,7 +343,7 @@ public class DefaultModelValidator implements ModelValidator
         {
             final Map<String, Implementation> implementationClassDeclarations = new HashMap<String, Implementation>();
 
-            for ( int i = implementations.getImplementation().size() - 1; i >= 0; i-- )
+            for ( int i = 0, s0 = implementations.getImplementation().size(); i < s0; i++ )
             {
                 final Implementation impl = implementations.getImplementation().get( i );
                 final Implementation cycle = this.findInheritanceCycle( modules, impl, impl, new Implementations() );
@@ -408,7 +408,7 @@ public class DefaultModelValidator implements ModelValidator
                     final Dependencies parentDependencies = new Dependencies();
                     this.collectParentDependencies( modules, impl, parentDependencies, new Implementations(), false );
 
-                    for ( int j = impl.getDependencies().getDependency().size() - 1; j >= 0; j-- )
+                    for ( int j = 0, s1 = impl.getDependencies().getDependency().size(); j < s1; j++ )
                     {
                         final Dependency d = impl.getDependencies().getDependency().get( j );
                         final Dependency parent = parentDependencies.getDependency( d.getName() );
@@ -440,7 +440,7 @@ public class DefaultModelValidator implements ModelValidator
 
                 if ( impl.getImplementations() != null )
                 {
-                    for ( int j = impl.getImplementations().getImplementation().size() - 1; j >= 0; j-- )
+                    for ( int j = 0, s1 = impl.getImplementations().getImplementation().size(); j < s1; j++ )
                     {
                         final Implementation pi = impl.getImplementations().getImplementation().get( j );
 
@@ -459,7 +459,7 @@ public class DefaultModelValidator implements ModelValidator
                     final Messages parentMessages = new Messages();
                     this.collectParentMessages( modules, impl, parentMessages, new Implementations(), false );
 
-                    for ( int j = impl.getMessages().getMessage().size() - 1; j >= 0; j-- )
+                    for ( int j = 0, s1 = impl.getMessages().getMessage().size(); j < s1; j++ )
                     {
                         final Message m = impl.getMessages().getMessage().get( j );
                         final Message parentMessage = parentMessages.getMessage( m.getName() );
@@ -478,7 +478,7 @@ public class DefaultModelValidator implements ModelValidator
 
                         if ( m.getTemplate() != null )
                         {
-                            for ( int k = m.getTemplate().getText().size() - 1; k >= 0; k-- )
+                            for ( int k = 0, s2 = m.getTemplate().getText().size(); k < s2; k++ )
                             {
                                 final Text t = m.getTemplate().getText().get( k );
 
@@ -530,7 +530,7 @@ public class DefaultModelValidator implements ModelValidator
                         }
                     }
 
-                    for ( int j = impl.getMessages().getReference().size() - 1; j >= 0; j-- )
+                    for ( int j = 0, s1 = impl.getMessages().getReference().size(); j < s1; j++ )
                     {
                         final MessageReference r = impl.getMessages().getReference().get( j );
                         final Message parentMessage = parentMessages.getMessage( r.getName() );
@@ -566,7 +566,7 @@ public class DefaultModelValidator implements ModelValidator
                     final Properties parentProperties = new Properties();
                     this.collectParentProperties( modules, impl, parentProperties, new Implementations(), false );
 
-                    for ( int j = impl.getProperties().getProperty().size() - 1; j >= 0; j-- )
+                    for ( int j = 0, s1 = impl.getProperties().getProperty().size(); j < s1; j++ )
                     {
                         final Property p = impl.getProperties().getProperty().get( j );
                         final Property parentProperty = parentProperties.getProperty( p.getName() );
@@ -650,7 +650,7 @@ public class DefaultModelValidator implements ModelValidator
                         }
                     }
 
-                    for ( int j = impl.getProperties().getReference().size() - 1; j >= 0; j-- )
+                    for ( int j = 0, s1 = impl.getProperties().getReference().size(); j < s1; j++ )
                     {
                         final PropertyReference r = impl.getProperties().getReference().get( j );
                         final Property parentProperty = parentProperties.getProperty( r.getName() );
@@ -687,7 +687,7 @@ public class DefaultModelValidator implements ModelValidator
                     this.collectParentSpecifications(
                         modules, impl, parentSpecifications, new Implementations(), false );
 
-                    for ( int j = impl.getSpecifications().getSpecification().size() - 1; j >= 0; j-- )
+                    for ( int j = 0, s1 = impl.getSpecifications().getSpecification().size(); j < s1; j++ )
                     {
                         final Specification s = impl.getSpecifications().getSpecification().get( j );
                         report.getDetails().add( this.createDetail(
@@ -699,7 +699,7 @@ public class DefaultModelValidator implements ModelValidator
 
                     }
 
-                    for ( int j = impl.getSpecifications().getReference().size() - 1; j >= 0; j-- )
+                    for ( int j = 0, s1 = impl.getSpecifications().getReference().size(); j < s1; j++ )
                     {
                         final SpecificationReference r = impl.getSpecifications().getReference().get( j );
                         final SpecificationReference parent = parentSpecifications.getReference( r.getIdentifier() );
@@ -742,7 +742,7 @@ public class DefaultModelValidator implements ModelValidator
 
         if ( specifications != null )
         {
-            for ( int i = specifications.getSpecification().size() - 1; i >= 0; i-- )
+            for ( int i = 0, s0 = specifications.getSpecification().size(); i < s0; i++ )
             {
                 final Specification s = specifications.getSpecification().get( i );
                 final Implementations impls = modules.getImplementations( s.getIdentifier() );
@@ -783,7 +783,7 @@ public class DefaultModelValidator implements ModelValidator
                 {
                     final Map<String, Implementations> map = new HashMap<String, Implementations>();
 
-                    for ( int j = impls.getImplementation().size() - 1; j >= 0; j-- )
+                    for ( int j = 0, s1 = impls.getImplementation().size(); j < s1; j++ )
                     {
                         final Implementation impl = impls.getImplementation().get( j );
                         Implementations implementations = map.get( impl.getName() );
@@ -800,7 +800,7 @@ public class DefaultModelValidator implements ModelValidator
                     {
                         if ( e.getValue().getImplementation().size() > 1 )
                         {
-                            for ( int j = e.getValue().getImplementation().size() - 1; j >= 0; j-- )
+                            for ( int j = 0, s1 = e.getValue().getImplementation().size(); j < s1; j++ )
                             {
                                 final Implementation impl = e.getValue().getImplementation().get( j );
                                 report.getDetails().add( this.createDetail(
@@ -816,7 +816,7 @@ public class DefaultModelValidator implements ModelValidator
 
                     if ( s.getMultiplicity() == Multiplicity.ONE && impls.getImplementation().size() > 1 )
                     {
-                        for ( int j = impls.getImplementation().size() - 1; j >= 0; j-- )
+                        for ( int j = 0, s1 = impls.getImplementation().size(); j < s1; j++ )
                         {
                             final Implementation impl = impls.getImplementation().get( j );
                             report.getDetails().add( this.createDetail(
@@ -832,7 +832,7 @@ public class DefaultModelValidator implements ModelValidator
 
                 if ( s.getProperties() != null )
                 {
-                    for ( int j = s.getProperties().getProperty().size() - 1; j >= 0; j-- )
+                    for ( int j = 0, s1 = s.getProperties().getProperty().size(); j < s1; j++ )
                     {
                         final Property p = s.getProperties().getProperty().get( j );
 
@@ -881,7 +881,7 @@ public class DefaultModelValidator implements ModelValidator
                         }
                     }
 
-                    for ( int j = s.getProperties().getReference().size() - 1; j >= 0; j-- )
+                    for ( int j = 0, s1 = s.getProperties().getReference().size(); j < s1; j++ )
                     {
                         final PropertyReference r = s.getProperties().getReference().get( j );
                         report.getDetails().add( this.createDetail(
@@ -1003,7 +1003,7 @@ public class DefaultModelValidator implements ModelValidator
             {
                 if ( dependency.getDependencies() != null )
                 {
-                    for ( int i = dependency.getDependencies().getDependency().size() - 1; i >= 0; i-- )
+                    for ( int i = 0, s0 = dependency.getDependencies().getDependency().size(); i < s0; i++ )
                     {
                         final Dependency d = dependency.getDependencies().getDependency().get( i );
                         report.getDetails().add( this.createDetail(
@@ -1019,7 +1019,7 @@ public class DefaultModelValidator implements ModelValidator
 
                 if ( dependency.getMessages() != null )
                 {
-                    for ( int i = dependency.getMessages().getMessage().size() - 1; i >= 0; i-- )
+                    for ( int i = 0, s0 = dependency.getMessages().getMessage().size(); i < s0; i++ )
                     {
                         final Message m = dependency.getMessages().getMessage().get( i );
                         report.getDetails().add( this.createDetail(
@@ -1035,7 +1035,7 @@ public class DefaultModelValidator implements ModelValidator
 
                 if ( dependency.getProperties() != null )
                 {
-                    for ( int i = dependency.getProperties().getProperty().size() - 1; i >= 0; i-- )
+                    for ( int i = 0, s0 = dependency.getProperties().getProperty().size(); i < s0; i++ )
                     {
                         final Property p = dependency.getProperties().getProperty().get( i );
                         report.getDetails().add( this.createDetail(
@@ -1053,7 +1053,7 @@ public class DefaultModelValidator implements ModelValidator
 
         if ( dependency.getMessages() != null )
         {
-            for ( int i = dependency.getMessages().getReference().size() - 1; i >= 0; i-- )
+            for ( int i = 0, s0 = dependency.getMessages().getReference().size(); i < s0; i++ )
             {
                 final MessageReference r = dependency.getMessages().getReference().get( i );
                 report.getDetails().add( this.createDetail(
@@ -1068,7 +1068,7 @@ public class DefaultModelValidator implements ModelValidator
 
         if ( dependency.getProperties() != null )
         {
-            for ( int i = dependency.getProperties().getProperty().size() - 1; i >= 0; i-- )
+            for ( int i = 0, s0 = dependency.getProperties().getProperty().size(); i < s0; i++ )
             {
                 final Property p = dependency.getProperties().getProperty().get( i );
 
@@ -1117,7 +1117,7 @@ public class DefaultModelValidator implements ModelValidator
                 }
             }
 
-            for ( int i = dependency.getProperties().getReference().size() - 1; i >= 0; i-- )
+            for ( int i = 0, s0 = dependency.getProperties().getReference().size(); i < s0; i++ )
             {
                 final PropertyReference r = dependency.getProperties().getReference().get( i );
                 report.getDetails().add( this.createDetail(
@@ -1132,7 +1132,7 @@ public class DefaultModelValidator implements ModelValidator
 
         if ( available != null )
         {
-            for ( int i = available.getImplementation().size() - 1; i >= 0; i-- )
+            for ( int i = 0, s0 = available.getImplementation().size(); i < s0; i++ )
             {
                 final Implementation a = available.getImplementation().get( i );
 
@@ -1148,7 +1148,7 @@ public class DefaultModelValidator implements ModelValidator
 
                     if ( dependencies != null )
                     {
-                        for ( int j = dependency.getDependencies().getDependency().size() - 1; j >= 0; j-- )
+                        for ( int j = 0, s1 = dependency.getDependencies().getDependency().size(); j < s1; j++ )
                         {
                             final Dependency override = dependency.getDependencies().getDependency().get( j );
                             final Dependency overriden = dependencies.getDependency( override.getName() );
@@ -1274,7 +1274,7 @@ public class DefaultModelValidator implements ModelValidator
 
                     if ( messages != null )
                     {
-                        for ( int j = dependency.getMessages().getMessage().size() - 1; j >= 0; j-- )
+                        for ( int j = 0, s1 = dependency.getMessages().getMessage().size(); j < s1; j++ )
                         {
                             final Message override = dependency.getMessages().getMessage().get( j );
                             final Message overriden = messages.getMessage( override.getName() );
@@ -1311,7 +1311,7 @@ public class DefaultModelValidator implements ModelValidator
 
                     if ( properties != null )
                     {
-                        for ( int j = dependency.getProperties().getProperty().size() - 1; j >= 0; j-- )
+                        for ( int j = 0, s1 = dependency.getProperties().getProperty().size(); j < s1; j++ )
                         {
                             final Property override = dependency.getProperties().getProperty().get( j );
                             final Property overriden = properties.getProperty( override.getName() );
@@ -1346,7 +1346,7 @@ public class DefaultModelValidator implements ModelValidator
 
         if ( dependency.getDependencies() != null )
         {
-            for ( int i = dependency.getDependencies().getDependency().size() - 1; i >= 0; i-- )
+            for ( int i = 0, s0 = dependency.getDependencies().getDependency().size(); i < s0; i++ )
             {
                 final Dependency d = dependency.getDependencies().getDependency().get( i );
                 this.assertDependencyValid( context, modules, implementation, d, report );
@@ -1370,7 +1370,7 @@ public class DefaultModelValidator implements ModelValidator
             this.collectParentImplementations(
                 modules, implementation, parentImplementations, new Implementations(), false );
 
-            for ( int i = implementation.getImplementations().getReference().size() - 1; i >= 0; i-- )
+            for ( int i = 0, s0 = implementation.getImplementations().getReference().size(); i < s0; i++ )
             {
                 final ImplementationReference r = implementation.getImplementations().getReference().get( i );
                 final Specifications currentSpecs = new Specifications();
@@ -1387,7 +1387,7 @@ public class DefaultModelValidator implements ModelValidator
                     this.collectMessages( modules, current, currentMessages, new Implementations(), true );
                     this.collectProperties( modules, current, currentProperties, new Implementations(), true );
 
-                    for ( int j = currentSpecs.getReference().size() - 1; j >= 0; j-- )
+                    for ( int j = 0, s1 = currentSpecs.getReference().size(); j < s1; j++ )
                     {
                         final SpecificationReference ref = currentSpecs.getReference().get( j );
                         List<SpecificationReference> list = specMap.get( ref.getIdentifier() );
@@ -1400,7 +1400,7 @@ public class DefaultModelValidator implements ModelValidator
                         list.add( ref );
                     }
 
-                    for ( int j = currentDependencies.getDependency().size() - 1; j >= 0; j-- )
+                    for ( int j = 0, s1 = currentDependencies.getDependency().size(); j < s1; j++ )
                     {
                         final Dependency d = currentDependencies.getDependency().get( j );
                         List<Dependency> list = dependencyMap.get( d.getName() );
@@ -1413,7 +1413,7 @@ public class DefaultModelValidator implements ModelValidator
                         list.add( d );
                     }
 
-                    for ( int j = currentMessages.getMessage().size() - 1; j >= 0; j-- )
+                    for ( int j = 0, s1 = currentMessages.getMessage().size(); j < s1; j++ )
                     {
                         final Message msg = currentMessages.getMessage().get( j );
                         List<Message> list = messageMap.get( msg.getName() );
@@ -1426,7 +1426,7 @@ public class DefaultModelValidator implements ModelValidator
                         list.add( msg );
                     }
 
-                    for ( int j = currentProperties.getProperty().size() - 1; j >= 0; j-- )
+                    for ( int j = 0, s1 = currentProperties.getProperty().size(); j < s1; j++ )
                     {
                         final Property p = currentProperties.getProperty().get( j );
                         List<Property> list = propertyMap.get( p.getName() );
@@ -1611,7 +1611,7 @@ public class DefaultModelValidator implements ModelValidator
 
         if ( specs != null )
         {
-            for ( int i = specs.getReference().size() - 1; i >= 0; i-- )
+            for ( int i = 0, s0 = specs.getReference().size(); i < s0; i++ )
             {
                 final SpecificationReference r = specs.getReference().get( i );
                 final Specification s = specs.getSpecification( r.getIdentifier() );
@@ -1703,7 +1703,7 @@ public class DefaultModelValidator implements ModelValidator
 
             if ( current.getImplementations() != null )
             {
-                for ( int i = current.getImplementations().getReference().size() - 1; i >= 0; i-- )
+                for ( int i = 0, s0 = current.getImplementations().getReference().size(); i < s0; i++ )
                 {
                     final ImplementationReference r = current.getImplementations().getReference().get( i );
                     return this.findInheritanceCycle( modules, modules.getImplementation( r.getIdentifier() ),
@@ -1731,7 +1731,7 @@ public class DefaultModelValidator implements ModelValidator
 
             if ( implementation.getImplementations() != null )
             {
-                for ( int i = implementation.getImplementations().getReference().size() - 1; i >= 0; i-- )
+                for ( int i = 0, s0 = implementation.getImplementations().getReference().size(); i < s0; i++ )
                 {
                     final ImplementationReference r = implementation.getImplementations().getReference().get( i );
 
@@ -1758,7 +1758,7 @@ public class DefaultModelValidator implements ModelValidator
 
             if ( includeImplementation && implementation.getSpecifications() != null )
             {
-                for ( int i = implementation.getSpecifications().getReference().size() - 1; i >= 0; i-- )
+                for ( int i = 0, s0 = implementation.getSpecifications().getReference().size(); i < s0; i++ )
                 {
                     final SpecificationReference r = implementation.getSpecifications().getReference().get( i );
                     if ( specifications.getReference( r.getIdentifier() ) == null )
@@ -1770,7 +1770,7 @@ public class DefaultModelValidator implements ModelValidator
 
             if ( implementation.getImplementations() != null )
             {
-                for ( int i = implementation.getImplementations().getReference().size() - 1; i >= 0; i-- )
+                for ( int i = 0, s0 = implementation.getImplementations().getReference().size(); i < s0; i++ )
                 {
                     final ImplementationReference r = implementation.getImplementations().getReference().get( i );
                     this.collectParentSpecifications( modules, modules.getImplementation( r.getIdentifier() ),
@@ -1791,7 +1791,7 @@ public class DefaultModelValidator implements ModelValidator
 
             if ( includeImplementation && implementation.getDependencies() != null )
             {
-                for ( int i = implementation.getDependencies().getDependency().size() - 1; i >= 0; i-- )
+                for ( int i = 0, s0 = implementation.getDependencies().getDependency().size(); i < s0; i++ )
                 {
                     final Dependency d = implementation.getDependencies().getDependency().get( i );
 
@@ -1804,7 +1804,7 @@ public class DefaultModelValidator implements ModelValidator
 
             if ( implementation.getImplementations() != null )
             {
-                for ( int i = implementation.getImplementations().getReference().size() - 1; i >= 0; i-- )
+                for ( int i = 0, s0 = implementation.getImplementations().getReference().size(); i < s0; i++ )
                 {
                     final ImplementationReference r = implementation.getImplementations().getReference().get( i );
                     this.collectParentDependencies( modules, modules.getImplementation( r.getIdentifier() ),
@@ -1825,7 +1825,7 @@ public class DefaultModelValidator implements ModelValidator
 
             if ( includeImplementation && implementation.getMessages() != null )
             {
-                for ( int i = implementation.getMessages().getMessage().size() - 1; i >= 0; i-- )
+                for ( int i = 0, s0 = implementation.getMessages().getMessage().size(); i < s0; i++ )
                 {
                     final Message m = implementation.getMessages().getMessage().get( i );
                     if ( messages.getMessage( m.getName() ) == null )
@@ -1833,7 +1833,8 @@ public class DefaultModelValidator implements ModelValidator
                         messages.getMessage().add( m );
                     }
                 }
-                for ( int i = implementation.getMessages().getReference().size() - 1; i >= 0; i-- )
+
+                for ( int i = 0, s0 = implementation.getMessages().getReference().size(); i < s0; i++ )
                 {
                     final MessageReference r = implementation.getMessages().getReference().get( i );
                     if ( messages.getReference( r.getName() ) == null )
@@ -1845,7 +1846,7 @@ public class DefaultModelValidator implements ModelValidator
 
             if ( implementation.getImplementations() != null )
             {
-                for ( int i = implementation.getImplementations().getReference().size() - 1; i >= 0; i-- )
+                for ( int i = 0, s0 = implementation.getImplementations().getReference().size(); i < s0; i++ )
                 {
                     final ImplementationReference r = implementation.getImplementations().getReference().get( i );
                     this.collectParentMessages( modules, modules.getImplementation( r.getIdentifier() ),
@@ -1866,7 +1867,7 @@ public class DefaultModelValidator implements ModelValidator
 
             if ( includeImplementation && implementation.getProperties() != null )
             {
-                for ( int i = implementation.getProperties().getProperty().size() - 1; i >= 0; i-- )
+                for ( int i = 0, s0 = implementation.getProperties().getProperty().size(); i < s0; i++ )
                 {
                     final Property p = implementation.getProperties().getProperty().get( i );
                     if ( properties.getProperty( p.getName() ) == null )
@@ -1874,7 +1875,8 @@ public class DefaultModelValidator implements ModelValidator
                         properties.getProperty().add( p );
                     }
                 }
-                for ( int i = implementation.getProperties().getReference().size() - 1; i >= 0; i-- )
+
+                for ( int i = 0, s0 = implementation.getProperties().getReference().size(); i < s0; i++ )
                 {
                     final PropertyReference r = implementation.getProperties().getReference().get( i );
                     if ( properties.getReference( r.getName() ) == null )
@@ -1886,7 +1888,7 @@ public class DefaultModelValidator implements ModelValidator
 
             if ( implementation.getImplementations() != null )
             {
-                for ( int i = implementation.getImplementations().getReference().size() - 1; i >= 0; i-- )
+                for ( int i = 0, s0 = implementation.getImplementations().getReference().size(); i < s0; i++ )
                 {
                     final ImplementationReference r = implementation.getImplementations().getReference().get( i );
                     this.collectParentProperties( modules, modules.getImplementation( r.getIdentifier() ),
@@ -1907,7 +1909,7 @@ public class DefaultModelValidator implements ModelValidator
 
             if ( includeDeclared && implementation.getSpecifications() != null )
             {
-                for ( int i = implementation.getSpecifications().getReference().size() - 1; i >= 0; i-- )
+                for ( int i = 0, s0 = implementation.getSpecifications().getReference().size(); i < s0; i++ )
                 {
                     final SpecificationReference r = implementation.getSpecifications().getReference().get( i );
 
@@ -1926,7 +1928,7 @@ public class DefaultModelValidator implements ModelValidator
 
             if ( implementation.getImplementations() != null )
             {
-                for ( int i = implementation.getImplementations().getReference().size() - 1; i >= 0; i-- )
+                for ( int i = 0, s0 = implementation.getImplementations().getReference().size(); i < s0; i++ )
                 {
                     final ImplementationReference r = implementation.getImplementations().getReference().get( i );
                     this.collectSpecifications( modules, modules.getImplementation( r.getIdentifier() ),
@@ -1947,7 +1949,7 @@ public class DefaultModelValidator implements ModelValidator
 
             if ( includeDeclared && implementation.getDependencies() != null )
             {
-                for ( int i = implementation.getDependencies().getDependency().size() - 1; i >= 0; i-- )
+                for ( int i = 0, s0 = implementation.getDependencies().getDependency().size(); i < s0; i++ )
                 {
                     final Dependency d = implementation.getDependencies().getDependency().get( i );
                     final Dependency dependency = dependencies.getDependency( d.getName() );
@@ -1965,7 +1967,7 @@ public class DefaultModelValidator implements ModelValidator
 
             if ( implementation.getImplementations() != null )
             {
-                for ( int i = implementation.getImplementations().getReference().size() - 1; i >= 0; i-- )
+                for ( int i = 0, s0 = implementation.getImplementations().getReference().size(); i < s0; i++ )
                 {
                     final ImplementationReference r = implementation.getImplementations().getReference().get( i );
                     this.collectDependencies( modules, modules.getImplementation( r.getIdentifier() ), dependencies,
@@ -1985,7 +1987,7 @@ public class DefaultModelValidator implements ModelValidator
                 target.setMessages( new Messages() );
             }
 
-            for ( int i = source.getMessages().getMessage().size() - 1; i >= 0; i-- )
+            for ( int i = 0, s0 = source.getMessages().getMessage().size(); i < s0; i++ )
             {
                 final Message m = source.getMessages().getMessage().get( i );
                 if ( target.getMessages().getMessage( m.getName() ) == null )
@@ -2002,7 +2004,7 @@ public class DefaultModelValidator implements ModelValidator
                 target.setProperties( new Properties() );
             }
 
-            for ( int i = source.getProperties().getProperty().size() - 1; i >= 0; i-- )
+            for ( int i = 0, s0 = source.getProperties().getProperty().size(); i < s0; i++ )
             {
                 final Property p = source.getProperties().getProperty().get( i );
                 if ( target.getProperties().getProperty( p.getName() ) == null )
@@ -2019,7 +2021,7 @@ public class DefaultModelValidator implements ModelValidator
                 target.setDependencies( new Dependencies() );
             }
 
-            for ( int i = source.getDependencies().getDependency().size() - 1; i >= 0; i-- )
+            for ( int i = 0, s0 = source.getDependencies().getDependency().size(); i < s0; i++ )
             {
                 final Dependency sd = source.getDependencies().getDependency().get( i );
                 final Dependency td = target.getDependencies().getDependency( sd.getName() );
@@ -2046,7 +2048,7 @@ public class DefaultModelValidator implements ModelValidator
 
             if ( includeDeclared && implementation.getProperties() != null )
             {
-                for ( int i = implementation.getProperties().getProperty().size() - 1; i >= 0; i-- )
+                for ( int i = 0, s0 = implementation.getProperties().getProperty().size(); i < s0; i++ )
                 {
                     final Property p = implementation.getProperties().getProperty().get( i );
                     if ( properties.getProperty( p.getName() ) == null )
@@ -2061,7 +2063,7 @@ public class DefaultModelValidator implements ModelValidator
 
                     if ( m != null )
                     {
-                        for ( int i = implementation.getProperties().getReference().size() - 1; i >= 0; i-- )
+                        for ( int i = 0, s0 = implementation.getProperties().getReference().size(); i < s0; i++ )
                         {
                             final PropertyReference ref = implementation.getProperties().getReference().get( i );
 
@@ -2084,7 +2086,7 @@ public class DefaultModelValidator implements ModelValidator
 
             if ( implementation.getImplementations() != null )
             {
-                for ( int i = implementation.getImplementations().getReference().size() - 1; i >= 0; i-- )
+                for ( int i = 0, s0 = implementation.getImplementations().getReference().size(); i < s0; i++ )
                 {
                     final ImplementationReference r = implementation.getImplementations().getReference().get( i );
                     this.collectProperties( modules, modules.getImplementation( r.getIdentifier() ), properties,
@@ -2104,7 +2106,7 @@ public class DefaultModelValidator implements ModelValidator
 
             if ( includeDeclared && implementation.getMessages() != null )
             {
-                for ( int i = implementation.getMessages().getMessage().size() - 1; i >= 0; i-- )
+                for ( int i = 0, s0 = implementation.getMessages().getMessage().size(); i < s0; i++ )
                 {
                     final Message msg = implementation.getMessages().getMessage().get( i );
                     if ( messages.getMessage( msg.getName() ) == null )
@@ -2119,7 +2121,7 @@ public class DefaultModelValidator implements ModelValidator
 
                     if ( m != null )
                     {
-                        for ( int i = implementation.getMessages().getReference().size() - 1; i >= 0; i-- )
+                        for ( int i = 0, s0 = implementation.getMessages().getReference().size(); i < s0; i++ )
                         {
                             final MessageReference ref = implementation.getMessages().getReference().get( i );
 
@@ -2142,7 +2144,7 @@ public class DefaultModelValidator implements ModelValidator
 
             if ( implementation.getImplementations() != null )
             {
-                for ( int i = implementation.getImplementations().getReference().size() - 1; i >= 0; i-- )
+                for ( int i = 0, s0 = implementation.getImplementations().getReference().size(); i < s0; i++ )
                 {
                     final ImplementationReference r = implementation.getImplementations().getReference().get( i );
                     this.collectMessages( modules, modules.getImplementation( r.getIdentifier() ), messages, seen,

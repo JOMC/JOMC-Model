@@ -398,13 +398,12 @@ public class DefaultModelProcessor implements ModelProcessor
 
                 if ( transformers != null )
                 {
-                    for ( int i = transformers.size() - 1; i >= 0; i-- )
+                    for ( int i = 0, s0 = transformers.size(); i < s0; i++ )
                     {
-                        final Transformer t = transformers.get( i );
                         final JAXBElement<Model> e = objectFactory.createModel( processed );
                         final JAXBSource source = new JAXBSource( jaxbContext, e );
                         final JAXBResult result = new JAXBResult( jaxbContext );
-                        t.transform( source, result );
+                        transformers.get( i ).transform( source, result );
 
                         if ( result.getResult() instanceof JAXBElement<?>
                              && ( (JAXBElement<?>) result.getResult() ).getValue() instanceof Model )

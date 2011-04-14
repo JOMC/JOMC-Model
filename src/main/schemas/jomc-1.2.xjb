@@ -73,7 +73,7 @@
 
         Text defaultText = null;
 
-        for ( int i = this.getText().size() - 1; i >= 0; i-- )
+        for ( int i = 0, s0 = this.getText().size(); i < s0; i++ )
         {
             final Text t = this.getText().get( i );
 
@@ -161,7 +161,7 @@
 
         javax.xml.bind.JAXBElement<?> anyElement = null;
 
-        for ( int i = any.size() - 1; i >= 0; i-- )
+        for ( int i = 0, s0 = any.size(); i < s0; i++ )
         {
             final Object o = any.get( i );
 
@@ -225,7 +225,7 @@
         final java.util.List<javax.xml.bind.JAXBElement> anyElements =
             new java.util.ArrayList<javax.xml.bind.JAXBElement>( any.size() );
 
-        for ( int i = any.size() - 1; i >= 0; i-- )
+        for ( int i = 0, s0 = any.size(); i < s0; i++ )
         {
             final Object o = any.get( i );
 
@@ -286,7 +286,7 @@
 
         javax.xml.bind.JAXBElement<?> anyElement = null;
 
-        for ( int i = any.size() - 1; i >= 0; i-- )
+        for ( int i = 0, s0 = any.size(); i < s0; i++ )
         {
             final Object o = any.get( i );
 
@@ -365,7 +365,7 @@
         final java.util.List<javax.xml.bind.JAXBElement<T>> anyElements =
             new java.util.ArrayList<javax.xml.bind.JAXBElement<T>>( any.size() );
 
-        for ( int i = any.size() - 1; i >= 0; i-- )
+        for ( int i = 0, s0 = any.size(); i < s0; i++ )
         {
             final Object o = any.get( i );
 
@@ -413,7 +413,7 @@
 
         T anyObject = null;
 
-        for ( int i = any.size() - 1; i >= 0; i-- )
+        for ( int i = 0, s0 = any.size(); i < s0; i++ )
         {
             Object o = any.get( i );
 
@@ -466,7 +466,7 @@
 
         final java.util.List<T> anyElements = new java.util.ArrayList<T>( any.size() );
 
-        for ( int i = any.size() - 1; i >= 0; i-- )
+        for ( int i = 0, s0 = any.size(); i < s0; i++ )
         {
             Object o = any.get( i );
 
@@ -688,7 +688,7 @@
             throw new NullPointerException( "specification" );
         }
 
-        for ( int i = this.getSpecification().size() - 1; i >= 0; i-- )
+        for ( int i = 0, s0 = this.getSpecification().size(); i < s0; i++ )
         {
             final Specification s = this.getSpecification().get( i );
 
@@ -720,7 +720,7 @@
             throw new NullPointerException( "specification" );
         }
 
-        for ( int i = this.getSpecification().size() - 1; i >= 0; i-- )
+        for ( int i = 0, s0 = this.getSpecification().size(); i < s0; i++ )
         {
             final Specification s = this.getSpecification().get( i );
 
@@ -752,7 +752,7 @@
             throw new NullPointerException( "specification" );
         }
 
-        for ( int i = this.getReference().size() - 1; i >= 0; i-- )
+        for ( int i = 0, s0 = this.getReference().size(); i < s0; i++ )
         {
             final SpecificationReference r = this.getReference().get( i );
 
@@ -986,7 +986,7 @@
             throw new NullPointerException( "implementation" );
         }
 
-        for ( int i = this.getImplementation().size() - 1; i >= 0; i-- )
+        for ( int i = 0, s0 = this.getImplementation().size(); i < s0; i++ )
         {
             final Implementation current = this.getImplementation().get( i );
 
@@ -1018,7 +1018,7 @@
             throw new NullPointerException( "implementation" );
         }
 
-        for ( int i = this.getImplementation().size() - 1; i >= 0; i-- )
+        for ( int i = 0, s0 = this.getImplementation().size(); i < s0; i++ )
         {
             final Implementation current = this.getImplementation().get( i );
 
@@ -1050,7 +1050,7 @@
             throw new NullPointerException( "name" );
         }
 
-        for ( int i = this.getImplementation().size() - 1; i >= 0; i-- )
+        for ( int i = 0, s0 = this.getImplementation().size(); i < s0; i++ )
         {
             final Implementation current = this.getImplementation().get( i );
 
@@ -1082,7 +1082,7 @@
             throw new NullPointerException( "implementation" );
         }
 
-        for ( int i = this.getReference().size() - 1; i >= 0; i-- )
+        for ( int i = 0, s0 = this.getReference().size(); i < s0; i++ )
         {
             final ImplementationReference r = this.getReference().get( i );
 
@@ -1378,7 +1378,7 @@
             throw new NullPointerException( "identifier" );
         }
 
-        for ( int i = this.getDependency().size() - 1; i >= 0; i-- )
+        for ( int i = 0, s0 = this.getDependency().size(); i < s0; i++ )
         {
             final Dependency d = this.getDependency().get( i );
 
@@ -1586,7 +1586,7 @@
             throw new NullPointerException( "name" );
         }
 
-        for ( int i = this.getProperty().size() - 1; i >= 0; i-- )
+        for ( int i = 0, s0 = this.getProperty().size(); i < s0; i++ )
         {
             final Property p = this.getProperty().get( i );
 
@@ -1618,7 +1618,7 @@
             throw new NullPointerException( "name" );
         }
 
-        for ( int i = this.getReference().size() - 1; i >= 0; i-- )
+        for ( int i = 0, s0 = this.getReference().size(); i < s0; i++ )
         {
             final PropertyReference r = this.getReference().get( i );
 
@@ -1948,7 +1948,7 @@
             throw new NullPointerException( "name" );
         }
 
-        for ( int i = this.getMessage().size() - 1; i >= 0; i-- )
+        for ( int i = 0, s0 = this.getMessage().size(); i < s0; i++ )
         {
             final Message m = this.getMessage().get( i );
 
@@ -1980,7 +1980,7 @@
             throw new NullPointerException( "name" );
         }
 
-        for ( int i = this.getReference().size() - 1; i >= 0; i-- )
+        for ( int i = 0, s0 = this.getReference().size(); i < s0; i++ )
         {
             final MessageReference r = this.getReference().get( i );
 
@@ -2194,7 +2194,7 @@
             throw new NullPointerException( "name" );
         }
 
-        for ( int i = this.getArgument().size() - 1; i >= 0; i-- )
+        for ( int i = 0, s0 = this.getArgument().size(); i < s0; i++ )
         {
             final Argument a = this.getArgument().get( i );
 
@@ -2226,7 +2226,7 @@
             throw new IndexOutOfBoundsException( Integer.toString( index ) );
         }
 
-        for ( int i = this.getArgument().size() - 1; i >= 0; i-- )
+        for ( int i = 0, s0 = this.getArgument().size(); i < s0; i++ )
         {
             final Argument a = this.getArgument().get( i );
 
@@ -2414,7 +2414,7 @@
             throw new NullPointerException( "identifier" );
         }
 
-        for ( int i = this.getInstance().size() - 1; i >= 0; i-- )
+        for ( int i = 0, s0 = this.getInstance().size(); i < s0; i++ )
         {
             final Instance current = this.getInstance().get( i );
 
@@ -2978,7 +2978,7 @@
             throw new NullPointerException( "name" );
         }
 
-        for ( int i = this.getModule().size() - 1; i >= 0; i-- )
+        for ( int i = 0, s0 = this.getModule().size(); i < s0; i++ )
         {
             final Module m = this.getModule().get( i );
 
@@ -3002,7 +3002,7 @@
     {
         final Specifications specifications = new Specifications();
 
-        for ( int i = this.getModule().size() - 1; i >= 0; i-- )
+        for ( int i = 0, s0 = this.getModule().size(); i < s0; i++ )
         {
             final Module m = this.getModule().get( i );
 
@@ -3026,7 +3026,7 @@
     {
         final Implementations implementations = new Implementations();
 
-        for ( int i = this.getModule().size() - 1; i >= 0; i-- )
+        for ( int i = 0, s0 = this.getModule().size(); i < s0; i++ )
         {
             final Module m = this.getModule().get( i );
 
@@ -3058,7 +3058,7 @@
             throw new NullPointerException( "specification" );
         }
 
-        for ( int i = this.getModule().size() - 1; i >= 0; i-- )
+        for ( int i = 0, s0 = this.getModule().size(); i < s0; i++ )
         {
             final Module m = this.getModule().get( i );
 
@@ -3090,7 +3090,7 @@
             throw new NullPointerException( "implementation" );
         }
 
-        for ( int i = this.getModule().size() - 1; i >= 0; i-- )
+        for ( int i = 0, s0 = this.getModule().size(); i < s0; i++ )
         {
             final Module m = this.getModule().get( i );
 
@@ -3122,7 +3122,7 @@
             throw new NullPointerException( "specification" );
         }
 
-        for ( int i = this.getModule().size() - 1; i >= 0; i-- )
+        for ( int i = 0, s0 = this.getModule().size(); i < s0; i++ )
         {
             final Module m = this.getModule().get( i );
 
@@ -3159,7 +3159,7 @@
             throw new NullPointerException( "specification" );
         }
 
-        for ( int i = this.getModule().size() - 1; i >= 0; i-- )
+        for ( int i = 0, s0 = this.getModule().size(); i < s0; i++ )
         {
             final Module m = this.getModule().get( i );
 
@@ -3205,13 +3205,13 @@
         Implementation declaration = null;
         if ( impl != null && impl.getClazz() != null && !impl.isClassDeclaration() )
         {
-            for ( int i = this.getModule().size() - 1; i >= 0; i-- )
+            for ( int i = 0, s0 = this.getModule().size(); i < s0; i++ )
             {
                 final Module m = this.getModule().get( i );
 
                 if ( m.getImplementations() != null )
                 {
-                    for ( int j = m.getImplementations().getImplementation().size() - 1; j >= 0; j-- )
+                    for ( int j = 0, s1 = m.getImplementations().getImplementation().size(); j < s1; j++ )
                     {
                         final Implementation current = m.getImplementations().getImplementation().get( j );
 
@@ -3232,7 +3232,7 @@
 
             if ( declaredSpecifications != null )
             {
-                for ( int i = declaredSpecifications.getReference().size() - 1; i >= 0; i-- )
+                for ( int i = 0, s0 = declaredSpecifications.getReference().size(); i < s0; i++ )
                 {
                     final SpecificationReference r = declaredSpecifications.getReference().get( i );
 
@@ -3293,7 +3293,7 @@
             throw new NullPointerException( "implementation" );
         }
 
-        for ( int i = this.getModule().size() - 1; i >= 0; i-- )
+        for ( int i = 0, s0 = this.getModule().size(); i < s0; i++ )
         {
             final Module m = this.getModule().get( i );
 
@@ -3330,7 +3330,7 @@
             throw new NullPointerException( "implementation" );
         }
 
-        for ( int i = this.getModule().size() - 1; i >= 0; i-- )
+        for ( int i = 0, s0 = this.getModule().size(); i < s0; i++ )
         {
             final Module m = this.getModule().get( i );
 
@@ -3426,13 +3426,13 @@
 
         if ( impl != null && impl.getClazz() != null && !impl.isClassDeclaration() )
         {
-            for ( int i = this.getModule().size() - 1; i >= 0; i-- )
+            for ( int i = 0, s0 = this.getModule().size(); i < s0; i++ )
             {
                 final Module m = this.getModule().get( i );
 
                 if ( m.getImplementations() != null )
                 {
-                    for ( int j = m.getImplementations().getImplementation().size() - 1; j >= 0; j-- )
+                    for ( int j = 0, s1 = m.getImplementations().getImplementation().size(); j < s1; j++ )
                     {
                         final Implementation current = m.getImplementations().getImplementation().get( j );
 
@@ -3453,7 +3453,7 @@
 
             if ( declaredDependencies != null )
             {
-                for ( int i = declaredDependencies.getDependency().size() - 1; i >= 0; i-- )
+                for ( int i = 0, s0 = declaredDependencies.getDependency().size(); i < s0; i++ )
                 {
                     final Dependency d = declaredDependencies.getDependency().get( i );
 
@@ -3505,13 +3505,13 @@
 
         if ( impl != null && impl.getClazz() != null && !impl.isClassDeclaration() )
         {
-            for ( int i = this.getModule().size() - 1; i >= 0; i-- )
+            for ( int i = 0, s0 = this.getModule().size(); i < s0; i++ )
             {
                 final Module m = this.getModule().get( i );
 
                 if ( m.getImplementations() != null )
                 {
-                    for ( int j = m.getImplementations().getImplementation().size() - 1; j >= 0; j-- )
+                    for ( int j = 0, s1 = m.getImplementations().getImplementation().size(); j < s1; j++ )
                     {
                         final Implementation current = m.getImplementations().getImplementation().get( j );
 
@@ -3532,7 +3532,7 @@
 
             if ( declaredProperties != null )
             {
-                for ( int i = declaredProperties.getProperty().size() - 1; i >= 0; i-- )
+                for ( int i = 0, s0 = declaredProperties.getProperty().size(); i < s0; i++ )
                 {
                     final Property p = declaredProperties.getProperty().get( i );
 
@@ -3548,7 +3548,7 @@
 
         if ( specified != null )
         {
-            for ( int i = specified.getProperty().size() - 1; i >= 0; i-- )
+            for ( int i = 0, s0 = specified.getProperty().size(); i < s0; i++ )
             {
                 final Property p = specified.getProperty().get( i );
 
@@ -3596,7 +3596,7 @@
 
         if ( specs != null )
         {
-            for ( int i = specs.getSpecification().size() - 1; i >= 0; i-- )
+            for ( int i = 0, s0 = specs.getSpecification().size(); i < s0; i++ )
             {
                 final Specification s = specs.getSpecification().get( i );
 
@@ -3646,13 +3646,13 @@
 
         if ( impl != null && impl.getClazz() != null && !impl.isClassDeclaration() )
         {
-            for ( int i = this.getModule().size() - 1; i >= 0; i-- )
+            for ( int i = 0, s0 = this.getModule().size(); i < s0; i++ )
             {
                 final Module m = this.getModule().get( i );
 
                 if ( m.getImplementations() != null )
                 {
-                    for ( int j = m.getImplementations().getImplementation().size() - 1; j >= 0; j-- )
+                    for ( int j = 0, s1 = m.getImplementations().getImplementation().size(); j < s1; j++ )
                     {
                         final Implementation current = m.getImplementations().getImplementation().get( j );
 
@@ -3673,7 +3673,7 @@
 
             if ( declaredMessages != null )
             {
-                for ( int i = declaredMessages.getMessage().size() - 1; i >= 0; i-- )
+                for ( int i = 0, s0 = declaredMessages.getMessage().size(); i < s0; i++ )
                 {
                     final Message m = declaredMessages.getMessage().get( i );
 
@@ -3719,13 +3719,13 @@
 
         final Implementations implementations = new Implementations();
 
-        for ( int i = this.getModule().size() - 1; i >= 0; i-- )
+        for ( int i = 0, s0 = this.getModule().size(); i < s0; i++ )
         {
             final Module m = this.getModule().get( i );
 
             if ( m.getImplementations() != null )
             {
-                for ( int j = m.getImplementations().getImplementation().size() - 1; j >= 0; j-- )
+                for ( int j = 0, s1 = m.getImplementations().getImplementation().size(); j < s1; j++ )
                 {
                     final Implementation impl = m.getImplementations().getImplementation().get( j );
                     final Specifications specs = this.getSpecifications( impl.getIdentifier() );
@@ -3761,7 +3761,7 @@
         final Module mergedModule = new Module();
         mergedModule.setName( name );
 
-        for ( int i = copy.getModule().size() - 1; i >= 0; i-- )
+        for ( int i = 0, s0 = copy.getModule().size(); i < s0; i++ )
         {
             final Module m = copy.getModule().get( i );
             final java.util.Set<String> referencedMessages = new java.util.HashSet<String>();
@@ -3769,7 +3769,7 @@
 
             if ( m.getImplementations() != null )
             {
-                for ( int j = m.getImplementations().getImplementation().size() - 1; j >= 0; j-- )
+                for ( int j = 0, s1 = m.getImplementations().getImplementation().size(); j < s1; j++ )
                 {
                     final Implementation impl = m.getImplementations().getImplementation().get( j );
                     if ( mergedModule.getImplementations() == null )
@@ -3812,7 +3812,7 @@
                     mergedModule.setSpecifications( new Specifications() );
                 }
 
-                for ( int j = m.getSpecifications().getSpecification().size() - 1; j >= 0; j-- )
+                for ( int j = 0, s1 = m.getSpecifications().getSpecification().size(); j < s1; j++ )
                 {
                     final Specification s = m.getSpecifications().getSpecification().get( j );
 
@@ -3999,7 +3999,7 @@
 
                     if ( instance.getDependencies() != null )
                     {
-                        for ( int i = instance.getDependencies().getDependency().size() - 1; i >= 0; i-- )
+                        for ( int i = 0, s0 = instance.getDependencies().getDependency().size(); i < s0; i++ )
                         {
                             final Dependency d = instance.getDependencies().getDependency().get( i );
                             final Dependency td = dependencies.getDependency( d.getName() );
@@ -4025,7 +4025,7 @@
 
                     if ( instance.getMessages() != null )
                     {
-                        for ( int i = instance.getMessages().getMessage().size() - 1; i >= 0; i-- )
+                        for ( int i = 0, s0 = instance.getMessages().getMessage().size(); i < s0; i++ )
                         {
                             final Message m = instance.getMessages().getMessage().get( i );
 
@@ -4046,7 +4046,7 @@
 
                     if ( instance.getProperties() != null )
                     {
-                        for ( int i = instance.getProperties().getProperty().size() - 1; i >= 0; i-- )
+                        for ( int i = 0, s0 = instance.getProperties().getProperty().size(); i < s0; i++ )
                         {
                             final Property p = instance.getProperties().getProperty().get( i );
 
@@ -4111,7 +4111,7 @@
                 boolean assignable = true;
                 if ( instance.getSpecifications() != null )
                 {
-                    for ( int i = instance.getSpecifications().getSpecification().size() - 1; i >= 0; i-- )
+                    for ( int i = 0, s0 = instance.getSpecifications().getSpecification().size(); i < s0; i++ )
                     {
                         final Specification s = instance.getSpecifications().getSpecification().get( i );
 
@@ -4263,7 +4263,7 @@
 
             if ( includeDeclared && implementation.getSpecifications() != null )
             {
-                for ( int i = implementation.getSpecifications().getReference().size() - 1; i >= 0; i-- )
+                for ( int i = 0, s0 = implementation.getSpecifications().getReference().size(); i < s0; i++ )
                 {
                     final SpecificationReference r = implementation.getSpecifications().getReference().get( i );
 
@@ -4282,7 +4282,7 @@
 
             if ( implementation.getImplementations() != null )
             {
-                for ( int i = implementation.getImplementations().getReference().size() - 1; i >= 0; i-- )
+                for ( int i = 0, s0 = implementation.getImplementations().getReference().size(); i < s0; i++ )
                 {
                     final ImplementationReference r = implementation.getImplementations().getReference().get( i );
 
@@ -4303,7 +4303,7 @@
 
             if ( includeDeclared && implementation.getDependencies() != null )
             {
-                for ( int i = implementation.getDependencies().getDependency().size() - 1; i >= 0; i-- )
+                for ( int i = 0, s0 = implementation.getDependencies().getDependency().size(); i < s0; i++ )
                 {
                     final Dependency d = implementation.getDependencies().getDependency().get( i );
                     final Dependency dependency = dependencies.getDependency( d.getName() );
@@ -4321,7 +4321,7 @@
 
             if ( implementation.getImplementations() != null )
             {
-                for ( int i = implementation.getImplementations().getReference().size() - 1; i >= 0; i-- )
+                for ( int i = 0, s0 = implementation.getImplementations().getReference().size(); i < s0; i++ )
                 {
                     final ImplementationReference r = implementation.getImplementations().getReference().get( i );
 
@@ -4342,7 +4342,7 @@
                 target.setMessages( new Messages() );
             }
 
-            for ( int i = source.getMessages().getMessage().size() - 1; i >= 0; i-- )
+            for ( int i = 0, s0 = source.getMessages().getMessage().size(); i < s0; i++ )
             {
                 final Message m = source.getMessages().getMessage().get( i );
 
@@ -4360,7 +4360,7 @@
                 target.setProperties( new Properties() );
             }
 
-            for ( int i = source.getProperties().getProperty().size() - 1; i >= 0; i-- )
+            for ( int i = 0, s0 = source.getProperties().getProperty().size(); i < s0; i++ )
             {
                 final Property p = source.getProperties().getProperty().get( i );
 
@@ -4378,7 +4378,7 @@
                 target.setDependencies( new Dependencies() );
             }
 
-            for ( int i = source.getDependencies().getDependency().size() - 1; i >= 0; i-- )
+            for ( int i = 0, s0 = source.getDependencies().getDependency().size(); i < s0; i++ )
             {
                 final Dependency sd = source.getDependencies().getDependency().get( i );
                 final Dependency td = target.getDependencies().getDependency( sd.getName() );
@@ -4404,7 +4404,7 @@
 
             if ( includeDeclared && implementation.getProperties() != null )
             {
-                for ( int i = implementation.getProperties().getProperty().size() - 1; i >= 0; i-- )
+                for ( int i = 0, s0 = implementation.getProperties().getProperty().size(); i < s0; i++ )
                 {
                     final Property p = implementation.getProperties().getProperty().get( i );
 
@@ -4420,7 +4420,7 @@
 
                     if ( m != null )
                     {
-                        for ( int i = implementation.getProperties().getReference().size() - 1; i >= 0; i-- )
+                        for ( int i = 0, s0 = implementation.getProperties().getReference().size(); i < s0; i++ )
                         {
                             final PropertyReference ref = implementation.getProperties().getReference().get( i );
 
@@ -4443,7 +4443,7 @@
 
             if ( implementation.getImplementations() != null )
             {
-                for ( int i = implementation.getImplementations().getReference().size() - 1; i >= 0; i-- )
+                for ( int i = 0, s0 = implementation.getImplementations().getReference().size(); i < s0; i++ )
                 {
                     final ImplementationReference r = implementation.getImplementations().getReference().get( i );
                     this.collectProperties( this.getImplementation( r.getIdentifier() ), properties, seen, true );
@@ -4461,7 +4461,7 @@
 
             if ( includeDeclared && implementation.getMessages() != null )
             {
-                for ( int i = implementation.getMessages().getMessage().size() - 1; i >= 0; i-- )
+                for ( int i = 0, s0 = implementation.getMessages().getMessage().size(); i < s0; i++ )
                 {
                     final Message msg = implementation.getMessages().getMessage().get( i );
 
@@ -4477,7 +4477,7 @@
 
                     if ( m != null )
                     {
-                        for ( int i = implementation.getMessages().getReference().size() - 1; i >= 0; i-- )
+                        for ( int i = 0, s0 = implementation.getMessages().getReference().size(); i < s0; i++ )
                         {
                             final MessageReference ref = implementation.getMessages().getReference().get( i );
 
@@ -4500,7 +4500,7 @@
 
             if ( implementation.getImplementations() != null )
             {
-                for ( int i = implementation.getImplementations().getReference().size() - 1; i >= 0; i-- )
+                for ( int i = 0, s0 = implementation.getImplementations().getReference().size(); i < s0; i++ )
                 {
                     final ImplementationReference r = implementation.getImplementations().getReference().get( i );
                     this.collectMessages( this.getImplementation( r.getIdentifier() ), messages, seen, true );
@@ -4518,7 +4518,7 @@
 
             if ( includeDeclared && !implementation.getAny().isEmpty() )
             {
-                for ( int i = implementation.getAny().size() - 1; i >= 0; i-- )
+                for ( int i = 0, s0 = implementation.getAny().size(); i < s0; i++ )
                 {
                     final Object o = implementation.getAny().get( i );
 
@@ -4548,7 +4548,7 @@
 
             if ( implementation.getImplementations() != null )
             {
-                for ( int i = implementation.getImplementations().getReference().size() - 1; i >= 0; i-- )
+                for ( int i = 0, s0 = implementation.getImplementations().getReference().size(); i < s0; i++ )
                 {
                     final ImplementationReference r = implementation.getImplementations().getReference().get( i );
                     this.collectAny( this.getImplementation( r.getIdentifier() ), any, seen, true );
@@ -4570,7 +4570,7 @@
 
     private org.w3c.dom.Element getElement( final List<Object> list, final org.w3c.dom.Element e )
     {
-        for ( int i = list.size() - 1; i >= 0; i-- )
+        for ( int i = 0, s0 = list.size(); i < s0; i++ )
         {
             final Object o = list.get( i );
 
@@ -4594,7 +4594,7 @@
 
     private javax.xml.bind.JAXBElement getElement( final List<Object> list, final javax.xml.bind.JAXBElement e )
     {
-        for ( int i = list.size() - 1; i >= 0; i-- )
+        for ( int i = 0, s0 = list.size(); i < s0; i++ )
         {
             final Object o = list.get( i );
 
@@ -4613,7 +4613,7 @@
 
     private void resolveClasspath( final Module cpModule, final ClassLoader classLoader )
     {
-        for ( int i = this.getModule().size() - 1; i >= 0; i-- )
+        for ( int i = 0, s0 = this.getModule().size(); i < s0; i++ )
         {
             final Module m = this.getModule().get( i );
 
@@ -4641,7 +4641,7 @@
     private void resolveClasspath( final Specifications references, final Module cpModule,
                                    final ClassLoader classLoader )
     {
-        for ( int i = references.getReference().size() - 1; i >= 0; i-- )
+        for ( int i = 0, s0 = references.getReference().size(); i < s0; i++ )
         {
             final SpecificationReference ref = references.getReference().get( i );
             this.resolveClasspath( ref, cpModule, classLoader );
@@ -4651,7 +4651,7 @@
     private void resolveClasspath( final Implementations implementations, final Module cpModule,
                                    final ClassLoader classLoader )
     {
-        for ( int i = implementations.getImplementation().size() - 1; i >= 0; i-- )
+        for ( int i = 0, s0 = implementations.getImplementation().size(); i < s0; i++ )
         {
             final Implementation implementation = implementations.getImplementation().get( i );
 
@@ -4670,7 +4670,7 @@
     private void resolveClasspath( final Dependencies dependencies, final Module cpModule,
                                    final ClassLoader classLoader )
     {
-        for ( int i = dependencies.getDependency().size() - 1; i >= 0; i-- )
+        for ( int i = 0, s0 = dependencies.getDependency().size(); i < s0; i++ )
         {
             final Dependency dependency = dependencies.getDependency().get( i );
             this.resolveClasspath( dependency, cpModule, classLoader );
