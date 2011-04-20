@@ -2845,7 +2845,7 @@
 
     /** Maps objects to {@code Instance}s. */
     @javax.xml.bind.annotation.XmlTransient private java.util.Map<Object, Instance> objects =
-        new org.jomc.util.WeakIdentityHashMap();
+        new org.jomc.util.WeakIdentityHashMap<Object, Instance>();
 
     /**
      * Creates a new {@code Modules} instance taking a map backing the instance.
