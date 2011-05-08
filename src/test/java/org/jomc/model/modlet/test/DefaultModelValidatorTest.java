@@ -130,6 +130,7 @@ public class DefaultModelValidatorTest
                 @Override
                 public void onLog( final Level level, String message, Throwable t )
                 {
+                    super.onLog( level, message, t );
                     System.out.println( "[" + level.getLocalizedName() + "] " + message );
                     if ( t != null )
                     {
