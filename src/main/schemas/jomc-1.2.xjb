@@ -2493,6 +2493,8 @@
 
     /**
      * Gets a mapping of dependency names to objects bound to the instance.
+     * <p>This method returns a reference to the live map, not a snapshot. Any modification you make to the returned map
+     * will be present inside the object.</p>
      *
      * @return A mapping of dependency names to objects bound to the instance.
      */
@@ -2508,6 +2510,8 @@
 
     /**
      * Gets a mapping of property names to objects bound to the instance.
+     * <p>This method returns a reference to the live map, not a snapshot. Any modification you make to the returned map
+     * will be present inside the object.</p>
      *
      * @return A mapping of property names to objects bound to the instance.
      */
