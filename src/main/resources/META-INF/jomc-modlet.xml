@@ -43,8 +43,8 @@
 
   </schemas>
   <services>
-    <service identifier="org.jomc.modlet.ModelProcessor" class="org.jomc.model.modlet.DefaultModelProcessor"/>
-    <service identifier="org.jomc.modlet.ModelProvider" class="org.jomc.model.modlet.DefaultModelProvider"/>
-    <service identifier="org.jomc.modlet.ModelValidator" class="org.jomc.model.modlet.DefaultModelValidator"/>
+    <service identifier="org.jomc.modlet.ModelProcessor" class="org.jomc.model.modlet.DefaultModelProcessor" ordinal="10000"/>
+    <service identifier="org.jomc.modlet.ModelProvider" class="org.jomc.model.modlet.DefaultModelProvider" ordinal="10000"/>
+    <service identifier="org.jomc.modlet.ModelValidator" class="org.jomc.model.modlet.DefaultModelValidator" ordinal="10000"/>
   </services>
 </modlet>
