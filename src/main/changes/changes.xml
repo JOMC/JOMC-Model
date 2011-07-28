@@ -87,6 +87,18 @@
       <code>org.jomc.model.modlet.DefaultModelProcessor</code> to add system properties to transformers as
       parameters.]]>
       </action>
+      <action dev="schulte2005" type="update"><![CDATA[Updated method <code>processModel</code> of class
+      <code>org.jomc.model.modlet.DefaultModelProcessor</code> to support model context attributes
+      <code>org.jomc.model.modlet.DefaultModelProcessor.enabledAttribute</code> and
+      <code>org.jomc.model.modlet.DefaultModelProcessor.transformerLocationAttribute</code>.
+      See the <a href="http://jomc.sourceforge.net/jomc/1.2/jomc-model-1.2/clirr-report.html">CLIRR report</a>.]]>
+      </action>
+      <action dev="schulte2005" type="update"><![CDATA[Updated method <code>findModel</code> of class
+      <code>org.jomc.model.modlet.DefaultModelProvider</code> to support model context attributes
+      <code>org.jomc.model.modlet.DefaultModelProvider.enabledAttribute</code> and
+      <code>org.jomc.model.modlet.DefaultModelProvider.moduleLocationAttribute</code>.
+      See the <a href="http://jomc.sourceforge.net/jomc/1.2/jomc-model-1.2/clirr-report.html">CLIRR report</a>.]]>
+      </action>
     </release>
   </body>
 </document>

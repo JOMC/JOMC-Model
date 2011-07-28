@@ -61,6 +61,29 @@ public class DefaultModelProvider implements ModelProvider
 {
 
     /**
+     * Constant for the name of the model context attribute backing property {@code enabled}.
+     * @see #findModel(org.jomc.modlet.ModelContext, org.jomc.modlet.Model)
+     * @see ModelContext#getAttribute(java.lang.String)
+     * @see ModelContext#getAttribute(java.lang.String, java.lang.Object)
+     * @see ModelContext#setAttribute(java.lang.String, java.lang.Object)
+     * @see ModelContext#clearAttribute(java.lang.String)
+     * @since 1.2
+     */
+    public static final String ENABLED_ATTRIBUTE_NAME = "org.jomc.model.modlet.DefaultModelProvider.enabledAttribute";
+
+    /**
+     * Constant for the name of the model context attribute backing property {@code moduleLocation}.
+     * @see #findModel(org.jomc.modlet.ModelContext, org.jomc.modlet.Model)
+     * @see ModelContext#getAttribute(java.lang.String)
+     * @see ModelContext#getAttribute(java.lang.String, java.lang.Object)
+     * @see ModelContext#setAttribute(java.lang.String, java.lang.Object)
+     * @see ModelContext#clearAttribute(java.lang.String)
+     * @since 1.2
+     */
+    public static final String MODULE_LOCATION_ATTRIBUTE_NAME =
+        "org.jomc.model.modlet.DefaultModelProvider.moduleLocationAttribute";
+
+    /**
      * Constant for the name of the system property controlling property {@code defaultEnabled}.
      * @see #isDefaultEnabled()
      */
@@ -87,6 +110,13 @@ public class DefaultModelProvider implements ModelProvider
      */
     private static final String DEPRECATED_DEFAULT_MODULE_LOCATION_PROPERTY_NAME =
         "org.jomc.model.DefaultModelProvider.defaultModuleLocation";
+
+    /**
+     * Default value of the flag indicating the processor is enabled by default.
+     * @see #isDefaultEnabled()
+     * @since 1.2
+     */
+    private static final Boolean DEFAULT_ENABLED = Boolean.TRUE;
 
     /**
      * Classpath location searched for modules by default.
@@ -129,7 +159,7 @@ public class DefaultModelProvider implements ModelProvider
             defaultEnabled =
                 Boolean.valueOf( System.getProperty( DEFAULT_ENABLED_PROPERTY_NAME,
                                                      System.getProperty( DEPRECATED_DEFAULT_ENABLED_PROPERTY_NAME,
-                                                                         Boolean.toString( true ) ) ) );
+                                                                         Boolean.toString( DEFAULT_ENABLED ) ) ) );
 
         }
 
@@ -352,6 +382,8 @@ public class DefaultModelProvider implements ModelProvider
      * @see #isEnabled()
      * @see #getModuleLocation()
      * @see #findModules(org.jomc.modlet.ModelContext, java.lang.String, java.lang.String)
+     * @see #ENABLED_ATTRIBUTE_NAME
+     * @see #MODULE_LOCATION_ATTRIBUTE_NAME
      */
     public Model findModel( final ModelContext context, final Model model ) throws ModelException
     {
@@ -366,9 +398,22 @@ public class DefaultModelProvider implements ModelProvider
 
         Model found = null;
 
-        if ( this.isEnabled() )
+        boolean contextEnabled = this.isEnabled();
+        if ( DEFAULT_ENABLED == contextEnabled && context.getAttribute( ENABLED_ATTRIBUTE_NAME ) != null )
         {
-            final Modules modules = this.findModules( context, model.getIdentifier(), this.getModuleLocation() );
+            contextEnabled = (Boolean) context.getAttribute( ENABLED_ATTRIBUTE_NAME );
+        }
+
+        String contextModuleLocation = this.getModuleLocation();
+        if ( DEFAULT_MODULE_LOCATION.equals( contextModuleLocation )
+             && context.getAttribute( MODULE_LOCATION_ATTRIBUTE_NAME ) != null )
+        {
+            contextModuleLocation = (String) context.getAttribute( MODULE_LOCATION_ATTRIBUTE_NAME );
+        }
+
+        if ( contextEnabled )
+        {
+            final Modules modules = this.findModules( context, model.getIdentifier(), contextModuleLocation );
 
             if ( modules != null )
             {

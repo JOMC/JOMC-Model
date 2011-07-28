@@ -69,6 +69,29 @@ public class DefaultModelProcessor implements ModelProcessor
 {
 
     /**
+     * Constant for the name of the model context attribute backing property {@code enabled}.
+     * @see #processModel(org.jomc.modlet.ModelContext, org.jomc.modlet.Model)
+     * @see ModelContext#getAttribute(java.lang.String)
+     * @see ModelContext#getAttribute(java.lang.String, java.lang.Object)
+     * @see ModelContext#setAttribute(java.lang.String, java.lang.Object)
+     * @see ModelContext#clearAttribute(java.lang.String)
+     * @since 1.2
+     */
+    public static final String ENABLED_ATTRIBUTE_NAME = "org.jomc.model.modlet.DefaultModelProcessor.enabledAttribute";
+
+    /**
+     * Constant for the name of the model context attribute backing property {@code transformerLocation}.
+     * @see #processModel(org.jomc.modlet.ModelContext, org.jomc.modlet.Model)
+     * @see ModelContext#getAttribute(java.lang.String)
+     * @see ModelContext#getAttribute(java.lang.String, java.lang.Object)
+     * @see ModelContext#setAttribute(java.lang.String, java.lang.Object)
+     * @see ModelContext#clearAttribute(java.lang.String)
+     * @since 1.2
+     */
+    public static final String TRANSFORMER_LOCATION_ATTRIBUTE_NAME =
+        "org.jomc.model.modlet.DefaultModelProcessor.transformerLocationAttribute";
+
+    /**
      * Constant for the name of the system property controlling property {@code defaultEnabled}.
      * @see #isDefaultEnabled()
      */
@@ -95,6 +118,13 @@ public class DefaultModelProcessor implements ModelProcessor
      */
     private static final String DEPRECATED_DEFAULT_TRANSFORMER_LOCATION_PROPERTY_NAME =
         "org.jomc.model.DefaultModelProcessor.defaultTransformerLocation";
+
+    /**
+     * Default value of the flag indicating the processor is enabled by default.
+     * @see #isDefaultEnabled()
+     * @since 1.2
+     */
+    private static final Boolean DEFAULT_ENABLED = Boolean.TRUE;
 
     /**
      * Classpath location searched for transformers by default.
@@ -138,7 +168,7 @@ public class DefaultModelProcessor implements ModelProcessor
             defaultEnabled =
                 Boolean.valueOf( System.getProperty( DEFAULT_ENABLED_PROPERTY_NAME,
                                                      System.getProperty( DEPRECATED_DEFAULT_ENABLED_PROPERTY_NAME,
-                                                                         Boolean.toString( true ) ) ) );
+                                                                         Boolean.toString( DEFAULT_ENABLED ) ) ) );
 
         }
 
@@ -373,6 +403,8 @@ public class DefaultModelProcessor implements ModelProcessor
      * @see #isEnabled()
      * @see #getTransformerLocation()
      * @see #findTransformers(org.jomc.modlet.ModelContext, java.lang.String)
+     * @see #ENABLED_ATTRIBUTE_NAME
+     * @see #TRANSFORMER_LOCATION_ATTRIBUTE_NAME
      */
     public Model processModel( final ModelContext context, final Model model ) throws ModelException
     {
@@ -389,11 +421,24 @@ public class DefaultModelProcessor implements ModelProcessor
         {
             Model processed = null;
 
-            if ( this.isEnabled() )
+            boolean contextEnabled = this.isEnabled();
+            if ( DEFAULT_ENABLED == contextEnabled && context.getAttribute( ENABLED_ATTRIBUTE_NAME ) != null )
+            {
+                contextEnabled = (Boolean) context.getAttribute( ENABLED_ATTRIBUTE_NAME );
+            }
+
+            String contextTransformerLocation = this.getTransformerLocation();
+            if ( DEFAULT_TRANSFORMER_LOCATION.equals( contextTransformerLocation )
+                 && context.getAttribute( TRANSFORMER_LOCATION_ATTRIBUTE_NAME ) != null )
+            {
+                contextTransformerLocation = (String) context.getAttribute( TRANSFORMER_LOCATION_ATTRIBUTE_NAME );
+            }
+
+            if ( contextEnabled )
             {
                 final org.jomc.modlet.ObjectFactory objectFactory = new org.jomc.modlet.ObjectFactory();
                 final JAXBContext jaxbContext = context.createContext( model.getIdentifier() );
-                final List<Transformer> transformers = this.findTransformers( context, this.getTransformerLocation() );
+                final List<Transformer> transformers = this.findTransformers( context, contextTransformerLocation );
                 processed = new Model( model );
 
                 if ( transformers != null )
