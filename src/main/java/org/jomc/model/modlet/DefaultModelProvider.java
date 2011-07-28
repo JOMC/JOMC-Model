@@ -112,7 +112,7 @@ public class DefaultModelProvider implements ModelProvider
         "org.jomc.model.DefaultModelProvider.defaultModuleLocation";
 
     /**
-     * Default value of the flag indicating the processor is enabled by default.
+     * Default value of the flag indicating the provider is enabled by default.
      * @see #isDefaultEnabled()
      * @since 1.2
      */
