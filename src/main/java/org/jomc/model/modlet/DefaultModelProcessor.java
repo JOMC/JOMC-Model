@@ -72,9 +72,6 @@ public class DefaultModelProcessor implements ModelProcessor
      * Constant for the name of the model context attribute backing property {@code enabled}.
      * @see #processModel(org.jomc.modlet.ModelContext, org.jomc.modlet.Model)
      * @see ModelContext#getAttribute(java.lang.String)
-     * @see ModelContext#getAttribute(java.lang.String, java.lang.Object)
-     * @see ModelContext#setAttribute(java.lang.String, java.lang.Object)
-     * @see ModelContext#clearAttribute(java.lang.String)
      * @since 1.2
      */
     public static final String ENABLED_ATTRIBUTE_NAME = "org.jomc.model.modlet.DefaultModelProcessor.enabledAttribute";
@@ -83,9 +80,6 @@ public class DefaultModelProcessor implements ModelProcessor
      * Constant for the name of the model context attribute backing property {@code transformerLocation}.
      * @see #processModel(org.jomc.modlet.ModelContext, org.jomc.modlet.Model)
      * @see ModelContext#getAttribute(java.lang.String)
-     * @see ModelContext#getAttribute(java.lang.String, java.lang.Object)
-     * @see ModelContext#setAttribute(java.lang.String, java.lang.Object)
-     * @see ModelContext#clearAttribute(java.lang.String)
      * @since 1.2
      */
     public static final String TRANSFORMER_LOCATION_ATTRIBUTE_NAME =
