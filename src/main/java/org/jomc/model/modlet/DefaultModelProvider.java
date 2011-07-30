@@ -78,6 +78,15 @@ public class DefaultModelProvider implements ModelProvider
         "org.jomc.model.modlet.DefaultModelProvider.moduleLocationAttribute";
 
     /**
+     * Constant for the name of the model context attribute backing property {@code validating}.
+     * @see #findModules(org.jomc.modlet.ModelContext, java.lang.String, java.lang.String)
+     * @see ModelContext#getAttribute(java.lang.String)
+     * @since 1.2
+     */
+    public static final String VALIDATING_ATTRIBUTE_NAME =
+        "org.jomc.model.modlet.DefaultModelProvider.validatingAttribute";
+
+    /**
      * Constant for the name of the system property controlling property {@code defaultEnabled}.
      * @see #isDefaultEnabled()
      */
@@ -113,13 +122,26 @@ public class DefaultModelProvider implements ModelProvider
     private static final Boolean DEFAULT_ENABLED = Boolean.TRUE;
 
     /**
-     * Classpath location searched for modules by default.
+     * Class path location searched for modules by default.
      * @see #getDefaultModuleLocation()
      */
     private static final String DEFAULT_MODULE_LOCATION = "META-INF/jomc.xml";
 
+    /**
+     * Default value of the flag indicating the provider is validating resources by default.
+     * @see #isValidating()
+     * @since 1.2
+     */
+    private static final Boolean DEFAULT_VALIDATING = Boolean.TRUE;
+
     /** Default module location. */
     private static volatile String defaultModuleLocation;
+
+    /**
+     * Flag indicating the provider is validating resources by default.
+     * @since 1.2
+     */
+    private static volatile Boolean defaultValidating;
 
     /** Module location of the instance. */
     private String moduleLocation;
@@ -129,6 +151,12 @@ public class DefaultModelProvider implements ModelProvider
 
     /** Flag indicating the provider is enabled. */
     private Boolean enabled;
+
+    /**
+     * Flag indicating the provider is validating resources.
+     * @since 1.2
+     */
+    private Boolean validating;
 
     /** Creates a new {@code DefaultModelProvider} instance. */
     public DefaultModelProvider()
@@ -269,6 +297,83 @@ public class DefaultModelProvider implements ModelProvider
     }
 
     /**
+     * Gets a flag indicating the provider is validating resources by default.
+     * <p>The default validating flag is controlled by system property
+     * {@code org.jomc.model.modlet.DefaultModelProvider.defaultValidating} holding a value indicating the provider is
+     * validating resources by default. If that property is not set, the {@code true} default is returned.</p>
+     *
+     * @return {@code true} if the provider is validating resources by default; {@code false} if the provider is not
+     * validating resources by default.
+     *
+     * @see #isValidating()
+     * @see #setDefaultValidating(java.lang.Boolean)
+     *
+     * @since 1.2
+     */
+    public static boolean isDefaultValidating()
+    {
+        if ( defaultValidating == null )
+        {
+            defaultValidating = Boolean.valueOf( System.getProperty(
+                "org.jomc.model.modlet.DefaultModelProvider.defaultValidating",
+                Boolean.toString( DEFAULT_VALIDATING ) ) );
+
+        }
+
+        return defaultValidating;
+    }
+
+    /**
+     * Sets the flag indicating the provider is validating resources by default.
+     *
+     * @param value The new value of the flag indicating the provider is validating resources by default or
+     * {@code null}.
+     *
+     * @see #isDefaultValidating()
+     *
+     * @since 1.2
+     */
+    public static void setDefaultValidating( final Boolean value )
+    {
+        defaultValidating = value;
+    }
+
+    /**
+     * Gets a flag indicating the provider is validating resources.
+     *
+     * @return {@code true} if the provider is validating resources; {@code false} if the provider is not validating
+     * resources.
+     *
+     * @see #isDefaultValidating()
+     * @see #setValidating(java.lang.Boolean)
+     *
+     * @since 1.2
+     */
+    public final boolean isValidating()
+    {
+        if ( this.validating == null )
+        {
+            this.validating = isDefaultValidating();
+        }
+
+        return this.validating;
+    }
+
+    /**
+     * Sets the flag indicating the provider is validating resources.
+     *
+     * @param value The new value of the flag indicating the provider is validating resources or {@code null}.
+     *
+     * @see #isValidating()
+     *
+     * @since 1.2
+     */
+    public final void setValidating( final Boolean value )
+    {
+        this.validating = value;
+    }
+
+    /**
      * Searches a given context for modules.
      *
      * @param context The context to search for modules.
@@ -279,6 +384,9 @@ public class DefaultModelProvider implements ModelProvider
      *
      * @throws NullPointerException if {@code context}, {@code model} or {@code location} is {@code null}.
      * @throws ModelException if searching the context fails.
+     *
+     * @see #isValidating()
+     * @see #VALIDATING_ATTRIBUTE_NAME
      */
     public Modules findModules( final ModelContext context, final String model, final String location )
         throws ModelException
@@ -298,6 +406,12 @@ public class DefaultModelProvider implements ModelProvider
 
         try
         {
+            boolean contextValidating = this.isEnabled();
+            if ( DEFAULT_VALIDATING == contextValidating && context.getAttribute( VALIDATING_ATTRIBUTE_NAME ) != null )
+            {
+                contextValidating = (Boolean) context.getAttribute( VALIDATING_ATTRIBUTE_NAME );
+            }
+
             final long t0 = System.currentTimeMillis();
             final Text text = new Text();
             text.setLanguage( "en" );
@@ -310,6 +424,11 @@ public class DefaultModelProvider implements ModelProvider
 
             final Unmarshaller u = context.createUnmarshaller( model );
             final Enumeration<URL> resources = context.findResources( location );
+
+            if ( contextValidating )
+            {
+                u.setSchema( context.createSchema( model ) );
+            }
 
             int count = 0;
             while ( resources.hasMoreElements() )
