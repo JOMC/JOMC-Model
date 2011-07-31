@@ -40,6 +40,7 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.UnmarshalException;
 import javax.xml.bind.Unmarshaller;
 import org.jomc.model.Module;
 import org.jomc.model.Modules;
@@ -404,6 +405,8 @@ public class DefaultModelProvider implements ModelProvider
             throw new NullPointerException( "location" );
         }
 
+        URL url = null;
+
         try
         {
             boolean contextValidating = this.isEnabled();
@@ -434,7 +437,7 @@ public class DefaultModelProvider implements ModelProvider
             while ( resources.hasMoreElements() )
             {
                 count++;
-                final URL url = resources.nextElement();
+                url = resources.nextElement();
 
                 if ( context.isLoggable( Level.FINEST ) )
                 {
@@ -476,6 +479,23 @@ public class DefaultModelProvider implements ModelProvider
             }
 
             return modules.getModule().isEmpty() ? null : modules;
+        }
+        catch ( final UnmarshalException e )
+        {
+            String message = getMessage( e );
+            if ( message == null && e.getLinkedException() != null )
+            {
+                message = getMessage( e.getLinkedException() );
+            }
+
+            if ( url != null )
+            {
+                message = getMessage( "unmarshalException", url.toExternalForm(),
+                                      message != null ? " " + message : "" );
+
+            }
+
+            throw new ModelException( message, e );
         }
         catch ( final JAXBException e )
         {
