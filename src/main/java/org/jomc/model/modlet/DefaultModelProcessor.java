@@ -413,7 +413,7 @@ public class DefaultModelProcessor implements ModelProcessor
 
         try
         {
-            Model processed = null;
+            Model processed = model;
 
             boolean contextEnabled = this.isEnabled();
             if ( DEFAULT_ENABLED == contextEnabled && context.getAttribute( ENABLED_ATTRIBUTE_NAME ) != null )
