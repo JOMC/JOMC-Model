@@ -512,6 +512,9 @@ public class DefaultModelProvider implements ModelProvider
     /**
      * {@inheritDoc}
      *
+     * @return The {@code Model} found in the context or {@code null} if no {@code Model} is found or the provider is
+     * disabled.
+     *
      * @see #isEnabled()
      * @see #getModuleLocation()
      * @see #findModules(org.jomc.modlet.ModelContext, java.lang.String, java.lang.String)
