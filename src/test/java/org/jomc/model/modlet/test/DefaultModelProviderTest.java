@@ -288,4 +288,33 @@ public class DefaultModelProviderTest
         this.getModelProvider().setModuleLocation( null );
     }
 
+    @Test
+    public final void testDefaultValidating() throws Exception
+    {
+        System.clearProperty( "org.jomc.model.modlet.DefaultModelProvider.defaultValidating" );
+        DefaultModelProvider.setDefaultValidating( null );
+        assertTrue( DefaultModelProvider.isDefaultValidating() );
+        DefaultModelProvider.setDefaultValidating( null );
+        System.setProperty( "org.jomc.model.modlet.DefaultModelProvider.defaultValidating", "false" );
+        assertFalse( DefaultModelProvider.isDefaultValidating() );
+        System.clearProperty( "org.jomc.model.modlet.DefaultModelProvider.defaultValidating" );
+        DefaultModelProvider.setDefaultValidating( null );
+        assertTrue( DefaultModelProvider.isDefaultValidating() );
+    }
+
+    @Test
+    public final void testValidating() throws Exception
+    {
+        DefaultModelProvider.setDefaultValidating( null );
+        this.getModelProvider().setValidating( null );
+        assertTrue( this.getModelProvider().isValidating() );
+
+        DefaultModelProvider.setDefaultValidating( false );
+        this.getModelProvider().setValidating( null );
+        assertFalse( this.getModelProvider().isValidating() );
+
+        DefaultModelProvider.setDefaultValidating( null );
+        this.getModelProvider().setValidating( null );
+    }
+
 }
