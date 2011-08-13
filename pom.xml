@@ -245,24 +245,6 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  <reporting>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>emma-maven-plugin</artifactId>
-        <version>${emma-maven-plugin.version}</version>
-        <configuration>
-          <dataFiles>
-            <dataFile>${project.build.directory}/coverage.ec</dataFile>
-          </dataFiles>
-          <sourcePaths>
-            <sourcePath>${project.build.sourceDirectory}</sourcePath>
-            <sourcePath>${xjcOutputDirectory}</sourcePath>
-          </sourcePaths>
-        </configuration>
-      </plugin>
-    </plugins>
-  </reporting>
   <distributionManagement>
     <site>
       <id>jomc.sourceforge.net</id>
