@@ -280,17 +280,18 @@ A module defines implementations, messages, properties and specifications.
       <xsd:documentation xml:lang="en">
 Model of a specification.
 
-The 'Specification' type defines attributes 'identifier', 'class', 'vendor', 'version', 'multiplicity' and 'scope'.
-Attribute 'identifier' holds an identifier uniquely identifying the specification in a set of specifications. Attribute
-'class' holds the identifier of the class providing the programming interface of the specification. Attribute 'vendor'
-holds information regarding the vendor of the specification. Attribute 'version' holds the version of the specification.
-Attribute 'multiplicity' specifies the number of implementations allowed to exist among a set of modules.
-A specification with a multiplicity equal to 'One' specifies that no more than one implementation of the specification
-is allowed to exist among a set of modules (including none). A specification with a multiplicity equal to 'Many'
-specifies that multiple implementations of the specification are allowed to exist among a set of modules (including
-none). Attribute 'scope' specifies the scope instances of implementations apply to. In 'Singleton' scope, objects are
-bound to a system's single instance store - an object is only created if not already available in that single instance
-store.
+The 'Specification' type defines attributes 'identifier', 'class', 'classDeclaration', 'vendor', 'version',
+'multiplicity' and 'scope'. Attribute 'identifier' holds an identifier uniquely identifying the specification in a set
+of specifications. Attribute 'class' holds the identifier of the class providing the programming interface of the
+specification. Attribute 'classDeclaration' flags the specification declaring the class providing the programming
+interface. Attribute 'vendor' holds information regarding the vendor of the specification. Attribute 'version' holds the
+version of the specification. Attribute 'multiplicity' specifies the number of implementations allowed to exist among a
+set of modules. A specification with a multiplicity equal to 'One' specifies that no more than one implementation of the
+specification is allowed to exist among a set of modules (including none). A specification with a multiplicity equal to
+'Many' specifies that multiple implementations of the specification are allowed to exist among a set of modules
+(including none). Attribute 'scope' specifies the scope instances of implementations apply to. In 'Singleton' scope,
+objects are bound to a system's single instance store - an object is only created if not already available in that
+single instance store.
       </xsd:documentation>
     </xsd:annotation>
     <xsd:complexContent>
@@ -360,10 +361,11 @@ store.
       <xsd:documentation xml:lang="en">
 Model of an implementation.
 
-The 'Implementation' type defines attributes 'identifier', 'name', 'class', 'location', 'vendor', 'version', 'final',
-'stateless' and 'abstract'. Attribute 'identifier' holds an identifier uniquely identifying the implementation in a set
-of implementations. Attribute 'name' holds a name uniquely identifying the implementation for its implemented
-specifications. Attribute 'class' holds an identifier of the class providing implementation instances. Attribute
+The 'Implementation' type defines attributes 'identifier', 'name', 'class', 'classDeclaration', 'location', 'vendor',
+'version', 'final', 'stateless' and 'abstract'. Attribute 'identifier' holds an identifier uniquely identifying the
+implementation in a set of implementations. Attribute 'name' holds a name uniquely identifying the implementation for
+its implemented specifications. Attribute 'class' holds an identifier of the class providing implementation instances.
+Attribute 'classDeclaration' flags the implementation declaring the class providing implementation instances. Attribute
 'location' holds an URI of the location of instances of the implementation. Attribute 'vendor' holds vendor information
 for the vendor providing the implementation. Attribute 'version' holds a version of the implementation. Dependencies,
 messages, properties and specifications may be inherited from multiple parent implementations. The 'final' attribute
