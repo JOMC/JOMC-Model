@@ -49,8 +49,9 @@
   --------------------------
 
     For building release artifacts, various properties need to be set. This is
-    most commonly done by adding a profile to the local Maven settings.xml file.
-    The following link redirects to the official Maven settings reference.
+    done by using the '-D' command line option. To minimize the number of '-D'
+    options, a profile can be added to the local Maven settings.xml file. The
+    following link redirects to the official Maven settings reference.
     http://jomc.sourceforge.net/redirect/msettings
 
     <profile>
@@ -69,7 +70,8 @@
         <!--                                                                 -->
         <!-- The 'jomc.scm.password' property must be set to the password    -->
         <!-- used for authentication with the project source code management -->
-        <!-- system.                                                         -->
+        <!-- system. To avoid storing cleartext passwords, this property     -->
+        <!-- should be set using the '-D' command line option.               -->
         <!--                                                                 -->
         <jomc.scm.password>Sourceforge Password</jomc.scm.password>
         <!--                                                                 -->
@@ -88,7 +90,9 @@
         <!-- <jarsigner.keystore>Location</jarsigner.keystore>               -->
         <!--                                                                 -->
         <!-- The 'jarsigner.storepass' property may be set to the password   -->
-        <!-- of the keystore used for signing Java archives.                 -->
+        <!-- of the keystore used for signing Java archives. To avoid        -->
+        <!-- storing cleartext passwords, this property should be set using  -->
+        <!-- the '-D' command line option.                                   -->
         <!--                                                                 -->
         <!-- <jarsigner.storepass>Password</jarsigner.storepass>             -->
         <!--                                                                 -->
@@ -98,7 +102,9 @@
         <jarsigner.alias>Alias</jarsigner.alias>
         <!--                                                                 -->
         <!-- The 'jarsigner.keypass' property may be set to the password of  -->
-        <!-- the certificate used for signing Java archives.                 -->
+        <!-- the certificate used for signing Java archives. To avoid        -->
+        <!-- storing cleartext passwords, this property should be set using  -->
+        <!-- the '-D' command line option.                                   -->
         <!--                                                                 -->
         <!-- <jarsigner.keypass>Password</jarsigner.keypass>                 -->
         <!--                                                                 -->
@@ -125,7 +131,9 @@
         <!-- <gpg.keyname>Key</gpg.keyname>                                  -->
         <!--                                                                 -->
         <!-- The 'gpg.passphrase' property may be set to the passphrase of   -->
-        <!-- the GPG key used for signing artifacts.                         -->
+        <!-- the GPG key used for signing artifacts. To avoid storing        -->
+        <!-- cleartext passwords, this property should be set using the '-D' -->
+        <!-- command line option.                                            -->
         <!--                                                                 -->
         <!-- <gpg.passphrase>Passphrase</gpg.passphrase>                     -->
         <!--                                                                 -->
