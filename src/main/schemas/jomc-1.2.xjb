@@ -4660,12 +4660,21 @@
         }
     }
 
-    private void resolveClasspath( final Specifications references, final Module cpModule,
+    private void resolveClasspath( final Specifications specifications, final Module cpModule,
                                    final ClassLoader classLoader )
     {
-        for ( int i = 0, s0 = references.getReference().size(); i < s0; i++ )
+        for ( int i = 0, s0 = specifications.getSpecification().size(); i < s0; i++ )
         {
-            final SpecificationReference ref = references.getReference().get( i );
+            final Specification s = specifications.getSpecification().get( i );
+
+            if ( s.getClazz() != null )
+            {
+                this.resolveClasspath( s, cpModule, classLoader );
+            }
+        }
+        for ( int i = 0, s0 = specifications.getReference().size(); i < s0; i++ )
+        {
+            final SpecificationReference ref = specifications.getReference().get( i );
             this.resolveClasspath( ref, cpModule, classLoader );
         }
     }
@@ -4696,6 +4705,11 @@
         {
             final Dependency dependency = dependencies.getDependency().get( i );
             this.resolveClasspath( dependency, cpModule, classLoader );
+
+            if ( dependency.getDependencies() != null )
+            {
+                this.resolveClasspath( dependency.getDependencies(), cpModule, classLoader );
+            }
         }
     }
 
@@ -4758,6 +4772,11 @@
 
         if ( implementation == null )
         {
+            implementation = this.getImplementation( specification.getIdentifier() );
+        }
+
+        if ( implementation == null )
+        {
             String name = null;
 
             try
@@ -4805,7 +4824,8 @@
 
                     }
 
-                    if ( classpathImplementation )
+                    if ( classpathImplementation
+                         && this.getImplementation( specification.getIdentifier(), name ) == null )
                     {
                         String vendor = null;
                         String version = null;

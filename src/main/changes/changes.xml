@@ -66,6 +66,13 @@
       <code>org.jomc.model.modlet.DefaultModelProcessor</code> to create <code>Transformers</code> supporting resolution
       of relative URIs based on the system id of found transformations.]]>
       </action>
+      <action dev="schulte2005" type="fix"><![CDATA[Corrected method <code>getClasspathModule</code> of class
+      <code>org.jomc.model.Modules</code> to search for class path implementations of any specification, not just
+      resolved specifications.]]>
+      </action>
+      <action dev="schulte2005" type="fix"><![CDATA[Corrected method <code>getClasspathModule</code> of class
+      <code>org.jomc.model.Modules</code> to also resolve specifications specified by overridden dependencies.]]>
+      </action>
       <action dev="schulte2005" type="remove"><![CDATA[Removed the <code>jomc-1.0.xsd</code> schema deprecated by the
       <code>jomc-1.2.xsd</code> schema.]]>
       </action>
