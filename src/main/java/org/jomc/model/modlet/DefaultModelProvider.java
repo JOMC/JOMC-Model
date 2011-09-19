@@ -409,7 +409,7 @@ public class DefaultModelProvider implements ModelProvider
 
         try
         {
-            boolean contextValidating = this.isEnabled();
+            boolean contextValidating = this.isValidating();
             if ( DEFAULT_VALIDATING == contextValidating && context.getAttribute( VALIDATING_ATTRIBUTE_NAME ) != null )
             {
                 contextValidating = (Boolean) context.getAttribute( VALIDATING_ATTRIBUTE_NAME );
