@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-  Copyright (C) 2009 The JOMC Project
   Copyright (C) 2005 Christian Schulte <schulte2005@users.sourceforge.net>
   All rights reserved.
 
