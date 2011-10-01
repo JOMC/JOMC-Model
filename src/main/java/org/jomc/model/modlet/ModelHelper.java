@@ -27,7 +27,7 @@
  *   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  *   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- *   $Id$
+ *   $JOMC$
  *
  */
 package org.jomc.model.modlet;
@@ -45,7 +45,7 @@ import org.jomc.modlet.Model;
  * Object management and configuration {@code Model} helper.
  *
  * @author <a href="mailto:schulte2005@users.sourceforge.net">Christian Schulte</a>
- * @version $Id$
+ * @version $JOMC$
  */
 public abstract class ModelHelper
 {

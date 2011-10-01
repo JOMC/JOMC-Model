@@ -27,7 +27,7 @@
  *   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  *   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- *   $Id$
+ *   $JOMC$
  *
  */
 package org.jomc.model;
@@ -36,7 +36,7 @@ package org.jomc.model;
  * Gets thrown whenever getting a {@code Property}'s value fails unexpectedly.
  *
  * @author <a href="mailto:schulte2005@users.sourceforge.net">Christian Schulte</a>
- * @version $Id$
+ * @version $JOMC$
  *
  * @see Property#getJavaValue(java.lang.ClassLoader)
  */

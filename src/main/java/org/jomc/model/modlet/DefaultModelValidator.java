@@ -27,7 +27,7 @@
  *   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  *   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- *   $Id$
+ *   $JOMC$
  *
  */
 package org.jomc.model.modlet;
@@ -78,7 +78,7 @@ import org.jomc.util.VersionParser;
  * Default object management and configuration {@code ModelValidator} implementation.
  *
  * @author <a href="mailto:schulte2005@users.sourceforge.net">Christian Schulte</a>
- * @version $Id$
+ * @version $JOMC$
  * @see ModelContext#validateModel(org.jomc.modlet.Model)
  */
 public class DefaultModelValidator implements ModelValidator

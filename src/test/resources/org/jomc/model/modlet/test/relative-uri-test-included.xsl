@@ -29,7 +29,7 @@
   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-  $Id$
+  $JOMC$
 
 -->
 <xsl:stylesheet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
