@@ -75,27 +75,11 @@ public class DefaultModelProcessor implements ModelProcessor
     public static final String ENABLED_ATTRIBUTE_NAME = "org.jomc.model.modlet.DefaultModelProcessor.enabledAttribute";
 
     /**
-     * Constant for the name of the model context attribute backing property {@code transformerLocation}.
-     * @see #processModel(org.jomc.modlet.ModelContext, org.jomc.modlet.Model)
-     * @see ModelContext#getAttribute(java.lang.String)
-     * @since 1.2
-     */
-    public static final String TRANSFORMER_LOCATION_ATTRIBUTE_NAME =
-        "org.jomc.model.modlet.DefaultModelProcessor.transformerLocationAttribute";
-
-    /**
      * Constant for the name of the system property controlling property {@code defaultEnabled}.
      * @see #isDefaultEnabled()
      */
     private static final String DEFAULT_ENABLED_PROPERTY_NAME =
         "org.jomc.model.modlet.DefaultModelProcessor.defaultEnabled";
-
-    /**
-     * Constant for the name of the system property controlling property {@code defaultTransformerLocation}.
-     * @see #getDefaultTransformerLocation()
-     */
-    private static final String DEFAULT_TRANSFORMER_LOCATION_PROPERTY_NAME =
-        "org.jomc.model.modlet.DefaultModelProcessor.defaultTransformerLocation";
 
     /**
      * Constant for the name of the deprecated system property controlling property {@code defaultEnabled}.
@@ -105,18 +89,40 @@ public class DefaultModelProcessor implements ModelProcessor
         "org.jomc.model.DefaultModelProcessor.defaultEnabled";
 
     /**
-     * Constant for the name of the deprecated system property controlling property {@code defaultTransformerLocation}.
-     * @see #getDefaultTransformerLocation()
-     */
-    private static final String DEPRECATED_DEFAULT_TRANSFORMER_LOCATION_PROPERTY_NAME =
-        "org.jomc.model.DefaultModelProcessor.defaultTransformerLocation";
-
-    /**
      * Default value of the flag indicating the processor is enabled by default.
      * @see #isDefaultEnabled()
      * @since 1.2
      */
     private static final Boolean DEFAULT_ENABLED = Boolean.TRUE;
+
+    /** Flag indicating the processor is enabled by default. */
+    private static volatile Boolean defaultEnabled;
+
+    /** Flag indicating the processor is enabled. */
+    private Boolean enabled;
+
+    /**
+     * Constant for the name of the model context attribute backing property {@code transformerLocation}.
+     * @see #processModel(org.jomc.modlet.ModelContext, org.jomc.modlet.Model)
+     * @see ModelContext#getAttribute(java.lang.String)
+     * @since 1.2
+     */
+    public static final String TRANSFORMER_LOCATION_ATTRIBUTE_NAME =
+        "org.jomc.model.modlet.DefaultModelProcessor.transformerLocationAttribute";
+
+    /**
+     * Constant for the name of the system property controlling property {@code defaultTransformerLocation}.
+     * @see #getDefaultTransformerLocation()
+     */
+    private static final String DEFAULT_TRANSFORMER_LOCATION_PROPERTY_NAME =
+        "org.jomc.model.modlet.DefaultModelProcessor.defaultTransformerLocation";
+
+    /**
+     * Constant for the name of the deprecated system property controlling property {@code defaultTransformerLocation}.
+     * @see #getDefaultTransformerLocation()
+     */
+    private static final String DEPRECATED_DEFAULT_TRANSFORMER_LOCATION_PROPERTY_NAME =
+        "org.jomc.model.DefaultModelProcessor.defaultTransformerLocation";
 
     /**
      * Class path location searched for transformers by default.
@@ -129,12 +135,6 @@ public class DefaultModelProcessor implements ModelProcessor
 
     /** Transformer location of the instance. */
     private String transformerLocation;
-
-    /** Flag indicating the processor is enabled by default. */
-    private static volatile Boolean defaultEnabled;
-
-    /** Flag indicating the processor is enabled. */
-    private Boolean enabled;
 
     /** Creates a new {@code DefaultModelProcessor} instance. */
     public DefaultModelProcessor()

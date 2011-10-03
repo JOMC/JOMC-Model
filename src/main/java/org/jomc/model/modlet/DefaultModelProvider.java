@@ -68,6 +68,33 @@ public class DefaultModelProvider implements ModelProvider
     public static final String ENABLED_ATTRIBUTE_NAME = "org.jomc.model.modlet.DefaultModelProvider.enabledAttribute";
 
     /**
+     * Constant for the name of the system property controlling property {@code defaultEnabled}.
+     * @see #isDefaultEnabled()
+     */
+    private static final String DEFAULT_ENABLED_PROPERTY_NAME =
+        "org.jomc.model.modlet.DefaultModelProvider.defaultEnabled";
+
+    /**
+     * Constant for the name of the deprecated system property controlling property {@code defaultEnabled}.
+     * @see #isDefaultEnabled()
+     */
+    private static final String DEPRECATED_DEFAULT_ENABLED_PROPERTY_NAME =
+        "org.jomc.model.DefaultModelProvider.defaultEnabled";
+
+    /**
+     * Default value of the flag indicating the provider is enabled by default.
+     * @see #isDefaultEnabled()
+     * @since 1.2
+     */
+    private static final Boolean DEFAULT_ENABLED = Boolean.TRUE;
+
+    /** Flag indicating the provider is enabled by default. */
+    private static volatile Boolean defaultEnabled;
+
+    /** Flag indicating the provider is enabled. */
+    private Boolean enabled;
+
+    /**
      * Constant for the name of the model context attribute backing property {@code moduleLocation}.
      * @see #findModel(org.jomc.modlet.ModelContext, org.jomc.modlet.Model)
      * @see ModelContext#getAttribute(java.lang.String)
@@ -75,6 +102,32 @@ public class DefaultModelProvider implements ModelProvider
      */
     public static final String MODULE_LOCATION_ATTRIBUTE_NAME =
         "org.jomc.model.modlet.DefaultModelProvider.moduleLocationAttribute";
+
+    /**
+     * Constant for the name of the system property controlling property {@code defaultModuleLocation}.
+     * @see #getDefaultModuleLocation()
+     */
+    private static final String DEFAULT_MODULE_LOCATION_PROPERTY_NAME =
+        "org.jomc.model.modlet.DefaultModelProvider.defaultModuleLocation";
+
+    /**
+     * Constant for the name of the deprecated system property controlling property {@code defaultModuleLocation}.
+     * @see #getDefaultModuleLocation()
+     */
+    private static final String DEPRECATED_DEFAULT_MODULE_LOCATION_PROPERTY_NAME =
+        "org.jomc.model.DefaultModelProvider.defaultModuleLocation";
+
+    /**
+     * Class path location searched for modules by default.
+     * @see #getDefaultModuleLocation()
+     */
+    private static final String DEFAULT_MODULE_LOCATION = "META-INF/jomc.xml";
+
+    /** Default module location. */
+    private static volatile String defaultModuleLocation;
+
+    /** Module location of the instance. */
+    private String moduleLocation;
 
     /**
      * Constant for the name of the model context attribute backing property {@code validating}.
@@ -86,45 +139,12 @@ public class DefaultModelProvider implements ModelProvider
         "org.jomc.model.modlet.DefaultModelProvider.validatingAttribute";
 
     /**
-     * Constant for the name of the system property controlling property {@code defaultEnabled}.
-     * @see #isDefaultEnabled()
-     */
-    private static final String DEFAULT_ENABLED_PROPERTY_NAME =
-        "org.jomc.model.modlet.DefaultModelProvider.defaultEnabled";
-
-    /**
-     * Constant for the name of the system property controlling property {@code defaultModuleLocation}.
-     * @see #getDefaultModuleLocation()
-     */
-    private static final String DEFAULT_MODULE_LOCATION_PROPERTY_NAME =
-        "org.jomc.model.modlet.DefaultModelProvider.defaultModuleLocation";
-
-    /**
-     * Constant for the name of the deprecated system property controlling property {@code defaultEnabled}.
-     * @see #isDefaultEnabled()
-     */
-    private static final String DEPRECATED_DEFAULT_ENABLED_PROPERTY_NAME =
-        "org.jomc.model.DefaultModelProvider.defaultEnabled";
-
-    /**
-     * Constant for the name of the deprecated system property controlling property {@code defaultModuleLocation}.
-     * @see #getDefaultModuleLocation()
-     */
-    private static final String DEPRECATED_DEFAULT_MODULE_LOCATION_PROPERTY_NAME =
-        "org.jomc.model.DefaultModelProvider.defaultModuleLocation";
-
-    /**
-     * Default value of the flag indicating the provider is enabled by default.
-     * @see #isDefaultEnabled()
+     * Constant for the name of the system property controlling property {@code defaultValidating}.
+     * @see #isDefaultValidating()
      * @since 1.2
      */
-    private static final Boolean DEFAULT_ENABLED = Boolean.TRUE;
-
-    /**
-     * Class path location searched for modules by default.
-     * @see #getDefaultModuleLocation()
-     */
-    private static final String DEFAULT_MODULE_LOCATION = "META-INF/jomc.xml";
+    private static final String DEFAULT_VALIDATING_PROPERTY_NAME =
+        "org.jomc.model.modlet.DefaultModelProvider.defaultValidating";
 
     /**
      * Default value of the flag indicating the provider is validating resources by default.
@@ -133,23 +153,11 @@ public class DefaultModelProvider implements ModelProvider
      */
     private static final Boolean DEFAULT_VALIDATING = Boolean.TRUE;
 
-    /** Default module location. */
-    private static volatile String defaultModuleLocation;
-
     /**
      * Flag indicating the provider is validating resources by default.
      * @since 1.2
      */
     private static volatile Boolean defaultValidating;
-
-    /** Module location of the instance. */
-    private String moduleLocation;
-
-    /** Flag indicating the provider is enabled by default. */
-    private static volatile Boolean defaultEnabled;
-
-    /** Flag indicating the provider is enabled. */
-    private Boolean enabled;
 
     /**
      * Flag indicating the provider is validating resources.
@@ -315,8 +323,7 @@ public class DefaultModelProvider implements ModelProvider
         if ( defaultValidating == null )
         {
             defaultValidating = Boolean.valueOf( System.getProperty(
-                "org.jomc.model.modlet.DefaultModelProvider.defaultValidating",
-                Boolean.toString( DEFAULT_VALIDATING ) ) );
+                DEFAULT_VALIDATING_PROPERTY_NAME, Boolean.toString( DEFAULT_VALIDATING ) ) );
 
         }
 
