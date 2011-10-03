@@ -53,14 +53,17 @@
     <jaxb:bindings node="xs:complexType[@name='Texts']">
       <ci:code><![CDATA[
     /**
-     * Gets a text for a given language.
+     * Gets a text for a given language from the list of texts.
      *
      * @param language The language of the text to return.
      *
-     * @return The text with language {@code language} or the default text, if no text matching {@code language} is
-     * found.
+     * @return The first matching text or the default text, if no such text is found.
      *
      * @throws NullPointerException if {@code language} is {@code null}.
+     *
+     * @see #getText()
+     * @see #getDefaultLanguage()
+     * @see Text#getLanguage()
      */
     public Text getText( final String language )
     {
@@ -117,7 +120,7 @@
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='ModelObject']/xs:attribute[@name='deprecated']">
       <jaxb:property>
-        <jaxb:javadoc>{@code true} if this object is deprecated.</jaxb:javadoc>
+        <jaxb:javadoc>{@code true}, if this object is deprecated.</jaxb:javadoc>
       </jaxb:property>
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='ModelObject']">
@@ -395,7 +398,7 @@
      * @param clazz The class to return an instance of.
      * @param <T> The type of the object to return.
      *
-     * @return The instance of {@code clazz} from the {@code any} list or {@code null} if no such instance is found.
+     * @return The instance of {@code clazz} from the {@code any} list or {@code null}, if no such instance is found.
      *
      * @throws NullPointerException if {@code any} or {@code clazz} is {@code null}.
      * @throws IllegalStateException if {@code any} contains more than one matching object.
@@ -540,7 +543,7 @@
      * @param localPart The local part of the {@code JAXBElement} to return.
      *
      * @return The {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any} property
-     * of the instance or {@code null} if no such element is found.
+     * of the instance or {@code null}, if no such element is found.
      *
      * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
      * @throws IllegalStateException if the {@code any} property contains more than one matching element.
@@ -590,7 +593,7 @@
      * @param <T> The type the element is bound to.
      *
      * @return The {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any} property
-     * of the instance or {@code null} if no such element is found.
+     * of the instance or {@code null}, if no such element is found.
      *
      * @throws NullPointerException if {@code namespaceURI}, {@code localPart} or {@code type} is {@code null}.
      * @throws IllegalStateException if the {@code any} property contains more than one matching element.
@@ -636,7 +639,7 @@
      * @param clazz The class to return an instance of.
      * @param <T> The type of the object to return.
      *
-     * @return The instance of {@code clazz} from the {@code any} property of the instance or {@code null} if no such
+     * @return The instance of {@code clazz} from the {@code any} property of the instance or {@code null}, if no such
      * instance is found.
      *
      * @throws NullPointerException if {@code clazz} is {@code null}.
@@ -676,12 +679,12 @@
      *
      * @param specification The identifier of the specification to return.
      *
-     * @return The specification identified by {@code specification} from the list or {@code null}, if no specification
-     * matching {@code specification} is found.
+     * @return The first matching specification or {@code null}, if no such specification is found.
      *
      * @throws NullPointerException if {@code specification} is {@code null}.
      *
      * @see #getSpecification()
+     * @see Specification#getIdentifier()
      */
     public Specification getSpecification( final String specification )
     {
@@ -708,12 +711,13 @@
      *
      * @param specification The class of the specification to return.
      *
-     * @return The specification identified by {@code specification} from the list or {@code null}, if no specification
-     * matching {@code specification} is found.
+     * @return The first matching specification or {@code null}, if no such specification is found.
      *
      * @throws NullPointerException if {@code specification} is {@code null}.
      *
      * @see #getSpecification()
+     * @see Specification#isClassDeclaration()
+     * @see Specification#getClazz()
      */
     public Specification getSpecification( final Class<?> specification )
     {
@@ -740,12 +744,12 @@
      *
      * @param specification The identifier of the reference to return.
      *
-     * @return The specification reference identified by {@code specification} from the list or {@code null}, if no
-     * specification reference matching {@code specification} is found.
+     * @return The first matching specification reference or {@code null}, if no such specification reference is found.
      *
      * @throws NullPointerException if {@code specification} is {@code null}.
      *
      * @see #getReference()
+     * @see SpecificationReference#getIdentifier()
      */
     public SpecificationReference getReference( final String specification )
     {
@@ -801,12 +805,12 @@
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Specification']/xs:complexContent/xs:extension/xs:attribute[@name='scope']">
       <jaxb:property>
-        <jaxb:javadoc>Scope instances of implementations of this specification apply to or {@code null} if instances of implementations of this specification are not bound to any scope (multiton).</jaxb:javadoc>
+        <jaxb:javadoc>Scope instances of implementations of this specification apply to or {@code null}, if instances of implementations of this specification are not bound to any scope (multiton).</jaxb:javadoc>
       </jaxb:property>
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Specification']/xs:complexContent/xs:extension/xs:attribute[@name='classDeclaration']">
       <jaxb:property>
-        <jaxb:javadoc>{@code true} if this specification declares the class given by property {@code clazz}.</jaxb:javadoc>
+        <jaxb:javadoc>{@code true}, if this specification declares the class given by property {@code clazz}.</jaxb:javadoc>
       </jaxb:property>
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Specification']">
@@ -915,7 +919,7 @@
      * @param clazz The class to return an instance of.
      * @param <T> The type of the object to return.
      *
-     * @return The instance of {@code clazz} from the {@code any} property of the instance or {@code null} if no such
+     * @return The instance of {@code clazz} from the {@code any} property of the instance or {@code null}, if no such
      * instance is found.
      *
      * @throws NullPointerException if {@code clazz} is {@code null}.
@@ -960,28 +964,28 @@
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='SpecificationReference']/xs:complexContent/xs:extension/xs:attribute[@name='final']">
       <jaxb:property>
-        <jaxb:javadoc>{@code true} if this specification reference is the final node in an inheritance hierarchy.</jaxb:javadoc>
+        <jaxb:javadoc>{@code true}, if this specification reference is the final node in an inheritance hierarchy.</jaxb:javadoc>
       </jaxb:property>
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='SpecificationReference']/xs:complexContent/xs:extension/xs:attribute[@name='override']">
       <jaxb:property>
-        <jaxb:javadoc>{@code true} if this specification reference is intended to override a super specification reference.</jaxb:javadoc>
+        <jaxb:javadoc>{@code true}, if this specification reference is intended to override a super specification reference.</jaxb:javadoc>
       </jaxb:property>
     </jaxb:bindings>
     <!-- *********************************************************************************************************** -->
     <jaxb:bindings node="xs:complexType[@name='Implementations']">
       <ci:code><![CDATA[
     /**
-     * Gets an implementation for a given identifier from the list.
+     * Gets an implementation for a given identifier from the list of implementations.
      *
      * @param implementation The identifier of the implementation to return.
      *
-     * @return The implementation identified by {@code implementation} from the list or {@code null}, if no
-     * implementation matching {@code implementation} is found.
+     * @return The first matching implementation or {@code null}, if no such implementation is found.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
      *
      * @see #getImplementation()
+     * @see Implementation#getIdentifier()
      */
     public Implementation getImplementation( final String implementation )
     {
@@ -1004,16 +1008,17 @@
     }
 
     /**
-     * Gets an implementation for a given class from the list.
+     * Gets an implementation for a given class from the list of implementations.
      *
      * @param implementation The class of the implementation to return.
      *
-     * @return The implementation identified by {@code implementation} from the list or {@code null}, if no
-     * implementation matching {@code implementation} is found.
+     * @return The first matching implementation or {@code null}, if no such implementation is found.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
      *
      * @see #getImplementation()
+     * @see Implementation#isClassDeclaration()
+     * @see Implementation#getClazz()
      */
     public Implementation getImplementation( final Class<?> implementation )
     {
@@ -1036,16 +1041,16 @@
     }
 
     /**
-     * Gets an implementation for a given name from the list.
+     * Gets an implementation for a given name from the list of implementations.
      *
      * @param name The name of the implementation to return.
      *
-     * @return The implementation named {@code name} from the list or {@code null}, if no implementation matching
-     * {@code name} is found.
+     * @return The first matching implementation or {@code null}, if no such implementation is found.
      *
      * @throws NullPointerException if {@code name} is {@code null}.
      *
      * @see #getImplementation()
+     * @see Implementation#getName()
      */
     public Implementation getImplementationByName( final String name )
     {
@@ -1072,12 +1077,12 @@
      *
      * @param implementation The identifier of the reference to return.
      *
-     * @return The implementation reference identified by {@code implementation} from the list or {@code null}, if no
-     * implementation reference matching {@code implementation} is found.
+     * @return The first matching implementation reference or {@code null}, if no such reference is found.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
      *
      * @see #getReference()
+     * @see ImplementationReference#getIdentifier()
      */
     public ImplementationReference getReference( final String implementation )
     {
@@ -1158,22 +1163,22 @@
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Implementation']/xs:complexContent/xs:extension/xs:attribute[@name='final']">
       <jaxb:property>
-        <jaxb:javadoc>{@code true} if this implementation is the final node in an inheritance hierarchy.</jaxb:javadoc>
+        <jaxb:javadoc>{@code true}, if this implementation is the final node in an inheritance hierarchy.</jaxb:javadoc>
       </jaxb:property>
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Implementation']/xs:complexContent/xs:extension/xs:attribute[@name='stateless']">
       <jaxb:property>
-        <jaxb:javadoc>{@code true} if instances of this implementation do not retain state across operations.</jaxb:javadoc>
+        <jaxb:javadoc>{@code true}, if instances of this implementation do not retain state across operations.</jaxb:javadoc>
       </jaxb:property>
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Implementation']/xs:complexContent/xs:extension/xs:attribute[@name='abstract']">
       <jaxb:property>
-        <jaxb:javadoc>{@code true} if this implementation is abstract.</jaxb:javadoc>
+        <jaxb:javadoc>{@code true}, if this implementation is abstract.</jaxb:javadoc>
       </jaxb:property>
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Implementation']/xs:complexContent/xs:extension/xs:attribute[@name='classDeclaration']">
       <jaxb:property>
-        <jaxb:javadoc>{@code true} if this implementation declares the class given by property {@code clazz}.</jaxb:javadoc>
+        <jaxb:javadoc>{@code true}, if this implementation declares the class given by property {@code clazz}.</jaxb:javadoc>
       </jaxb:property>
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Implementation']">
@@ -1213,7 +1218,7 @@
      * @param localPart The local part of the {@code JAXBElement} to return.
      *
      * @return The {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any} property
-     * of the instance or {@code null} if no such element is found.
+     * of the instance or {@code null}, if no such element is found.
      *
      * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
      * @throws IllegalStateException if the {@code any} property contains more than one matching element.
@@ -1263,7 +1268,7 @@
      * @param <T> The type the element is bound to.
      *
      * @return The {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any} property
-     * of the instance or {@code null} if no such element is found.
+     * of the instance or {@code null}, if no such element is found.
      *
      * @throws NullPointerException if {@code namespaceURI}, {@code localPart} or {@code type} is {@code null}.
      * @throws IllegalStateException if the {@code any} property contains more than one matching element.
@@ -1309,7 +1314,7 @@
      * @param clazz The class to return an instance of.
      * @param <T> The type of the object to return.
      *
-     * @return The instance of {@code clazz} from the {@code any} property of the instance or {@code null} if no such
+     * @return The instance of {@code clazz} from the {@code any} property of the instance or {@code null}, if no such
      * instance is found.
      *
      * @throws NullPointerException if {@code clazz} is {@code null}.
@@ -1354,12 +1359,12 @@
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='ImplementationReference']/xs:complexContent/xs:extension/xs:attribute[@name='final']">
       <jaxb:property>
-        <jaxb:javadoc>{@code true} if this implementation reference is the final node in an inheritance hierarchy.</jaxb:javadoc>
+        <jaxb:javadoc>{@code true}, if this implementation reference is the final node in an inheritance hierarchy.</jaxb:javadoc>
       </jaxb:property>
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='ImplementationReference']/xs:complexContent/xs:extension/xs:attribute[@name='override']">
       <jaxb:property>
-        <jaxb:javadoc>{@code true} if this implementation reference is intended to override a super implementation reference.</jaxb:javadoc>
+        <jaxb:javadoc>{@code true}, if this implementation reference is intended to override a super implementation reference.</jaxb:javadoc>
       </jaxb:property>
     </jaxb:bindings>
     <!-- *********************************************************************************************************** -->
@@ -1370,12 +1375,12 @@
      *
      * @param name The name of the dependency to return.
      *
-     * @return The dependency with name {@code name} from the list or {@code null}, if no dependency matching
-     * {@code name} is found.
+     * @return The first matching dependency or {@code null}, if no such dependency is found.
      *
      * @throws NullPointerException if {@code name} is {@code null}.
      *
      * @see #getDependency()
+     * @see Dependency#getName()
      */
     public Dependency getDependency( final String name )
     {
@@ -1426,12 +1431,12 @@
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Dependency']/xs:complexContent/xs:extension/xs:attribute[@name='bound']">
       <jaxb:property>
-        <jaxb:javadoc>{@code true} if instances of this dependency are bound to the declaring implementation.</jaxb:javadoc>
+        <jaxb:javadoc>{@code true}, if instances of this dependency are bound to the declaring implementation.</jaxb:javadoc>
       </jaxb:property>
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Dependency']/xs:complexContent/xs:extension/xs:attribute[@name='optional']">
       <jaxb:property>
-        <jaxb:javadoc>{@code true} if this dependency is optional.</jaxb:javadoc>
+        <jaxb:javadoc>{@code true}, if this dependency is optional.</jaxb:javadoc>
       </jaxb:property>
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Dependency']">
@@ -1444,7 +1449,7 @@
      * @param localPart The local part of the {@code JAXBElement} to return.
      *
      * @return The {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any} property
-     * of the instance or {@code null} if no such element is found.
+     * of the instance or {@code null}, if no such element is found.
      *
      * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
      * @throws IllegalStateException if the {@code any} property contains more than one matching element.
@@ -1494,7 +1499,7 @@
      * @param <T> The type the element is bound to.
      *
      * @return The {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any} property
-     * of the instance or {@code null} if no such element is found.
+     * of the instance or {@code null}, if no such element is found.
      *
      * @throws NullPointerException if {@code namespaceURI}, {@code localPart} or {@code type} is {@code null}.
      * @throws IllegalStateException if the {@code any} property contains more than one matching element.
@@ -1540,7 +1545,7 @@
      * @param clazz The class to return an instance of.
      * @param <T> The type of the object to return.
      *
-     * @return The instance of {@code clazz} from the {@code any} property of the instance or {@code null} if no such
+     * @return The instance of {@code clazz} from the {@code any} property of the instance or {@code null}, if no such
      * instance is found.
      *
      * @throws NullPointerException if {@code clazz} is {@code null}.
@@ -1580,12 +1585,12 @@
      *
      * @param name The name of the property to return.
      *
-     * @return The property with name {@code name} from the list or {@code null}, if no property matching {@code name}
-     * is found.
+     * @return The first matching property or {@code null}, if no such property is found.
      *
      * @throws NullPointerException if {@code name} is {@code null}.
      *
      * @see #getProperty()
+     * @see Property#getName()
      */
     public Property getProperty( final String name )
     {
@@ -1612,12 +1617,12 @@
      *
      * @param name The name of the property reference to return.
      *
-     * @return The property reference with name {@code name} from the list or {@code null}, if no property reference
-     * matching {@code name} is found.
+     * @return The first matching property reference or {@code null}, if no such reference is found.
      *
      * @throws NullPointerException if {@code name} is {@code null}.
      *
      * @see #getReference()
+     * @see PropertyReference#getName()
      */
     public PropertyReference getReference( final String name )
     {
@@ -1663,12 +1668,12 @@
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Property']/xs:complexContent/xs:extension/xs:attribute[@name='final']">
       <jaxb:property>
-        <jaxb:javadoc>{@code true} if this property is the final node in an inheritance hierarchy.</jaxb:javadoc>
+        <jaxb:javadoc>{@code true}, if this property is the final node in an inheritance hierarchy.</jaxb:javadoc>
       </jaxb:property>
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Property']/xs:complexContent/xs:extension/xs:attribute[@name='override']">
       <jaxb:property>
-        <jaxb:javadoc>{@code true} if this property is intended to override a super property.</jaxb:javadoc>
+        <jaxb:javadoc>{@code true}, if this property is intended to override a super property.</jaxb:javadoc>
       </jaxb:property>
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Property']">
@@ -1926,12 +1931,12 @@
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='PropertyReference']/xs:complexContent/xs:extension/xs:attribute[@name='final']">
       <jaxb:property>
-        <jaxb:javadoc>{@code true} if this property reference is the final node in an inheritance hierarchy.</jaxb:javadoc>
+        <jaxb:javadoc>{@code true}, if this property reference is the final node in an inheritance hierarchy.</jaxb:javadoc>
       </jaxb:property>
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='PropertyReference']/xs:complexContent/xs:extension/xs:attribute[@name='override']">
       <jaxb:property>
-        <jaxb:javadoc>{@code true} if this property reference is intended to override a super property reference.</jaxb:javadoc>
+        <jaxb:javadoc>{@code true}, if this property reference is intended to override a super property reference.</jaxb:javadoc>
       </jaxb:property>
     </jaxb:bindings>
     <!-- *********************************************************************************************************** -->
@@ -1942,12 +1947,12 @@
      *
      * @param name The name of the message to return.
      *
-     * @return The message with name {@code name} from the list or {@code null}, if no message matching {@code name} is
-     * found.
+     * @return The first matching message or {@code null}, if no such message is found.
      *
      * @throws NullPointerException if {@code name} is {@code null}.
      *
      * @see #getMessage()
+     * @see Message#getName()
      */
     public Message getMessage( final String name )
     {
@@ -1974,12 +1979,12 @@
      *
      * @param name The name of the message reference to return.
      *
-     * @return The message reference with name {@code name} from the list or {@code null}, if no message reference
-     * matching {@code name} is found.
+     * @return The first matching message reference or {@code null}, if no such reference is found.
      *
      * @throws NullPointerException if {@code name} is {@code null}.
      *
      * @see #getReference()
+     * @see MessageReference#getName()
      */
     public MessageReference getReference( final String name )
     {
@@ -2020,12 +2025,12 @@
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Message']/xs:complexContent/xs:extension/xs:attribute[@name='final']">
       <jaxb:property>
-        <jaxb:javadoc>{@code true} if this message is the final node in an inheritance hierarchy.</jaxb:javadoc>
+        <jaxb:javadoc>{@code true}, if this message is the final node in an inheritance hierarchy.</jaxb:javadoc>
       </jaxb:property>
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Message']/xs:complexContent/xs:extension/xs:attribute[@name='override']">
       <jaxb:property>
-        <jaxb:javadoc>{@code true} if this message is intended to override a super message.</jaxb:javadoc>
+        <jaxb:javadoc>{@code true}, if this message is intended to override a super message.</jaxb:javadoc>
       </jaxb:property>
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Message']">
@@ -2038,7 +2043,7 @@
      * @param localPart The local part of the {@code JAXBElement} to return.
      *
      * @return The {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any} property
-     * of the instance or {@code null} if no such element is found.
+     * of the instance or {@code null}, if no such element is found.
      *
      * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
      * @throws IllegalStateException if the {@code any} property contains more than one matching element.
@@ -2088,7 +2093,7 @@
      * @param <T> The type the element is bound to.
      *
      * @return The {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any} property
-     * of the instance or {@code null} if no such element is found.
+     * of the instance or {@code null}, if no such element is found.
      *
      * @throws NullPointerException if {@code namespaceURI}, {@code localPart} or {@code type} is {@code null}.
      * @throws IllegalStateException if the {@code any} property contains more than one matching element.
@@ -2134,7 +2139,7 @@
      * @param clazz The class to return an instance of.
      * @param <T> The type of the object to return.
      *
-     * @return The instance of {@code clazz} from the {@code any} property of the instance or {@code null} if no such
+     * @return The instance of {@code clazz} from the {@code any} property of the instance or {@code null}, if no such
      * instance is found.
      *
      * @throws NullPointerException if {@code clazz} is {@code null}.
@@ -2174,12 +2179,12 @@
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='MessageReference']/xs:complexContent/xs:extension/xs:attribute[@name='final']">
       <jaxb:property>
-        <jaxb:javadoc>{@code true} if this message reference is the final node in an inheritance hierarchy.</jaxb:javadoc>
+        <jaxb:javadoc>{@code true}, if this message reference is the final node in an inheritance hierarchy.</jaxb:javadoc>
       </jaxb:property>
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='MessageReference']/xs:complexContent/xs:extension/xs:attribute[@name='override']">
       <jaxb:property>
-        <jaxb:javadoc>{@code true} if this message reference is intended to override a super message reference.</jaxb:javadoc>
+        <jaxb:javadoc>{@code true}, if this message reference is intended to override a super message reference.</jaxb:javadoc>
       </jaxb:property>
     </jaxb:bindings>
     <!-- *********************************************************************************************************** -->
@@ -2190,12 +2195,12 @@
      *
      * @param name The name of the argument to return.
      *
-     * @return The argument with name {@code name} from the list or {@code null}, if no argument matching {@code name}
-     * is found.
+     * @return The first matching argument or {@code null}, if no such argument is found.
      *
      * @throws NullPointerException if {@code name} is {@code null}.
      *
      * @see #getArgument()
+     * @see Argument#getName()
      */
     public Argument getArgument( final String name )
     {
@@ -2222,12 +2227,13 @@
      *
      * @param index The index of the argument to return.
      *
-     * @return The argument at {@code index} from the list.
+     * @return The first matching argument or {@code null}, if no such argument is found.
      *
      * @throws IndexOutOfBoundsException if {@code index} is negative, greater or equal to the size of the list of
      * arguments.
      *
      * @see #getArgument()
+     * @see Argument#getIndex()
      */
     public Argument getArgument( final int index )
     {
@@ -2276,7 +2282,7 @@
      * @param localPart The local part of the {@code JAXBElement} to return.
      *
      * @return The {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any} property
-     * of the instance or {@code null} if no such element is found.
+     * of the instance or {@code null}, if no such element is found.
      *
      * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
      * @throws IllegalStateException if the {@code any} property contains more than one matching element.
@@ -2326,7 +2332,7 @@
      * @param <T> The type the element is bound to.
      *
      * @return The {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any} property
-     * of the instance or {@code null} if no such element is found.
+     * of the instance or {@code null}, if no such element is found.
      *
      * @throws NullPointerException if {@code namespaceURI}, {@code localPart} or {@code type} is {@code null}.
      * @throws IllegalStateException if the {@code any} property contains more than one matching element.
@@ -2372,7 +2378,7 @@
      * @param clazz The class to return an instance of.
      * @param <T> The type of the object to return.
      *
-     * @return The instance of {@code clazz} from the {@code any} property of the instance or {@code null} if no such
+     * @return The instance of {@code clazz} from the {@code any} property of the instance or {@code null}, if no such
      * instance is found.
      *
      * @throws NullPointerException if {@code clazz} is {@code null}.
@@ -2412,12 +2418,12 @@
      *
      * @param identifier The identifier of the instance to return.
      *
-     * @return The instance identified by {@code identifier} from the list or {@code null}, if no instance matching
-     * {@code identifier} is found.
+     * @return The first matching instance or {@code null}, if no such instance is found.
      *
      * @throws NullPointerException if {@code identifier} is {@code null}.
      *
      * @see #getInstance()
+     * @see Instance#getIdentifier()
      */
     public Instance getInstance( final String identifier )
     {
@@ -2478,7 +2484,7 @@
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Instance']/xs:complexContent/xs:extension/xs:attribute[@name='stateless']">
       <jaxb:property>
-        <jaxb:javadoc>{@code true} if this instance does not retain state across operations.</jaxb:javadoc>
+        <jaxb:javadoc>{@code true}, if this instance does not retain state across operations.</jaxb:javadoc>
       </jaxb:property>
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Instance']">
@@ -2531,7 +2537,7 @@
      * @param localPart The local part of the {@code JAXBElement} to return.
      *
      * @return The {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any} property
-     * of the instance or {@code null} if no such element is found.
+     * of the instance or {@code null}, if no such element is found.
      *
      * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
      * @throws IllegalStateException if the {@code any} property contains more than one matching element.
@@ -2581,7 +2587,7 @@
      * @param <T> The type the element is bound to.
      *
      * @return The {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any} property
-     * of the instance or {@code null} if no such element is found.
+     * of the instance or {@code null}, if no such element is found.
      *
      * @throws NullPointerException if {@code namespaceURI}, {@code localPart} or {@code type} is {@code null}.
      * @throws IllegalStateException if the {@code any} property contains more than one matching element.
@@ -2680,7 +2686,7 @@
      * @param localPart The local part of the {@code JAXBElement} to return.
      *
      * @return The {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any} property
-     * of the instance or {@code null} if no such element is found.
+     * of the instance or {@code null}, if no such element is found.
      *
      * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
      * @throws IllegalStateException if the {@code any} property contains more than one matching element.
@@ -2730,7 +2736,7 @@
      * @param <T> The type the element is bound to.
      *
      * @return The {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any} property
-     * of the instance or {@code null} if no such element is found.
+     * of the instance or {@code null}, if no such element is found.
      *
      * @throws NullPointerException if {@code namespaceURI}, {@code localPart} or {@code type} is {@code null}.
      * @throws IllegalStateException if the {@code any} property contains more than one matching element.
@@ -2776,7 +2782,7 @@
      * @param clazz The class to return an instance of.
      * @param <T> The type of the object to return.
      *
-     * @return The instance of {@code clazz} from the {@code any} property of the instance or {@code null} if no such
+     * @return The instance of {@code clazz} from the {@code any} property of the instance or {@code null}, if no such
      * instance is found.
      *
      * @throws NullPointerException if {@code clazz} is {@code null}.
@@ -2947,10 +2953,10 @@
      * reference by inspecting the given class loader.</p>
      *
      * @param moduleName The name of the module to return.
-     * @param classLoader The class loader to use for resolving entities or {@code null} to resolve entities using the
+     * @param classLoader The class loader to use for resolving entities or {@code null}, to resolve entities using the
      * bootstrap class loader.
      *
-     * @return A module holding model objects resolved by inspecting the given class loader or {@code null} if nothing
+     * @return A module holding model objects resolved by inspecting the given class loader or {@code null}, if nothing
      * is resolved.
      *
      * @throws NullPointerException if {@code moduleName} is {@code null}.
@@ -2980,16 +2986,16 @@
     }
 
     /**
-     * Gets a module for a given name from this list of modules.
+     * Gets a module for a given name from the list of modules.
      *
      * @param name The name of the module to return.
      *
-     * @return The module with name {@code name} from the list or {@code null}, if no module matching {@code name} is
-     * found.
+     * @return The first matching module or {@code null}, if no such module is found.
      *
      * @throws NullPointerException if {@code name} is {@code null}.
      *
      * @see #getModule()
+     * @see Module#getName()
      */
     public Module getModule( final String name )
     {
@@ -3012,9 +3018,9 @@
     }
 
     /**
-     * Gets all specifications declared in this list of modules.
+     * Gets all specifications of the list of modules.
      *
-     * @return All specifications declared in the list or {@code null}, if no specifications are declared.
+     * @return All specifications or {@code null}, if no specifications are found.
      *
      * @see #getModule()
      */
@@ -3036,9 +3042,9 @@
     }
 
     /**
-     * Gets all implementations declared in this list of modules.
+     * Gets all implementations of the list of modules.
      *
-     * @return All implementations declared in the list or {@code null}, if no implementations are declared.
+     * @return All implementations or {@code null}, if no implementations are found.
      *
      * @see #getModule()
      */
@@ -3060,16 +3066,17 @@
     }
 
     /**
-     * Gets the module declaring a given specification from this list of modules.
+     * Gets the module declaring a given specification from the list of modules.
      *
      * @param specification The identifier of the specification whose declaring module to return.
      *
-     * @return The module declaring {@code specification} from the list or {@code null}, if no module is found declaring
-     * {@code specification}.
+     * @return The first matching module or {@code null}, if no such module is found.
      *
      * @throws NullPointerException if {@code specification} is {@code null}.
      *
      * @see #getModule()
+     * @see Module#getSpecifications()
+     * @see Specifications#getSpecification( java.lang.String )
      */
     public Module getModuleOfSpecification( final String specification )
     {
@@ -3092,16 +3099,17 @@
     }
 
     /**
-     * Gets the module declaring a given implementation from this list of modules.
+     * Gets the module declaring a given implementation from the list of modules.
      *
      * @param implementation The identifier of the implementation whose declaring module to return.
      *
-     * @return The module declaring {@code implementation} from the list or {@code null}, if no module is found
-     * declaring {@code implementation}.
+     * @return The first matching module or {@code null}, if no such module is found.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
      *
      * @see #getModule()
+     * @see Module#getImplementations()
+     * @see Implementations#getImplementation( java.lang.String )
      */
     public Module getModuleOfImplementation( final String implementation )
     {
@@ -3124,16 +3132,17 @@
     }
 
     /**
-     * Gets a specification for a given identifier from this list of modules.
+     * Gets a specification for a given identifier from the list of modules.
      *
      * @param specification The identifier of the specification to return.
      *
-     * @return The specification identified by {@code specification} from the list or {@code null}, if no specification
-     * matching {@code specification} is found.
+     * @return The first matching specification or {@code null}, if no such specification is found.
      *
      * @throws NullPointerException if {@code specification} is {@code null}.
      *
      * @see #getModule()
+     * @see Module#getSpecifications()
+     * @see Specifications#getSpecification( java.lang.String )
      */
     public Specification getSpecification( final String specification )
     {
@@ -3161,16 +3170,17 @@
     }
 
     /**
-     * Gets a specification for a given class from this list of modules.
+     * Gets a specification for a given class from the list of modules.
      *
      * @param specification The class of the specification to return.
      *
-     * @return The specification identified by {@code specification} from the list or {@code null}, if no specification
-     * matching {@code specification} is found.
+     * @return The first matching specification or {@code null}, if no such specification is found.
      *
      * @throws NullPointerException if {@code specification} is {@code null}.
      *
      * @see #getModule()
+     * @see Module#getSpecifications()
+     * @see Specifications#getSpecification( java.lang.Class )
      */
     public Specification getSpecification( final Class<?> specification )
     {
@@ -3198,17 +3208,19 @@
     }
 
     /**
-     * Gets all specifications an implementation implements from this list of modules.
+     * Gets all specifications an implementation implements from the list of modules.
      *
      * @param implementation The identifier of the implementation to get all implemented specifications of.
      *
-     * @return List of all specifications implemented by {@code implementation} from the list or {@code null}, if no
-     * implementation matching {@code implementation} is found or if that implementation does not implement any
-     * specification.
+     * @return All specifications implemented by the first matching implementation or {@code null}, if no such
+     * implementation is found or if the first matching implementation does not implement any specification.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
      *
      * @see #getModule()
+     * @see #getImplementation( java.lang.String )
+     * @see Implementation#getImplementations()
+     * @see Implementations#getReference()
      */
     public Specifications getSpecifications( final String implementation )
     {
@@ -3295,16 +3307,17 @@
     }
 
     /**
-     * Gets an implementation for a given identifier from this list of modules.
+     * Gets an implementation for a given identifier from the list of modules.
      *
      * @param implementation The identifier of the implementation to return.
      *
-     * @return The implementation identified by {@code implementation} from the list or {@code null}, if no
-     * implementation matching {@code implementation} is found.
+     * @return The first matching implementation or {@code null}, if no such implementation is found.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
      *
      * @see #getModule()
+     * @see Module#getImplementations()
+     * @see Implementations#getImplementation( java.lang.String )
      */
     public Implementation getImplementation( final String implementation )
     {
@@ -3332,16 +3345,17 @@
     }
 
     /**
-     * Gets an implementation for a given class from this list of modules.
+     * Gets an implementation for a given class from the list of modules.
      *
      * @param implementation The class of the implementation to return.
      *
-     * @return The implementation identified by {@code implementation} from the list or {@code null}, if no
-     * implementation matching {@code implementation} is found.
+     * @return The first matching implementation or {@code null}, if no such implementation is found.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
      *
      * @see #getModule()
+     * @see Module#getImplementations()
+     * @see Implementations#getImplementation( java.lang.Class )
      */
     public Implementation getImplementation( final Class<?> implementation )
     {
@@ -3369,16 +3383,16 @@
     }
 
     /**
-     * Gets an implementation for a given object from this list of modules.
+     * Gets an implementation for a given object from the list of modules.
      *
      * @param object The object of the implementation to return.
      *
-     * @return The implementation identified by {@code object} from the list or {@code null}, if no implementation
-     * matching {@code object} is found.
+     * @return The first matching implementation or {@code null}, if no such implementation is found.
      *
      * @throws NullPointerException if {@code object} is {@code null}.
      *
      * @see #getModule()
+     * @see #getImplementation( java.lang.Class )
      */
     public Implementation getImplementation( final Object object )
     {
@@ -3386,18 +3400,18 @@
     }
 
     /**
-     * Gets an implementation for a given name implementing a given specification from this list of
-     * modules.
+     * Gets an implementation for a given name implementing a given specification from the list of modules.
      *
      * @param specification The identifier of the specification to return an implementation of.
      * @param name The name of the implementation to return.
      *
-     * @return The implementation with name {@code name} implementing the specification identified by
-     * {@code specification} from the list or {@code null}, if no such implementation is found.
+     * @return The first matching implementation or {@code null}, if no such implementation is found.
      *
      * @throws NullPointerException if {@code specification} or {@code name} is {@code null}.
      *
      * @see #getModule()
+     * @see #getImplementations( java.lang.String )
+     * @see Implementations#getImplementationByName( java.lang.String )
      */
     public Implementation getImplementation( final String specification, final String name )
     {
@@ -3420,16 +3434,19 @@
     }
 
     /**
-     * Gets all dependencies of an implementation from this list of modules.
+     * Gets all dependencies of an implementation from the list of modules.
      *
      * @param implementation The identifier of the implementation to get all dependencies of.
      *
-     * @return List of all dependencies of {@code implementation} from the list or {@code null}, if no dependencies are
-     * found.
+     * @return All dependencies of the first matching implementation or {@code null}, if no such implementation is
+     * found or if the first matching implementation does not have any dependencies.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
      *
      * @see #getModule()
+     * @see #getImplementation( java.lang.String )
+     * @see Implementation#getImplementations()
+     * @see Implementations#getReference()
      */
     public Dependencies getDependencies( final String implementation )
     {
@@ -3499,16 +3516,19 @@
     }
 
     /**
-     * Gets all properties of an implementation from this list of modules.
+     * Gets all properties of an implementation from the list of modules.
      *
      * @param implementation The identifier of the implementation to get all properties of.
      *
-     * @return List of all properties of {@code implementation} from the list or {@code null}, if no properties are
-     * found.
+     * @return All properties of the first matching implementation or {@code null}, if no such implementation is found
+     * or if the first matching implementation does not have any properties.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
      *
      * @see #getModule()
+     * @see #getImplementation( java.lang.String )
+     * @see Implementation#getImplementations()
+     * @see Implementations#getReference()
      */
     public Properties getProperties( final String implementation )
     {
@@ -3593,16 +3613,18 @@
     }
 
     /**
-     * Gets all properties specified for an implementation from this list of modules.
+     * Gets all properties specified for an implementation from the list of modules.
      *
      * @param implementation The identifier of the implementation to return specified properties of.
      *
-     * @return List of all properties specified for {@code implementation} from the list or {@code null}, if no
-     * properties are found.
+     * @return All properties specified for the first matching implementation or {@code null}, if no such implementation
+     * is found or if the first matching implementation does not have any specified properties.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
      *
      * @see #getModule()
+     * @see #getSpecifications( java.lang.String )
+     * @see Specification#getProperties()
      */
     public Properties getSpecifiedProperties( final String implementation )
     {
@@ -3641,15 +3663,19 @@
     }
 
     /**
-     * Gets all messages of an implementation from this list of modules.
+     * Gets all messages of an implementation from the list of modules.
      *
      * @param implementation The identifier of the implementation to get all messages of.
      *
-     * @return List of all messages of {@code implementation} from the list or {@code null}, if no messages are found.
+     * @return All messages of the first matching implementation or {@code null}, if no such implementation is found
+     * or if the first matching implementation does not have any messages.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
      *
      * @see #getModule()
+     * @see #getImplementation( java.lang.String )
+     * @see Implementation#getImplementations()
+     * @see Implementations#getReference()
      */
     public Messages getMessages( final String implementation )
     {
@@ -3719,16 +3745,17 @@
     }
 
     /**
-     * Gets all implementations implementing a given specification from this list of modules.
+     * Gets all implementations implementing a given specification from the list of modules.
      *
      * @param specification The identifier of the specification to return all implementations of.
      *
-     * @return All implementations implementing the specification identified by {@code specification} from the list or
-     * {@code null}, if no implementation implementing {@code specification} is found.
+     * @return All implementations implementing the first matching specification or {@code null}, if no such
+     * specification is found or if the first matching specification does not have any implementations.
      *
      * @throws NullPointerException if {@code specification} is {@code null}.
      *
      * @see #getModule()
+     * @see #getSpecifications( java.lang.String )
      */
     public Implementations getImplementations( final String specification )
     {
@@ -3901,15 +3928,17 @@
     }
 
     /**
-     * Gets the instance of an object from this list of modules.
+     * Gets the instance of an object from the list of modules.
      *
      * @param object The object to get the instance of.
      *
-     * @return The instance of {@code object} from the list or {@code null} if no such instance is found.
+     * @return The instance of {@code object} or {@code null}, if no such instance is found.
      *
      * @throws NullPointerException if {@code object} is {@code null}.
      *
      * @see #getModule()
+     * @see #getImplementation( java.lang.Object )
+     * @see #getInstance( java.lang.String )
      * @see #createObject(org.jomc.model.Instance instance, java.lang.ClassLoader classLoader)
      */
     public Instance getInstance( final Object object )
@@ -3942,16 +3971,16 @@
     }
 
     /**
-     * Gets an instance for an implementation from this list of modules.
+     * Gets an instance for an implementation from the list of modules.
      *
      * @param implementation The identifier of the implementation to get an instance for.
      *
-     * @return An instance for the implementation identified by {@code implementation} from the list or {@code null}, if
-     * no such instance is found.
+     * @return A new instance for the first matching implementation or {@code null}, if no such implementation is found.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
      *
      * @see #getModule()
+     * @see #getImplementation( java.lang.String )
      */
     public Instance getInstance( final String implementation )
     {
@@ -3981,17 +4010,18 @@
     }
 
     /**
-     * Gets an instance for an implementation from this list of modules overridden with a given dependency.
+     * Gets an instance for an implementation from the list of modules overridden with a given dependency.
      *
      * @param implementation The identifier of the implementation to get an instance for.
      * @param dependency The dependency to use for overriding model objects of the instance.
      *
-     * @return An instance for the implementation identified by {@code implementation} from the list with any model
-     * objects overridden using {@code dependency} or {@code null}, if no such instance is found.
+     * @return An instance for the first matching implementation with any model objects overridden using
+     * {@code dependency} or {@code null}, if no such implementation is found.
      *
      * @throws NullPointerException if {@code implementation} or {@code dependency} is {@code null}.
      *
      * @see #getModule()
+     * @see #getInstance( java.lang.String )
      */
     public Instance getInstance( final String implementation, final Dependency dependency )
     {
@@ -4086,13 +4116,13 @@
     }
 
     /**
-     * Creates an object for a given instance from this list of modules.
+     * Creates an object for a given instance from the list of modules.
      *
      * @param instance The instance to create an object of.
-     * @param classLoader The class loader to use for creating the object or {@code null} to use the bootstrap class
+     * @param classLoader The class loader to use for creating the object or {@code null}, to use the bootstrap class
      * loader.
      *
-     * @return A new object of {@code instance} from the list or {@code null} if no such object is found.
+     * @return A new object of {@code instance}.
      *
      * @throws NullPointerException if {@code instance}  is {@code null},
      * @throws InstantiationException if creating an object fails.

@@ -128,7 +128,7 @@ public class DefaultModelProvider implements ModelProvider
 
     /**
      * Default value of the flag indicating the provider is validating resources by default.
-     * @see #isValidating()
+     * @see #isDefaultValidating()
      * @since 1.2
      */
     private static final Boolean DEFAULT_VALIDATING = Boolean.TRUE;
@@ -169,7 +169,8 @@ public class DefaultModelProvider implements ModelProvider
      * {@code org.jomc.model.modlet.DefaultModelProvider.defaultEnabled} holding a value indicating the provider is
      * enabled by default. If that property is not set, the {@code true} default is returned.</p>
      *
-     * @return {@code true} if the provider is enabled by default; {@code false} if the provider is disabled by default.
+     * @return {@code true}, if the provider is enabled by default; {@code false}, if the provider is disabled by
+     * default.
      *
      * @see #setDefaultEnabled(java.lang.Boolean)
      */
@@ -202,7 +203,7 @@ public class DefaultModelProvider implements ModelProvider
     /**
      * Gets a flag indicating the provider is enabled.
      *
-     * @return {@code true} if the provider is enabled; {@code false} if the provider is disabled.
+     * @return {@code true}, if the provider is enabled; {@code false}, if the provider is disabled.
      *
      * @see #isDefaultEnabled()
      * @see #setEnabled(java.lang.Boolean)
@@ -301,7 +302,7 @@ public class DefaultModelProvider implements ModelProvider
      * {@code org.jomc.model.modlet.DefaultModelProvider.defaultValidating} holding a value indicating the provider is
      * validating resources by default. If that property is not set, the {@code true} default is returned.</p>
      *
-     * @return {@code true} if the provider is validating resources by default; {@code false} if the provider is not
+     * @return {@code true}, if the provider is validating resources by default; {@code false}, if the provider is not
      * validating resources by default.
      *
      * @see #isValidating()
@@ -340,7 +341,7 @@ public class DefaultModelProvider implements ModelProvider
     /**
      * Gets a flag indicating the provider is validating resources.
      *
-     * @return {@code true} if the provider is validating resources; {@code false} if the provider is not validating
+     * @return {@code true}, if the provider is validating resources; {@code false}, if the provider is not validating
      * resources.
      *
      * @see #isDefaultValidating()
@@ -379,7 +380,7 @@ public class DefaultModelProvider implements ModelProvider
      * @param model The identifier of the model to search for modules.
      * @param location The location to search at.
      *
-     * @return The modules found at {@code location} in {@code context} or {@code null} if no modules are found.
+     * @return The modules found at {@code location} in {@code context} or {@code null}, if no modules are found.
      *
      * @throws NullPointerException if {@code context}, {@code model} or {@code location} is {@code null}.
      * @throws ModelException if searching the context fails.
@@ -510,7 +511,7 @@ public class DefaultModelProvider implements ModelProvider
     /**
      * {@inheritDoc}
      *
-     * @return The {@code Model} found in the context or {@code null} if no {@code Model} is found or the provider is
+     * @return The {@code Model} found in the context or {@code null}, if no {@code Model} is found or the provider is
      * disabled.
      *
      * @see #isEnabled()

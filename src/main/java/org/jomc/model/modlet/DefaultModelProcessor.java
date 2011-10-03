@@ -119,7 +119,7 @@ public class DefaultModelProcessor implements ModelProcessor
     private static final Boolean DEFAULT_ENABLED = Boolean.TRUE;
 
     /**
-     * Classpath location searched for transformers by default.
+     * Class path location searched for transformers by default.
      * @see #getDefaultTransformerLocation()
      */
     private static final String DEFAULT_TRANSFORMER_LOCATION = "META-INF/jomc.xsl";
@@ -148,7 +148,7 @@ public class DefaultModelProcessor implements ModelProcessor
      * {@code org.jomc.model.modlet.DefaultModelProcessor.defaultEnabled} holding a value indicating the processor is
      * enabled by default. If that property is not set, the {@code true} default is returned.</p>
      *
-     * @return {@code true} if the processor is enabled by default; {@code false} if the processor is disabled by
+     * @return {@code true}, if the processor is enabled by default; {@code false}, if the processor is disabled by
      * default.
      *
      * @see #setDefaultEnabled(java.lang.Boolean)
@@ -182,7 +182,7 @@ public class DefaultModelProcessor implements ModelProcessor
     /**
      * Gets a flag indicating the processor is enabled.
      *
-     * @return {@code true} if the processor is enabled; {@code false} if the processor is disabled.
+     * @return {@code true}, if the processor is enabled; {@code false}, if the processor is disabled.
      *
      * @see #isDefaultEnabled()
      * @see #setEnabled(java.lang.Boolean)
@@ -282,7 +282,7 @@ public class DefaultModelProcessor implements ModelProcessor
      * @param context The context to search for transformers.
      * @param location The location to search at.
      *
-     * @return The transformers found at {@code location} in {@code context} or {@code null} of no transformers are
+     * @return The transformers found at {@code location} in {@code context} or {@code null}, if no transformers are
      * found.
      *
      * @throws NullPointerException if {@code context} or {@code location} is {@code null}.
