@@ -183,7 +183,7 @@
           <artifactId>maven-jaxb21-plugin</artifactId>
           <executions>
             <execution>
-              <id>test-generate</id>
+              <id>default-test-generate</id>
               <phase>generate-test-sources</phase>
               <goals>
                 <goal>generate</goal>
