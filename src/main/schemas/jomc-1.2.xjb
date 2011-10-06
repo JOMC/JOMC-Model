@@ -2968,7 +2968,7 @@
     {
         if ( moduleName == null )
         {
-            throw new NullPointerException( "moduleName," );
+            throw new NullPointerException( "moduleName" );
         }
 
         final Module classpathModule = new Module();
@@ -4479,7 +4479,7 @@
                                 Property referenced = m.getProperties().getProperty( ref.getName() );
                                 if ( referenced != null )
                                 {
-                                    referenced = new Property( referenced );
+                                    referenced = referenced.clone();
                                     referenced.setDeprecated( ref.isDeprecated() );
                                     referenced.setFinal( ref.isFinal() );
                                     referenced.setOverride( ref.isOverride() );
@@ -4536,7 +4536,7 @@
                                 Message referenced = m.getMessages().getMessage( ref.getName() );
                                 if ( referenced != null )
                                 {
-                                    referenced = new Message( referenced );
+                                    referenced = referenced.clone();
                                     referenced.setDeprecated( ref.isDeprecated() );
                                     referenced.setFinal( ref.isFinal() );
                                     referenced.setOverride( ref.isOverride() );

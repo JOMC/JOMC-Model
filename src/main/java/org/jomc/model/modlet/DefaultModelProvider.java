@@ -559,7 +559,7 @@ public class DefaultModelProvider implements ModelProvider
 
             if ( modules != null )
             {
-                found = new Model( model );
+                found = model.clone();
                 ModelHelper.addModules( found, modules );
             }
         }

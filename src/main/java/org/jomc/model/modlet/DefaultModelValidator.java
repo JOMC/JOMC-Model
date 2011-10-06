@@ -2070,7 +2070,7 @@ public class DefaultModelValidator implements ModelValidator
                                 Property referenced = m.getProperties().getProperty( ref.getName() );
                                 if ( referenced != null )
                                 {
-                                    referenced = new Property( referenced );
+                                    referenced = referenced.clone();
                                     referenced.setDeprecated( ref.isDeprecated() );
                                     referenced.setFinal( ref.isFinal() );
                                     referenced.setOverride( ref.isOverride() );
@@ -2128,7 +2128,7 @@ public class DefaultModelValidator implements ModelValidator
                                 Message referenced = m.getMessages().getMessage( ref.getName() );
                                 if ( referenced != null )
                                 {
-                                    referenced = new Message( referenced );
+                                    referenced = referenced.clone();
                                     referenced.setDeprecated( ref.isDeprecated() );
                                     referenced.setFinal( ref.isFinal() );
                                     referenced.setOverride( ref.isOverride() );
