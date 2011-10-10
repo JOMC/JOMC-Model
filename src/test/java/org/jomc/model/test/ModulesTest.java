@@ -54,8 +54,8 @@ import org.jomc.model.Texts;
 import org.jomc.model.modlet.ModelHelper;
 import org.jomc.modlet.Model;
 import org.jomc.modlet.ModelContext;
-import org.jomc.modlet.ModelValidationReport;
 import org.jomc.modlet.ModelException;
+import org.jomc.modlet.ModelValidationReport;
 import org.junit.Assert;
 import org.junit.Test;
 

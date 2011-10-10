@@ -30,12 +30,12 @@
  */
 package org.jomc.model.test;
 
-import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import org.jomc.model.ModelObject;
+import org.junit.Test;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 

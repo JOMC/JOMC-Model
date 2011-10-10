@@ -30,9 +30,6 @@
  */
 package org.jomc.model.modlet.test;
 
-import org.jomc.model.test.ModulesConstraintsTestType;
-import org.jomc.model.test.SchemaConstraintsTestType;
-import org.junit.Test;
 import java.util.List;
 import java.util.logging.Level;
 import javax.xml.bind.JAXBContext;
@@ -44,11 +41,14 @@ import org.jomc.model.Modules;
 import org.jomc.model.modlet.DefaultModelValidator;
 import org.jomc.model.modlet.ModelHelper;
 import org.jomc.model.test.ModelValidationReportDetail;
+import org.jomc.model.test.ModulesConstraintsTestType;
+import org.jomc.model.test.SchemaConstraintsTestType;
 import org.jomc.model.test.TestSuite;
 import org.jomc.modlet.Model;
 import org.jomc.modlet.ModelContext;
 import org.jomc.modlet.ModelException;
 import org.jomc.modlet.ModelValidationReport;
+import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;

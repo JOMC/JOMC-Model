@@ -30,9 +30,9 @@
  */
 package org.jomc.model.test;
 
-import org.junit.Test;
 import java.io.ObjectInputStream;
 import org.jomc.model.PropertyException;
+import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 /**

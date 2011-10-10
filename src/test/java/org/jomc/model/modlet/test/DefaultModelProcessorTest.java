@@ -30,13 +30,13 @@
  */
 package org.jomc.model.modlet.test;
 
-import org.junit.Test;
-import org.jomc.model.Modules;
-import org.jomc.model.modlet.ModelHelper;
 import org.jomc.model.ModelObject;
+import org.jomc.model.Modules;
 import org.jomc.model.modlet.DefaultModelProcessor;
+import org.jomc.model.modlet.ModelHelper;
 import org.jomc.modlet.Model;
 import org.jomc.modlet.ModelContext;
+import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
