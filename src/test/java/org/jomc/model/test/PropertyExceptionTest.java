@@ -30,6 +30,7 @@
  */
 package org.jomc.model.test;
 
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import org.jomc.model.PropertyException;
 import org.junit.Test;
@@ -56,14 +57,36 @@ public class PropertyExceptionTest
     @Test
     public final void testSerializabe() throws Exception
     {
-        final ObjectInputStream objectStream = new ObjectInputStream( this.getClass().getResourceAsStream(
-            ABSOLUTE_RESOURCE_NAME_PREFIX + "PropertyException.ser" ) );
+        ObjectInputStream in = null;
+        boolean suppressExceptionOnClose = true;
 
-        final PropertyException e = (PropertyException) objectStream.readObject();
-        objectStream.close();
+        try
+        {
+            in = new ObjectInputStream( this.getClass().getResourceAsStream(
+                ABSOLUTE_RESOURCE_NAME_PREFIX + "PropertyException.ser" ) );
 
-        assertEquals( "PropertyException", e.getMessage() );
-        System.out.println( e );
+            final PropertyException e = (PropertyException) in.readObject();
+            suppressExceptionOnClose = false;
+            assertEquals( "PropertyException", e.getMessage() );
+            System.out.println( e );
+        }
+        finally
+        {
+            try
+            {
+                if ( in != null )
+                {
+                    in.close();
+                }
+            }
+            catch ( final IOException e )
+            {
+                if ( !suppressExceptionOnClose )
+                {
+                    throw e;
+                }
+            }
+        }
     }
 
 }
