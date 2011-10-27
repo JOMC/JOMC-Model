@@ -6,7 +6,7 @@
   In order to build JOMC artifacts, the following software needs to be
   installed.
 
-    o Java Development Kit (JDK), Version 1.5 or higher
+    o Java Development Kit (JDK), Version 1.6 or higher
 
       Please consult the operating system documentation on how to install a Java
       development kit.
