@@ -4642,15 +4642,15 @@
         return null;
     }
 
-    private javax.xml.bind.JAXBElement getElement( final List<Object> list, final javax.xml.bind.JAXBElement e )
+    private javax.xml.bind.JAXBElement<?> getElement( final List<Object> list, final javax.xml.bind.JAXBElement<?> e )
     {
         for ( int i = 0, s0 = list.size(); i < s0; i++ )
         {
             final Object o = list.get( i );
 
-            if ( o instanceof javax.xml.bind.JAXBElement )
+            if ( o instanceof javax.xml.bind.JAXBElement<?> )
             {
-                final javax.xml.bind.JAXBElement current = (javax.xml.bind.JAXBElement) o;
+                final javax.xml.bind.JAXBElement<?> current = (javax.xml.bind.JAXBElement<?>) o;
                 if ( e.getName().equals( current.getName() ) )
                 {
                     return current;
