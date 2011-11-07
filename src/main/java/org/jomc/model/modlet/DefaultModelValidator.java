@@ -1698,7 +1698,11 @@ public class DefaultModelValidator implements ModelValidator
         private static class Node<T extends ModelObject>
         {
 
-            private final Implementation declaration;
+            private final Implementation implementation;
+
+            private final Specification specification;
+
+            private final Implementation classDeclaration;
 
             private final T modelObject;
 
@@ -1706,23 +1710,21 @@ public class DefaultModelValidator implements ModelValidator
 
             private final boolean override;
 
-            private final boolean specificationModelObject;
-
-            private final boolean classDeclarationModelObject;
-
             private final List<String> path;
 
-            private Node( final Implementation declaration, final T modelObject, final boolean _final,
-                          final boolean override, final boolean specificationModelObject,
-                          final boolean classDeclarationModelObject, final List<String> path )
+            private final Set<Node<T>> overrides = newSet();
+
+            private Node( final Implementation implementation, final Specification specification,
+                          final Implementation classDeclaration, final T modelObject, final boolean _final,
+                          final boolean override, final List<String> path )
             {
                 super();
-                this.declaration = declaration;
+                this.implementation = implementation;
+                this.specification = specification;
+                this.classDeclaration = classDeclaration;
                 this.modelObject = modelObject;
                 this._final = _final;
                 this.override = override;
-                this.specificationModelObject = specificationModelObject;
-                this.classDeclarationModelObject = classDeclarationModelObject;
                 this.path = new ArrayList<String>( path );
             }
 
@@ -1731,9 +1733,19 @@ public class DefaultModelValidator implements ModelValidator
                 return this.modelObject;
             }
 
-            private Implementation getDeclaration()
+            private Implementation getImplementation()
             {
-                return this.declaration;
+                return this.implementation;
+            }
+
+            private Specification getSpecification()
+            {
+                return this.specification;
+            }
+
+            private Implementation getClassDeclaration()
+            {
+                return this.classDeclaration;
             }
 
             private boolean isFinal()
@@ -1746,19 +1758,24 @@ public class DefaultModelValidator implements ModelValidator
                 return this.override;
             }
 
-            private boolean isSpecificationModelObject()
-            {
-                return this.specificationModelObject;
-            }
-
-            private boolean isClassDeclarationModelObject()
-            {
-                return this.classDeclarationModelObject;
-            }
-
             private List<String> getPath()
             {
                 return this.path;
+            }
+
+            private Set<Node<T>> getOverrides()
+            {
+                return this.overrides;
+            }
+
+            private boolean isScope( final String implementation )
+            {
+                return this.implementation.getIdentifier().equals( implementation );
+            }
+
+            private boolean isScope( final Implementation implementation )
+            {
+                return this.isScope( implementation.getIdentifier() );
             }
 
             private String pathToString()
@@ -1829,11 +1846,6 @@ public class DefaultModelValidator implements ModelValidator
             this.classDeclaration = this.findClassDeclaration( implementation );
 
             this.collectNodes( implementation, implementation, null );
-
-            for ( Implementation root : this.roots )
-            {
-                this.collectEffectiveSpecificationReferenceNodes( root );
-            }
 
             for ( Implementation root : this.roots )
             {
@@ -2028,29 +2040,29 @@ public class DefaultModelValidator implements ModelValidator
             return set;
         }
 
-        private Map<String, Node<Dependency>> getDeclaredDependencies( final String impl )
+        private Map<String, List<Node<Dependency>>> getDeclaredDependencies( final String impl )
         {
             return getDeclarationNodes( this.dependencies, impl );
         }
 
-        private Map<String, Node<Message>> getDeclaredMessages( final String impl )
+        private Map<String, List<Node<Message>>> getDeclaredMessages( final String impl )
         {
             return getDeclarationNodes( this.messages, impl );
         }
 
-        private Map<String, Node<Property>> getDeclaredProperties( final String impl )
+        private Map<String, List<Node<Property>>> getDeclaredProperties( final String impl )
         {
             return getDeclarationNodes( this.properties, impl );
         }
 
-        private Map<String, Node<SpecificationReference>> getDeclaredSpecificationReferences( final String impl )
+        private Map<String, List<Node<SpecificationReference>>> getDeclaredSpecificationReferences( final String i )
         {
-            return getDeclarationNodes( this.specReferences, impl );
+            return getDeclarationNodes( this.specReferences, i );
         }
 
-        private Map<String, Node<ImplementationReference>> getDeclaredImplementationReferences( final String impl )
+        private Map<String, List<Node<ImplementationReference>>> getDeclaredImplementationReferences( final String i )
         {
-            return getDeclarationNodes( this.implReferences, impl );
+            return getDeclarationNodes( this.implReferences, i );
         }
 
         private Map<String, List<Node<Dependency>>> getEffectiveDependencies()
@@ -2160,7 +2172,7 @@ public class DefaultModelValidator implements ModelValidator
                     {
                         final Dependency d = declaration.getDependencies().getDependency().get( i );
                         this.addDependencyNode( new Node<Dependency>(
-                            declaration, d, d.isFinal(), d.isOverride(), false, false, path ) );
+                            declaration, null, null, d, d.isFinal(), d.isOverride(), path ) );
 
                     }
                 }
@@ -2171,7 +2183,7 @@ public class DefaultModelValidator implements ModelValidator
                     {
                         final Message m = declaration.getMessages().getMessage().get( i );
                         this.addMessageNode( new Node<Message>(
-                            declaration, m, m.isFinal(), m.isOverride(), false, false, path ) );
+                            declaration, null, null, m, m.isFinal(), m.isOverride(), path ) );
 
                     }
 
@@ -2192,7 +2204,7 @@ public class DefaultModelValidator implements ModelValidator
                                     msg.setFinal( r.isFinal() );
                                     msg.setOverride( r.isOverride() );
                                     this.addMessageNode( new Node<Message>(
-                                        declaration, msg, msg.isFinal(), msg.isOverride(), false, false, path ) );
+                                        declaration, null, null, msg, msg.isFinal(), msg.isOverride(), path ) );
 
                                 }
                             }
@@ -2206,7 +2218,7 @@ public class DefaultModelValidator implements ModelValidator
                     {
                         final Property p = declaration.getProperties().getProperty().get( i );
                         this.addPropertyNode( new Node<Property>(
-                            declaration, p, p.isFinal(), p.isOverride(), false, false, path ) );
+                            declaration, null, null, p, p.isFinal(), p.isOverride(), path ) );
 
                     }
 
@@ -2227,7 +2239,7 @@ public class DefaultModelValidator implements ModelValidator
                                     p.setFinal( r.isFinal() );
                                     p.setOverride( r.isOverride() );
                                     this.addPropertyNode( new Node<Property>(
-                                        declaration, p, p.isFinal(), p.isOverride(), false, false, path ) );
+                                        declaration, null, null, p, p.isFinal(), p.isOverride(), path ) );
 
                                 }
                             }
@@ -2241,8 +2253,24 @@ public class DefaultModelValidator implements ModelValidator
                     {
                         final SpecificationReference r = declaration.getSpecifications().getReference().get( i );
                         this.addSpecificationNode( new Node<SpecificationReference>(
-                            declaration, r, r.isFinal(), r.isOverride(), false, false, path ) );
+                            declaration, null, null, r, r.isFinal(), r.isOverride(), path ) );
 
+                        final Specification s = this.context.getModules().getSpecification( r.getIdentifier() );
+                        if ( s != null && s.getProperties() != null )
+                        {
+                            final String str = "SPECIFICATION:" + s.getIdentifier();
+                            path.add( str );
+
+                            for ( int j = 0, s1 = s.getProperties().getProperty().size(); j < s1; j++ )
+                            {
+                                final Property p = s.getProperties().getProperty().get( j );
+                                this.addPropertyNode( new Node<Property>(
+                                    declaration, s, null, p, p.isFinal(), p.isOverride(), path ) );
+
+                            }
+
+                            path.remove( str );
+                        }
                     }
                 }
 
@@ -2253,7 +2281,7 @@ public class DefaultModelValidator implements ModelValidator
                     {
                         final ImplementationReference r = declaration.getImplementations().getReference().get( i );
                         this.addImplementationReferenceNode( new Node<ImplementationReference>(
-                            declaration, r, r.isFinal(), r.isOverride(), false, false, path ) );
+                            declaration, null, null, r, r.isFinal(), r.isOverride(), path ) );
 
                         final Implementation ancestor =
                             this.context.getModules().getImplementation( r.getIdentifier() );
@@ -2270,81 +2298,79 @@ public class DefaultModelValidator implements ModelValidator
             }
         }
 
-        private void collectEffectiveSpecificationReferenceNodes( final Implementation declaration )
+        private void collectEffectiveNodes( final Implementation declaration )
         {
-            final Map<String, Node<SpecificationReference>> specificationReferenceDeclarations =
+            final Map<String, List<Node<SpecificationReference>>> specificationReferenceDeclarations =
                 this.getDeclaredSpecificationReferences( declaration.getIdentifier() );
 
-            for ( Map.Entry<String, Node<SpecificationReference>> e : specificationReferenceDeclarations.entrySet() )
+            for ( Map.Entry<String, List<Node<SpecificationReference>>> e :
+                  specificationReferenceDeclarations.entrySet() )
             {
-                addEffectiveDeclarationNode(
-                    this.effectiveSpecReferences, e.getValue(), e.getValue().getModelObject().getIdentifier() );
+                for ( int i = 0, s0 = e.getValue().size(); i < s0; i++ )
+                {
+                    addEffectiveDeclarationNode( this.effectiveSpecReferences, e.getValue().get( i ),
+                                                 e.getValue().get( i ).getModelObject().getIdentifier() );
 
+                }
             }
+
+            final Map<String, List<Node<Dependency>>> dependencyDeclarations =
+                this.getDeclaredDependencies( declaration.getIdentifier() );
+
+            for ( Map.Entry<String, List<Node<Dependency>>> e : dependencyDeclarations.entrySet() )
+            {
+                for ( int i = 0, s0 = e.getValue().size(); i < s0; i++ )
+                {
+                    addEffectiveDeclarationNode( this.effectiveDependencies, e.getValue().get( i ),
+                                                 e.getValue().get( i ).getModelObject().getName() );
+
+                }
+            }
+
+            final Map<String, List<Node<Message>>> messageDeclarations =
+                this.getDeclaredMessages( declaration.getIdentifier() );
+
+            for ( Map.Entry<String, List<Node<Message>>> e : messageDeclarations.entrySet() )
+            {
+                for ( int i = 0, s0 = e.getValue().size(); i < s0; i++ )
+                {
+                    addEffectiveDeclarationNode( this.effectiveMessages, e.getValue().get( i ),
+                                                 e.getValue().get( i ).getModelObject().getName() );
+
+                }
+            }
+
+            final Map<String, List<Node<Property>>> propertyDeclarations =
+                this.getDeclaredProperties( declaration.getIdentifier() );
+
+            for ( Map.Entry<String, List<Node<Property>>> e : propertyDeclarations.entrySet() )
+            {
+                for ( int i = 0, s0 = e.getValue().size(); i < s0; i++ )
+                {
+                    addEffectiveDeclarationNode( this.effectiveProperties, e.getValue().get( i ),
+                                                 e.getValue().get( i ).getModelObject().getName() );
+
+                }
+            }
+
+            final Map<String, List<Node<ImplementationReference>>> implementationReferenceDeclarations =
+                this.getDeclaredImplementationReferences( declaration.getIdentifier() );
+
+            for ( Map.Entry<String, List<Node<ImplementationReference>>> e :
+                  implementationReferenceDeclarations.entrySet() )
+            {
+                for ( int i = 0, s0 = e.getValue().size(); i < s0; i++ )
+                {
+                    addEffectiveDeclarationNode( this.effectiveImplReferences, e.getValue().get( i ),
+                                                 e.getValue().get( i ).getModelObject().getIdentifier() );
+
+                }
+            }
+
+            this.declareClassDeclarationModelObjects( declaration );
 
             final Map<String, List<Node<SpecificationReference>>> ancestorSpecificationReferences =
                 this.effectiveSpecReferences.get( declaration.getIdentifier() );
-
-            for ( Implementation descendant : this.descendants.get( declaration.getIdentifier() ) )
-            {
-                if ( descendant.getIdentifier().equals( declaration.getIdentifier() ) )
-                {
-                    continue;
-                }
-
-                if ( ancestorSpecificationReferences != null )
-                {
-                    this.inheritSpecificationReferences( ancestorSpecificationReferences, descendant.getIdentifier() );
-                }
-
-                collectEffectiveSpecificationReferenceNodes( descendant );
-            }
-        }
-
-        private void collectEffectiveNodes( final Implementation declaration )
-        {
-            final Map<String, Node<Dependency>> dependencyDeclarations =
-                this.getDeclaredDependencies( declaration.getIdentifier() );
-
-            for ( Map.Entry<String, Node<Dependency>> e : dependencyDeclarations.entrySet() )
-            {
-                addEffectiveDeclarationNode(
-                    this.effectiveDependencies, e.getValue(), e.getValue().getModelObject().getName() );
-
-            }
-
-            final Map<String, Node<Message>> messageDeclarations =
-                this.getDeclaredMessages( declaration.getIdentifier() );
-
-            for ( Map.Entry<String, Node<Message>> e : messageDeclarations.entrySet() )
-            {
-                addEffectiveDeclarationNode(
-                    this.effectiveMessages, e.getValue(), e.getValue().getModelObject().getName() );
-
-            }
-
-            final Map<String, Node<Property>> propertyDeclarations =
-                this.getDeclaredProperties( declaration.getIdentifier() );
-
-            for ( Map.Entry<String, Node<Property>> e : propertyDeclarations.entrySet() )
-            {
-                addEffectiveDeclarationNode(
-                    this.effectiveProperties, e.getValue(), e.getValue().getModelObject().getName() );
-
-            }
-
-            final Map<String, Node<ImplementationReference>> implementationReferenceDeclarations =
-                this.getDeclaredImplementationReferences( declaration.getIdentifier() );
-
-            for ( Map.Entry<String, Node<ImplementationReference>> e : implementationReferenceDeclarations.entrySet() )
-            {
-                addEffectiveDeclarationNode(
-                    this.effectiveImplReferences, e.getValue(), e.getValue().getModelObject().getIdentifier() );
-
-            }
-
-            this.implementSpecificationModelObjects( declaration );
-            this.declareClassDeclarationModelObjects( declaration );
 
             final Map<String, List<Node<Dependency>>> ancestorDependencies =
                 this.effectiveDependencies.get( declaration.getIdentifier() );
@@ -2363,6 +2389,11 @@ public class DefaultModelValidator implements ModelValidator
                 if ( descendant.getIdentifier().equals( declaration.getIdentifier() ) )
                 {
                     continue;
+                }
+
+                if ( ancestorSpecificationReferences != null )
+                {
+                    this.inheritSpecificationReferences( ancestorSpecificationReferences, descendant.getIdentifier() );
                 }
 
                 if ( ancestorDependencies != null )
@@ -2388,38 +2419,6 @@ public class DefaultModelValidator implements ModelValidator
                 }
 
                 collectEffectiveNodes( descendant );
-            }
-        }
-
-        private void implementSpecificationModelObjects( final Implementation declaration )
-        {
-            final Map<String, List<Node<SpecificationReference>>> effSpecificationReferences =
-                this.effectiveSpecReferences.get( declaration.getIdentifier() );
-
-            if ( effSpecificationReferences != null )
-            {
-                for ( Map.Entry<String, List<Node<SpecificationReference>>> e : effSpecificationReferences.entrySet() )
-                {
-                    final Specification s = this.context.getModules().getSpecification( e.getKey() );
-
-                    if ( s != null && s.getProperties() != null && !s.getProperties().getProperty().isEmpty() )
-                    {
-                        final List<String> path = newList( 2 );
-                        path.add( declaration.getIdentifier() );
-                        path.add( "SPECIFICATION:" + s.getIdentifier() );  // pathToString
-
-                        for ( int i = 0, s0 = s.getProperties().getProperty().size(); i < s0; i++ )
-                        {
-                            final Property specified = s.getProperties().getProperty().get( i );
-                            final Node<Property> specifiedNode =
-                                new Node<Property>( declaration, specified, false, false, true, false, path );
-
-                            addEffectiveSpecificationNode(
-                                this.effectiveProperties, specifiedNode, specified.getName() );
-
-                        }
-                    }
-                }
             }
         }
 
@@ -2473,12 +2472,12 @@ public class DefaultModelValidator implements ModelValidator
                                 final Node<Dependency> n = e.getValue().get( i );
                                 final List<String> effPath = newList();
                                 effPath.add( implementation.getIdentifier() );
-                                effPath.add( "CLASS_DECL:" + n.getDeclaration().getIdentifier() ); // pathToString
+                                effPath.add( "CLASS_DECL:" + n.getImplementation().getIdentifier() ); // pathToString
                                 effPath.addAll( n.getPath().subList( 1, n.getPath().size() ) );
 
                                 final Node<Dependency> effNode = new Node<Dependency>(
-                                    n.getDeclaration(), n.getModelObject(), n.isFinal(), n.isOverride(), false, true,
-                                    effPath );
+                                    implementation, null, n.getImplementation(), n.getModelObject(), n.isFinal(),
+                                    n.isOverride(), effPath );
 
                                 list.add( effNode );
                             }
@@ -2507,12 +2506,12 @@ public class DefaultModelValidator implements ModelValidator
                                 final Node<SpecificationReference> n = e.getValue().get( i );
                                 final List<String> effPath = newList();
                                 effPath.add( implementation.getIdentifier() );
-                                effPath.add( "CLASS_DECL:" + n.getDeclaration().getIdentifier() ); // pathToString
+                                effPath.add( "CLASS_DECL:" + n.getImplementation().getIdentifier() ); // pathToString
                                 effPath.addAll( n.getPath().subList( 1, n.getPath().size() ) );
 
                                 final Node<SpecificationReference> effNode = new Node<SpecificationReference>(
-                                    n.getDeclaration(), n.getModelObject(), n.isFinal(), n.isOverride(), false, true,
-                                    effPath );
+                                    implementation, null, n.getImplementation(), n.getModelObject(), n.isFinal(),
+                                    n.isOverride(), effPath );
 
                                 list.add( effNode );
                             }
@@ -2541,12 +2540,12 @@ public class DefaultModelValidator implements ModelValidator
                                 final Node<Message> n = e.getValue().get( i );
                                 final List<String> effPath = newList();
                                 effPath.add( implementation.getIdentifier() );
-                                effPath.add( "CLASS_DECL:" + n.getDeclaration().getIdentifier() ); // pathToString
+                                effPath.add( "CLASS_DECL:" + n.getImplementation().getIdentifier() ); // pathToString
                                 effPath.addAll( n.getPath().subList( 1, n.getPath().size() ) );
 
                                 final Node<Message> effNode = new Node<Message>(
-                                    n.getDeclaration(), n.getModelObject(), n.isFinal(), n.isOverride(), false, true,
-                                    effPath );
+                                    implementation, null, n.getImplementation(), n.getModelObject(), n.isFinal(),
+                                    n.isOverride(), effPath );
 
                                 list.add( effNode );
                             }
@@ -2575,12 +2574,12 @@ public class DefaultModelValidator implements ModelValidator
                                 final Node<Property> n = e.getValue().get( i );
                                 final List<String> effPath = newList();
                                 effPath.add( implementation.getIdentifier() );
-                                effPath.add( "CLASS_DECL:" + n.getDeclaration().getIdentifier() ); // pathToString
+                                effPath.add( "CLASS_DECL:" + n.getImplementation().getIdentifier() ); // pathToString
                                 effPath.addAll( n.getPath().subList( 1, n.getPath().size() ) );
 
                                 final Node<Property> effNode = new Node<Property>(
-                                    n.getDeclaration(), n.getModelObject(), n.isFinal(), n.isOverride(), false, true,
-                                    effPath );
+                                    implementation, null, n.getImplementation(), n.getModelObject(), n.isFinal(),
+                                    n.isOverride(), effPath );
 
                                 list.add( effNode );
                             }
@@ -2641,12 +2640,12 @@ public class DefaultModelValidator implements ModelValidator
         private static <T extends ModelObject> void addEffectiveDeclarationNode(
             final Map<String, Map<String, List<Node<T>>>> map, final Node<T> node, final String nodeKey )
         {
-            Map<String, List<Node<T>>> nodeMap = map.get( node.getDeclaration().getIdentifier() );
+            Map<String, List<Node<T>>> nodeMap = map.get( node.getImplementation().getIdentifier() );
 
             if ( nodeMap == null )
             {
                 nodeMap = newMap();
-                map.put( node.getDeclaration().getIdentifier(), nodeMap );
+                map.put( node.getImplementation().getIdentifier(), nodeMap );
             }
 
             List<Node<T>> list = nodeMap.get( nodeKey );
@@ -2656,86 +2655,91 @@ public class DefaultModelValidator implements ModelValidator
                 nodeMap.put( nodeKey, list );
             }
 
-            boolean contains = false;
+            boolean found = false;
+            final Set<Node<T>> overrides = newSet();
+
+            node:
             for ( final Iterator<Node<T>> it = list.iterator(); it.hasNext(); )
             {
                 final Node<T> n = it.next();
-                if ( !n.getDeclaration().getIdentifier().equals( node.getDeclaration().getIdentifier() ) )
+
+                if ( !n.isScope( node.getImplementation() ) )
                 {
-                    it.remove();
+                    if ( node.getSpecification() != null )
+                    {
+                        boolean overridden = false;
+
+                        for ( Node<T> override : n.getOverrides() )
+                        {
+                            if ( override.getSpecification() != null && override.getSpecification().getIdentifier().
+                                equals( node.getSpecification().getIdentifier() ) )
+                            {
+                                overridden = true;
+                                break;
+                            }
+                        }
+
+                        if ( overridden )
+                        {
+                            n.getOverrides().add( node );
+                            found = true;
+                        }
+                    }
+                    else
+                    {
+                        it.remove();
+                        overrides.add( n );
+                    }
+
+                    continue node;
                 }
-                else
+
+                if ( n.getSpecification() == null )
                 {
-                    contains = true;
+                    found = true;
+                    n.getOverrides().add( node );
+                    continue node;
+                }
+
+                if ( node.getSpecification() != null
+                     && n.getSpecification().getIdentifier().equals( node.getSpecification().getIdentifier() ) )
+                {
+                    found = true;
+                    n.getOverrides().add( node );
+                    continue node;
                 }
             }
 
-            if ( !contains )
+            if ( !found )
             {
+                node.getOverrides().addAll( overrides );
                 list.add( node );
             }
         }
 
-        private static <T extends ModelObject> void addEffectiveSpecificationNode(
-            final Map<String, Map<String, List<Node<T>>>> map, final Node<T> node, final String nodeKey )
-        {
-            Map<String, List<Node<T>>> nodeMap = map.get( node.getDeclaration().getIdentifier() );
-
-            if ( nodeMap == null )
-            {
-                nodeMap = newMap();
-                map.put( node.getDeclaration().getIdentifier(), nodeMap );
-            }
-
-            List<Node<T>> list = nodeMap.get( nodeKey );
-            if ( list == null )
-            {
-                list = newList();
-                nodeMap.put( nodeKey, list );
-            }
-
-            boolean declared = false;
-            for ( final Iterator<Node<T>> it = list.iterator(); it.hasNext(); )
-            {
-                final Node<T> n = it.next();
-                if ( !n.getDeclaration().getIdentifier().equals( node.getDeclaration().getIdentifier() ) )
-                {
-                    it.remove();
-                }
-                else if ( !n.isSpecificationModelObject() )
-                {
-                    declared = true;
-                }
-            }
-
-            if ( !declared )
-            {
-                list.add( node );
-            }
-        }
-
-        private static <T extends ModelObject> Map<String, Node<T>> getDeclarationNodes(
+        private static <T extends ModelObject> Map<String, List<Node<T>>> getDeclarationNodes(
             final Map<String, List<Node<T>>> map, final String origin )
         {
-            final Map<String, Node<T>> declarationMap = newMap( map.size() );
+            final Map<String, List<Node<T>>> declarationMap = newMap( map.size() );
 
             for ( Map.Entry<String, List<Node<T>>> e : map.entrySet() )
             {
-                Node<T> declaration = null;
-
                 for ( int i = 0, s0 = e.getValue().size(); i < s0; i++ )
                 {
                     final Node<T> n = e.getValue().get( i );
-                    if ( n.getDeclaration().getIdentifier().equals( origin ) )
-                    {
-                        declaration = n;
-                        break;
-                    }
-                }
 
-                if ( declaration != null )
-                {
-                    declarationMap.put( e.getKey(), declaration );
+                    if ( n.isScope( origin ) )
+                    {
+                        List<Node<T>> list = declarationMap.get( e.getKey() );
+
+                        if ( list == null )
+                        {
+                            list = newList();
+                            declarationMap.put( e.getKey(), list );
+                        }
+
+                        list.add( n );
+                    }
                 }
             }
 
@@ -2769,12 +2773,12 @@ public class DefaultModelValidator implements ModelValidator
                     boolean overridden = false;
                     final Node<T> inherit = e.getValue().get( i );
 
-                    if ( !inherit.isClassDeclarationModelObject() )
+                    if ( inherit.getClassDeclaration() == null )
                     {
                         for ( int j = 0, s1 = list.size(); j < s1; j++ )
                         {
                             final Node<T> n = list.get( j );
-                            if ( n.getDeclaration().getIdentifier().equals( inherit.getDeclaration().getIdentifier() ) )
+                            if ( n.isScope( inherit.getImplementation() ) )
                             {
                                 overridden = true;
                                 break;
@@ -2800,7 +2804,7 @@ public class DefaultModelValidator implements ModelValidator
                 for ( int i = 0, s0 = nodes.size(); i < s0; i++ )
                 {
                     final Node<T> node = nodes.get( i );
-                    if ( !node.getDeclaration().getIdentifier().equals( implementation ) )
+                    if ( !node.isScope( implementation ) || node.getSpecification() != null )
                     {
                         return true;
                     }
@@ -2820,7 +2824,7 @@ public class DefaultModelValidator implements ModelValidator
                 for ( int i = 0, s0 = nodes.size(); i < s0; i++ )
                 {
                     final Node<T> node = nodes.get( i );
-                    if ( !node.getDeclaration().getIdentifier().equals( implementation ) && node.isFinal() )
+                    if ( node.isFinal() && ( !node.isScope( implementation ) || node.getSpecification() != null ) )
                     {
                         return true;
                     }
