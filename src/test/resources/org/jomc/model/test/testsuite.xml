@@ -1082,4 +1082,190 @@
     </instance>
   </instance-test>
 
+  <!-- ********************************************************************* -->
+  <instance-test identifier="INT0004" implementationIdentifier="Implementation">
+    <modules>
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <specifications>
+            <specification identifier="Specification 1" class="java.lang.Object"/>
+            <specification identifier="Specification 2" class="java.lang.Object"/>
+            <specification identifier="Specification 3" class="java.lang.Object"/>
+            <specification identifier="Specification 4" class="java.lang.Object"/>
+            <specification identifier="Specification 5" class="java.lang.Object"/>
+          </specifications>
+          <implementations>
+            <implementation identifier="Implementation 1" name="Implementation Name 1" class="java.lang.Object">
+              <specifications>
+                <reference identifier="Specification 1"/>
+              </specifications>
+              <implementations>
+                <reference identifier="Implementation 5"/>
+                <reference identifier="Implementation 2"/>
+              </implementations>
+              <dependencies>
+                <dependency name="Dependency 1" identifier="Specification 1" optional="true"/>
+              </dependencies>
+              <properties>
+                <property name="Property 1"/>
+              </properties>
+              <messages>
+                <message name="Message 1">
+                  <template defaultLanguage="en">
+                    <text language="en">Text 1</text>
+                  </template>
+                </message>
+              </messages>
+            </implementation>
+            <implementation identifier="Implementation 2" name="Implementation Name 2">
+              <specifications>
+                <reference identifier="Specification 2"/>
+              </specifications>
+              <implementations>
+                <reference identifier="Implementation 5"/>
+                <reference identifier="Implementation 3"/>
+              </implementations>
+              <dependencies>
+                <dependency name="Dependency 2" identifier="Specification 2" optional="true"/>
+              </dependencies>
+              <properties>
+                <property name="Property 2"/>
+              </properties>
+              <messages>
+                <message name="Message 2">
+                  <template defaultLanguage="en">
+                    <text language="en">Text 2</text>
+                  </template>
+                </message>
+              </messages>
+            </implementation>
+            <implementation identifier="Implementation 3" name="Implementation Name 3">
+              <specifications>
+                <reference identifier="Specification 3"/>
+              </specifications>
+              <implementations>
+                <reference identifier="Implementation 5"/>
+                <reference identifier="Implementation 4"/>
+              </implementations>
+              <dependencies>
+                <dependency name="Dependency 3" identifier="Specification 3" optional="true"/>
+              </dependencies>
+              <properties>
+                <property name="Property 3"/>
+              </properties>
+              <messages>
+                <message name="Message 3">
+                  <template defaultLanguage="en">
+                    <text language="en">Text 3</text>
+                  </template>
+                </message>
+              </messages>
+            </implementation>
+            <implementation identifier="Implementation 4" name="Implementation Name 4">
+              <specifications>
+                <reference identifier="Specification 4"/>
+              </specifications>
+              <implementations>
+                <reference identifier="Implementation 5"/>
+              </implementations>
+              <dependencies>
+                <dependency name="Dependency 4" identifier="Specification 4" optional="true"/>
+              </dependencies>
+              <properties>
+                <property name="Property 4"/>
+              </properties>
+              <messages>
+                <message name="Message 4">
+                  <template defaultLanguage="en">
+                    <text language="en">Text 4</text>
+                  </template>
+                </message>
+              </messages>
+            </implementation>
+            <implementation identifier="Implementation 5" name="Implementation Name 5">
+              <specifications>
+                <reference identifier="Specification 5"/>
+              </specifications>
+              <dependencies>
+                <dependency name="Dependency 5" identifier="Specification 5" optional="true"/>
+              </dependencies>
+              <properties>
+                <property name="Property 5"/>
+              </properties>
+              <messages>
+                <message name="Message 5">
+                  <template defaultLanguage="en">
+                    <text language="en">Text 5</text>
+                  </template>
+                </message>
+              </messages>
+            </implementation>
+            <implementation identifier="Implementation" name="Implementation Name" class="java.lang.Object">
+              <implementations>
+                <reference identifier="Implementation 1"/>
+              </implementations>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+    <instance>
+      <instance xmlns="http://jomc.org/model" identifier="Implementation" name="Implementation Name" class="java.lang.Object">
+        <specifications>
+          <specification identifier="Specification 1" class="java.lang.Object"/>
+          <specification identifier="Specification 2" class="java.lang.Object"/>
+          <specification identifier="Specification 3" class="java.lang.Object"/>
+          <specification identifier="Specification 4" class="java.lang.Object"/>
+          <specification identifier="Specification 5" class="java.lang.Object"/>
+          <reference identifier="Specification 1"/>
+          <reference identifier="Specification 2"/>
+          <reference identifier="Specification 3"/>
+          <reference identifier="Specification 4"/>
+          <reference identifier="Specification 5"/>
+        </specifications>
+        <dependencies>
+          <dependency name="Dependency 1" identifier="Specification 1" optional="true"/>
+          <dependency name="Dependency 2" identifier="Specification 2" optional="true"/>
+          <dependency name="Dependency 3" identifier="Specification 3" optional="true"/>
+          <dependency name="Dependency 4" identifier="Specification 4" optional="true"/>
+          <dependency name="Dependency 5" identifier="Specification 5" optional="true"/>
+        </dependencies>
+        <properties>
+          <property name="Property 1"/>
+          <property name="Property 2"/>
+          <property name="Property 3"/>
+          <property name="Property 4"/>
+          <property name="Property 5"/>
+        </properties>
+        <messages>
+          <message name="Message 1">
+            <template defaultLanguage="en">
+              <text language="en">Text 1</text>
+            </template>
+          </message>
+          <message name="Message 2">
+            <template defaultLanguage="en">
+              <text language="en">Text 2</text>
+            </template>
+          </message>
+          <message name="Message 3">
+            <template defaultLanguage="en">
+              <text language="en">Text 3</text>
+            </template>
+          </message>
+          <message name="Message 4">
+            <template defaultLanguage="en">
+              <text language="en">Text 4</text>
+            </template>
+          </message>
+          <message name="Message 5">
+            <template defaultLanguage="en">
+              <text language="en">Text 5</text>
+            </template>
+          </message>
+        </messages>
+      </instance>
+    </instance>
+  </instance-test>
+
 </testsuite>
