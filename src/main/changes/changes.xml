@@ -71,6 +71,9 @@
       <action dev="schulte2005" type="fix"><![CDATA[Corrected method <code>getClasspathModule</code> of class
       <code>org.jomc.model.Modules</code> to also resolve specifications specified by overridden dependencies.]]>
       </action>
+      <action dev="schulte2005" type="fix"><![CDATA[Updated class
+      <code>org.jomc.model.modlet.DefaultModelValidator</code> to correctly validate model object inheritance.]]>
+      </action>
       <action dev="schulte2005" type="remove"><![CDATA[Removed the <code>jomc-1.0.xsd</code> schema deprecated by the
       <code>jomc-1.2.xsd</code> schema.]]>
       </action>

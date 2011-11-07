@@ -31,31 +31,32 @@
 package org.jomc.model.modlet;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.logging.Level;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.util.JAXBSource;
 import javax.xml.transform.Source;
-import org.jomc.model.Dependencies;
 import org.jomc.model.Dependency;
 import org.jomc.model.Implementation;
 import org.jomc.model.ImplementationReference;
 import org.jomc.model.Implementations;
 import org.jomc.model.Message;
 import org.jomc.model.MessageReference;
-import org.jomc.model.Messages;
 import org.jomc.model.ModelObject;
 import org.jomc.model.Module;
 import org.jomc.model.Modules;
 import org.jomc.model.Multiplicity;
 import org.jomc.model.ObjectFactory;
-import org.jomc.model.Properties;
 import org.jomc.model.Property;
 import org.jomc.model.PropertyException;
 import org.jomc.model.PropertyReference;
@@ -106,12 +107,13 @@ public class DefaultModelValidator implements ModelValidator
 
             final ModelValidationReport report = context.validateModel( model.getIdentifier(), source );
             final Modules modules = ModelHelper.getModules( model );
+            final ValidationContext validationContext = new ValidationContext( context, modules, report );
 
             if ( modules != null )
             {
-                this.assertModulesValid( context, modules, report );
-                this.assertSpecificationsValid( context, modules, report );
-                this.assertImplementationsValid( context, modules, report );
+                assertModulesValid( validationContext );
+                assertSpecificationsValid( validationContext );
+                assertImplementationsValid( validationContext );
             }
 
             return report;
@@ -133,25 +135,20 @@ public class DefaultModelValidator implements ModelValidator
         }
     }
 
-    private void assertModulesValid( final ModelContext context, final Modules modules,
-                                     final ModelValidationReport report )
+    private static void assertModulesValid( final ValidationContext validationContext )
     {
-        for ( int i = 0, s0 = modules.getModule().size(); i < s0; i++ )
+        for ( int i = 0, s0 = validationContext.getModules().getModule().size(); i < s0; i++ )
         {
-            final Module m = modules.getModule().get( i );
+            final Module m = validationContext.getModules().getModule().get( i );
 
             if ( m.getImplementations() != null )
             {
                 for ( int j = 0, s1 = m.getImplementations().getReference().size(); j < s1; j++ )
                 {
                     final ImplementationReference r = m.getImplementations().getReference().get( j );
-
-                    report.getDetails().add( this.createDetail(
-                        "MODULE_IMPLEMENTATION_REFERENCE_DECLARATION_CONSTRAINT", Level.SEVERE,
-                        "moduleImplementationReferenceDeclarationConstraint", new Object[]
-                        {
-                            m.getName(), r.getIdentifier()
-                        }, new ObjectFactory().createModule( m ) ) );
+                    addDetail( validationContext.getReport(), "MODULE_IMPLEMENTATION_REFERENCE_DECLARATION_CONSTRAINT",
+                               Level.SEVERE, new ObjectFactory().createModule( m ),
+                               "moduleImplementationReferenceDeclarationConstraint", m.getName(), r.getIdentifier() );
 
                 }
             }
@@ -164,23 +161,17 @@ public class DefaultModelValidator implements ModelValidator
 
                     if ( msg.isFinal() )
                     {
-                        report.getDetails().add( this.createDetail(
-                            "MODULE_FINAL_MESSAGE_DECLARATION_CONSTRAINT", Level.SEVERE,
-                            "moduleFinalMessageConstraint", new Object[]
-                            {
-                                m.getName(), msg.getName()
-                            }, new ObjectFactory().createModule( m ) ) );
+                        addDetail( validationContext.getReport(), "MODULE_FINAL_MESSAGE_DECLARATION_CONSTRAINT",
+                                   Level.SEVERE, new ObjectFactory().createModule( m ), "moduleFinalMessageConstraint",
+                                   m.getName(), msg.getName() );
 
                     }
 
                     if ( msg.isOverride() )
                     {
-                        report.getDetails().add( this.createDetail(
-                            "MODULE_OVERRIDE_MESSAGE_DECLARATION_CONSTRAINT", Level.SEVERE,
-                            "moduleOverrideMessageConstraint", new Object[]
-                            {
-                                m.getName(), msg.getName()
-                            }, new ObjectFactory().createModule( m ) ) );
+                        addDetail( validationContext.getReport(), "MODULE_OVERRIDE_MESSAGE_DECLARATION_CONSTRAINT",
+                                   Level.SEVERE, new ObjectFactory().createModule( m ),
+                                   "moduleOverrideMessageConstraint", m.getName(), msg.getName() );
 
                     }
 
@@ -198,17 +189,15 @@ public class DefaultModelValidator implements ModelValidator
                             {
                                 final String message = getMessage( e );
 
-                                if ( context.isLoggable( Level.FINE ) )
+                                if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
                                 {
-                                    context.log( Level.FINE, message, e );
+                                    validationContext.getModelContext().log( Level.FINE, message, e );
                                 }
 
-                                report.getDetails().add( this.createDetail(
-                                    "MODULE_MESSAGE_TEMPLATE_CONSTRAINT", Level.SEVERE,
-                                    "moduleMessageTemplateConstraint", new Object[]
-                                    {
-                                        m.getName(), msg.getName(), t.getValue(), message
-                                    }, new ObjectFactory().createModule( m ) ) );
+                                addDetail( validationContext.getReport(), "MODULE_MESSAGE_TEMPLATE_CONSTRAINT",
+                                           Level.SEVERE, new ObjectFactory().createModule( m ),
+                                           "moduleMessageTemplateConstraint", m.getName(), msg.getName(), t.getValue(),
+                                           message );
 
                             }
                         }
@@ -218,13 +207,9 @@ public class DefaultModelValidator implements ModelValidator
                 for ( int j = 0, s1 = m.getMessages().getReference().size(); j < s1; j++ )
                 {
                     final MessageReference r = m.getMessages().getReference().get( j );
-
-                    report.getDetails().add( this.createDetail(
-                        "MODULE_MESSAGE_REFERENCE_DECLARATION_CONSTRAINT", Level.SEVERE,
-                        "moduleMessageReferenceDeclarationConstraint", new Object[]
-                        {
-                            m.getName(), r.getName()
-                        }, new ObjectFactory().createModule( m ) ) );
+                    addDetail( validationContext.getReport(), "MODULE_MESSAGE_REFERENCE_DECLARATION_CONSTRAINT",
+                               Level.SEVERE, new ObjectFactory().createModule( m ),
+                               "moduleMessageReferenceDeclarationConstraint", m.getName(), r.getName() );
 
                 }
             }
@@ -237,65 +222,52 @@ public class DefaultModelValidator implements ModelValidator
 
                     if ( p.isFinal() )
                     {
-                        report.getDetails().add( this.createDetail(
-                            "MODULE_FINAL_PROPERTY_DECLARATION_CONSTRAINT", Level.SEVERE,
-                            "moduleFinalPropertyConstraint", new Object[]
-                            {
-                                m.getName(), p.getName()
-                            }, new ObjectFactory().createModule( m ) ) );
+                        addDetail( validationContext.getReport(), "MODULE_FINAL_PROPERTY_DECLARATION_CONSTRAINT",
+                                   Level.SEVERE, new ObjectFactory().createModule( m ), "moduleFinalPropertyConstraint",
+                                   m.getName(), p.getName() );
 
                     }
 
                     if ( p.isOverride() )
                     {
-                        report.getDetails().add( this.createDetail(
-                            "MODULE_OVERRIDE_PROPERTY_DECLARATION_CONSTRAINT", Level.SEVERE,
-                            "moduleOverridePropertyConstraint", new Object[]
-                            {
-                                m.getName(), p.getName()
-                            }, new ObjectFactory().createModule( m ) ) );
+                        addDetail( validationContext.getReport(), "MODULE_OVERRIDE_PROPERTY_DECLARATION_CONSTRAINT",
+                                   Level.SEVERE, new ObjectFactory().createModule( m ),
+                                   "moduleOverridePropertyConstraint", m.getName(), p.getName() );
 
                     }
 
                     if ( p.getValue() != null && p.getAny() != null )
                     {
-                        report.getDetails().add( this.createDetail( "MODULE_PROPERTY_VALUE_CONSTRAINT", Level.SEVERE,
-                                                                    "modulePropertyValueConstraint", new Object[]
-                            {
-                                m.getName(), p.getName()
-                            }, new ObjectFactory().createModule( m ) ) );
+                        addDetail( validationContext.getReport(), "MODULE_PROPERTY_VALUE_CONSTRAINT", Level.SEVERE,
+                                   new ObjectFactory().createModule( m ), "modulePropertyValueConstraint", m.getName(),
+                                   p.getName() );
 
                     }
 
                     if ( p.getAny() != null && p.getType() == null )
                     {
-                        report.getDetails().add( this.createDetail( "MODULE_PROPERTY_TYPE_CONSTRAINT", Level.SEVERE,
-                                                                    "modulePropertyTypeConstraint", new Object[]
-                            {
-                                m.getName(), p.getName()
-                            }, new ObjectFactory().createModule( m ) ) );
+                        addDetail( validationContext.getReport(), "MODULE_PROPERTY_TYPE_CONSTRAINT", Level.SEVERE,
+                                   new ObjectFactory().createModule( m ), "modulePropertyTypeConstraint", m.getName(),
+                                   p.getName() );
 
                     }
 
                     try
                     {
-                        p.getJavaValue( context.getClassLoader() );
+                        p.getJavaValue( validationContext.getModelContext().getClassLoader() );
                     }
                     catch ( final PropertyException e )
                     {
                         final String message = getMessage( e );
 
-                        if ( context.isLoggable( Level.FINE ) )
+                        if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
                         {
-                            context.log( Level.FINE, message, e );
+                            validationContext.getModelContext().log( Level.FINE, message, e );
                         }
 
-                        report.getDetails().add( this.createDetail(
-                            "MODULE_PROPERTY_JAVA_VALUE_CONSTRAINT", Level.SEVERE,
-                            "modulePropertyJavaValueConstraint", new Object[]
-                            {
-                                m.getName(), p.getName(), message
-                            }, new ObjectFactory().createModule( m ) ) );
+                        addDetail( validationContext.getReport(), "MODULE_PROPERTY_JAVA_VALUE_CONSTRAINT", Level.SEVERE,
+                                   new ObjectFactory().createModule( m ), "modulePropertyJavaValueConstraint",
+                                   m.getName(), p.getName(), message );
 
                     }
                 }
@@ -303,13 +275,9 @@ public class DefaultModelValidator implements ModelValidator
                 for ( int j = 0, s1 = m.getProperties().getReference().size(); j < s1; j++ )
                 {
                     final PropertyReference r = m.getProperties().getReference().get( j );
-
-                    report.getDetails().add( this.createDetail(
-                        "MODULE_PROPERTY_REFERENCE_DECLARATION_CONSTRAINT", Level.SEVERE,
-                        "modulePropertyReferenceDeclarationConstraint", new Object[]
-                        {
-                            m.getName(), r.getName()
-                        }, new ObjectFactory().createModule( m ) ) );
+                    addDetail( validationContext.getReport(), "MODULE_PROPERTY_REFERENCE_DECLARATION_CONSTRAINT",
+                               Level.SEVERE, new ObjectFactory().createModule( m ),
+                               "modulePropertyReferenceDeclarationConstraint", m.getName(), r.getName() );
 
                 }
             }
@@ -319,23 +287,18 @@ public class DefaultModelValidator implements ModelValidator
                 for ( int j = 0, s1 = m.getSpecifications().getReference().size(); j < s1; j++ )
                 {
                     final SpecificationReference r = m.getSpecifications().getReference().get( j );
-
-                    report.getDetails().add( this.createDetail(
-                        "MODULE_SPECIFICATION_REFERENCE_DECLARATION_CONSTRAINT", Level.SEVERE,
-                        "moduleSpecificationReferenceDeclarationConstraint", new Object[]
-                        {
-                            m.getName(), r.getIdentifier()
-                        }, new ObjectFactory().createModule( m ) ) );
+                    addDetail( validationContext.getReport(), "MODULE_SPECIFICATION_REFERENCE_DECLARATION_CONSTRAINT",
+                               Level.SEVERE, new ObjectFactory().createModule( m ),
+                               "moduleSpecificationReferenceDeclarationConstraint", m.getName(), r.getIdentifier() );
 
                 }
             }
         }
     }
 
-    private void assertImplementationsValid( final ModelContext context, final Modules modules,
-                                             final ModelValidationReport report )
+    private static void assertImplementationsValid( final ValidationContext validationContext )
     {
-        final Implementations implementations = modules.getImplementations();
+        final Implementations implementations = validationContext.getModules().getImplementations();
 
         if ( implementations != null )
         {
@@ -344,16 +307,22 @@ public class DefaultModelValidator implements ModelValidator
             for ( int i = 0, s0 = implementations.getImplementation().size(); i < s0; i++ )
             {
                 final Implementation impl = implementations.getImplementation().get( i );
-                final Implementation cycle = this.findInheritanceCycle( modules, impl, impl, new Implementations() );
+                final InheritanceModel inheritanceModel = validationContext.getInheritanceModel( impl );
+                final List<String> cyclePath = new LinkedList<String>();
 
-                if ( cycle != null )
+                if ( isInheritanceCycle( validationContext, impl, null, cyclePath ) )
                 {
-                    report.getDetails().add( this.createDetail(
-                        "IMPLEMENTATION_INHERITANCE_CYCLE_CONSTRAINT", Level.SEVERE,
-                        "implementationInheritanceCycleConstraint", new Object[]
-                        {
-                            impl.getIdentifier(), cycle.getIdentifier()
-                        }, new ObjectFactory().createImplementation( impl ) ) );
+                    final StringBuilder b = new StringBuilder( cyclePath.size() * 50 );
+
+                    for ( int j = 0, s1 = cyclePath.size(); j < s1; j++ )
+                    {
+                        b.append( " -> " ).append( "'" ).append( cyclePath.get( j ) ).append( "'" );
+                    }
+
+                    addDetail( validationContext.getReport(), "IMPLEMENTATION_INHERITANCE_CYCLE_CONSTRAINT",
+                               Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                               "implementationInheritanceCycleConstraint", impl.getIdentifier(),
+                               b.substring( " -> ".length() ) );
 
                 }
 
@@ -361,12 +330,9 @@ public class DefaultModelValidator implements ModelValidator
                 {
                     if ( impl.getClazz() == null )
                     {
-                        report.getDetails().add( this.createDetail(
-                            "IMPLEMENTATION_CLASS_CONSTRAINT", Level.SEVERE,
-                            "implementationClassConstraint", new Object[]
-                            {
-                                impl.getIdentifier()
-                            }, new ObjectFactory().createImplementation( impl ) ) );
+                        addDetail( validationContext.getReport(), "IMPLEMENTATION_CLASS_CONSTRAINT", Level.SEVERE,
+                                   new ObjectFactory().createImplementation( impl ), "implementationClassConstraint",
+                                   impl.getIdentifier() );
 
                     }
                     else
@@ -375,12 +341,10 @@ public class DefaultModelValidator implements ModelValidator
 
                         if ( prev != null )
                         {
-                            report.getDetails().add( this.createDetail(
-                                "IMPLEMENTATION_CLASS_DECLARATION_CONSTRAINT",
-                                Level.SEVERE, "implementationClassDeclarationConstraint", new Object[]
-                                {
-                                    impl.getIdentifier(), impl.getClazz(), prev.getIdentifier()
-                                }, new ObjectFactory().createImplementation( impl ) ) );
+                            addDetail( validationContext.getReport(), "IMPLEMENTATION_CLASS_DECLARATION_CONSTRAINT",
+                                       Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                       "implementationClassDeclarationConstraint", impl.getIdentifier(),
+                                       impl.getClazz(), prev.getIdentifier() );
 
                         }
                         else
@@ -392,85 +356,107 @@ public class DefaultModelValidator implements ModelValidator
 
                 if ( impl.isAbstract() && impl.getLocation() != null )
                 {
-                    report.getDetails().add( this.createDetail(
-                        "IMPLEMENTATION_ABSTRACT_LOCATION_DECLARATION_CONSTRAINT", Level.SEVERE,
-                        "implementationAbstractLocationDeclarationConstraint", new Object[]
-                        {
-                            impl.getIdentifier(), impl.getLocation()
-                        }, new ObjectFactory().createImplementation( impl ) ) );
+                    addDetail( validationContext.getReport(), "IMPLEMENTATION_ABSTRACT_LOCATION_DECLARATION_CONSTRAINT",
+                               Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                               "implementationAbstractLocationDeclarationConstraint", impl.getIdentifier(),
+                               impl.getLocation() );
 
                 }
 
                 if ( impl.getDependencies() != null )
                 {
-                    final Dependencies parentDependencies = new Dependencies();
-                    this.collectParentDependencies( modules, impl, parentDependencies, new Implementations(), false );
-
                     for ( int j = 0, s1 = impl.getDependencies().getDependency().size(); j < s1; j++ )
                     {
                         final Dependency d = impl.getDependencies().getDependency().get( j );
-                        final Dependency parent = parentDependencies.getDependency( d.getName() );
 
-                        if ( d.isOverride() && parent == null )
+                        if ( d.isOverride() && !inheritanceModel.isAncestorDependencyOverridden( d.getName() )
+                             && !inheritanceModel.isClassDeclarationDependencyOverridden( d.getName() ) )
                         {
-                            report.getDetails().add( this.createDetail(
-                                "IMPLEMENTATION_DEPENDENCY_OVERRIDE_CONSTRAINT", Level.SEVERE,
-                                "implementationDependencyOverrideConstraint", new Object[]
-                                {
-                                    impl.getIdentifier(), d.getName(),
-                                }, new ObjectFactory().createImplementation( impl ) ) );
-
-                        }
-                        if ( parent != null && parent.isFinal() )
-                        {
-                            report.getDetails().add( this.createDetail(
-                                "IMPLEMENTATION_DEPENDENCY_INHERITANCE_CONSTRAINT", Level.SEVERE,
-                                "implementationDependencyFinalConstraint", new Object[]
-                                {
-                                    impl.getIdentifier(), d.getName(),
-                                }, new ObjectFactory().createImplementation( impl ) ) );
+                            addDetail( validationContext.getReport(), "IMPLEMENTATION_DEPENDENCY_OVERRIDE_CONSTRAINT",
+                                       Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                       "implementationDependencyOverrideConstraint", impl.getIdentifier(),
+                                       d.getName() );
 
                         }
 
-                        this.assertDependencyValid( context, modules, impl, d, report );
+                        if ( inheritanceModel.isFinalAncestorDependencyOverridden( d.getName() )
+                             || inheritanceModel.isFinalClassDeclarationDependencyOverridden( d.getName() ) )
+                        {
+                            addDetail( validationContext.getReport(),
+                                       "IMPLEMENTATION_DEPENDENCY_INHERITANCE_CONSTRAINT", Level.SEVERE,
+                                       new ObjectFactory().createImplementation( impl ),
+                                       "implementationDependencyFinalConstraint", impl.getIdentifier(), d.getName() );
+
+                        }
+
+                        assertDependencyValid( validationContext, impl, d );
                     }
                 }
 
                 if ( impl.getImplementations() != null )
                 {
+                    final Set<String> finalAncestors = inheritanceModel.getFinalAncestorImplementations();
+
+                    for ( String finalAncestor : finalAncestors )
+                    {
+                        addDetail( validationContext.getReport(),
+                                   "IMPLEMENTATION_IMPLEMENTATION_INHERITANCE_CONSTRAINT", Level.SEVERE,
+                                   new ObjectFactory().createImplementation( impl ),
+                                   "implementationFinalImplementationConstraint", impl.getIdentifier(),
+                                   finalAncestor );
+
+                    }
+
                     for ( int j = 0, s1 = impl.getImplementations().getImplementation().size(); j < s1; j++ )
                     {
                         final Implementation pi = impl.getImplementations().getImplementation().get( j );
+                        addDetail( validationContext.getReport(),
+                                   "IMPLEMENTATION_IMPLEMENTATION_DECLARATION_CONSTRAINT", Level.SEVERE,
+                                   new ObjectFactory().createImplementation( impl ),
+                                   "implementationImplementationDeclarationConstraint", impl.getIdentifier(),
+                                   pi.getIdentifier() );
 
-                        report.getDetails().add( this.createDetail(
-                            "IMPLEMENTATION_IMPLEMENTATION_DECLARATION_CONSTRAINT", Level.SEVERE,
-                            "implementationImplementationDeclarationConstraint", new Object[]
-                            {
-                                impl.getIdentifier(), pi.getIdentifier()
-                            }, new ObjectFactory().createImplementation( impl ) ) );
+                    }
 
+                    for ( int j = 0, s1 = impl.getImplementations().getReference().size(); j < s1; j++ )
+                    {
+                        final ImplementationReference r = impl.getImplementations().getReference().get( j );
+
+                        if ( r.isOverride()
+                             && !inheritanceModel.isAncestorImplReferenceOverridden( r.getIdentifier() ) )
+                        {
+                            addDetail( validationContext.getReport(),
+                                       "IMPLEMENTATION_IMPLEMENTATION_OVERRIDE_CONSTRAINT", Level.SEVERE,
+                                       new ObjectFactory().createImplementation( impl ),
+                                       "implementationImplementationOverrideConstraint", impl.getIdentifier(),
+                                       r.getIdentifier() );
+
+                        }
+
+                        if ( inheritanceModel.isFinalAncestorImplReferenceOverridden( r.getIdentifier() ) )
+                        {
+                            addDetail( validationContext.getReport(),
+                                       "IMPLEMENTATION_IMPLEMENTATION_REFERENCE_INHERITANCE_CONSTRAINT", Level.SEVERE,
+                                       new ObjectFactory().createImplementation( impl ),
+                                       "implementationFinalImplementatioReferenceConstraint", impl.getIdentifier(),
+                                       r.getIdentifier() );
+
+                        }
                     }
                 }
 
                 if ( impl.getMessages() != null )
                 {
-                    final Messages parentMessages = new Messages();
-                    this.collectParentMessages( modules, impl, parentMessages, new Implementations(), false );
-
                     for ( int j = 0, s1 = impl.getMessages().getMessage().size(); j < s1; j++ )
                     {
                         final Message m = impl.getMessages().getMessage().get( j );
-                        final Message parentMessage = parentMessages.getMessage( m.getName() );
-                        final MessageReference parentReference = parentMessages.getReference( m.getName() );
 
                         if ( impl.getMessages().getReference( m.getName() ) != null )
                         {
-                            report.getDetails().add( this.createDetail(
-                                "IMPLEMENTATION_MESSAGES_UNIQUENESS_CONSTRAINT", Level.SEVERE,
-                                "implementationMessagesUniquenessConstraint", new Object[]
-                                {
-                                    impl.getIdentifier(), m.getName(),
-                                }, new ObjectFactory().createImplementation( impl ) ) );
+                            addDetail( validationContext.getReport(), "IMPLEMENTATION_MESSAGES_UNIQUENESS_CONSTRAINT",
+                                       Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                       "implementationMessagesUniquenessConstraint", impl.getIdentifier(),
+                                       m.getName() );
 
                         }
 
@@ -488,42 +474,36 @@ public class DefaultModelValidator implements ModelValidator
                                 {
                                     final String message = getMessage( e );
 
-                                    if ( context.isLoggable( Level.FINE ) )
+                                    if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
                                     {
-                                        context.log( Level.FINE, message, e );
+                                        validationContext.getModelContext().log( Level.FINE, message, e );
                                     }
 
-                                    report.getDetails().add( this.createDetail(
-                                        "IMPLEMENTATION_MESSAGE_TEMPLATE_CONSTRAINT", Level.SEVERE,
-                                        "implementationMessageTemplateConstraint", new Object[]
-                                        {
-                                            impl.getIdentifier(), m.getName(), t.getValue(), message
-                                        }, new ObjectFactory().createImplementation( impl ) ) );
+                                    addDetail( validationContext.getReport(),
+                                               "IMPLEMENTATION_MESSAGE_TEMPLATE_CONSTRAINT", Level.SEVERE,
+                                               new ObjectFactory().createImplementation( impl ),
+                                               "implementationMessageTemplateConstraint", impl.getIdentifier(),
+                                               m.getName(), t.getValue(), message );
 
                                 }
                             }
                         }
 
-                        if ( m.isOverride() && parentMessage == null && parentReference == null )
+                        if ( m.isOverride() && !inheritanceModel.isAncestorMessageOverridden( m.getName() )
+                             && !inheritanceModel.isClassDeclarationMessageOverridden( m.getName() ) )
                         {
-                            report.getDetails().add( this.createDetail(
-                                "IMPLEMENTATION_MESSAGE_OVERRIDE_CONSTRAINT", Level.SEVERE,
-                                "implementationMessageOverrideConstraint", new Object[]
-                                {
-                                    impl.getIdentifier(), m.getName(),
-                                }, new ObjectFactory().createImplementation( impl ) ) );
+                            addDetail( validationContext.getReport(), "IMPLEMENTATION_MESSAGE_OVERRIDE_CONSTRAINT",
+                                       Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                       "implementationMessageOverrideConstraint", impl.getIdentifier(), m.getName() );
 
                         }
 
-                        if ( ( parentMessage != null && parentMessage.isFinal() )
-                             || ( parentReference != null && parentReference.isFinal() ) )
+                        if ( inheritanceModel.isFinalAncestorMessageOverridden( m.getName() )
+                             || inheritanceModel.isFinalClassDeclarationMessageOverridden( m.getName() ) )
                         {
-                            report.getDetails().add( this.createDetail(
-                                "IMPLEMENTATION_MESSAGE_INHERITANCE_CONSTRAINT", Level.SEVERE,
-                                "implementationMessageFinalConstraint", new Object[]
-                                {
-                                    impl.getIdentifier(), m.getName(),
-                                }, new ObjectFactory().createImplementation( impl ) ) );
+                            addDetail( validationContext.getReport(), "IMPLEMENTATION_MESSAGE_INHERITANCE_CONSTRAINT",
+                                       Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                       "implementationMessageFinalConstraint", impl.getIdentifier(), m.getName() );
 
                         }
                     }
@@ -531,29 +511,22 @@ public class DefaultModelValidator implements ModelValidator
                     for ( int j = 0, s1 = impl.getMessages().getReference().size(); j < s1; j++ )
                     {
                         final MessageReference r = impl.getMessages().getReference().get( j );
-                        final Message parentMessage = parentMessages.getMessage( r.getName() );
-                        final MessageReference parentReference = parentMessages.getReference( r.getName() );
 
-                        if ( r.isOverride() && parentMessage == null && parentReference == null )
+                        if ( r.isOverride() && !inheritanceModel.isAncestorMessageOverridden( r.getName() )
+                             && !inheritanceModel.isClassDeclarationMessageOverridden( r.getName() ) )
                         {
-                            report.getDetails().add( this.createDetail(
-                                "IMPLEMENTATION_MESSAGE_OVERRIDE_CONSTRAINT", Level.SEVERE,
-                                "implementationMessageOverrideConstraint", new Object[]
-                                {
-                                    impl.getIdentifier(), r.getName(),
-                                }, new ObjectFactory().createImplementation( impl ) ) );
+                            addDetail( validationContext.getReport(), "IMPLEMENTATION_MESSAGE_OVERRIDE_CONSTRAINT",
+                                       Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                       "implementationMessageOverrideConstraint", impl.getIdentifier(), r.getName() );
 
                         }
 
-                        if ( ( parentMessage != null && parentMessage.isFinal() )
-                             || ( parentReference != null && parentReference.isFinal() ) )
+                        if ( inheritanceModel.isFinalAncestorMessageOverridden( r.getName() )
+                             || inheritanceModel.isFinalClassDeclarationMessageOverridden( r.getName() ) )
                         {
-                            report.getDetails().add( this.createDetail(
-                                "IMPLEMENTATION_MESSAGE_INHERITANCE_CONSTRAINT", Level.SEVERE,
-                                "implementationMessageFinalConstraint", new Object[]
-                                {
-                                    impl.getIdentifier(), r.getName(),
-                                }, new ObjectFactory().createImplementation( impl ) ) );
+                            addDetail( validationContext.getReport(), "IMPLEMENTATION_MESSAGE_INHERITANCE_CONSTRAINT",
+                                       Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                       "implementationMessageFinalConstraint", impl.getIdentifier(), r.getName() );
 
                         }
                     }
@@ -561,89 +534,69 @@ public class DefaultModelValidator implements ModelValidator
 
                 if ( impl.getProperties() != null )
                 {
-                    final Properties parentProperties = new Properties();
-                    this.collectParentProperties( modules, impl, parentProperties, new Implementations(), false );
-
                     for ( int j = 0, s1 = impl.getProperties().getProperty().size(); j < s1; j++ )
                     {
                         final Property p = impl.getProperties().getProperty().get( j );
-                        final Property parentProperty = parentProperties.getProperty( p.getName() );
-                        final PropertyReference parentReference = parentProperties.getReference( p.getName() );
 
                         if ( impl.getProperties().getReference( p.getName() ) != null )
                         {
-                            report.getDetails().add( this.createDetail(
-                                "IMPLEMENTATION_PROPERTIES_UNIQUENESS_CONSTRAINT", Level.SEVERE,
-                                "implementationPropertiesUniquenessConstraint", new Object[]
-                                {
-                                    impl.getIdentifier(), p.getName(),
-                                }, new ObjectFactory().createImplementation( impl ) ) );
+                            addDetail( validationContext.getReport(), "IMPLEMENTATION_PROPERTIES_UNIQUENESS_CONSTRAINT",
+                                       Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                       "implementationPropertiesUniquenessConstraint", impl.getIdentifier(),
+                                       p.getName() );
 
                         }
 
                         if ( p.getValue() != null && p.getAny() != null )
                         {
-                            report.getDetails().add( this.createDetail(
-                                "IMPLEMENTATION_PROPERTY_VALUE_CONSTRAINT", Level.SEVERE,
-                                "implementationPropertyValueConstraint", new Object[]
-                                {
-                                    impl.getIdentifier(), p.getName()
-                                }, new ObjectFactory().createImplementation( impl ) ) );
+                            addDetail( validationContext.getReport(), "IMPLEMENTATION_PROPERTY_VALUE_CONSTRAINT",
+                                       Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                       "implementationPropertyValueConstraint", impl.getIdentifier(), p.getName() );
 
                         }
 
                         if ( p.getAny() != null && p.getType() == null )
                         {
-                            report.getDetails().add( this.createDetail(
-                                "IMPLEMENTATION_PROPERTY_TYPE_CONSTRAINT", Level.SEVERE,
-                                "implementationPropertyTypeConstraint", new Object[]
-                                {
-                                    impl.getIdentifier(), p.getName()
-                                }, new ObjectFactory().createImplementation( impl ) ) );
+                            addDetail( validationContext.getReport(), "IMPLEMENTATION_PROPERTY_TYPE_CONSTRAINT",
+                                       Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                       "implementationPropertyTypeConstraint", impl.getIdentifier(), p.getName() );
 
                         }
 
                         try
                         {
-                            p.getJavaValue( context.getClassLoader() );
+                            p.getJavaValue( validationContext.getModelContext().getClassLoader() );
                         }
                         catch ( final PropertyException e )
                         {
                             final String message = getMessage( e );
 
-                            if ( context.isLoggable( Level.FINE ) )
+                            if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
                             {
-                                context.log( Level.FINE, message, e );
+                                validationContext.getModelContext().log( Level.FINE, message, e );
                             }
 
-                            report.getDetails().add( this.createDetail(
-                                "IMPLEMENTATION_PROPERTY_JAVA_VALUE_CONSTRAINT", Level.SEVERE,
-                                "implementationPropertyJavaValueConstraint", new Object[]
-                                {
-                                    impl.getIdentifier(), p.getName(), message
-                                }, new ObjectFactory().createImplementation( impl ) ) );
+                            addDetail( validationContext.getReport(), "IMPLEMENTATION_PROPERTY_JAVA_VALUE_CONSTRAINT",
+                                       Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                       "implementationPropertyJavaValueConstraint", impl.getIdentifier(), p.getName(),
+                                       message );
 
                         }
 
-                        if ( p.isOverride() && parentProperty == null && parentReference == null )
+                        if ( p.isOverride() && !inheritanceModel.isAncestorPropertyOverridden( p.getName() )
+                             && !inheritanceModel.isClassDeclarationPropertyOverridden( p.getName() ) )
                         {
-                            report.getDetails().add( this.createDetail(
-                                "IMPLEMENTATION_PROPERTY_OVERRIDE_CONSTRAINT", Level.SEVERE,
-                                "implementationPropertyOverrideConstraint", new Object[]
-                                {
-                                    impl.getIdentifier(), p.getName(),
-                                }, new ObjectFactory().createImplementation( impl ) ) );
+                            addDetail( validationContext.getReport(), "IMPLEMENTATION_PROPERTY_OVERRIDE_CONSTRAINT",
+                                       Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                       "implementationPropertyOverrideConstraint", impl.getIdentifier(), p.getName() );
 
                         }
-                        if ( ( parentProperty != null && parentProperty.isFinal() )
-                             || ( parentReference != null && parentReference.isFinal() ) )
+                        if ( inheritanceModel.isFinalAncestorPropertyOverridden( p.getName() )
+                             || inheritanceModel.isFinalClassDeclarationPropertyOverridden( p.getName() ) )
                         {
-                            report.getDetails().add( this.createDetail(
-                                "IMPLEMENTATION_PROPERTY_INHERITANCE_CONSTRAINT", Level.SEVERE,
-                                "implementationPropertyFinalConstraint", new Object[]
-                                {
-                                    impl.getIdentifier(), p.getName(),
-                                }, new ObjectFactory().createImplementation( impl ) ) );
+                            addDetail( validationContext.getReport(), "IMPLEMENTATION_PROPERTY_INHERITANCE_CONSTRAINT",
+                                       Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                       "implementationPropertyFinalConstraint", impl.getIdentifier(), p.getName() );
 
                         }
                     }
@@ -651,29 +604,22 @@ public class DefaultModelValidator implements ModelValidator
                     for ( int j = 0, s1 = impl.getProperties().getReference().size(); j < s1; j++ )
                     {
                         final PropertyReference r = impl.getProperties().getReference().get( j );
-                        final Property parentProperty = parentProperties.getProperty( r.getName() );
-                        final PropertyReference parentReference = parentProperties.getReference( r.getName() );
 
-                        if ( r.isOverride() && parentProperty == null && parentReference == null )
+                        if ( r.isOverride() && !inheritanceModel.isAncestorPropertyOverridden( r.getName() )
+                             && !inheritanceModel.isClassDeclarationPropertyOverridden( r.getName() ) )
                         {
-                            report.getDetails().add( this.createDetail(
-                                "IMPLEMENTATION_PROPERTY_OVERRIDE_CONSTRAINT", Level.SEVERE,
-                                "implementationPropertyOverrideConstraint", new Object[]
-                                {
-                                    impl.getIdentifier(), r.getName(),
-                                }, new ObjectFactory().createImplementation( impl ) ) );
+                            addDetail( validationContext.getReport(), "IMPLEMENTATION_PROPERTY_OVERRIDE_CONSTRAINT",
+                                       Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                       "implementationPropertyOverrideConstraint", impl.getIdentifier(), r.getName() );
 
                         }
 
-                        if ( ( parentProperty != null && parentProperty.isFinal() )
-                             || ( parentReference != null && parentReference.isFinal() ) )
+                        if ( inheritanceModel.isFinalAncestorPropertyOverridden( r.getName() )
+                             || inheritanceModel.isFinalClassDeclarationPropertyOverridden( r.getName() ) )
                         {
-                            report.getDetails().add( this.createDetail(
-                                "IMPLEMENTATION_PROPERTY_INHERITANCE_CONSTRAINT", Level.SEVERE,
-                                "implementationPropertyFinalConstraint", new Object[]
-                                {
-                                    impl.getIdentifier(), r.getName(),
-                                }, new ObjectFactory().createImplementation( impl ) ) );
+                            addDetail( validationContext.getReport(), "IMPLEMENTATION_PROPERTY_INHERITANCE_CONSTRAINT",
+                                       Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                       "implementationPropertyFinalConstraint", impl.getIdentifier(), r.getName() );
 
                         }
                     }
@@ -681,61 +627,262 @@ public class DefaultModelValidator implements ModelValidator
 
                 if ( impl.getSpecifications() != null )
                 {
-                    final Specifications parentSpecifications = new Specifications();
-                    this.collectParentSpecifications(
-                        modules, impl, parentSpecifications, new Implementations(), false );
-
                     for ( int j = 0, s1 = impl.getSpecifications().getSpecification().size(); j < s1; j++ )
                     {
                         final Specification s = impl.getSpecifications().getSpecification().get( j );
-                        report.getDetails().add( this.createDetail(
-                            "IMPLEMENTATION_SPECIFICATION_DECLARATION_CONSTRAINT", Level.SEVERE,
-                            "implementationSpecificationDeclarationConstraint", new Object[]
-                            {
-                                impl.getIdentifier(), s.getIdentifier()
-                            }, new ObjectFactory().createImplementation( impl ) ) );
+                        addDetail( validationContext.getReport(), "IMPLEMENTATION_SPECIFICATION_DECLARATION_CONSTRAINT",
+                                   Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                   "implementationSpecificationDeclarationConstraint", impl.getIdentifier(),
+                                   s.getIdentifier() );
 
                     }
 
                     for ( int j = 0, s1 = impl.getSpecifications().getReference().size(); j < s1; j++ )
                     {
                         final SpecificationReference r = impl.getSpecifications().getReference().get( j );
-                        final SpecificationReference parent = parentSpecifications.getReference( r.getIdentifier() );
 
-                        if ( r.isOverride() && parent == null )
+                        if ( r.isOverride()
+                             && !inheritanceModel.isAncestorSpecReferenceOverridden( r.getIdentifier() )
+                             && !inheritanceModel.isClassDeclarationSpecReferenceOverridden( r.getIdentifier() ) )
                         {
-                            report.getDetails().add( this.createDetail(
-                                "IMPLEMENTATION_SPECIFICATION_OVERRIDE_CONSTRAINT", Level.SEVERE,
-                                "implementationSpecificationOverrideConstraint", new Object[]
-                                {
-                                    impl.getIdentifier(), r.getIdentifier(),
-                                }, new ObjectFactory().createImplementation( impl ) ) );
+                            addDetail( validationContext.getReport(),
+                                       "IMPLEMENTATION_SPECIFICATION_OVERRIDE_CONSTRAINT", Level.SEVERE,
+                                       new ObjectFactory().createImplementation( impl ),
+                                       "implementationSpecificationOverrideConstraint", impl.getIdentifier(),
+                                       r.getIdentifier() );
 
                         }
 
-                        if ( parent != null && parent.isFinal() )
+                        if ( inheritanceModel.isFinalAncestorSpecReferenceOverridden( r.getIdentifier() )
+                             || inheritanceModel.isFinalClassDeclarationSpecReferenceOverridden( r.getIdentifier() ) )
                         {
-                            report.getDetails().add( this.createDetail(
-                                "IMPLEMENTATION_SPECIFICATION_INHERITANCE_CONSTRAINT", Level.SEVERE,
-                                "implementationSpecificationFinalConstraint", new Object[]
-                                {
-                                    impl.getIdentifier(), r.getIdentifier(),
-                                }, new ObjectFactory().createImplementation( impl ) ) );
+                            addDetail( validationContext.getReport(),
+                                       "IMPLEMENTATION_SPECIFICATION_INHERITANCE_CONSTRAINT", Level.SEVERE,
+                                       new ObjectFactory().createImplementation( impl ),
+                                       "implementationSpecificationFinalConstraint", impl.getIdentifier(),
+                                       r.getIdentifier() );
 
                         }
                     }
                 }
 
-                this.assertValidImplementationInheritanceConstraints( context, modules, impl, report );
-                this.assertImplementationSpecificationCompatibility( context, modules, impl, report );
+                final Map<String, List<InheritanceModel.Node<Dependency>>> dependencyNodes =
+                    inheritanceModel.getEffectiveDependencies();
+
+                if ( dependencyNodes != null )
+                {
+                    for ( Map.Entry<String, List<InheritanceModel.Node<Dependency>>> e : dependencyNodes.entrySet() )
+                    {
+                        if ( e.getValue().size() > 1 )
+                        {
+                            final StringBuilder path = new StringBuilder( e.getValue().size() * 255 );
+
+                            for ( int j = 0, s1 = e.getValue().size(); j < s1; j++ )
+                            {
+                                path.append( ", " ).append( e.getValue().get( j ).pathToString() );
+                            }
+
+                            addDetail( validationContext.getReport(),
+                                       "IMPLEMENTATION_DEPENDENCY_MULTIPLE_INHERITANCE_CONSTRAINT",
+                                       Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                       "implementationMultipleInheritanceDependencyConstraint", impl.getIdentifier(),
+                                       e.getKey(), path.substring( 2 ) );
+
+                        }
+                    }
+                }
+
+                final Map<String, List<InheritanceModel.Node<Message>>> messageNodes =
+                    inheritanceModel.getEffectiveMessages();
+
+                if ( messageNodes != null )
+                {
+                    for ( Map.Entry<String, List<InheritanceModel.Node<Message>>> e : messageNodes.entrySet() )
+                    {
+                        if ( e.getValue().size() > 1 )
+                        {
+                            final StringBuilder path = new StringBuilder( e.getValue().size() * 255 );
+
+                            for ( int j = 0, s1 = e.getValue().size(); j < s1; j++ )
+                            {
+                                path.append( ", " ).append( e.getValue().get( j ).pathToString() );
+                            }
+
+                            addDetail( validationContext.getReport(),
+                                       "IMPLEMENTATION_MESSAGE_MULTIPLE_INHERITANCE_CONSTRAINT", Level.SEVERE,
+                                       new ObjectFactory().createImplementation( impl ),
+                                       "implementationMultipleInheritanceMessageConstraint", impl.getIdentifier(),
+                                       e.getKey(), path.substring( 2 ) );
+
+                        }
+                    }
+                }
+
+                final Map<String, List<InheritanceModel.Node<Property>>> propertyNodes =
+                    inheritanceModel.getEffectiveProperties();
+
+                if ( propertyNodes != null )
+                {
+                    for ( Map.Entry<String, List<InheritanceModel.Node<Property>>> e : propertyNodes.entrySet() )
+                    {
+                        if ( e.getValue().size() > 1 )
+                        {
+                            final StringBuilder path = new StringBuilder( e.getValue().size() * 255 );
+
+                            for ( int j = 0, s1 = e.getValue().size(); j < s1; j++ )
+                            {
+                                path.append( ", " ).append( e.getValue().get( j ).pathToString() );
+                            }
+
+                            addDetail( validationContext.getReport(),
+                                       "IMPLEMENTATION_PROPERTY_MULTIPLE_INHERITANCE_CONSTRAINT", Level.SEVERE,
+                                       new ObjectFactory().createImplementation( impl ),
+                                       "implementationMultipleInheritancePropertyConstraint", impl.getIdentifier(),
+                                       e.getKey(), path.substring( 2 ) );
+
+                        }
+                    }
+                }
+
+                final Map<String, List<InheritanceModel.Node<SpecificationReference>>> specificationReferenceNodes =
+                    inheritanceModel.getEffectiveSpecificationReferences();
+
+                if ( specificationReferenceNodes != null )
+                {
+                    for ( Map.Entry<String, List<InheritanceModel.Node<SpecificationReference>>> e :
+                          specificationReferenceNodes.entrySet() )
+                    {
+                        if ( e.getValue().size() > 1 )
+                        {
+                            final StringBuilder path = new StringBuilder( e.getValue().size() * 255 );
+
+                            for ( int j = 0, s1 = e.getValue().size(); j < s1; j++ )
+                            {
+                                path.append( ", " ).append( e.getValue().get( j ).pathToString() );
+                            }
+
+                            addDetail( validationContext.getReport(),
+                                       "IMPLEMENTATION_SPECIFICATION_MULTIPLE_INHERITANCE_CONSTRAINT",
+                                       Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                       "implementationMultipleInheritanceSpecificationConstraint",
+                                       impl.getIdentifier(), e.getKey(), path.substring( 2 ) );
+
+                        }
+                    }
+                }
+
+                final Map<String, List<InheritanceModel.Node<ImplementationReference>>> implementationReferenceNodes =
+                    inheritanceModel.getEffectiveImplementationReferences();
+
+                if ( implementationReferenceNodes != null )
+                {
+                    final Module moduleOfImplementation =
+                        validationContext.getModules().getModuleOfImplementation( impl.getIdentifier() );
+
+                    for ( Map.Entry<String, List<InheritanceModel.Node<ImplementationReference>>> e :
+                          implementationReferenceNodes.entrySet() )
+                    {
+                        for ( int j = 0, s1 = e.getValue().size(); j < s1; j++ )
+                        {
+                            final ImplementationReference r = e.getValue().get( j ).getModelObject();
+                            final Implementation referenced =
+                                validationContext.getModules().getImplementation( r.getIdentifier() );
+
+                            final Module moduleOfReferenced =
+                                validationContext.getModules().getModuleOfImplementation( referenced.getIdentifier() );
+
+                            if ( r.getVersion() != null && referenced != null )
+                            {
+                                if ( referenced.getVersion() == null )
+                                {
+                                    addDetail( validationContext.getReport(),
+                                               "IMPLEMENTATION_IMPLEMENTATION_VERSIONING_CONSTRAINT", Level.SEVERE,
+                                               new ObjectFactory().createImplementation( impl ),
+                                               "implementationImplementationVersioningConstraint",
+                                               impl.getIdentifier(),
+                                               moduleOfImplementation != null ? moduleOfImplementation.getName() : "<>",
+                                               r.getIdentifier(),
+                                               moduleOfReferenced != null ? moduleOfReferenced.getName() : "<>" );
+
+                                }
+                                else
+                                {
+                                    try
+                                    {
+                                        if ( VersionParser.compare( r.getVersion(), referenced.getVersion() ) > 0 )
+                                        {
+                                            addDetail( validationContext.getReport(),
+                                                       "IMPLEMENTATION_INHERITANCE_COMPATIBILITY_CONSTRAINT",
+                                                       Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                                       "implementationInheritanceCompatibilityConstraint",
+                                                       impl.getIdentifier(),
+                                                       moduleOfImplementation != null
+                                                       ? moduleOfImplementation.getName() : "<>",
+                                                       referenced.getIdentifier(),
+                                                       moduleOfReferenced != null
+                                                       ? moduleOfReferenced.getName() : "<>",
+                                                       r.getVersion(), referenced.getVersion() );
+
+                                        }
+                                    }
+                                    catch ( final ParseException ex )
+                                    {
+                                        final String message = getMessage( ex );
+
+                                        if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                                        {
+                                            validationContext.getModelContext().log( Level.FINE, message, ex );
+                                        }
+
+                                        addDetail(
+                                            validationContext.getReport(),
+                                            "IMPLEMENTATION_INHERITANCE_COMPATIBILITY_VERSIONING_PARSE_EXCEPTION",
+                                            Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                            "implementationInheritanceCompatibilityParseException",
+                                            impl.getIdentifier(),
+                                            moduleOfImplementation != null ? moduleOfImplementation.getName() : "<>",
+                                            r.getIdentifier(),
+                                            moduleOfReferenced != null ? moduleOfReferenced.getName() : "<>",
+                                            r.getVersion(),
+                                            message != null && message.length() > 0 ? " " + message : "" );
+
+                                    }
+                                    catch ( final TokenMgrError ex )
+                                    {
+                                        final String message = getMessage( ex );
+
+                                        if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                                        {
+                                            validationContext.getModelContext().log( Level.FINE, message, ex );
+                                        }
+
+                                        addDetail(
+                                            validationContext.getReport(),
+                                            "IMPLEMENTATION_INHERITANCE_COMPATIBILITY_VERSIONING_TOKEN_MANAGER_ERROR",
+                                            Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                            "implementationInheritanceCompatiblityVersioningTokenManagerError",
+                                            impl.getIdentifier(),
+                                            moduleOfImplementation != null ? moduleOfImplementation.getName() : "<>",
+                                            r.getIdentifier(),
+                                            moduleOfReferenced != null ? moduleOfReferenced.getName() : "<>",
+                                            r.getVersion(),
+                                            message != null && message.length() > 0 ? " " + message : "" );
+
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                assertImplementationSpecificationCompatibility( validationContext, impl );
             }
         }
     }
 
-    private void assertSpecificationsValid( final ModelContext context, final Modules modules,
-                                            final ModelValidationReport report )
+    private static void assertSpecificationsValid( final ValidationContext validationContext )
     {
-        final Specifications specifications = modules.getSpecifications();
+        final Specifications specifications = validationContext.getModules().getSpecifications();
         final Map<String, Specification> specificationClassDeclarations = new HashMap<String, Specification>();
 
         if ( specifications != null )
@@ -743,18 +890,15 @@ public class DefaultModelValidator implements ModelValidator
             for ( int i = 0, s0 = specifications.getSpecification().size(); i < s0; i++ )
             {
                 final Specification s = specifications.getSpecification().get( i );
-                final Implementations impls = modules.getImplementations( s.getIdentifier() );
+                final Implementations impls = validationContext.getModules().getImplementations( s.getIdentifier() );
 
                 if ( s.isClassDeclaration() )
                 {
                     if ( s.getClazz() == null )
                     {
-                        report.getDetails().add( this.createDetail(
-                            "SPECIFICATION_CLASS_CONSTRAINT", Level.SEVERE, "specificationClassConstraint",
-                            new Object[]
-                            {
-                                s.getIdentifier()
-                            }, new ObjectFactory().createSpecification( s ) ) );
+                        addDetail( validationContext.getReport(), "SPECIFICATION_CLASS_CONSTRAINT", Level.SEVERE,
+                                   new ObjectFactory().createSpecification( s ), "specificationClassConstraint",
+                                   s.getIdentifier() );
 
                     }
                     else
@@ -762,12 +906,10 @@ public class DefaultModelValidator implements ModelValidator
                         final Specification prev = specificationClassDeclarations.get( s.getClazz() );
                         if ( prev != null )
                         {
-                            report.getDetails().add( this.createDetail(
-                                "SPECIFICATION_CLASS_DECLARATION_CONSTRAINT", Level.SEVERE,
-                                "specificationClassDeclarationConstraint", new Object[]
-                                {
-                                    s.getIdentifier(), s.getClazz(), prev.getIdentifier()
-                                }, new ObjectFactory().createSpecification( s ) ) );
+                            addDetail( validationContext.getReport(), "SPECIFICATION_CLASS_DECLARATION_CONSTRAINT",
+                                       Level.SEVERE, new ObjectFactory().createSpecification( s ),
+                                       "specificationClassDeclarationConstraint", s.getIdentifier(), s.getClazz(),
+                                       prev.getIdentifier() );
 
                         }
                         else
@@ -801,12 +943,11 @@ public class DefaultModelValidator implements ModelValidator
                             for ( int j = 0, s1 = e.getValue().getImplementation().size(); j < s1; j++ )
                             {
                                 final Implementation impl = e.getValue().getImplementation().get( j );
-                                report.getDetails().add( this.createDetail(
-                                    "SPECIFICATION_IMPLEMENTATION_NAME_UNIQUENESS_CONSTRAINT", Level.SEVERE,
-                                    "specificationImplementationNameConstraint", new Object[]
-                                    {
-                                        impl.getIdentifier(), s.getIdentifier(), impl.getName()
-                                    }, new ObjectFactory().createImplementation( impl ) ) );
+                                addDetail( validationContext.getReport(),
+                                           "SPECIFICATION_IMPLEMENTATION_NAME_UNIQUENESS_CONSTRAINT",
+                                           Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                           "specificationImplementationNameConstraint", impl.getIdentifier(),
+                                           s.getIdentifier(), impl.getName() );
 
                             }
                         }
@@ -817,12 +958,11 @@ public class DefaultModelValidator implements ModelValidator
                         for ( int j = 0, s1 = impls.getImplementation().size(); j < s1; j++ )
                         {
                             final Implementation impl = impls.getImplementation().get( j );
-                            report.getDetails().add( this.createDetail(
-                                "SPECIFICATION_IMPLEMENTATION_MULTIPLICITY_CONSTRAINT", Level.SEVERE,
-                                "specificationMultiplicityConstraint", new Object[]
-                                {
-                                    impl.getIdentifier(), s.getIdentifier(), s.getMultiplicity()
-                                }, new ObjectFactory().createImplementation( impl ) ) );
+                            addDetail( validationContext.getReport(),
+                                       "SPECIFICATION_IMPLEMENTATION_MULTIPLICITY_CONSTRAINT", Level.SEVERE,
+                                       new ObjectFactory().createImplementation( impl ),
+                                       "specificationMultiplicityConstraint", impl.getIdentifier(), s.getIdentifier(),
+                                       s.getMultiplicity() );
 
                         }
                     }
@@ -836,45 +976,37 @@ public class DefaultModelValidator implements ModelValidator
 
                         if ( p.getValue() != null && p.getAny() != null )
                         {
-                            report.getDetails().add( this.createDetail(
-                                "SPECIFICATION_PROPERTY_VALUE_CONSTRAINT", Level.SEVERE,
-                                "specificationPropertyValueConstraint", new Object[]
-                                {
-                                    s.getIdentifier(), p.getName()
-                                }, new ObjectFactory().createSpecification( s ) ) );
+                            addDetail( validationContext.getReport(), "SPECIFICATION_PROPERTY_VALUE_CONSTRAINT",
+                                       Level.SEVERE, new ObjectFactory().createSpecification( s ),
+                                       "specificationPropertyValueConstraint", s.getIdentifier(), p.getName() );
 
                         }
 
                         if ( p.getAny() != null && p.getType() == null )
                         {
-                            report.getDetails().add( this.createDetail(
-                                "SPECIFICATION_PROPERTY_TYPE_CONSTRAINT", Level.SEVERE,
-                                "specificationPropertyTypeConstraint", new Object[]
-                                {
-                                    s.getIdentifier(), p.getName()
-                                }, new ObjectFactory().createSpecification( s ) ) );
+                            addDetail( validationContext.getReport(), "SPECIFICATION_PROPERTY_TYPE_CONSTRAINT",
+                                       Level.SEVERE, new ObjectFactory().createSpecification( s ),
+                                       "specificationPropertyTypeConstraint", s.getIdentifier(), p.getName() );
 
                         }
 
                         try
                         {
-                            p.getJavaValue( context.getClassLoader() );
+                            p.getJavaValue( validationContext.getModelContext().getClassLoader() );
                         }
                         catch ( final PropertyException e )
                         {
                             final String message = getMessage( e );
 
-                            if ( context.isLoggable( Level.FINE ) )
+                            if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
                             {
-                                context.log( Level.FINE, message, e );
+                                validationContext.getModelContext().log( Level.FINE, message, e );
                             }
 
-                            report.getDetails().add( this.createDetail(
-                                "SPECIFICATION_PROPERTY_JAVA_VALUE_CONSTRAINT", Level.SEVERE,
-                                "specificationPropertyJavaValueConstraint", new Object[]
-                                {
-                                    s.getIdentifier(), p.getName(), message
-                                }, new ObjectFactory().createSpecification( s ) ) );
+                            addDetail( validationContext.getReport(), "SPECIFICATION_PROPERTY_JAVA_VALUE_CONSTRAINT",
+                                       Level.SEVERE, new ObjectFactory().createSpecification( s ),
+                                       "specificationPropertyJavaValueConstraint", s.getIdentifier(), p.getName(),
+                                       message );
 
                         }
                     }
@@ -882,12 +1014,11 @@ public class DefaultModelValidator implements ModelValidator
                     for ( int j = 0, s1 = s.getProperties().getReference().size(); j < s1; j++ )
                     {
                         final PropertyReference r = s.getProperties().getReference().get( j );
-                        report.getDetails().add( this.createDetail(
-                            "SPECIFICATION_PROPERTY_REFERENCE_DECLARATION_CONSTRAINT", Level.SEVERE,
-                            "specificationPropertyReferenceDeclarationConstraint", new Object[]
-                            {
-                                s.getIdentifier(), r.getName()
-                            }, new ObjectFactory().createSpecification( s ) ) );
+                        addDetail( validationContext.getReport(),
+                                   "SPECIFICATION_PROPERTY_REFERENCE_DECLARATION_CONSTRAINT", Level.SEVERE,
+                                   new ObjectFactory().createSpecification( s ),
+                                   "specificationPropertyReferenceDeclarationConstraint", s.getIdentifier(),
+                                   r.getName() );
 
                     }
                 }
@@ -895,23 +1026,22 @@ public class DefaultModelValidator implements ModelValidator
         }
     }
 
-    private void assertDependencyValid( final ModelContext context, final Modules modules,
-                                        final Implementation implementation, final Dependency dependency,
-                                        final ModelValidationReport report )
+    private static void assertDependencyValid( final ValidationContext validationContext,
+                                               final Implementation implementation, final Dependency dependency )
     {
-        final Implementations available = modules.getImplementations( dependency.getIdentifier() );
-        final Specification s = modules.getSpecification( dependency.getIdentifier() );
+        final Specification s = validationContext.getModules().getSpecification( dependency.getIdentifier() );
+        final Implementations available =
+            validationContext.getModules().getImplementations( dependency.getIdentifier() );
 
         if ( !dependency.isOptional()
              && ( available == null || available.getImplementation().isEmpty()
                   || ( dependency.getImplementationName() != null
                        && available.getImplementationByName( dependency.getImplementationName() ) == null ) ) )
         {
-            report.getDetails().add( this.createDetail( "IMPLEMENTATION_MANDATORY_DEPENDENCY_CONSTRAINT", Level.SEVERE,
-                                                        "implementationMandatoryDependencyConstraint", new Object[]
-                {
-                    implementation.getIdentifier(), dependency.getName()
-                }, new ObjectFactory().createImplementation( implementation ) ) );
+            addDetail( validationContext.getReport(), "IMPLEMENTATION_MANDATORY_DEPENDENCY_CONSTRAINT", Level.SEVERE,
+                       new ObjectFactory().createImplementation( implementation ),
+                       "implementationMandatoryDependencyConstraint", implementation.getIdentifier(),
+                       dependency.getName() );
 
         }
 
@@ -919,12 +1049,10 @@ public class DefaultModelValidator implements ModelValidator
         {
             if ( s.getClazz() == null )
             {
-                report.getDetails().add( this.createDetail(
-                    "IMPLEMENTATION_DEPENDENCY_SPECIFICATION_CLASS_CONSTRAINT", Level.SEVERE,
-                    "implementationDependencySpecificationClassConstraint", new Object[]
-                    {
-                        implementation.getIdentifier(), dependency.getName(), dependency.getIdentifier()
-                    }, new ObjectFactory().createImplementation( implementation ) ) );
+                addDetail( validationContext.getReport(), "IMPLEMENTATION_DEPENDENCY_SPECIFICATION_CLASS_CONSTRAINT",
+                           Level.SEVERE, new ObjectFactory().createImplementation( implementation ),
+                           "implementationDependencySpecificationClassConstraint", implementation.getIdentifier(),
+                           dependency.getName(), dependency.getIdentifier() );
 
             }
 
@@ -932,35 +1060,34 @@ public class DefaultModelValidator implements ModelValidator
             {
                 if ( s.getVersion() == null )
                 {
-                    report.getDetails().add( this.createDetail(
-                        "IMPLEMENTATION_DEPENDENCY_SPECIFICATION_VERSIONING_CONSTRAINT", Level.SEVERE,
-                        "implementationDependencySpecificationVersioningConstraint", new Object[]
-                        {
-                            implementation.getIdentifier(), dependency.getName(), s.getIdentifier()
-                        }, new ObjectFactory().createImplementation( implementation ) ) );
+                    addDetail( validationContext.getReport(),
+                               "IMPLEMENTATION_DEPENDENCY_SPECIFICATION_VERSIONING_CONSTRAINT", Level.SEVERE,
+                               new ObjectFactory().createImplementation( implementation ),
+                               "implementationDependencySpecificationVersioningConstraint",
+                               implementation.getIdentifier(), dependency.getName(), s.getIdentifier() );
 
                 }
                 else
                 {
+                    final Module moduleOfSpecification =
+                        validationContext.getModules().getModuleOfSpecification( s.getIdentifier() );
+
+                    final Module moduleOfImplementation =
+                        validationContext.getModules().getModuleOfImplementation( implementation.getIdentifier() );
+
                     try
                     {
                         if ( VersionParser.compare( dependency.getVersion(), s.getVersion() ) > 0 )
                         {
-                            final Module moduleOfImplementation =
-                                modules.getModuleOfImplementation( implementation.getIdentifier() );
-
-                            final Module moduleOfSpecification = modules.getModuleOfSpecification( s.getIdentifier() );
-
-                            report.getDetails().add( this.createDetail(
-                                "IMPLEMENTATION_DEPENDENCY_SPECIFICATION_COMPATIBILITY_CONSTRAINT", Level.SEVERE,
-                                "implementationDependencySpecificationCompatibilityConstraint", new Object[]
-                                {
-                                    implementation.getIdentifier(),
-                                    moduleOfImplementation != null ? moduleOfImplementation.getName() : "<>",
-                                    s.getIdentifier(),
-                                    moduleOfSpecification != null ? moduleOfSpecification.getName() : "<>",
-                                    dependency.getVersion(), s.getVersion()
-                                }, new ObjectFactory().createImplementation( implementation ) ) );
+                            addDetail( validationContext.getReport(),
+                                       "IMPLEMENTATION_DEPENDENCY_SPECIFICATION_COMPATIBILITY_CONSTRAINT",
+                                       Level.SEVERE, new ObjectFactory().createImplementation( implementation ),
+                                       "implementationDependencySpecificationCompatibilityConstraint",
+                                       implementation.getIdentifier(),
+                                       moduleOfImplementation != null ? moduleOfImplementation.getName() : "<>",
+                                       s.getIdentifier(),
+                                       moduleOfSpecification != null ? moduleOfSpecification.getName() : "<>",
+                                       dependency.getVersion(), s.getVersion() );
 
                         }
                     }
@@ -968,31 +1095,43 @@ public class DefaultModelValidator implements ModelValidator
                     {
                         final String message = getMessage( e );
 
-                        if ( context.isLoggable( Level.FINE ) )
+                        if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
                         {
-                            context.log( Level.FINE, message, e );
+                            validationContext.getModelContext().log( Level.FINE, message, e );
                         }
 
-                        final ModelValidationReport.Detail detail = new ModelValidationReport.Detail(
-                            "IMPLEMENTATION_DEPENDENCY_SPECIFICATION_COMPATIBILITY_VERSIONING_PARSE_EXCEPTION",
-                            Level.SEVERE, message, new ObjectFactory().createImplementation( implementation ) );
+                        addDetail( validationContext.getReport(),
+                                   "IMPLEMENTATION_DEPENDENCY_SPECIFICATION_COMPATIBILITY_VERSIONING_PARSE_EXCEPTION",
+                                   Level.SEVERE, new ObjectFactory().createImplementation( implementation ),
+                                   "implementationDependencySpecificationCompatibilityParseException",
+                                   implementation.getIdentifier(),
+                                   moduleOfImplementation != null ? moduleOfImplementation.getName() : "<>",
+                                   s.getIdentifier(),
+                                   moduleOfSpecification != null ? moduleOfSpecification.getName() : "<>",
+                                   dependency.getVersion(),
+                                   message != null && message.length() > 0 ? " " + message : "" );
 
-                        report.getDetails().add( detail );
                     }
                     catch ( final TokenMgrError e )
                     {
                         final String message = getMessage( e );
 
-                        if ( context.isLoggable( Level.FINE ) )
+                        if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
                         {
-                            context.log( Level.FINE, message, e );
+                            validationContext.getModelContext().log( Level.FINE, message, e );
                         }
 
-                        final ModelValidationReport.Detail detail = new ModelValidationReport.Detail(
-                            "IMPLEMENTATION_DEPENDENCY_SPECIFICATION_COMPATIBILITY_VERSIONING_TOKEN_MANAGER_ERROR",
-                            Level.SEVERE, message, new ObjectFactory().createImplementation( implementation ) );
+                        addDetail( validationContext.getReport(),
+                                   "IMPLEMENTATION_DEPENDENCY_SPECIFICATION_COMPATIBILITY_VERSIONING_TOKEN_MANAGER_ERROR",
+                                   Level.SEVERE, new ObjectFactory().createImplementation( implementation ),
+                                   "implementationDependencySpecificationCompatibilityTokenMgrError",
+                                   implementation.getIdentifier(),
+                                   moduleOfImplementation != null ? moduleOfImplementation.getName() : "<>",
+                                   s.getIdentifier(),
+                                   moduleOfSpecification != null ? moduleOfSpecification.getName() : "<>",
+                                   dependency.getVersion(),
+                                   message != null && message.length() > 0 ? " " + message : "" );
 
-                        report.getDetails().add( detail );
                     }
                 }
             }
@@ -1004,13 +1143,12 @@ public class DefaultModelValidator implements ModelValidator
                     for ( int i = 0, s0 = dependency.getDependencies().getDependency().size(); i < s0; i++ )
                     {
                         final Dependency d = dependency.getDependencies().getDependency().get( i );
-                        report.getDetails().add( this.createDetail(
-                            "IMPLEMENTATION_DEPENDENCY_DEPENDENCIES_OVERRIDE_CONSTRAINT", Level.SEVERE,
-                            "implementationDependencyDependenciesOverrideConstraint", new Object[]
-                            {
-                                implementation.getIdentifier(), dependency.getName(), s.getIdentifier(), s.getScope(),
-                                d.getName()
-                            }, new ObjectFactory().createImplementation( implementation ) ) );
+                        addDetail( validationContext.getReport(),
+                                   "IMPLEMENTATION_DEPENDENCY_DEPENDENCIES_OVERRIDE_CONSTRAINT", Level.SEVERE,
+                                   new ObjectFactory().createImplementation( implementation ),
+                                   "implementationDependencyDependenciesOverrideConstraint",
+                                   implementation.getIdentifier(), dependency.getName(), s.getIdentifier(),
+                                   s.getScope(), d.getName() );
 
                     }
                 }
@@ -1020,13 +1158,11 @@ public class DefaultModelValidator implements ModelValidator
                     for ( int i = 0, s0 = dependency.getMessages().getMessage().size(); i < s0; i++ )
                     {
                         final Message m = dependency.getMessages().getMessage().get( i );
-                        report.getDetails().add( this.createDetail(
-                            "IMPLEMENTATION_DEPENDENCY_MESSAGES_OVERRIDE_CONSTRAINT", Level.SEVERE,
-                            "implementationDependencyMessagesOverrideConstraint", new Object[]
-                            {
-                                implementation.getIdentifier(), dependency.getName(), s.getIdentifier(), s.getScope(),
-                                m.getName()
-                            }, new ObjectFactory().createImplementation( implementation ) ) );
+                        addDetail( validationContext.getReport(),
+                                   "IMPLEMENTATION_DEPENDENCY_MESSAGES_OVERRIDE_CONSTRAINT", Level.SEVERE,
+                                   new ObjectFactory().createImplementation( implementation ),
+                                   "implementationDependencyMessagesOverrideConstraint", implementation.getIdentifier(),
+                                   dependency.getName(), s.getIdentifier(), s.getScope(), m.getName() );
 
                     }
                 }
@@ -1036,13 +1172,12 @@ public class DefaultModelValidator implements ModelValidator
                     for ( int i = 0, s0 = dependency.getProperties().getProperty().size(); i < s0; i++ )
                     {
                         final Property p = dependency.getProperties().getProperty().get( i );
-                        report.getDetails().add( this.createDetail(
-                            "IMPLEMENTATION_DEPENDENCY_PROPERTIES_OVERRIDE_CONSTRAINT", Level.SEVERE,
-                            "implementationDependencyPropertiesOverrideConstraint", new Object[]
-                            {
-                                implementation.getIdentifier(), dependency.getName(), s.getIdentifier(), s.getScope(),
-                                p.getName()
-                            }, new ObjectFactory().createImplementation( implementation ) ) );
+                        addDetail( validationContext.getReport(),
+                                   "IMPLEMENTATION_DEPENDENCY_PROPERTIES_OVERRIDE_CONSTRAINT", Level.SEVERE,
+                                   new ObjectFactory().createImplementation( implementation ),
+                                   "implementationDependencyPropertiesOverrideConstraint",
+                                   implementation.getIdentifier(), dependency.getName(), s.getIdentifier(),
+                                   s.getScope(), p.getName() );
 
                     }
                 }
@@ -1054,12 +1189,11 @@ public class DefaultModelValidator implements ModelValidator
             for ( int i = 0, s0 = dependency.getMessages().getReference().size(); i < s0; i++ )
             {
                 final MessageReference r = dependency.getMessages().getReference().get( i );
-                report.getDetails().add( this.createDetail(
-                    "IMPLEMENTATION_DEPENDENCY_MESSAGE_REFERENCE_DECLARATION_CONSTRAINT", Level.SEVERE,
-                    "implementationDependencyMessageReferenceDeclarationConstraint", new Object[]
-                    {
-                        implementation.getIdentifier(), dependency.getName(), r.getName()
-                    }, new ObjectFactory().createImplementation( implementation ) ) );
+                addDetail( validationContext.getReport(),
+                           "IMPLEMENTATION_DEPENDENCY_MESSAGE_REFERENCE_DECLARATION_CONSTRAINT", Level.SEVERE,
+                           new ObjectFactory().createImplementation( implementation ),
+                           "implementationDependencyMessageReferenceDeclarationConstraint",
+                           implementation.getIdentifier(), dependency.getName(), r.getName() );
 
             }
         }
@@ -1072,45 +1206,40 @@ public class DefaultModelValidator implements ModelValidator
 
                 if ( p.getValue() != null && p.getAny() != null )
                 {
-                    report.getDetails().add( this.createDetail(
-                        "IMPLEMENTATION_DEPENDENCY_PROPERTY_VALUE_CONSTRAINT", Level.SEVERE,
-                        "implementationDependencyPropertyValueConstraint", new Object[]
-                        {
-                            implementation.getIdentifier(), dependency.getName(), p.getName()
-                        }, new ObjectFactory().createImplementation( implementation ) ) );
+                    addDetail( validationContext.getReport(), "IMPLEMENTATION_DEPENDENCY_PROPERTY_VALUE_CONSTRAINT",
+                               Level.SEVERE, new ObjectFactory().createImplementation( implementation ),
+                               "implementationDependencyPropertyValueConstraint", implementation.getIdentifier(),
+                               dependency.getName(), p.getName() );
 
                 }
 
                 if ( p.getAny() != null && p.getType() == null )
                 {
-                    report.getDetails().add( this.createDetail(
-                        "IMPLEMENTATION_DEPENDENCY_PROPERTY_TYPE_CONSTRAINT", Level.SEVERE,
-                        "implementationDependencyPropertyTypeConstraint", new Object[]
-                        {
-                            implementation.getIdentifier(), dependency.getName(), p.getName()
-                        }, new ObjectFactory().createImplementation( implementation ) ) );
+                    addDetail( validationContext.getReport(), "IMPLEMENTATION_DEPENDENCY_PROPERTY_TYPE_CONSTRAINT",
+                               Level.SEVERE, new ObjectFactory().createImplementation( implementation ),
+                               "implementationDependencyPropertyTypeConstraint", implementation.getIdentifier(),
+                               dependency.getName(), p.getName() );
 
                 }
 
                 try
                 {
-                    p.getJavaValue( context.getClassLoader() );
+                    p.getJavaValue( validationContext.getModelContext().getClassLoader() );
                 }
                 catch ( final PropertyException e )
                 {
                     final String message = getMessage( e );
 
-                    if ( context.isLoggable( Level.FINE ) )
+                    if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
                     {
-                        context.log( Level.FINE, message, e );
+                        validationContext.getModelContext().log( Level.FINE, message, e );
                     }
 
-                    report.getDetails().add( this.createDetail(
-                        "IMPLEMENTATION_DEPENDENCY_PROPERTY_JAVA_VALUE_CONSTRAINT", Level.SEVERE,
-                        "implementationDependencyPropertyJavaValueConstraint", new Object[]
-                        {
-                            implementation.getIdentifier(), dependency.getName(), p.getName(), message
-                        }, new ObjectFactory().createImplementation( implementation ) ) );
+                    addDetail( validationContext.getReport(),
+                               "IMPLEMENTATION_DEPENDENCY_PROPERTY_JAVA_VALUE_CONSTRAINT", Level.SEVERE,
+                               new ObjectFactory().createImplementation( implementation ),
+                               "implementationDependencyPropertyJavaValueConstraint", implementation.getIdentifier(),
+                               dependency.getName(), p.getName(), message );
 
                 }
             }
@@ -1118,12 +1247,11 @@ public class DefaultModelValidator implements ModelValidator
             for ( int i = 0, s0 = dependency.getProperties().getReference().size(); i < s0; i++ )
             {
                 final PropertyReference r = dependency.getProperties().getReference().get( i );
-                report.getDetails().add( this.createDetail(
-                    "IMPLEMENTATION_DEPENDENCY_PROPERTY_REFERENCE_DECLARATION_CONSTRAINT", Level.SEVERE,
-                    "implementationDependencyPropertyReferenceDeclarationConstraint", new Object[]
-                    {
-                        implementation.getIdentifier(), dependency.getName(), r.getName()
-                    }, new ObjectFactory().createImplementation( implementation ) ) );
+                addDetail( validationContext.getReport(),
+                           "IMPLEMENTATION_DEPENDENCY_PROPERTY_REFERENCE_DECLARATION_CONSTRAINT", Level.SEVERE,
+                           new ObjectFactory().createImplementation( implementation ),
+                           "implementationDependencyPropertyReferenceDeclarationConstraint",
+                           implementation.getIdentifier(), dependency.getName(), r.getName() );
 
             }
         }
@@ -1140,126 +1268,133 @@ public class DefaultModelValidator implements ModelValidator
                     continue;
                 }
 
+                final InheritanceModel inheritanceModel = validationContext.getInheritanceModel( a );
+
                 if ( dependency.getDependencies() != null )
                 {
-                    final Dependencies dependencies = modules.getDependencies( a.getIdentifier() );
+                    final Map<String, List<InheritanceModel.Node<Dependency>>> dependencies =
+                        inheritanceModel.getEffectiveDependencies();
 
                     if ( dependencies != null )
                     {
                         for ( int j = 0, s1 = dependency.getDependencies().getDependency().size(); j < s1; j++ )
                         {
                             final Dependency override = dependency.getDependencies().getDependency().get( j );
-                            final Dependency overriden = dependencies.getDependency( override.getName() );
 
-                            if ( overriden == null && override.isOverride() )
+                            if ( override.isOverride()
+                                 && !inheritanceModel.isEffectiveDependencyOverridden( override.getName() ) )
                             {
-                                report.getDetails().add( this.createDetail(
-                                    "IMPLEMENTATION_DEPENDENCY_OVERRIDE_DEPENDENCY_CONSTRAINT", Level.SEVERE,
-                                    "implementationDependencyOverrideDependencyConstraint", new Object[]
-                                    {
-                                        implementation.getIdentifier(), dependency.getName(), a.getIdentifier(),
-                                        override.getName()
-                                    }, new ObjectFactory().createImplementation( implementation ) ) );
+                                addDetail( validationContext.getReport(),
+                                           "IMPLEMENTATION_DEPENDENCY_OVERRIDE_DEPENDENCY_CONSTRAINT",
+                                           Level.SEVERE, new ObjectFactory().createImplementation( implementation ),
+                                           "implementationDependencyOverrideDependencyConstraint",
+                                           implementation.getIdentifier(), dependency.getName(), a.getIdentifier(),
+                                           override.getName() );
 
                             }
 
-                            if ( overriden != null )
+                            if ( inheritanceModel.isFinalEffectiveDependencyOverridden( override.getName() ) )
                             {
-                                final Specification overrideSpecification =
-                                    modules.getSpecification( override.getIdentifier() );
+                                addDetail( validationContext.getReport(),
+                                           "IMPLEMENTATION_DEPENDENCY_FINAL_DEPENDENCY_CONSTRAINT",
+                                           Level.SEVERE, new ObjectFactory().createImplementation( implementation ),
+                                           "implementationDependencyFinalDependencyConstraint",
+                                           implementation.getIdentifier(), dependency.getName(), a.getIdentifier(),
+                                           override.getName() );
 
-                                final Specification overridenSpecification =
-                                    modules.getSpecification( overriden.getIdentifier() );
+                            }
 
-                                if ( overriden.isFinal() )
+                            if ( inheritanceModel.isEffectiveDependencyOverridden( override.getName() ) )
+                            {
+                                final List<InheritanceModel.Node<Dependency>> nodes =
+                                    dependencies.get( override.getName() );
+
+                                for ( int k = 0, s2 = nodes.size(); k < s2; k++ )
                                 {
-                                    report.getDetails().add( this.createDetail(
-                                        "IMPLEMENTATION_DEPENDENCY_FINAL_DEPENDENCY_CONSTRAINT", Level.SEVERE,
-                                        "implementationDependencyFinalDependencyConstraint", new Object[]
+                                    final Dependency overridden = nodes.get( k ).getModelObject();
+                                    final Specification overrideSpecification =
+                                        validationContext.getModules().getSpecification( override.getIdentifier() );
+
+                                    final Specification overriddenSpecification =
+                                        validationContext.getModules().getSpecification( overridden.getIdentifier() );
+
+                                    if ( overrideSpecification != null && overriddenSpecification != null )
+                                    {
+                                        if ( overrideSpecification.getMultiplicity()
+                                             != overriddenSpecification.getMultiplicity() )
                                         {
-                                            implementation.getIdentifier(), dependency.getName(), a.getIdentifier(),
-                                            override.getName()
-                                        }, new ObjectFactory().createImplementation( implementation ) ) );
-
-                                }
-
-                                if ( overrideSpecification != null && overridenSpecification != null )
-                                {
-                                    if ( overrideSpecification.getMultiplicity()
-                                         != overridenSpecification.getMultiplicity() )
-                                    {
-                                        report.getDetails().add( this.createDetail(
-                                            "IMPLEMENTATION_DEPENDENCY_MULTIPLICITY_CONSTRAINT", Level.SEVERE,
-                                            "implementationDependencyMultiplicityConstraint", new Object[]
-                                            {
-                                                implementation.getIdentifier(), dependency.getName(), a.getIdentifier(),
-                                                overriden.getName(), overrideSpecification.getMultiplicity().value(),
-                                                overridenSpecification.getMultiplicity().value()
-                                            }, new ObjectFactory().createImplementation( implementation ) ) );
-
-                                    }
-
-                                    if ( overrideSpecification.getScope() != null
-                                         ? !overrideSpecification.getScope().equals( overridenSpecification.getScope() )
-                                         : overridenSpecification.getScope() != null )
-                                    {
-                                        report.getDetails().add( this.createDetail(
-                                            "IMPLEMENTATION_DEPENDENCY_SCOPE_CONSTRAINT", Level.SEVERE,
-                                            "implementationDependencyScopeConstraint", new Object[]
-                                            {
-                                                implementation.getIdentifier(), dependency.getName(), a.getIdentifier(),
-                                                overriden.getName(),
-                                                overrideSpecification.getScope() == null
-                                                ? "Multiton" : overrideSpecification.getScope(),
-                                                overridenSpecification.getScope() == null
-                                                ? "Multiton" : overridenSpecification.getScope()
-                                            }, new ObjectFactory().createImplementation( implementation ) ) );
-
-                                    }
-
-                                    if ( overridenSpecification.getMultiplicity() == Multiplicity.MANY )
-                                    {
-                                        if ( override.getImplementationName() == null
-                                             && overriden.getImplementationName() != null )
-                                        {
-                                            report.getDetails().add( this.createDetail(
-                                                "IMPLEMENTATION_DEPENDENCY_NO_IMPLEMENTATION_NAME_CONSTRAINT",
-                                                Level.SEVERE,
-                                                "implementationDependencyNoImplementationNameConstraint", new Object[]
-                                                {
-                                                    implementation.getIdentifier(), dependency.getName(),
-                                                    a.getIdentifier(), overriden.getName()
-                                                }, new ObjectFactory().createImplementation( implementation ) ) );
+                                            addDetail( validationContext.getReport(),
+                                                       "IMPLEMENTATION_DEPENDENCY_MULTIPLICITY_CONSTRAINT",
+                                                       Level.SEVERE,
+                                                       new ObjectFactory().createImplementation( implementation ),
+                                                       "implementationDependencyMultiplicityConstraint",
+                                                       implementation.getIdentifier(), dependency.getName(),
+                                                       a.getIdentifier(), overridden.getName(),
+                                                       overrideSpecification.getMultiplicity().value(),
+                                                       overriddenSpecification.getMultiplicity().value() );
 
                                         }
 
-                                        if ( override.getImplementationName() != null
-                                             && overriden.getImplementationName() == null )
+                                        if ( overrideSpecification.getScope() != null
+                                             ? !overrideSpecification.getScope().equals(
+                                            overriddenSpecification.getScope() )
+                                             : overriddenSpecification.getScope() != null )
                                         {
-                                            report.getDetails().add( this.createDetail(
-                                                "IMPLEMENTATION_DEPENDENCY_IMPLEMENTATION_NAME_CONSTRAINT",
-                                                Level.SEVERE,
-                                                "implementationDependencyImplementationNameConstraint", new Object[]
-                                                {
-                                                    implementation.getIdentifier(), dependency.getName(),
-                                                    a.getIdentifier(), overriden.getName(),
-                                                    override.getImplementationName()
-                                                }, new ObjectFactory().createImplementation( implementation ) ) );
+                                            addDetail( validationContext.getReport(),
+                                                       "IMPLEMENTATION_DEPENDENCY_SCOPE_CONSTRAINT",
+                                                       Level.SEVERE,
+                                                       new ObjectFactory().createImplementation( implementation ),
+                                                       "implementationDependencyScopeConstraint",
+                                                       implementation.getIdentifier(), dependency.getName(),
+                                                       a.getIdentifier(), overridden.getName(),
+                                                       overrideSpecification.getScope() == null
+                                                       ? "Multiton" : overrideSpecification.getScope(),
+                                                       overriddenSpecification.getScope() == null
+                                                       ? "Multiton" : overriddenSpecification.getScope() );
 
                                         }
-                                    }
-                                }
 
-                                if ( override.isOptional() != overriden.isOptional() )
-                                {
-                                    report.getDetails().add( this.createDetail(
-                                        "IMPLEMENTATION_DEPENDENCY_OPTIONALITY_CONSTRAINT", Level.SEVERE,
-                                        "implementationDependencyOptonalityConstraint", new Object[]
+                                        if ( overriddenSpecification.getMultiplicity() == Multiplicity.MANY )
                                         {
-                                            implementation.getIdentifier(), dependency.getName(), a.getIdentifier(),
-                                            overriden.getName()
-                                        }, new ObjectFactory().createImplementation( implementation ) ) );
+                                            if ( override.getImplementationName() == null
+                                                 && overridden.getImplementationName() != null )
+                                            {
+                                                addDetail( validationContext.getReport(),
+                                                           "IMPLEMENTATION_DEPENDENCY_NO_IMPLEMENTATION_NAME_CONSTRAINT",
+                                                           Level.SEVERE,
+                                                           new ObjectFactory().createImplementation( implementation ),
+                                                           "implementationDependencyNoImplementationNameConstraint",
+                                                           implementation.getIdentifier(), dependency.getName(),
+                                                           a.getIdentifier(), overridden.getName() );
 
+                                            }
+
+                                            if ( override.getImplementationName() != null
+                                                 && overridden.getImplementationName() == null )
+                                            {
+                                                addDetail( validationContext.getReport(),
+                                                           "IMPLEMENTATION_DEPENDENCY_IMPLEMENTATION_NAME_CONSTRAINT",
+                                                           Level.SEVERE,
+                                                           new ObjectFactory().createImplementation( implementation ),
+                                                           "implementationDependencyImplementationNameConstraint",
+                                                           implementation.getIdentifier(), dependency.getName(),
+                                                           a.getIdentifier(), overridden.getName(),
+                                                           override.getImplementationName() );
+
+                                            }
+                                        }
+                                    }
+
+                                    if ( override.isOptional() != overridden.isOptional() )
+                                    {
+                                        addDetail( validationContext.getReport(),
+                                                   "IMPLEMENTATION_DEPENDENCY_OPTIONALITY_CONSTRAINT", Level.SEVERE,
+                                                   new ObjectFactory().createImplementation( implementation ),
+                                                   "implementationDependencyOptonalityConstraint",
+                                                   implementation.getIdentifier(), dependency.getName(),
+                                                   a.getIdentifier(), overridden.getName() );
+
+                                    }
                                 }
                             }
                         }
@@ -1268,35 +1403,35 @@ public class DefaultModelValidator implements ModelValidator
 
                 if ( dependency.getMessages() != null )
                 {
-                    final Messages messages = modules.getMessages( a.getIdentifier() );
+                    final Map<String, List<InheritanceModel.Node<Message>>> messages =
+                        inheritanceModel.getEffectiveMessages();
 
                     if ( messages != null )
                     {
                         for ( int j = 0, s1 = dependency.getMessages().getMessage().size(); j < s1; j++ )
                         {
                             final Message override = dependency.getMessages().getMessage().get( j );
-                            final Message overriden = messages.getMessage( override.getName() );
 
-                            if ( overriden != null && overriden.isFinal() )
+                            if ( override.isOverride()
+                                 && !inheritanceModel.isEffectiveMessageOverridden( override.getName() ) )
                             {
-                                report.getDetails().add( this.createDetail(
-                                    "IMPLEMENTATION_DEPENDENCY_FINAL_MESSAGE_CONSTRAINT", Level.SEVERE,
-                                    "implementationDependencyFinalMessageConstraint", new Object[]
-                                    {
-                                        implementation.getIdentifier(), dependency.getName(), a.getIdentifier(),
-                                        override.getName()
-                                    }, new ObjectFactory().createImplementation( implementation ) ) );
+                                addDetail( validationContext.getReport(),
+                                           "IMPLEMENTATION_DEPENDENCY_OVERRIDE_MESSAGE_CONSTRAINT", Level.SEVERE,
+                                           new ObjectFactory().createImplementation( implementation ),
+                                           "implementationDependencyOverrideMessageConstraint",
+                                           implementation.getIdentifier(), dependency.getName(), a.getIdentifier(),
+                                           override.getName() );
 
                             }
-                            if ( overriden == null && override.isOverride() )
+
+                            if ( inheritanceModel.isFinalEffectiveMessageOverridden( override.getName() ) )
                             {
-                                report.getDetails().add( this.createDetail(
-                                    "IMPLEMENTATION_DEPENDENCY_OVERRIDE_MESSAGE_CONSTRAINT", Level.SEVERE,
-                                    "implementationDependencyOverrideMessageConstraint", new Object[]
-                                    {
-                                        implementation.getIdentifier(), dependency.getName(), a.getIdentifier(),
-                                        override.getName()
-                                    }, new ObjectFactory().createImplementation( implementation ) ) );
+                                addDetail( validationContext.getReport(),
+                                           "IMPLEMENTATION_DEPENDENCY_FINAL_MESSAGE_CONSTRAINT", Level.SEVERE,
+                                           new ObjectFactory().createImplementation( implementation ),
+                                           "implementationDependencyFinalMessageConstraint",
+                                           implementation.getIdentifier(), dependency.getName(), a.getIdentifier(),
+                                           override.getName() );
 
                             }
                         }
@@ -1305,35 +1440,35 @@ public class DefaultModelValidator implements ModelValidator
 
                 if ( dependency.getProperties() != null )
                 {
-                    final Properties properties = modules.getProperties( a.getIdentifier() );
+                    final Map<String, List<InheritanceModel.Node<Property>>> properties =
+                        inheritanceModel.getEffectiveProperties();
 
                     if ( properties != null )
                     {
                         for ( int j = 0, s1 = dependency.getProperties().getProperty().size(); j < s1; j++ )
                         {
                             final Property override = dependency.getProperties().getProperty().get( j );
-                            final Property overriden = properties.getProperty( override.getName() );
 
-                            if ( overriden != null && overriden.isFinal() )
+                            if ( override.isOverride()
+                                 && !inheritanceModel.isEffectivePropertyOverridden( override.getName() ) )
                             {
-                                report.getDetails().add( this.createDetail(
-                                    "IMPLEMENTATION_DEPENDENCY_FINAL_PROPERTY_CONSTRAINT", Level.SEVERE,
-                                    "implementationDependencyFinalPropertyConstraint", new Object[]
-                                    {
-                                        implementation.getIdentifier(), dependency.getName(), a.getIdentifier(),
-                                        override.getName()
-                                    }, new ObjectFactory().createImplementation( implementation ) ) );
+                                addDetail( validationContext.getReport(),
+                                           "IMPLEMENTATION_DEPENDENCY_OVERRIDE_PROPERTY_CONSTRAINT", Level.SEVERE,
+                                           new ObjectFactory().createImplementation( implementation ),
+                                           "implementationDependencyOverridePropertyConstraint",
+                                           implementation.getIdentifier(), dependency.getName(), a.getIdentifier(),
+                                           override.getName() );
 
                             }
-                            if ( overriden == null && override.isOverride() )
+
+                            if ( inheritanceModel.isFinalEffectivePropertyOverridden( override.getName() ) )
                             {
-                                report.getDetails().add( this.createDetail(
-                                    "IMPLEMENTATION_DEPENDENCY_OVERRIDE_PROPERTY_CONSTRAINT", Level.SEVERE,
-                                    "implementationDependencyOverridePropertyConstraint", new Object[]
-                                    {
-                                        implementation.getIdentifier(), dependency.getName(), a.getIdentifier(),
-                                        override.getName()
-                                    }, new ObjectFactory().createImplementation( implementation ) ) );
+                                addDetail( validationContext.getReport(),
+                                           "IMPLEMENTATION_DEPENDENCY_FINAL_PROPERTY_CONSTRAINT", Level.SEVERE,
+                                           new ObjectFactory().createImplementation( implementation ),
+                                           "implementationDependencyFinalPropertyConstraint",
+                                           implementation.getIdentifier(), dependency.getName(), a.getIdentifier(),
+                                           override.getName() );
 
                             }
                         }
@@ -1347,265 +1482,15 @@ public class DefaultModelValidator implements ModelValidator
             for ( int i = 0, s0 = dependency.getDependencies().getDependency().size(); i < s0; i++ )
             {
                 final Dependency d = dependency.getDependencies().getDependency().get( i );
-                this.assertDependencyValid( context, modules, implementation, d, report );
+                assertDependencyValid( validationContext, implementation, d );
             }
         }
     }
 
-    private void assertValidImplementationInheritanceConstraints( final ModelContext context, final Modules modules,
-                                                                  final Implementation implementation,
-                                                                  final ModelValidationReport report )
+    private static void assertImplementationSpecificationCompatibility(
+        final ValidationContext validationContext, final Implementation implementation )
     {
-        if ( implementation.getImplementations() != null )
-        {
-            final Implementations parentImplementations = new Implementations();
-            final Map<String, List<Dependency>> dependencyMap = new HashMap<String, List<Dependency>>();
-            final Map<String, List<Message>> messageMap = new HashMap<String, List<Message>>();
-            final Map<String, List<Property>> propertyMap = new HashMap<String, List<Property>>();
-            final Map<String, List<SpecificationReference>> specMap =
-                new HashMap<String, List<SpecificationReference>>();
-
-            this.collectParentImplementations(
-                modules, implementation, parentImplementations, new Implementations(), false );
-
-            for ( int i = 0, s0 = implementation.getImplementations().getReference().size(); i < s0; i++ )
-            {
-                final ImplementationReference r = implementation.getImplementations().getReference().get( i );
-                final Specifications currentSpecs = new Specifications();
-                final Dependencies currentDependencies = new Dependencies();
-                final Properties currentProperties = new Properties();
-                final Messages currentMessages = new Messages();
-                final Implementation current = modules.getImplementation( r.getIdentifier() );
-                final ImplementationReference parentReference = parentImplementations.getReference( r.getIdentifier() );
-
-                if ( current != null )
-                {
-                    this.collectSpecifications( modules, current, currentSpecs, new Implementations(), true );
-                    this.collectDependencies( modules, current, currentDependencies, new Implementations(), true );
-                    this.collectMessages( modules, current, currentMessages, new Implementations(), true );
-                    this.collectProperties( modules, current, currentProperties, new Implementations(), true );
-
-                    for ( int j = 0, s1 = currentSpecs.getReference().size(); j < s1; j++ )
-                    {
-                        final SpecificationReference ref = currentSpecs.getReference().get( j );
-                        List<SpecificationReference> list = specMap.get( ref.getIdentifier() );
-                        if ( list == null )
-                        {
-                            list = new LinkedList<SpecificationReference>();
-                            specMap.put( ref.getIdentifier(), list );
-                        }
-
-                        list.add( ref );
-                    }
-
-                    for ( int j = 0, s1 = currentDependencies.getDependency().size(); j < s1; j++ )
-                    {
-                        final Dependency d = currentDependencies.getDependency().get( j );
-                        List<Dependency> list = dependencyMap.get( d.getName() );
-                        if ( list == null )
-                        {
-                            list = new LinkedList<Dependency>();
-                            dependencyMap.put( d.getName(), list );
-                        }
-
-                        list.add( d );
-                    }
-
-                    for ( int j = 0, s1 = currentMessages.getMessage().size(); j < s1; j++ )
-                    {
-                        final Message msg = currentMessages.getMessage().get( j );
-                        List<Message> list = messageMap.get( msg.getName() );
-                        if ( list == null )
-                        {
-                            list = new LinkedList<Message>();
-                            messageMap.put( msg.getName(), list );
-                        }
-
-                        list.add( msg );
-                    }
-
-                    for ( int j = 0, s1 = currentProperties.getProperty().size(); j < s1; j++ )
-                    {
-                        final Property p = currentProperties.getProperty().get( j );
-                        List<Property> list = propertyMap.get( p.getName() );
-                        if ( list == null )
-                        {
-                            list = new LinkedList<Property>();
-                            propertyMap.put( p.getName(), list );
-                        }
-
-                        list.add( p );
-                    }
-
-                    if ( r.getVersion() != null )
-                    {
-                        if ( current.getVersion() == null )
-                        {
-                            report.getDetails().add( this.createDetail(
-                                "IMPLEMENTATION_IMPLEMENTATION_VERSIONING_CONSTRAINT", Level.SEVERE,
-                                "implementationImplementationVersioningConstraint", new Object[]
-                                {
-                                    implementation.getIdentifier(), current.getIdentifier()
-                                }, new ObjectFactory().createImplementation( implementation ) ) );
-
-                        }
-                        else
-                        {
-                            try
-                            {
-                                if ( VersionParser.compare( r.getVersion(), current.getVersion() ) > 0 )
-                                {
-                                    report.getDetails().add( this.createDetail(
-                                        "IMPLEMENTATION_INHERITANCE_COMPATIBILITY_CONSTRAINT", Level.SEVERE,
-                                        "implementationInheritanceCompatibilityConstraint", new Object[]
-                                        {
-                                            implementation.getIdentifier(), current.getIdentifier(),
-                                            r.getVersion(), current.getVersion()
-                                        }, new ObjectFactory().createImplementation( implementation ) ) );
-
-                                }
-                            }
-                            catch ( final ParseException e )
-                            {
-                                final String message = getMessage( e );
-
-                                if ( context.isLoggable( Level.FINE ) )
-                                {
-                                    context.log( Level.FINE, message, e );
-                                }
-
-                                final ModelValidationReport.Detail detail = new ModelValidationReport.Detail(
-                                    "IMPLEMENTATION_INHERITANCE_COMPATIBILITY_VERSIONING_PARSE_EXCEPTION",
-                                    Level.SEVERE, message, new ObjectFactory().createImplementation( implementation ) );
-
-                                report.getDetails().add( detail );
-                            }
-                            catch ( final TokenMgrError e )
-                            {
-                                final String message = getMessage( e );
-
-                                if ( context.isLoggable( Level.FINE ) )
-                                {
-                                    context.log( Level.FINE, message, e );
-                                }
-
-                                final ModelValidationReport.Detail detail = new ModelValidationReport.Detail(
-                                    "IMPLEMENTATION_INHERITANCE_COMPATIBILITY_VERSIONING_TOKEN_MANAGER_ERROR",
-                                    Level.SEVERE, message, new ObjectFactory().createImplementation( implementation ) );
-
-                                report.getDetails().add( detail );
-                            }
-                        }
-                    }
-
-                    if ( current.isFinal() )
-                    {
-                        report.getDetails().add( this.createDetail(
-                            "IMPLEMENTATION_IMPLEMENTATION_INHERITANCE_CONSTRAINT", Level.SEVERE,
-                            "implementationFinalImplementationConstraint", new Object[]
-                            {
-                                implementation.getIdentifier(), current.getIdentifier(),
-                            }, new ObjectFactory().createImplementation( implementation ) ) );
-
-                    }
-
-                    if ( parentReference != null && parentReference.isFinal() )
-                    {
-                        report.getDetails().add( this.createDetail(
-                            "IMPLEMENTATION_IMPLEMENTATION_REFERENCE_INHERITANCE_CONSTRAINT", Level.SEVERE,
-                            "implementationFinalImplementatioReferenceConstraint", new Object[]
-                            {
-                                implementation.getIdentifier(), parentReference.getIdentifier(),
-                            }, new ObjectFactory().createImplementation( implementation ) ) );
-
-                    }
-
-                    if ( r.isOverride() && parentReference == null )
-                    {
-                        report.getDetails().add( this.createDetail(
-                            "IMPLEMENTATION_IMPLEMENTATION_OVERRIDE_CONSTRAINT", Level.SEVERE,
-                            "implementationImplementationOverrideConstraint", new Object[]
-                            {
-                                implementation.getIdentifier(), r.getIdentifier(),
-                            }, new ObjectFactory().createImplementation( implementation ) ) );
-
-                    }
-                }
-            }
-
-            for ( Map.Entry<String, List<SpecificationReference>> e : specMap.entrySet() )
-            {
-                if ( e.getValue().size() > 1
-                     && ( implementation.getSpecifications() == null
-                          || implementation.getSpecifications().getReference( e.getKey() ) == null ) )
-                {
-                    report.getDetails().add( this.createDetail(
-                        "IMPLEMENTATION_SPECIFICATION_MULTIPLE_INHERITANCE_CONSTRAINT", Level.SEVERE,
-                        "implementationMultipleInheritanceSpecificationConstraint", new Object[]
-                        {
-                            implementation.getIdentifier(), e.getKey()
-                        }, new ObjectFactory().createImplementation( implementation ) ) );
-
-                }
-            }
-
-            for ( Map.Entry<String, List<Dependency>> e : dependencyMap.entrySet() )
-            {
-                if ( e.getValue().size() > 1
-                     && ( implementation.getDependencies() == null
-                          || implementation.getDependencies().getDependency( e.getKey() ) == null ) )
-                {
-                    report.getDetails().add( this.createDetail(
-                        "IMPLEMENTATION_DEPENDENCY_MULTIPLE_INHERITANCE_CONSTRAINT", Level.SEVERE,
-                        "implementationMultipleInheritanceDependencyConstraint", new Object[]
-                        {
-                            implementation.getIdentifier(), e.getKey()
-                        }, new ObjectFactory().createImplementation( implementation ) ) );
-
-                }
-            }
-
-            for ( Map.Entry<String, List<Message>> e : messageMap.entrySet() )
-            {
-                if ( e.getValue().size() > 1
-                     && ( implementation.getMessages() == null
-                          || ( implementation.getMessages().getMessage( e.getKey() ) == null
-                               && implementation.getMessages().getReference( e.getKey() ) == null ) ) )
-                {
-                    report.getDetails().add( this.createDetail(
-                        "IMPLEMENTATION_MESSAGE_MULTIPLE_INHERITANCE_CONSTRAINT", Level.SEVERE,
-                        "implementationMultipleInheritanceMessageConstraint", new Object[]
-                        {
-                            implementation.getIdentifier(), e.getKey()
-                        }, new ObjectFactory().createImplementation( implementation ) ) );
-
-                }
-            }
-
-            for ( Map.Entry<String, List<Property>> e : propertyMap.entrySet() )
-            {
-                if ( e.getValue().size() > 1
-                     && ( implementation.getProperties() == null
-                          || ( implementation.getProperties().getProperty( e.getKey() ) == null
-                               && implementation.getProperties().getReference( e.getKey() ) == null ) ) )
-                {
-                    report.getDetails().add( this.createDetail(
-                        "IMPLEMENTATION_PROPERTY_MULTIPLE_INHERITANCE_CONSTRAINT", Level.SEVERE,
-                        "implementationMultipleInheritancePropertyConstraint", new Object[]
-                        {
-                            implementation.getIdentifier(), e.getKey()
-                        }, new ObjectFactory().createImplementation( implementation ) ) );
-
-                }
-            }
-        }
-    }
-
-    private void assertImplementationSpecificationCompatibility( final ModelContext context, final Modules modules,
-                                                                 final Implementation implementation,
-                                                                 final ModelValidationReport report )
-    {
-        final Specifications specs = modules.getSpecifications( implementation.getIdentifier() );
+        final Specifications specs = validationContext.getModules().getSpecifications( implementation.getIdentifier() );
 
         if ( specs != null )
         {
@@ -1618,36 +1503,34 @@ public class DefaultModelValidator implements ModelValidator
                 {
                     if ( s.getVersion() == null )
                     {
-                        report.getDetails().add( this.createDetail(
-                            "IMPLEMENTATION_SPECIFICATION_VERSIONING_CONSTRAINT", Level.SEVERE,
-                            "implementationSpecificationVersioningConstraint", new Object[]
-                            {
-                                implementation.getIdentifier(), s.getIdentifier()
-                            }, new ObjectFactory().createImplementation( implementation ) ) );
+                        addDetail( validationContext.getReport(),
+                                   "IMPLEMENTATION_SPECIFICATION_VERSIONING_CONSTRAINT", Level.SEVERE,
+                                   new ObjectFactory().createImplementation( implementation ),
+                                   "implementationSpecificationVersioningConstraint", implementation.getIdentifier(),
+                                   s.getIdentifier() );
 
                     }
                     else
                     {
+                        final Module moduleOfImplementation =
+                            validationContext.getModules().getModuleOfImplementation( implementation.getIdentifier() );
+
+                        final Module moduleOfSpecification =
+                            validationContext.getModules().getModuleOfSpecification( s.getIdentifier() );
+
                         try
                         {
                             if ( VersionParser.compare( r.getVersion(), s.getVersion() ) != 0 )
                             {
-                                final Module moduleOfImplementation =
-                                    modules.getModuleOfImplementation( implementation.getIdentifier() );
-
-                                final Module moduleOfSpecification =
-                                    modules.getModuleOfSpecification( s.getIdentifier() );
-
-                                report.getDetails().add( this.createDetail(
-                                    "IMPLEMENTATION_SPECIFICATION_COMPATIBILITY_CONSTRAINT", Level.SEVERE,
-                                    "implementationSpecificationCompatibilityConstraint", new Object[]
-                                    {
-                                        implementation.getIdentifier(),
-                                        moduleOfImplementation != null ? moduleOfImplementation.getName() : "<>",
-                                        s.getIdentifier(),
-                                        moduleOfSpecification != null ? moduleOfSpecification.getName() : "<>",
-                                        r.getVersion(), s.getVersion()
-                                    }, new ObjectFactory().createImplementation( implementation ) ) );
+                                addDetail( validationContext.getReport(),
+                                           "IMPLEMENTATION_SPECIFICATION_COMPATIBILITY_CONSTRAINT", Level.SEVERE,
+                                           new ObjectFactory().createImplementation( implementation ),
+                                           "implementationSpecificationCompatibilityConstraint",
+                                           implementation.getIdentifier(),
+                                           moduleOfImplementation != null ? moduleOfImplementation.getName() : "<>",
+                                           s.getIdentifier(),
+                                           moduleOfSpecification != null ? moduleOfSpecification.getName() : "<>",
+                                           r.getVersion(), s.getVersion() );
 
                             }
                         }
@@ -1655,31 +1538,41 @@ public class DefaultModelValidator implements ModelValidator
                         {
                             final String message = getMessage( e );
 
-                            if ( context.isLoggable( Level.FINE ) )
+                            if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
                             {
-                                context.log( Level.FINE, message, e );
+                                validationContext.getModelContext().log( Level.FINE, message, e );
                             }
 
-                            final ModelValidationReport.Detail d = new ModelValidationReport.Detail(
-                                "IMPLEMENTATION_SPECIFICATION_COMPATIBILITY_VERSIONING_PARSE_EXCEPTION",
-                                Level.SEVERE, message, new ObjectFactory().createImplementation( implementation ) );
+                            addDetail( validationContext.getReport(),
+                                       "IMPLEMENTATION_SPECIFICATION_COMPATIBILITY_VERSIONING_PARSE_EXCEPTION",
+                                       Level.SEVERE, new ObjectFactory().createImplementation( implementation ),
+                                       "implementationSpecificationCompatibilityVersioningParseException",
+                                       implementation.getIdentifier(),
+                                       moduleOfImplementation != null ? moduleOfImplementation.getName() : "<>",
+                                       s.getIdentifier(),
+                                       moduleOfSpecification != null ? moduleOfSpecification.getName() : "<>",
+                                       r.getVersion(), message != null && message.length() > 0 ? " " + message : "" );
 
-                            report.getDetails().add( d );
                         }
                         catch ( final TokenMgrError e )
                         {
                             final String message = getMessage( e );
 
-                            if ( context.isLoggable( Level.FINE ) )
+                            if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
                             {
-                                context.log( Level.FINE, message, e );
+                                validationContext.getModelContext().log( Level.FINE, message, e );
                             }
 
-                            final ModelValidationReport.Detail d = new ModelValidationReport.Detail(
-                                "IMPLEMENTATION_SPECIFICATION_COMPATIBILITY_VERSIONING_TOKEN_MANAGER_ERROR",
-                                Level.SEVERE, message, new ObjectFactory().createImplementation( implementation ) );
+                            addDetail( validationContext.getReport(),
+                                       "IMPLEMENTATION_SPECIFICATION_COMPATIBILITY_VERSIONING_TOKEN_MANAGER_ERROR",
+                                       Level.SEVERE, new ObjectFactory().createImplementation( implementation ),
+                                       "implementationSpecificationCompatibilityVersioningTokenManagerError",
+                                       implementation.getIdentifier(),
+                                       moduleOfImplementation != null ? moduleOfImplementation.getName() : "<>",
+                                       s.getIdentifier(),
+                                       moduleOfSpecification != null ? moduleOfSpecification.getName() : "<>",
+                                       r.getVersion(), message != null && message.length() > 0 ? " " + message : "" );
 
-                            report.getDetails().add( d );
                         }
                     }
                 }
@@ -1687,486 +1580,57 @@ public class DefaultModelValidator implements ModelValidator
         }
     }
 
-    private Implementation findInheritanceCycle( final Modules modules, final Implementation current,
-                                                 final Implementation report, final Implementations implementations )
+    private static boolean isInheritanceCycle( final ValidationContext validationContext, final Implementation current,
+                                               Map<String, Implementation> implementations, final List<String> path )
     {
+        if ( implementations == null )
+        {
+            implementations = new HashMap<String, Implementation>();
+        }
+
         if ( current != null )
         {
-            if ( implementations.getImplementation( current.getIdentifier() ) != null )
+            path.add( current.getIdentifier() );
+
+            if ( implementations.containsKey( current.getIdentifier() ) )
             {
-                return report;
+                return true;
             }
 
-            implementations.getImplementation().add( current );
+            implementations.put( current.getIdentifier(), current );
 
             if ( current.getImplementations() != null )
             {
                 for ( int i = 0, s0 = current.getImplementations().getReference().size(); i < s0; i++ )
                 {
                     final ImplementationReference r = current.getImplementations().getReference().get( i );
-                    return this.findInheritanceCycle( modules, modules.getImplementation( r.getIdentifier() ),
-                                                      current, implementations );
+                    return isInheritanceCycle(
+                        validationContext, validationContext.getModules().getImplementation( r.getIdentifier() ),
+                        implementations, path );
 
                 }
             }
+
+            path.remove( current.getIdentifier() );
         }
 
-        return null;
+        return false;
     }
 
-    private void collectParentImplementations( final Modules modules, final Implementation implementation,
-                                               final Implementations implementations, final Implementations seen,
-                                               final boolean includeImplementation )
+    private static void addDetail(
+        final ModelValidationReport report, final String identifier, final Level level,
+        final JAXBElement<? extends ModelObject> element, final String messageKey, final Object... messageArguments )
     {
-        if ( implementation != null && seen.getImplementation( implementation.getIdentifier() ) == null )
-        {
-            seen.getImplementation().add( implementation );
-
-            if ( includeImplementation && implementations.getImplementation( implementation.getIdentifier() ) == null )
-            {
-                implementations.getImplementation().add( implementation );
-            }
-
-            if ( implementation.getImplementations() != null )
-            {
-                for ( int i = 0, s0 = implementation.getImplementations().getReference().size(); i < s0; i++ )
-                {
-                    final ImplementationReference r = implementation.getImplementations().getReference().get( i );
-
-                    if ( includeImplementation && implementations.getReference( r.getIdentifier() ) == null )
-                    {
-                        implementations.getReference().add( r );
-                    }
-
-                    this.collectParentImplementations( modules, modules.getImplementation( r.getIdentifier() ),
-                                                       implementations, seen, true );
-
-                }
-            }
-        }
-    }
-
-    private void collectParentSpecifications( final Modules modules, final Implementation implementation,
-                                              final Specifications specifications, final Implementations seen,
-                                              final boolean includeImplementation )
-    {
-        if ( implementation != null && seen.getImplementation( implementation.getIdentifier() ) == null )
-        {
-            seen.getImplementation().add( implementation );
-
-            if ( includeImplementation && implementation.getSpecifications() != null )
-            {
-                for ( int i = 0, s0 = implementation.getSpecifications().getReference().size(); i < s0; i++ )
-                {
-                    final SpecificationReference r = implementation.getSpecifications().getReference().get( i );
-                    if ( specifications.getReference( r.getIdentifier() ) == null )
-                    {
-                        specifications.getReference().add( r );
-                    }
-                }
-            }
-
-            if ( implementation.getImplementations() != null )
-            {
-                for ( int i = 0, s0 = implementation.getImplementations().getReference().size(); i < s0; i++ )
-                {
-                    final ImplementationReference r = implementation.getImplementations().getReference().get( i );
-                    this.collectParentSpecifications( modules, modules.getImplementation( r.getIdentifier() ),
-                                                      specifications, seen, true );
-
-                }
-            }
-        }
-    }
-
-    private void collectParentDependencies( final Modules modules, final Implementation implementation,
-                                            final Dependencies dependencies, final Implementations seen,
-                                            final boolean includeImplementation )
-    {
-        if ( implementation != null && seen.getImplementation( implementation.getIdentifier() ) == null )
-        {
-            seen.getImplementation().add( implementation );
-
-            if ( includeImplementation && implementation.getDependencies() != null )
-            {
-                for ( int i = 0, s0 = implementation.getDependencies().getDependency().size(); i < s0; i++ )
-                {
-                    final Dependency d = implementation.getDependencies().getDependency().get( i );
-
-                    if ( dependencies.getDependency( d.getName() ) == null )
-                    {
-                        dependencies.getDependency().add( d );
-                    }
-                }
-            }
-
-            if ( implementation.getImplementations() != null )
-            {
-                for ( int i = 0, s0 = implementation.getImplementations().getReference().size(); i < s0; i++ )
-                {
-                    final ImplementationReference r = implementation.getImplementations().getReference().get( i );
-                    this.collectParentDependencies( modules, modules.getImplementation( r.getIdentifier() ),
-                                                    dependencies, seen, true );
-
-                }
-            }
-        }
-    }
-
-    private void collectParentMessages( final Modules modules, final Implementation implementation,
-                                        final Messages messages, final Implementations seen,
-                                        final boolean includeImplementation )
-    {
-        if ( implementation != null && seen.getImplementation( implementation.getIdentifier() ) == null )
-        {
-            seen.getImplementation().add( implementation );
-
-            if ( includeImplementation && implementation.getMessages() != null )
-            {
-                for ( int i = 0, s0 = implementation.getMessages().getMessage().size(); i < s0; i++ )
-                {
-                    final Message m = implementation.getMessages().getMessage().get( i );
-                    if ( messages.getMessage( m.getName() ) == null )
-                    {
-                        messages.getMessage().add( m );
-                    }
-                }
-
-                for ( int i = 0, s0 = implementation.getMessages().getReference().size(); i < s0; i++ )
-                {
-                    final MessageReference r = implementation.getMessages().getReference().get( i );
-                    if ( messages.getReference( r.getName() ) == null )
-                    {
-                        messages.getReference().add( r );
-                    }
-                }
-            }
-
-            if ( implementation.getImplementations() != null )
-            {
-                for ( int i = 0, s0 = implementation.getImplementations().getReference().size(); i < s0; i++ )
-                {
-                    final ImplementationReference r = implementation.getImplementations().getReference().get( i );
-                    this.collectParentMessages( modules, modules.getImplementation( r.getIdentifier() ),
-                                                messages, seen, true );
-
-                }
-            }
-        }
-    }
-
-    private void collectParentProperties( final Modules modules, final Implementation implementation,
-                                          final Properties properties, final Implementations seen,
-                                          final boolean includeImplementation )
-    {
-        if ( implementation != null && seen.getImplementation( implementation.getIdentifier() ) == null )
-        {
-            seen.getImplementation().add( implementation );
-
-            if ( includeImplementation && implementation.getProperties() != null )
-            {
-                for ( int i = 0, s0 = implementation.getProperties().getProperty().size(); i < s0; i++ )
-                {
-                    final Property p = implementation.getProperties().getProperty().get( i );
-                    if ( properties.getProperty( p.getName() ) == null )
-                    {
-                        properties.getProperty().add( p );
-                    }
-                }
-
-                for ( int i = 0, s0 = implementation.getProperties().getReference().size(); i < s0; i++ )
-                {
-                    final PropertyReference r = implementation.getProperties().getReference().get( i );
-                    if ( properties.getReference( r.getName() ) == null )
-                    {
-                        properties.getReference().add( r );
-                    }
-                }
-            }
-
-            if ( implementation.getImplementations() != null )
-            {
-                for ( int i = 0, s0 = implementation.getImplementations().getReference().size(); i < s0; i++ )
-                {
-                    final ImplementationReference r = implementation.getImplementations().getReference().get( i );
-                    this.collectParentProperties( modules, modules.getImplementation( r.getIdentifier() ),
-                                                  properties, seen, true );
-
-                }
-            }
-        }
-    }
-
-    private void collectSpecifications( final Modules modules, final Implementation implementation,
-                                        final Specifications specifications, final Implementations seen,
-                                        final boolean includeDeclared )
-    {
-        if ( implementation != null && seen.getImplementation( implementation.getIdentifier() ) == null )
-        {
-            seen.getImplementation().add( implementation );
-
-            if ( includeDeclared && implementation.getSpecifications() != null )
-            {
-                for ( int i = 0, s0 = implementation.getSpecifications().getReference().size(); i < s0; i++ )
-                {
-                    final SpecificationReference r = implementation.getSpecifications().getReference().get( i );
-
-                    if ( specifications.getReference( r.getIdentifier() ) == null )
-                    {
-                        specifications.getReference().add( r );
-
-                        final Specification s = modules.getSpecification( r.getIdentifier() );
-                        if ( s != null && specifications.getSpecification( s.getIdentifier() ) == null )
-                        {
-                            specifications.getSpecification().add( s );
-                        }
-                    }
-                }
-            }
-
-            if ( implementation.getImplementations() != null )
-            {
-                for ( int i = 0, s0 = implementation.getImplementations().getReference().size(); i < s0; i++ )
-                {
-                    final ImplementationReference r = implementation.getImplementations().getReference().get( i );
-                    this.collectSpecifications( modules, modules.getImplementation( r.getIdentifier() ),
-                                                specifications, seen, true );
-
-                }
-            }
-        }
-    }
-
-    private void collectDependencies( final Modules modules, final Implementation implementation,
-                                      final Dependencies dependencies, final Implementations seen,
-                                      final boolean includeDeclared )
-    {
-        if ( implementation != null && seen.getImplementation( implementation.getIdentifier() ) == null )
-        {
-            seen.getImplementation().add( implementation );
-
-            if ( includeDeclared && implementation.getDependencies() != null )
-            {
-                for ( int i = 0, s0 = implementation.getDependencies().getDependency().size(); i < s0; i++ )
-                {
-                    final Dependency d = implementation.getDependencies().getDependency().get( i );
-                    final Dependency dependency = dependencies.getDependency( d.getName() );
-
-                    if ( dependency == null )
-                    {
-                        dependencies.getDependency().add( d );
-                    }
-                    else
-                    {
-                        this.collectDependencies( d, dependency );
-                    }
-                }
-            }
-
-            if ( implementation.getImplementations() != null )
-            {
-                for ( int i = 0, s0 = implementation.getImplementations().getReference().size(); i < s0; i++ )
-                {
-                    final ImplementationReference r = implementation.getImplementations().getReference().get( i );
-                    this.collectDependencies( modules, modules.getImplementation( r.getIdentifier() ), dependencies,
-                                              seen, true );
-
-                }
-            }
-        }
-    }
-
-    private void collectDependencies( final Dependency source, final Dependency target )
-    {
-        if ( source.getMessages() != null )
-        {
-            if ( target.getMessages() == null )
-            {
-                target.setMessages( new Messages() );
-            }
-
-            for ( int i = 0, s0 = source.getMessages().getMessage().size(); i < s0; i++ )
-            {
-                final Message m = source.getMessages().getMessage().get( i );
-                if ( target.getMessages().getMessage( m.getName() ) == null )
-                {
-                    target.getMessages().getMessage().add( m );
-                }
-            }
-        }
-
-        if ( source.getProperties() != null )
-        {
-            if ( target.getProperties() == null )
-            {
-                target.setProperties( new Properties() );
-            }
-
-            for ( int i = 0, s0 = source.getProperties().getProperty().size(); i < s0; i++ )
-            {
-                final Property p = source.getProperties().getProperty().get( i );
-                if ( target.getProperties().getProperty( p.getName() ) == null )
-                {
-                    target.getProperties().getProperty().add( p );
-                }
-            }
-        }
-
-        if ( source.getDependencies() != null )
-        {
-            if ( target.getDependencies() == null )
-            {
-                target.setDependencies( new Dependencies() );
-            }
-
-            for ( int i = 0, s0 = source.getDependencies().getDependency().size(); i < s0; i++ )
-            {
-                final Dependency sd = source.getDependencies().getDependency().get( i );
-                final Dependency td = target.getDependencies().getDependency( sd.getName() );
-
-                if ( td == null )
-                {
-                    target.getDependencies().getDependency().add( sd );
-                }
-                else
-                {
-                    this.collectDependencies( sd, td );
-                }
-            }
-        }
-    }
-
-    private void collectProperties( final Modules modules, final Implementation implementation,
-                                    final Properties properties, final Implementations seen,
-                                    final boolean includeDeclared )
-    {
-        if ( implementation != null && seen.getImplementation( implementation.getIdentifier() ) == null )
-        {
-            seen.getImplementation().add( implementation );
-
-            if ( includeDeclared && implementation.getProperties() != null )
-            {
-                for ( int i = 0, s0 = implementation.getProperties().getProperty().size(); i < s0; i++ )
-                {
-                    final Property p = implementation.getProperties().getProperty().get( i );
-                    if ( properties.getProperty( p.getName() ) == null )
-                    {
-                        properties.getProperty().add( p );
-                    }
-                }
-
-                if ( !implementation.getProperties().getReference().isEmpty() )
-                {
-                    final Module m = modules.getModuleOfImplementation( implementation.getIdentifier() );
-
-                    if ( m != null )
-                    {
-                        for ( int i = 0, s0 = implementation.getProperties().getReference().size(); i < s0; i++ )
-                        {
-                            final PropertyReference ref = implementation.getProperties().getReference().get( i );
-
-                            if ( properties.getProperty( ref.getName() ) == null )
-                            {
-                                Property referenced = m.getProperties().getProperty( ref.getName() );
-                                if ( referenced != null )
-                                {
-                                    referenced = referenced.clone();
-                                    referenced.setDeprecated( ref.isDeprecated() );
-                                    referenced.setFinal( ref.isFinal() );
-                                    referenced.setOverride( ref.isOverride() );
-                                    properties.getProperty().add( referenced );
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            if ( implementation.getImplementations() != null )
-            {
-                for ( int i = 0, s0 = implementation.getImplementations().getReference().size(); i < s0; i++ )
-                {
-                    final ImplementationReference r = implementation.getImplementations().getReference().get( i );
-                    this.collectProperties( modules, modules.getImplementation( r.getIdentifier() ), properties,
-                                            seen, true );
-
-                }
-            }
-        }
-    }
-
-    private void collectMessages( final Modules modules, final Implementation implementation, final Messages messages,
-                                  final Implementations seen, final boolean includeDeclared )
-    {
-        if ( implementation != null && seen.getImplementation( implementation.getIdentifier() ) == null )
-        {
-            seen.getImplementation().add( implementation );
-
-            if ( includeDeclared && implementation.getMessages() != null )
-            {
-                for ( int i = 0, s0 = implementation.getMessages().getMessage().size(); i < s0; i++ )
-                {
-                    final Message msg = implementation.getMessages().getMessage().get( i );
-                    if ( messages.getMessage( msg.getName() ) == null )
-                    {
-                        messages.getMessage().add( msg );
-                    }
-                }
-
-                if ( !implementation.getMessages().getReference().isEmpty() )
-                {
-                    final Module m = modules.getModuleOfImplementation( implementation.getIdentifier() );
-
-                    if ( m != null )
-                    {
-                        for ( int i = 0, s0 = implementation.getMessages().getReference().size(); i < s0; i++ )
-                        {
-                            final MessageReference ref = implementation.getMessages().getReference().get( i );
-
-                            if ( messages.getMessage( ref.getName() ) == null )
-                            {
-                                Message referenced = m.getMessages().getMessage( ref.getName() );
-                                if ( referenced != null )
-                                {
-                                    referenced = referenced.clone();
-                                    referenced.setDeprecated( ref.isDeprecated() );
-                                    referenced.setFinal( ref.isFinal() );
-                                    referenced.setOverride( ref.isOverride() );
-                                    messages.getMessage().add( referenced );
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            if ( implementation.getImplementations() != null )
-            {
-                for ( int i = 0, s0 = implementation.getImplementations().getReference().size(); i < s0; i++ )
-                {
-                    final ImplementationReference r = implementation.getImplementations().getReference().get( i );
-                    this.collectMessages( modules, modules.getImplementation( r.getIdentifier() ), messages, seen,
-                                          true );
-
-                }
-            }
-        }
-    }
-
-    private ModelValidationReport.Detail createDetail( final String identifier, final Level level,
-                                                       final String messageKey, final Object messageArguments,
-                                                       final JAXBElement<? extends ModelObject> element )
-    {
-        return new ModelValidationReport.Detail(
-            identifier, level, this.getMessage( messageKey, messageArguments ), element );
+        report.getDetails().add( new ModelValidationReport.Detail(
+            identifier, level, getMessage( messageKey, messageArguments ), element ) );
 
     }
 
-    private String getMessage( final String key, final Object args )
+    private static String getMessage( final String key, final Object... messageArguments )
     {
-        return new MessageFormat( ResourceBundle.getBundle(
+        return MessageFormat.format( ResourceBundle.getBundle(
             DefaultModelValidator.class.getName().replace( '.', '/' ),
-            Locale.getDefault() ).getString( key ) ).format( args );
+            Locale.getDefault() ).getString( key ), messageArguments );
 
     }
 
@@ -2175,4 +1639,1261 @@ public class DefaultModelValidator implements ModelValidator
         return t != null ? t.getMessage() != null ? t.getMessage() : getMessage( t.getCause() ) : null;
     }
 
+    /** @since 1.2 */
+    private static class ValidationContext
+    {
+
+        private final ModelContext modelContext;
+
+        private final Modules modules;
+
+        private final ModelValidationReport report;
+
+        private final Map<String, InheritanceModel> inheritanceModels = new HashMap<String, InheritanceModel>();
+
+        private ValidationContext( final ModelContext modelContext, final Modules modules,
+                                   final ModelValidationReport report )
+        {
+            super();
+            this.modelContext = modelContext;
+            this.modules = modules;
+            this.report = report;
+        }
+
+        private ModelContext getModelContext()
+        {
+            return modelContext;
+        }
+
+        private Modules getModules()
+        {
+            return modules;
+        }
+
+        private ModelValidationReport getReport()
+        {
+            return report;
+        }
+
+        private InheritanceModel getInheritanceModel( final Implementation implementation )
+        {
+            InheritanceModel inheritanceModel = this.inheritanceModels.get( implementation.getIdentifier() );
+
+            if ( inheritanceModel == null )
+            {
+                inheritanceModel = new InheritanceModel( this, implementation );
+                this.inheritanceModels.put( implementation.getIdentifier(), inheritanceModel );
+            }
+
+            return inheritanceModel;
+        }
+
+    }
+
+    /** @since 1.2 */
+    private static class InheritanceModel
+    {
+
+        /** @since 1.2 */
+        private static class Node<T extends ModelObject>
+        {
+
+            private final Implementation declaration;
+
+            private final T modelObject;
+
+            private final boolean _final;
+
+            private final boolean override;
+
+            private final boolean specificationModelObject;
+
+            private final boolean classDeclarationModelObject;
+
+            private final List<String> path;
+
+            private Node( final Implementation declaration, final T modelObject, final boolean _final,
+                          final boolean override, final boolean specificationModelObject,
+                          final boolean classDeclarationModelObject, final List<String> path )
+            {
+                super();
+                this.declaration = declaration;
+                this.modelObject = modelObject;
+                this._final = _final;
+                this.override = override;
+                this.specificationModelObject = specificationModelObject;
+                this.classDeclarationModelObject = classDeclarationModelObject;
+                this.path = new ArrayList<String>( path );
+            }
+
+            private T getModelObject()
+            {
+                return this.modelObject;
+            }
+
+            private Implementation getDeclaration()
+            {
+                return this.declaration;
+            }
+
+            private boolean isFinal()
+            {
+                return this._final;
+            }
+
+            private boolean isOverride()
+            {
+                return this.override;
+            }
+
+            private boolean isSpecificationModelObject()
+            {
+                return this.specificationModelObject;
+            }
+
+            private boolean isClassDeclarationModelObject()
+            {
+                return this.classDeclarationModelObject;
+            }
+
+            private List<String> getPath()
+            {
+                return this.path;
+            }
+
+            private String pathToString()
+            {
+                final StringBuilder b = new StringBuilder( this.path.size() * 50 );
+
+                for ( int i = 0, s0 = this.path.size(); i < s0; i++ )
+                {
+                    final String s = this.path.get( i );
+                    b.append( " -> " );
+
+                    if ( s.startsWith( "CLASS_DECL:" ) )
+                    {
+                        b.append( ":" ).append( s.substring( "CLASS_DECL:".length() ) ).append( ":" );
+                    }
+                    else if ( s.startsWith( "SPECIFICATION:" ) )
+                    {
+                        b.append( "<" ).append( s.substring( "SPECIFICATION:".length() ) ).append( ">" );
+                    }
+                    else
+                    {
+                        b.append( "'" ).append( s ).append( "'" );
+                    }
+                }
+
+                return b.substring( " -> ".length() );
+            }
+
+        }
+
+        private final ValidationContext context;
+
+        private final Implementation implementation;
+
+        private final Implementation classDeclaration;
+
+        private final Map<String, List<Node<Dependency>>> dependencies = newMap();
+
+        private final Map<String, Map<String, List<Node<Dependency>>>> effectiveDependencies = newMap();
+
+        private final Map<String, List<Node<Message>>> messages = newMap();
+
+        private final Map<String, Map<String, List<Node<Message>>>> effectiveMessages = newMap();
+
+        private final Map<String, List<Node<Property>>> properties = newMap();
+
+        private final Map<String, Map<String, List<Node<Property>>>> effectiveProperties = newMap();
+
+        private final Map<String, List<Node<SpecificationReference>>> specReferences = newMap();
+
+        private final Map<String, Map<String, List<Node<SpecificationReference>>>> effectiveSpecReferences = newMap();
+
+        private final Map<String, List<Node<ImplementationReference>>> implReferences = newMap();
+
+        private final Map<String, Map<String, List<Node<ImplementationReference>>>> effectiveImplReferences = newMap();
+
+        private final Map<String, Implementation> implementations = newMap();
+
+        private final Map<String, Set<Implementation>> descendants = newMap();
+
+        private final Set<Implementation> roots = newSet();
+
+        private InheritanceModel( final ValidationContext context, final Implementation implementation )
+        {
+            super();
+            this.context = context;
+            this.implementation = implementation;
+            this.classDeclaration = this.findClassDeclaration( implementation );
+
+            this.collectNodes( implementation, implementation, null );
+
+            for ( Implementation root : this.roots )
+            {
+                this.collectEffectiveSpecificationReferenceNodes( root );
+            }
+
+            for ( Implementation root : this.roots )
+            {
+                this.collectEffectiveNodes( root );
+            }
+        }
+
+        private boolean isEffectiveDependencyOverridden( final String name )
+        {
+            return isEffectiveModelObjectOverridden(
+                this.effectiveDependencies, this.implementation.getIdentifier(), name );
+
+        }
+
+        private boolean isFinalEffectiveDependencyOverridden( final String name )
+        {
+            return isFinalEffectiveModelObjectOverridden(
+                this.effectiveDependencies, this.implementation.getIdentifier(), name );
+
+        }
+
+        private boolean isAncestorDependencyOverridden( final String name )
+        {
+            return isAncestorModelObjectOverridden( this.dependencies, this.implementation.getIdentifier(), name );
+        }
+
+        private boolean isFinalAncestorDependencyOverridden( final String name )
+        {
+            return isFinalAncestorModelObjectOverridden( this.dependencies, this.implementation.getIdentifier(), name );
+        }
+
+        private boolean isClassDeclarationDependencyOverridden( final String name )
+        {
+            return this.classDeclaration != null && this.context.getInheritanceModel( this.classDeclaration ).
+                isEffectiveDependencyOverridden( name );
+
+        }
+
+        private boolean isFinalClassDeclarationDependencyOverridden( final String name )
+        {
+            return this.classDeclaration != null && this.context.getInheritanceModel( this.classDeclaration ).
+                isFinalEffectiveDependencyOverridden( name );
+
+        }
+
+        private boolean isEffectiveMessageOverridden( final String name )
+        {
+            return isEffectiveModelObjectOverridden(
+                this.effectiveMessages, this.implementation.getIdentifier(), name );
+
+        }
+
+        private boolean isFinalEffectiveMessageOverridden( final String name )
+        {
+            return isFinalEffectiveModelObjectOverridden(
+                this.effectiveMessages, this.implementation.getIdentifier(), name );
+
+        }
+
+        private boolean isAncestorMessageOverridden( final String name )
+        {
+            return isAncestorModelObjectOverridden( this.messages, this.implementation.getIdentifier(), name );
+        }
+
+        private boolean isFinalAncestorMessageOverridden( final String name )
+        {
+            return isFinalAncestorModelObjectOverridden( this.messages, this.implementation.getIdentifier(), name );
+        }
+
+        private boolean isClassDeclarationMessageOverridden( final String name )
+        {
+            return this.classDeclaration != null && this.context.getInheritanceModel( this.classDeclaration ).
+                isEffectiveMessageOverridden( name );
+
+        }
+
+        private boolean isFinalClassDeclarationMessageOverridden( final String name )
+        {
+            return this.classDeclaration != null && this.context.getInheritanceModel( this.classDeclaration ).
+                isFinalEffectiveMessageOverridden( name );
+
+        }
+
+        private boolean isEffectivePropertyOverridden( final String name )
+        {
+            return isEffectiveModelObjectOverridden(
+                this.effectiveProperties, this.implementation.getIdentifier(), name );
+
+        }
+
+        private boolean isFinalEffectivePropertyOverridden( final String name )
+        {
+            return isFinalEffectiveModelObjectOverridden(
+                this.effectiveProperties, this.implementation.getIdentifier(), name );
+
+        }
+
+        private boolean isAncestorPropertyOverridden( final String name )
+        {
+            return isAncestorModelObjectOverridden( this.properties, this.implementation.getIdentifier(), name );
+        }
+
+        private boolean isFinalAncestorPropertyOverridden( final String name )
+        {
+            return isFinalAncestorModelObjectOverridden( this.properties, this.implementation.getIdentifier(), name );
+        }
+
+        private boolean isClassDeclarationPropertyOverridden( final String name )
+        {
+            return this.classDeclaration != null && this.context.getInheritanceModel( this.classDeclaration ).
+                isEffectivePropertyOverridden( name );
+
+        }
+
+        private boolean isFinalClassDeclarationPropertyOverridden( final String name )
+        {
+            return this.classDeclaration != null && this.context.getInheritanceModel( this.classDeclaration ).
+                isFinalEffectivePropertyOverridden( name );
+
+        }
+
+        private boolean isEffectiveSpecReferenceOverridden( final String identifier )
+        {
+            return isEffectiveModelObjectOverridden(
+                this.effectiveSpecReferences, this.implementation.getIdentifier(), identifier );
+
+        }
+
+        private boolean isFinalEffectiveSpecReferenceOverridden( final String identifier )
+        {
+            return isFinalEffectiveModelObjectOverridden(
+                this.effectiveSpecReferences, this.implementation.getIdentifier(), identifier );
+
+        }
+
+        private boolean isAncestorSpecReferenceOverridden( final String identifier )
+        {
+            return isAncestorModelObjectOverridden(
+                this.specReferences, this.implementation.getIdentifier(), identifier );
+
+        }
+
+        private boolean isFinalAncestorSpecReferenceOverridden( final String identifier )
+        {
+            return isFinalAncestorModelObjectOverridden(
+                this.specReferences, this.implementation.getIdentifier(), identifier );
+
+        }
+
+        private boolean isClassDeclarationSpecReferenceOverridden( final String identifier )
+        {
+            return this.classDeclaration != null && this.context.getInheritanceModel( this.classDeclaration ).
+                isEffectiveSpecReferenceOverridden( identifier );
+
+        }
+
+        private boolean isFinalClassDeclarationSpecReferenceOverridden( final String identifier )
+        {
+            return this.classDeclaration != null && this.context.getInheritanceModel( this.classDeclaration ).
+                isFinalEffectiveSpecReferenceOverridden( identifier );
+
+        }
+
+        private boolean isAncestorImplReferenceOverridden( final String identifier )
+        {
+            return isAncestorModelObjectOverridden(
+                this.implReferences, this.implementation.getIdentifier(), identifier );
+
+        }
+
+        private boolean isFinalAncestorImplReferenceOverridden( final String identifier )
+        {
+            return isFinalAncestorModelObjectOverridden(
+                this.implReferences, this.implementation.getIdentifier(), identifier );
+
+        }
+
+        private Set<String> getFinalAncestorImplementations()
+        {
+            final Set<String> set = newSet( this.implementations.size() );
+
+            for ( final Iterator<Implementation> it = this.implementations.values().iterator(); it.hasNext(); )
+            {
+                final Implementation i = it.next();
+
+                if ( !i.getIdentifier().equals( this.implementation.getIdentifier() ) && i.isFinal() )
+                {
+                    set.add( i.getIdentifier() );
+                }
+            }
+
+            return set;
+        }
+
+        private Map<String, Node<Dependency>> getDeclaredDependencies( final String impl )
+        {
+            return getDeclarationNodes( this.dependencies, impl );
+        }
+
+        private Map<String, Node<Message>> getDeclaredMessages( final String impl )
+        {
+            return getDeclarationNodes( this.messages, impl );
+        }
+
+        private Map<String, Node<Property>> getDeclaredProperties( final String impl )
+        {
+            return getDeclarationNodes( this.properties, impl );
+        }
+
+        private Map<String, Node<SpecificationReference>> getDeclaredSpecificationReferences( final String impl )
+        {
+            return getDeclarationNodes( this.specReferences, impl );
+        }
+
+        private Map<String, Node<ImplementationReference>> getDeclaredImplementationReferences( final String impl )
+        {
+            return getDeclarationNodes( this.implReferences, impl );
+        }
+
+        private Map<String, List<Node<Dependency>>> getEffectiveDependencies()
+        {
+            return this.effectiveDependencies.get( this.implementation.getIdentifier() );
+        }
+
+        private Map<String, List<Node<Message>>> getEffectiveMessages()
+        {
+            return this.effectiveMessages.get( this.implementation.getIdentifier() );
+        }
+
+        private Map<String, List<Node<Property>>> getEffectiveProperties()
+        {
+            return this.effectiveProperties.get( this.implementation.getIdentifier() );
+        }
+
+        private Map<String, List<Node<SpecificationReference>>> getEffectiveSpecificationReferences()
+        {
+            return this.effectiveSpecReferences.get( this.implementation.getIdentifier() );
+        }
+
+        private Map<String, List<Node<ImplementationReference>>> getEffectiveImplementationReferences()
+        {
+            return this.effectiveImplReferences.get( this.implementation.getIdentifier() );
+        }
+
+        private void inheritDependencies( final Map<String, List<Node<Dependency>>> ancestor, final String descendant )
+        {
+            inheritModelObjects( this.effectiveDependencies, ancestor, descendant );
+        }
+
+        private void inheritMessages( final Map<String, List<Node<Message>>> ancestor, final String descendant )
+        {
+            inheritModelObjects( this.effectiveMessages, ancestor, descendant );
+        }
+
+        private void inheritProperties( final Map<String, List<Node<Property>>> ancestor, final String descendant )
+        {
+            inheritModelObjects( this.effectiveProperties, ancestor, descendant );
+        }
+
+        private void inheritSpecificationReferences(
+            final Map<String, List<Node<SpecificationReference>>> ancestor, final String descendant )
+        {
+            inheritModelObjects( this.effectiveSpecReferences, ancestor, descendant );
+        }
+
+        private void inheritImplementationReferences(
+            final Map<String, List<Node<ImplementationReference>>> ancestor, final String descendant )
+        {
+            inheritModelObjects( this.effectiveImplReferences, ancestor, descendant );
+        }
+
+        private void addDependencyNode( final Node<Dependency> node )
+        {
+            addNode( this.dependencies, node, node.getModelObject().getName() );
+        }
+
+        private void addMessageNode( final Node<Message> node )
+        {
+            addNode( this.messages, node, node.getModelObject().getName() );
+        }
+
+        private void addPropertyNode( final Node<Property> node )
+        {
+            addNode( this.properties, node, node.getModelObject().getName() );
+        }
+
+        private void addSpecificationNode( final Node<SpecificationReference> node )
+        {
+            addNode( this.specReferences, node, node.getModelObject().getIdentifier() );
+        }
+
+        private void addImplementationReferenceNode( final Node<ImplementationReference> node )
+        {
+            addNode( this.implReferences, node, node.getModelObject().getIdentifier() );
+        }
+
+        private void collectNodes(
+            final Implementation declaration, final Implementation descendant, List<String> path )
+        {
+            if ( path == null )
+            {
+                path = newList();
+            }
+
+            if ( declaration != null && !this.implementations.containsKey( declaration.getIdentifier() ) )
+            {
+                this.implementations.put( declaration.getIdentifier(), declaration );
+
+                path.add( declaration.getIdentifier() );
+
+                Set<Implementation> set = this.descendants.get( declaration.getIdentifier() );
+
+                if ( set == null )
+                {
+                    set = newSet();
+                    this.descendants.put( declaration.getIdentifier(), set );
+                }
+
+                set.add( descendant );
+
+                if ( declaration.getDependencies() != null )
+                {
+                    for ( int i = 0, s0 = declaration.getDependencies().getDependency().size(); i < s0; i++ )
+                    {
+                        final Dependency d = declaration.getDependencies().getDependency().get( i );
+                        this.addDependencyNode( new Node<Dependency>(
+                            declaration, d, d.isFinal(), d.isOverride(), false, false, path ) );
+
+                    }
+                }
+
+                if ( declaration.getMessages() != null )
+                {
+                    for ( int i = 0, s0 = declaration.getMessages().getMessage().size(); i < s0; i++ )
+                    {
+                        final Message m = declaration.getMessages().getMessage().get( i );
+                        this.addMessageNode( new Node<Message>(
+                            declaration, m, m.isFinal(), m.isOverride(), false, false, path ) );
+
+                    }
+
+                    if ( !declaration.getMessages().getReference().isEmpty() )
+                    {
+                        final Module m =
+                            this.context.getModules().getModuleOfImplementation( declaration.getIdentifier() );
+
+                        if ( m != null && m.getMessages() != null )
+                        {
+                            for ( int i = 0, s0 = declaration.getMessages().getReference().size(); i < s0; i++ )
+                            {
+                                final MessageReference r = declaration.getMessages().getReference().get( i );
+                                Message msg = m.getMessages().getMessage( r.getName() );
+                                if ( msg != null )
+                                {
+                                    msg = msg.clone();
+                                    msg.setFinal( r.isFinal() );
+                                    msg.setOverride( r.isOverride() );
+                                    this.addMessageNode( new Node<Message>(
+                                        declaration, msg, msg.isFinal(), msg.isOverride(), false, false, path ) );
+
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if ( declaration.getProperties() != null )
+                {
+                    for ( int i = 0, s0 = declaration.getProperties().getProperty().size(); i < s0; i++ )
+                    {
+                        final Property p = declaration.getProperties().getProperty().get( i );
+                        this.addPropertyNode( new Node<Property>(
+                            declaration, p, p.isFinal(), p.isOverride(), false, false, path ) );
+
+                    }
+
+                    if ( !declaration.getProperties().getReference().isEmpty() )
+                    {
+                        final Module m =
+                            this.context.getModules().getModuleOfImplementation( declaration.getIdentifier() );
+
+                        if ( m != null && m.getProperties() != null )
+                        {
+                            for ( int i = 0, s0 = declaration.getProperties().getReference().size(); i < s0; i++ )
+                            {
+                                final PropertyReference r = declaration.getProperties().getReference().get( i );
+                                Property p = m.getProperties().getProperty( r.getName() );
+                                if ( p != null )
+                                {
+                                    p = p.clone();
+                                    p.setFinal( r.isFinal() );
+                                    p.setOverride( r.isOverride() );
+                                    this.addPropertyNode( new Node<Property>(
+                                        declaration, p, p.isFinal(), p.isOverride(), false, false, path ) );
+
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if ( declaration.getSpecifications() != null )
+                {
+                    for ( int i = 0, s0 = declaration.getSpecifications().getReference().size(); i < s0; i++ )
+                    {
+                        final SpecificationReference r = declaration.getSpecifications().getReference().get( i );
+                        this.addSpecificationNode( new Node<SpecificationReference>(
+                            declaration, r, r.isFinal(), r.isOverride(), false, false, path ) );
+
+                    }
+                }
+
+                if ( declaration.getImplementations() != null
+                     && !declaration.getImplementations().getReference().isEmpty() )
+                {
+                    for ( int i = 0, s0 = declaration.getImplementations().getReference().size(); i < s0; i++ )
+                    {
+                        final ImplementationReference r = declaration.getImplementations().getReference().get( i );
+                        this.addImplementationReferenceNode( new Node<ImplementationReference>(
+                            declaration, r, r.isFinal(), r.isOverride(), false, false, path ) );
+
+                        final Implementation ancestor =
+                            this.context.getModules().getImplementation( r.getIdentifier() );
+
+                        this.collectNodes( ancestor, declaration, path );
+                    }
+                }
+                else
+                {
+                    this.roots.add( declaration );
+                }
+
+                path.remove( declaration.getIdentifier() );
+            }
+        }
+
+        private void collectEffectiveSpecificationReferenceNodes( final Implementation declaration )
+        {
+            final Map<String, Node<SpecificationReference>> specificationReferenceDeclarations =
+                this.getDeclaredSpecificationReferences( declaration.getIdentifier() );
+
+            for ( Map.Entry<String, Node<SpecificationReference>> e : specificationReferenceDeclarations.entrySet() )
+            {
+                addEffectiveDeclarationNode(
+                    this.effectiveSpecReferences, e.getValue(), e.getValue().getModelObject().getIdentifier() );
+
+            }
+
+            final Map<String, List<Node<SpecificationReference>>> ancestorSpecificationReferences =
+                this.effectiveSpecReferences.get( declaration.getIdentifier() );
+
+            for ( Implementation descendant : this.descendants.get( declaration.getIdentifier() ) )
+            {
+                if ( descendant.getIdentifier().equals( declaration.getIdentifier() ) )
+                {
+                    continue;
+                }
+
+                if ( ancestorSpecificationReferences != null )
+                {
+                    this.inheritSpecificationReferences( ancestorSpecificationReferences, descendant.getIdentifier() );
+                }
+
+                collectEffectiveSpecificationReferenceNodes( descendant );
+            }
+        }
+
+        private void collectEffectiveNodes( final Implementation declaration )
+        {
+            final Map<String, Node<Dependency>> dependencyDeclarations =
+                this.getDeclaredDependencies( declaration.getIdentifier() );
+
+            for ( Map.Entry<String, Node<Dependency>> e : dependencyDeclarations.entrySet() )
+            {
+                addEffectiveDeclarationNode(
+                    this.effectiveDependencies, e.getValue(), e.getValue().getModelObject().getName() );
+
+            }
+
+            final Map<String, Node<Message>> messageDeclarations =
+                this.getDeclaredMessages( declaration.getIdentifier() );
+
+            for ( Map.Entry<String, Node<Message>> e : messageDeclarations.entrySet() )
+            {
+                addEffectiveDeclarationNode(
+                    this.effectiveMessages, e.getValue(), e.getValue().getModelObject().getName() );
+
+            }
+
+            final Map<String, Node<Property>> propertyDeclarations =
+                this.getDeclaredProperties( declaration.getIdentifier() );
+
+            for ( Map.Entry<String, Node<Property>> e : propertyDeclarations.entrySet() )
+            {
+                addEffectiveDeclarationNode(
+                    this.effectiveProperties, e.getValue(), e.getValue().getModelObject().getName() );
+
+            }
+
+            final Map<String, Node<ImplementationReference>> implementationReferenceDeclarations =
+                this.getDeclaredImplementationReferences( declaration.getIdentifier() );
+
+            for ( Map.Entry<String, Node<ImplementationReference>> e : implementationReferenceDeclarations.entrySet() )
+            {
+                addEffectiveDeclarationNode(
+                    this.effectiveImplReferences, e.getValue(), e.getValue().getModelObject().getIdentifier() );
+
+            }
+
+            this.implementSpecificationModelObjects( declaration );
+            this.declareClassDeclarationModelObjects( declaration );
+
+            final Map<String, List<Node<Dependency>>> ancestorDependencies =
+                this.effectiveDependencies.get( declaration.getIdentifier() );
+
+            final Map<String, List<Node<Message>>> ancestorMessages =
+                this.effectiveMessages.get( declaration.getIdentifier() );
+
+            final Map<String, List<Node<Property>>> ancestorProperties =
+                this.effectiveProperties.get( declaration.getIdentifier() );
+
+            final Map<String, List<Node<ImplementationReference>>> ancestorImplementationReferences =
+                this.effectiveImplReferences.get( declaration.getIdentifier() );
+
+            for ( Implementation descendant : this.descendants.get( declaration.getIdentifier() ) )
+            {
+                if ( descendant.getIdentifier().equals( declaration.getIdentifier() ) )
+                {
+                    continue;
+                }
+
+                if ( ancestorDependencies != null )
+                {
+                    this.inheritDependencies( ancestorDependencies, descendant.getIdentifier() );
+                }
+
+                if ( ancestorProperties != null )
+                {
+                    this.inheritProperties( ancestorProperties, descendant.getIdentifier() );
+                }
+
+                if ( ancestorMessages != null )
+                {
+                    this.inheritMessages( ancestorMessages, descendant.getIdentifier() );
+                }
+
+                if ( ancestorImplementationReferences != null )
+                {
+                    this.inheritImplementationReferences(
+                        ancestorImplementationReferences, descendant.getIdentifier() );
+
+                }
+
+                collectEffectiveNodes( descendant );
+            }
+        }
+
+        private void implementSpecificationModelObjects( final Implementation declaration )
+        {
+            final Map<String, List<Node<SpecificationReference>>> effSpecificationReferences =
+                this.effectiveSpecReferences.get( declaration.getIdentifier() );
+
+            if ( effSpecificationReferences != null )
+            {
+                for ( Map.Entry<String, List<Node<SpecificationReference>>> e : effSpecificationReferences.entrySet() )
+                {
+                    final Specification s = this.context.getModules().getSpecification( e.getKey() );
+
+                    if ( s != null && s.getProperties() != null && !s.getProperties().getProperty().isEmpty() )
+                    {
+                        final List<String> path = newList( 2 );
+                        path.add( declaration.getIdentifier() );
+                        path.add( "SPECIFICATION:" + s.getIdentifier() );  // pathToString
+
+                        for ( int i = 0, s0 = s.getProperties().getProperty().size(); i < s0; i++ )
+                        {
+                            final Property specified = s.getProperties().getProperty().get( i );
+                            final Node<Property> specifiedNode =
+                                new Node<Property>( declaration, specified, false, false, true, false, path );
+
+                            addEffectiveSpecificationNode(
+                                this.effectiveProperties, specifiedNode, specified.getName() );
+
+                        }
+                    }
+                }
+            }
+        }
+
+        private void declareClassDeclarationModelObjects( final Implementation implementation )
+        {
+            if ( this.classDeclaration != null )
+            {
+                final InheritanceModel classDeclarationModel =
+                    this.context.getInheritanceModel( this.classDeclaration );
+
+                Map<String, List<Node<Dependency>>> effDependencies =
+                    this.effectiveDependencies.get( implementation.getIdentifier() );
+
+                Map<String, List<Node<Message>>> effMessages =
+                    this.effectiveMessages.get( implementation.getIdentifier() );
+
+                Map<String, List<Node<Property>>> effProperties =
+                    this.effectiveProperties.get( implementation.getIdentifier() );
+
+                Map<String, List<Node<SpecificationReference>>> effSpecificationReferences =
+                    this.effectiveSpecReferences.get( implementation.getIdentifier() );
+
+                Map<String, List<Node<Dependency>>> declDependencies =
+                    classDeclarationModel.getEffectiveDependencies();
+
+                Map<String, List<Node<Message>>> declMessages =
+                    classDeclarationModel.getEffectiveMessages();
+
+                Map<String, List<Node<Property>>> declProperties =
+                    classDeclarationModel.getEffectiveProperties();
+
+                Map<String, List<Node<SpecificationReference>>> declSpecReferences =
+                    classDeclarationModel.getEffectiveSpecificationReferences();
+
+                if ( declDependencies != null )
+                {
+                    if ( effDependencies == null )
+                    {
+                        effDependencies = newMap();
+                        this.effectiveDependencies.put( implementation.getIdentifier(), effDependencies );
+                    }
+
+                    for ( Map.Entry<String, List<Node<Dependency>>> e : declDependencies.entrySet() )
+                    {
+                        if ( !effDependencies.containsKey( e.getKey() ) )
+                        {
+                            final List<Node<Dependency>> list = newList( e.getValue().size() );
+
+                            for ( int i = 0, s0 = e.getValue().size(); i < s0; i++ )
+                            {
+                                final Node<Dependency> n = e.getValue().get( i );
+                                final List<String> effPath = newList();
+                                effPath.add( implementation.getIdentifier() );
+                                effPath.add( "CLASS_DECL:" + n.getDeclaration().getIdentifier() ); // pathToString
+                                effPath.addAll( n.getPath().subList( 1, n.getPath().size() ) );
+
+                                final Node<Dependency> effNode = new Node<Dependency>(
+                                    n.getDeclaration(), n.getModelObject(), n.isFinal(), n.isOverride(), false, true,
+                                    effPath );
+
+                                list.add( effNode );
+                            }
+
+                            effDependencies.put( e.getKey(), list );
+                        }
+                    }
+                }
+
+                if ( declSpecReferences != null )
+                {
+                    if ( effSpecificationReferences == null )
+                    {
+                        effSpecificationReferences = newMap();
+                        this.effectiveSpecReferences.put( implementation.getIdentifier(), effSpecificationReferences );
+                    }
+
+                    for ( Map.Entry<String, List<Node<SpecificationReference>>> e : declSpecReferences.entrySet() )
+                    {
+                        if ( !effSpecificationReferences.containsKey( e.getKey() ) )
+                        {
+                            final List<Node<SpecificationReference>> list = newList( e.getValue().size() );
+
+                            for ( int i = 0, s0 = e.getValue().size(); i < s0; i++ )
+                            {
+                                final Node<SpecificationReference> n = e.getValue().get( i );
+                                final List<String> effPath = newList();
+                                effPath.add( implementation.getIdentifier() );
+                                effPath.add( "CLASS_DECL:" + n.getDeclaration().getIdentifier() ); // pathToString
+                                effPath.addAll( n.getPath().subList( 1, n.getPath().size() ) );
+
+                                final Node<SpecificationReference> effNode = new Node<SpecificationReference>(
+                                    n.getDeclaration(), n.getModelObject(), n.isFinal(), n.isOverride(), false, true,
+                                    effPath );
+
+                                list.add( effNode );
+                            }
+
+                            effSpecificationReferences.put( e.getKey(), list );
+                        }
+                    }
+                }
+
+                if ( declMessages != null )
+                {
+                    if ( effMessages == null )
+                    {
+                        effMessages = newMap();
+                        this.effectiveMessages.put( implementation.getIdentifier(), effMessages );
+                    }
+
+                    for ( Map.Entry<String, List<Node<Message>>> e : declMessages.entrySet() )
+                    {
+                        if ( !effMessages.containsKey( e.getKey() ) )
+                        {
+                            final List<Node<Message>> list = newList( e.getValue().size() );
+
+                            for ( int i = 0, s0 = e.getValue().size(); i < s0; i++ )
+                            {
+                                final Node<Message> n = e.getValue().get( i );
+                                final List<String> effPath = newList();
+                                effPath.add( implementation.getIdentifier() );
+                                effPath.add( "CLASS_DECL:" + n.getDeclaration().getIdentifier() ); // pathToString
+                                effPath.addAll( n.getPath().subList( 1, n.getPath().size() ) );
+
+                                final Node<Message> effNode = new Node<Message>(
+                                    n.getDeclaration(), n.getModelObject(), n.isFinal(), n.isOverride(), false, true,
+                                    effPath );
+
+                                list.add( effNode );
+                            }
+
+                            effMessages.put( e.getKey(), list );
+                        }
+                    }
+                }
+
+                if ( declProperties != null )
+                {
+                    if ( effProperties == null )
+                    {
+                        effProperties = newMap();
+                        this.effectiveProperties.put( implementation.getIdentifier(), effProperties );
+                    }
+
+                    for ( Map.Entry<String, List<Node<Property>>> e : declProperties.entrySet() )
+                    {
+                        if ( !effProperties.containsKey( e.getKey() ) )
+                        {
+                            final List<Node<Property>> list = newList( e.getValue().size() );
+
+                            for ( int i = 0, s0 = e.getValue().size(); i < s0; i++ )
+                            {
+                                final Node<Property> n = e.getValue().get( i );
+                                final List<String> effPath = newList();
+                                effPath.add( implementation.getIdentifier() );
+                                effPath.add( "CLASS_DECL:" + n.getDeclaration().getIdentifier() ); // pathToString
+                                effPath.addAll( n.getPath().subList( 1, n.getPath().size() ) );
+
+                                final Node<Property> effNode = new Node<Property>(
+                                    n.getDeclaration(), n.getModelObject(), n.isFinal(), n.isOverride(), false, true,
+                                    effPath );
+
+                                list.add( effNode );
+                            }
+
+                            effProperties.put( e.getKey(), list );
+                        }
+                    }
+                }
+            }
+        }
+
+        private Implementation findClassDeclaration( final Implementation implementation )
+        {
+            Implementation declaration = null;
+
+            if ( implementation.getClazz() != null && !implementation.isClassDeclaration() )
+            {
+                find:
+                for ( int i = 0, s0 = this.context.getModules().getModule().size(); i < s0; i++ )
+                {
+                    final Module candidateModule = this.context.getModules().getModule().get( i );
+
+                    if ( candidateModule.getImplementations() != null )
+                    {
+                        for ( int j = 0, s1 = candidateModule.getImplementations().getImplementation().size();
+                              j < s1; j++ )
+                        {
+                            final Implementation candidate =
+                                candidateModule.getImplementations().getImplementation().get( j );
+
+                            if ( candidate.isClassDeclaration()
+                                 && candidate.getClazz().equals( implementation.getClazz() ) )
+                            {
+                                declaration = candidate;
+                                break find;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return declaration;
+        }
+
+        private static <T extends ModelObject> void addNode(
+            final Map<String, List<Node<T>>> map, final Node<T> node, final String key )
+        {
+            List<Node<T>> list = map.get( key );
+            if ( list == null )
+            {
+                list = newList();
+                map.put( key, list );
+            }
+
+            list.add( node );
+        }
+
+        private static <T extends ModelObject> void addEffectiveDeclarationNode(
+            final Map<String, Map<String, List<Node<T>>>> map, final Node<T> node, final String nodeKey )
+        {
+            Map<String, List<Node<T>>> nodeMap = map.get( node.getDeclaration().getIdentifier() );
+
+            if ( nodeMap == null )
+            {
+                nodeMap = newMap();
+                map.put( node.getDeclaration().getIdentifier(), nodeMap );
+            }
+
+            List<Node<T>> list = nodeMap.get( nodeKey );
+            if ( list == null )
+            {
+                list = newList();
+                nodeMap.put( nodeKey, list );
+            }
+
+            boolean contains = false;
+            for ( final Iterator<Node<T>> it = list.iterator(); it.hasNext(); )
+            {
+                final Node<T> n = it.next();
+                if ( !n.getDeclaration().getIdentifier().equals( node.getDeclaration().getIdentifier() ) )
+                {
+                    it.remove();
+                }
+                else
+                {
+                    contains = true;
+                }
+            }
+
+            if ( !contains )
+            {
+                list.add( node );
+            }
+        }
+
+        private static <T extends ModelObject> void addEffectiveSpecificationNode(
+            final Map<String, Map<String, List<Node<T>>>> map, final Node<T> node, final String nodeKey )
+        {
+            Map<String, List<Node<T>>> nodeMap = map.get( node.getDeclaration().getIdentifier() );
+
+            if ( nodeMap == null )
+            {
+                nodeMap = newMap();
+                map.put( node.getDeclaration().getIdentifier(), nodeMap );
+            }
+
+            List<Node<T>> list = nodeMap.get( nodeKey );
+            if ( list == null )
+            {
+                list = newList();
+                nodeMap.put( nodeKey, list );
+            }
+
+            boolean declared = false;
+            for ( final Iterator<Node<T>> it = list.iterator(); it.hasNext(); )
+            {
+                final Node<T> n = it.next();
+                if ( !n.getDeclaration().getIdentifier().equals( node.getDeclaration().getIdentifier() ) )
+                {
+                    it.remove();
+                }
+                else if ( !n.isSpecificationModelObject() )
+                {
+                    declared = true;
+                }
+            }
+
+            if ( !declared )
+            {
+                list.add( node );
+            }
+        }
+
+        private static <T extends ModelObject> Map<String, Node<T>> getDeclarationNodes(
+            final Map<String, List<Node<T>>> map, final String origin )
+        {
+            final Map<String, Node<T>> declarationMap = newMap( map.size() );
+
+            for ( Map.Entry<String, List<Node<T>>> e : map.entrySet() )
+            {
+                Node<T> declaration = null;
+
+                for ( int i = 0, s0 = e.getValue().size(); i < s0; i++ )
+                {
+                    final Node<T> n = e.getValue().get( i );
+                    if ( n.getDeclaration().getIdentifier().equals( origin ) )
+                    {
+                        declaration = n;
+                        break;
+                    }
+                }
+
+                if ( declaration != null )
+                {
+                    declarationMap.put( e.getKey(), declaration );
+                }
+            }
+
+            return declarationMap;
+        }
+
+        private static <T extends ModelObject> void inheritModelObjects(
+            final Map<String, Map<String, List<Node<T>>>> effective, final Map<String, List<Node<T>>> ancestor,
+            final String descendant )
+        {
+            Map<String, List<Node<T>>> descendantModelObjects = effective.get( descendant );
+
+            if ( descendantModelObjects == null )
+            {
+                descendantModelObjects = newMap();
+                effective.put( descendant, descendantModelObjects );
+            }
+
+            for ( Map.Entry<String, List<Node<T>>> e : ancestor.entrySet() )
+            {
+                List<Node<T>> list = descendantModelObjects.get( e.getKey() );
+
+                if ( list == null )
+                {
+                    list = newList();
+                    descendantModelObjects.put( e.getKey(), list );
+                }
+
+                for ( int i = 0, s0 = e.getValue().size(); i < s0; i++ )
+                {
+                    boolean overridden = false;
+                    final Node<T> inherit = e.getValue().get( i );
+
+                    if ( !inherit.isClassDeclarationModelObject() )
+                    {
+                        for ( int j = 0, s1 = list.size(); j < s1; j++ )
+                        {
+                            final Node<T> n = list.get( j );
+                            if ( n.getDeclaration().getIdentifier().equals( inherit.getDeclaration().getIdentifier() ) )
+                            {
+                                overridden = true;
+                                break;
+                            }
+                        }
+
+                        if ( !overridden )
+                        {
+                            list.add( inherit );
+                        }
+                    }
+                }
+            }
+        }
+
+        private static <T extends ModelObject> boolean isAncestorModelObjectOverridden(
+            final Map<String, List<Node<T>>> modelObjects, final String implementation, final String modelObject )
+        {
+            List<Node<T>> nodes = modelObjects.get( modelObject );
+
+            if ( nodes != null )
+            {
+                for ( int i = 0, s0 = nodes.size(); i < s0; i++ )
+                {
+                    final Node<T> node = nodes.get( i );
+                    if ( !node.getDeclaration().getIdentifier().equals( implementation ) )
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private static <T extends ModelObject> boolean isFinalAncestorModelObjectOverridden(
+            final Map<String, List<Node<T>>> modelObjects, final String implementation, final String modelObject )
+        {
+            List<Node<T>> nodes = modelObjects.get( modelObject );
+
+            if ( nodes != null )
+            {
+                for ( int i = 0, s0 = nodes.size(); i < s0; i++ )
+                {
+                    final Node<T> node = nodes.get( i );
+                    if ( !node.getDeclaration().getIdentifier().equals( implementation ) && node.isFinal() )
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private static <T extends ModelObject> boolean isEffectiveModelObjectOverridden(
+            final Map<String, Map<String, List<Node<T>>>> modelObjects, final String implementation,
+            final String modelObject )
+        {
+            return modelObjects.containsKey( implementation )
+                   && modelObjects.get( implementation ).containsKey( modelObject );
+
+        }
+
+        private static <T extends ModelObject> boolean isFinalEffectiveModelObjectOverridden(
+            final Map<String, Map<String, List<Node<T>>>> modelObjects, final String implementation,
+            final String modelObject )
+        {
+            Map<String, List<Node<T>>> map = modelObjects.get( implementation );
+
+            if ( map != null )
+            {
+                List<Node<T>> nodes = map.get( modelObject );
+
+                if ( nodes != null )
+                {
+                    for ( int i = 0, s0 = nodes.size(); i < s0; i++ )
+                    {
+                        final Node<T> n = nodes.get( i );
+                        if ( n.isFinal() )
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private static <T> List<T> newList()
+        {
+            return new ArrayList<T>();
+        }
+
+        private static <T> List<T> newList( final int initialCapacity )
+        {
+            return new ArrayList<T>( initialCapacity );
+        }
+
+        private static <K, V> Map<K, V> newMap()
+        {
+            return new HashMap<K, V>();
+        }
+
+        private static <K, V> Map<K, V> newMap( final int initialCapacity )
+        {
+            return new HashMap<K, V>( initialCapacity );
+        }
+
+        private static <T> Set<T> newSet()
+        {
+            return new HashSet<T>();
+        }
+
+        private static <T> Set<T> newSet( final int initialCapacity )
+        {
+            return new HashSet<T>( initialCapacity );
+        }
+
+    }
 }
