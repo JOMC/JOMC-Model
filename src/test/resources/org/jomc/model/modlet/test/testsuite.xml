@@ -27,7 +27,7 @@
   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-  $JOMC$
+  $JOMC: testsuite.xml 3928 2011-11-07 01:49:48Z schulte2005 $
 
 -->
 <testsuite xmlns="http://jomc.org/model/test">
@@ -3921,6 +3921,483 @@
         </module>
       </modules>
     </modules>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="MCT0095">
+    <modules valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <specifications>
+            <specification identifier="Specification 1" class="java.lang.Object">
+              <properties>
+                <property name="Specified Property"/>
+              </properties>
+            </specification>
+            <specification identifier="Specification 2" class="java.lang.Object">
+              <properties>
+                <property name="Specified Property"/>
+              </properties>
+            </specification>
+          </specifications>
+          <implementations>
+            <implementation identifier="Implementation" name="Implementation Name" class="java.lang.Object"
+                            classDeclaration="true">
+              <specifications>
+                <reference identifier="Specification 1"/>
+                <reference identifier="Specification 2"/>
+              </specifications>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="IMPLEMENTATION_PROPERTY_MULTIPLE_INHERITANCE_CONSTRAINT" count="1"/>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="MCT0096">
+    <modules valid="true">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <specifications>
+            <specification identifier="Specification 1" class="java.lang.Object">
+              <properties>
+                <property name="Specified Property"/>
+              </properties>
+            </specification>
+            <specification identifier="Specification 2" class="java.lang.Object">
+              <properties>
+                <property name="Specified Property"/>
+              </properties>
+            </specification>
+          </specifications>
+          <implementations>
+            <implementation identifier="Implementation" name="Implementation Name">
+              <specifications>
+                <reference identifier="Specification 1"/>
+                <reference identifier="Specification 2"/>
+              </specifications>
+              <properties>
+                <property name="Specified Property" override="true"/>
+              </properties>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="MCT0097">
+    <modules valid="true">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <specifications>
+            <specification identifier="Class Declaration Specification" class="java.lang.Object">
+              <properties>
+                <property name="Specified Property"/>
+              </properties>
+            </specification>
+          </specifications>
+          <implementations>
+            <implementation identifier="Class Declaration" name="Class Declaration Name" class="java.lang.Object"
+                            classDeclaration="true">
+              <specifications>
+                <reference identifier="Class Declaration Specification"/>
+              </specifications>
+              <dependencies>
+                <dependency name="Class Declaration Dependency" identifier="Class Declaration Specification"/>
+              </dependencies>
+              <properties>
+                <property name="Class Declaration Property"/>
+              </properties>
+              <messages>
+                <message name="Class Declaration Message">
+                  <template defaultLanguage="en">
+                    <text language="en">Declaration Text</text>
+                  </template>
+                </message>
+              </messages>
+            </implementation>
+            <implementation identifier="Override" name="Override Name" class="java.lang.Object"/>
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="MCT0098">
+    <modules valid="true">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <specifications>
+            <specification identifier="Class Declaration Specification" class="java.lang.Object">
+              <properties>
+                <property name="Specified Property"/>
+              </properties>
+            </specification>
+          </specifications>
+          <implementations>
+            <implementation identifier="Class Declaration" name="Class Declaration Name" class="java.lang.Object"
+                            classDeclaration="true">
+              <specifications>
+                <reference identifier="Class Declaration Specification"/>
+              </specifications>
+              <dependencies>
+                <dependency name="Class Declaration Dependency" identifier="Class Declaration Specification"/>
+              </dependencies>
+              <properties>
+                <property name="Class Declaration Property"/>
+              </properties>
+              <messages>
+                <message name="Class Declaration Message">
+                  <template defaultLanguage="en">
+                    <text language="en">Declaration Text</text>
+                  </template>
+                </message>
+              </messages>
+            </implementation>
+            <implementation identifier="Override" name="Override Name" class="java.lang.Object">
+              <specifications>
+                <reference identifier="Class Declaration Specification" override="true"/>
+              </specifications>
+              <dependencies>
+                <dependency name="Class Declaration Dependency" identifier="Class Declaration Specification"
+                            override="true"/>
+              </dependencies>
+              <properties>
+                <property name="Class Declaration Property" override="true"/>
+                <property name="Specified Property" override="true"/>
+              </properties>
+              <messages>
+                <message name="Class Declaration Message" override="true">
+                  <template defaultLanguage="en">
+                    <text language="en">Declaration Text</text>
+                  </template>
+                </message>
+              </messages>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="MCT0099">
+    <modules valid="true">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <specifications>
+            <specification identifier="Specification 1" class="java.lang.Object">
+              <properties>
+                <property name="Specified Property"/>
+              </properties>
+            </specification>
+            <specification identifier="Specification 2" class="java.lang.Object">
+              <properties>
+                <property name="Specified Property"/>
+              </properties>
+            </specification>
+          </specifications>
+          <implementations>
+            <implementation identifier="Ancestor Implementation" name="Ancestor Implementation Name">
+              <specifications>
+                <reference identifier="Specification 1"/>
+                <reference identifier="Specification 2"/>
+              </specifications>
+              <properties>
+                <property name="Specified Property" override="true"/>
+              </properties>
+            </implementation>
+            <implementation identifier="Descendant Implementation" name="Descendant Implementation Name">
+              <specifications>
+                <reference identifier="Specification 1" override="true"/>
+                <reference identifier="Specification 2" override="true"/>
+              </specifications>
+              <implementations>
+                <reference identifier="Ancestor Implementation"/>
+              </implementations>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="MCT0100">
+    <modules valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <specifications>
+            <specification identifier="Specification 1" class="java.lang.Object">
+              <properties>
+                <property name="Specified Property"/>
+              </properties>
+            </specification>
+            <specification identifier="Specification 2" class="java.lang.Object">
+              <properties>
+                <property name="Specified Property"/>
+              </properties>
+            </specification>
+            <specification identifier="Specification 3" class="java.lang.Object">
+              <properties>
+                <property name="Specified Property"/>
+              </properties>
+            </specification>
+          </specifications>
+          <implementations>
+            <implementation identifier="Ancestor Implementation" name="Ancestor Implementation Name">
+              <specifications>
+                <reference identifier="Specification 1"/>
+                <reference identifier="Specification 2"/>
+              </specifications>
+              <properties>
+                <property name="Specified Property" override="true"/>
+              </properties>
+            </implementation>
+            <implementation identifier="Descendant Implementation" name="Descendant Implementation Name">
+              <specifications>
+                <reference identifier="Specification 1" override="true"/>
+                <reference identifier="Specification 2" override="true"/>
+                <reference identifier="Specification 3"/>
+              </specifications>
+              <implementations>
+                <reference identifier="Ancestor Implementation"/>
+              </implementations>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="IMPLEMENTATION_PROPERTY_MULTIPLE_INHERITANCE_CONSTRAINT" count="1"/>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="MCT0101">
+    <modules valid="true">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <specifications>
+            <specification identifier="Specification 1" class="java.lang.Object">
+              <properties>
+                <property name="Specified Property"/>
+              </properties>
+            </specification>
+            <specification identifier="Specification 2" class="java.lang.Object">
+              <properties>
+                <property name="Specified Property"/>
+              </properties>
+            </specification>
+            <specification identifier="Specification 3" class="java.lang.Object">
+              <properties>
+                <property name="Specified Property"/>
+              </properties>
+            </specification>
+          </specifications>
+          <implementations>
+            <implementation identifier="Ancestor Implementation" name="Ancestor Implementation Name">
+              <specifications>
+                <reference identifier="Specification 1"/>
+                <reference identifier="Specification 2"/>
+              </specifications>
+              <properties>
+                <property name="Specified Property" override="true"/>
+              </properties>
+            </implementation>
+            <implementation identifier="Descendant Implementation" name="Descendant Implementation Name">
+              <specifications>
+                <reference identifier="Specification 1" override="true"/>
+                <reference identifier="Specification 2" override="true"/>
+                <reference identifier="Specification 3"/>
+              </specifications>
+              <implementations>
+                <reference identifier="Ancestor Implementation"/>
+              </implementations>
+              <properties>
+                <property name="Specified Property" override="true"/>
+              </properties>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="MCT0102">
+    <modules valid="true">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <specifications>
+            <specification identifier="Specification 1" class="java.lang.Object">
+              <properties>
+                <property name="Specified Property"/>
+              </properties>
+            </specification>
+            <specification identifier="Specification 2" class="java.lang.Object">
+              <properties>
+                <property name="Specified Property"/>
+              </properties>
+            </specification>
+            <specification identifier="Specification 3" class="java.lang.Object">
+              <properties>
+                <property name="Specified Property"/>
+              </properties>
+            </specification>
+          </specifications>
+          <implementations>
+            <implementation identifier="Ancestor Implementation 1" name="Ancestor Implementation Name 1">
+              <specifications>
+                <reference identifier="Specification 1"/>
+                <reference identifier="Specification 2"/>
+              </specifications>
+              <properties>
+                <property name="Specified Property" override="true"/>
+              </properties>
+            </implementation>
+            <implementation identifier="Ancestor Implementation 2" name="Ancestor Implementation Name 2">
+              <specifications>
+                <reference identifier="Specification 1"/>
+                <reference identifier="Specification 2"/>
+              </specifications>
+              <properties>
+                <property name="Specified Property" override="true"/>
+              </properties>
+            </implementation>
+            <implementation identifier="Descendant Implementation" name="Descendant Implementation Name">
+              <specifications>
+                <reference identifier="Specification 1" override="true"/>
+                <reference identifier="Specification 2" override="true"/>
+                <reference identifier="Specification 3"/>
+              </specifications>
+              <implementations>
+                <reference identifier="Ancestor Implementation 1"/>
+                <reference identifier="Ancestor Implementation 2"/>
+              </implementations>
+              <properties>
+                <property name="Specified Property" override="true"/>
+              </properties>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="MCT0103">
+    <modules valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <specifications>
+            <specification identifier="Specification 1" class="java.lang.Object">
+              <properties>
+                <property name="Specified Property"/>
+              </properties>
+            </specification>
+            <specification identifier="Specification 2" class="java.lang.Object">
+              <properties>
+                <property name="Specified Property"/>
+              </properties>
+            </specification>
+          </specifications>
+          <implementations>
+            <implementation identifier="Ancestor Implementation 1" name="Ancestor Implementation Name 1">
+              <specifications>
+                <reference identifier="Specification 1"/>
+                <reference identifier="Specification 2"/>
+              </specifications>
+              <properties>
+                <property name="Specified Property" override="true"/>
+              </properties>
+            </implementation>
+            <implementation identifier="Ancestor Implementation 2" name="Ancestor Implementation Name 2">
+              <specifications>
+                <reference identifier="Specification 1"/>
+                <reference identifier="Specification 2"/>
+              </specifications>
+              <properties>
+                <property name="Specified Property" override="true"/>
+              </properties>
+            </implementation>
+            <implementation identifier="Descendant Implementation" name="Descendant Implementation Name">
+              <specifications>
+                <reference identifier="Specification 1" override="true"/>
+                <reference identifier="Specification 2" override="true"/>
+              </specifications>
+              <implementations>
+                <reference identifier="Ancestor Implementation 1"/>
+                <reference identifier="Ancestor Implementation 2"/>
+              </implementations>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="IMPLEMENTATION_PROPERTY_MULTIPLE_INHERITANCE_CONSTRAINT" count="1"/>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="MCT0104">
+    <modules valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <specifications>
+            <specification identifier="Specification 1" class="java.lang.Object">
+              <properties>
+                <property name="Specified Property"/>
+              </properties>
+            </specification>
+            <specification identifier="Specification 2" class="java.lang.Object">
+              <properties>
+                <property name="Specified Property"/>
+              </properties>
+            </specification>
+            <specification identifier="Specification 3" class="java.lang.Object">
+              <properties>
+                <property name="Specified Property"/>
+              </properties>
+            </specification>
+          </specifications>
+          <implementations>
+            <implementation identifier="Ancestor Implementation 1" name="Ancestor Implementation Name 1">
+              <specifications>
+                <reference identifier="Specification 1"/>
+                <reference identifier="Specification 2"/>
+              </specifications>
+              <properties>
+                <property name="Specified Property" override="true"/>
+              </properties>
+            </implementation>
+            <implementation identifier="Ancestor Implementation 2" name="Ancestor Implementation Name 2">
+              <specifications>
+                <reference identifier="Specification 1"/>
+                <reference identifier="Specification 2"/>
+              </specifications>
+              <properties>
+                <property name="Specified Property" override="true"/>
+              </properties>
+            </implementation>
+            <implementation identifier="Descendant Implementation" name="Descendant Implementation Name">
+              <specifications>
+                <reference identifier="Specification 1" override="true"/>
+                <reference identifier="Specification 2" override="true"/>
+                <reference identifier="Specification 3"/>
+              </specifications>
+              <implementations>
+                <reference identifier="Ancestor Implementation 1"/>
+                <reference identifier="Ancestor Implementation 2"/>
+              </implementations>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="IMPLEMENTATION_PROPERTY_MULTIPLE_INHERITANCE_CONSTRAINT" count="1"/>
   </modules-constraints-test>
 
 </testsuite>
