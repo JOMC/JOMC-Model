@@ -1768,14 +1768,14 @@ public class DefaultModelValidator implements ModelValidator
                 return this.overrides;
             }
 
-            private boolean isScope( final String implementation )
+            private boolean isOrigin( final String implementation )
             {
                 return this.implementation.getIdentifier().equals( implementation );
             }
 
-            private boolean isScope( final Implementation implementation )
+            private boolean isOrigin( final Implementation implementation )
             {
-                return this.isScope( implementation.getIdentifier() );
+                return this.isOrigin( implementation.getIdentifier() );
             }
 
             private String pathToString()
@@ -2663,7 +2663,7 @@ public class DefaultModelValidator implements ModelValidator
             {
                 final Node<T> n = it.next();
 
-                if ( !n.isScope( node.getImplementation() ) )
+                if ( !n.isOrigin( node.getImplementation() ) )
                 {
                     if ( node.getSpecification() != null )
                     {
@@ -2728,7 +2728,7 @@ public class DefaultModelValidator implements ModelValidator
                 {
                     final Node<T> n = e.getValue().get( i );
 
-                    if ( n.isScope( origin ) )
+                    if ( n.isOrigin( origin ) )
                     {
                         List<Node<T>> list = declarationMap.get( e.getKey() );
 
@@ -2778,7 +2778,7 @@ public class DefaultModelValidator implements ModelValidator
                         for ( int j = 0, s1 = list.size(); j < s1; j++ )
                         {
                             final Node<T> n = list.get( j );
-                            if ( n.isScope( inherit.getImplementation() ) )
+                            if ( n.isOrigin( inherit.getImplementation() ) )
                             {
                                 overridden = true;
                                 break;
@@ -2804,7 +2804,7 @@ public class DefaultModelValidator implements ModelValidator
                 for ( int i = 0, s0 = nodes.size(); i < s0; i++ )
                 {
                     final Node<T> node = nodes.get( i );
-                    if ( !node.isScope( implementation ) || node.getSpecification() != null )
+                    if ( !node.isOrigin( implementation ) || node.getSpecification() != null )
                     {
                         return true;
                     }
@@ -2824,7 +2824,7 @@ public class DefaultModelValidator implements ModelValidator
                 for ( int i = 0, s0 = nodes.size(); i < s0; i++ )
                 {
                     final Node<T> node = nodes.get( i );
-                    if ( node.isFinal() && ( !node.isScope( implementation ) || node.getSpecification() != null ) )
+                    if ( node.isFinal() && ( !node.isOrigin( implementation ) || node.getSpecification() != null ) )
                     {
                         return true;
                     }
