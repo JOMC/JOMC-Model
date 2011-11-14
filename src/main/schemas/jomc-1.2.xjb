@@ -1762,7 +1762,7 @@
                     typeName = typeName.substring( 0, idx );
                 }
 
-                final Class<?> javaType = Class.forName( typeName, true, classLoader );
+                final Class<?> javaType = Class.forName( typeName, false, classLoader );
                 final Object anyObject = this.getAny() instanceof JAXBElement
                                          ? ( (JAXBElement) this.getAny() ).getValue() : this.getAny();
 
@@ -1823,7 +1823,7 @@
                         typeName = typeName.substring( 0, idx );
                     }
 
-                    javaType = Class.forName( typeName, true, classLoader );
+                    javaType = Class.forName( typeName, false, classLoader );
                 }
             }
 
@@ -4918,7 +4918,7 @@
         {
             try
             {
-                final Class<?> classpathSpec = Class.forName( identifier, true, classLoader );
+                final Class<?> classpathSpec = Class.forName( identifier, false, classLoader );
                 if ( java.lang.reflect.Modifier.isPublic( classpathSpec.getModifiers() ) )
                 {
                     classpathSpecification = true;
@@ -4976,7 +4976,7 @@
 
             try
             {
-                final Class<?> classpathImpl = Class.forName( specification.getClazz(), true, classLoader );
+                final Class<?> classpathImpl = Class.forName( specification.getClazz(), false, classLoader );
 
                 if ( java.lang.reflect.Modifier.isPublic( classpathImpl.getModifiers() ) )
                 {
