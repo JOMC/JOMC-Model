@@ -816,6 +816,25 @@
     <jaxb:bindings node="xs:complexType[@name='Specification']">
       <ci:code><![CDATA[
     /**
+     * Gets the Java class of the specification for a given class loader.
+     *
+     * @param classLoader The class loader to get the Java class from or {@code null}, to get the Java class from the
+     * platform's bootstrap class loader.
+     *
+     * @return The Java class of the specification or {@code null}, if the specification does not declare a class.
+     *
+     * @throws ClassNotFoundException if the Java class is not found.
+     *
+     * @see #getClazz()
+     *
+     * @since 1.2
+     */
+    public Class<?> getJavaClass( final ClassLoader classLoader ) throws ClassNotFoundException
+    {
+        return this.getClazz() != null ? Class.forName( this.getClazz(), false, classLoader ) : null;
+    }
+
+    /**
      * Gets a single {@code JAXBElement} matching a namespace URI and local part from the {@code any} property of the
      * instance.
      *
@@ -1183,6 +1202,25 @@
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Implementation']">
       <ci:code><![CDATA[
+    /**
+     * Gets the Java class of the implementation for a given class loader.
+     *
+     * @param classLoader The class loader to get the Java class from or {@code null}, to get the Java class from the
+     * platform's bootstrap class loader.
+     *
+     * @return The Java class of the implementation or {@code null}, if the implementation does not declare a class.
+     *
+     * @throws ClassNotFoundException if the Java class is not found.
+     *
+     * @see #getClazz()
+     *
+     * @since 1.2
+     */
+    public Class<?> getJavaClass( final ClassLoader classLoader ) throws ClassNotFoundException
+    {
+        return this.getClazz() != null ? Class.forName( this.getClazz(), false, classLoader ) : null;
+    }
+
     /**
      * Gets the location URI used for locating instances of this implementation.
      *
@@ -1868,7 +1906,7 @@
                         throw new PropertyException( getMessage( "illegalValue", value, Character.class.getName() ) );
                     }
 
-                    return type.getConstructor( new Class[]
+                    return type.getConstructor( new Class<?>[]
                         {
                             char.class
                         } ).newInstance( new Object[]
@@ -1883,7 +1921,7 @@
                 }
                 else
                 {
-                    return type.getConstructor( new Class[]
+                    return type.getConstructor( new Class<?>[]
                         {
                             String.class
                         } ).newInstance( value );
@@ -2036,6 +2074,13 @@
     <jaxb:bindings node="xs:complexType[@name='Message']">
       <ci:code><![CDATA[
     /**
+     * System's line separator.
+     * @since 1.2
+     */
+    @javax.xml.bind.annotation.XmlTransient
+    private static final String LINE_SEPARATOR = System.getProperty( "line.separator", "\n" );
+
+    /**
      * Gets a single {@code JAXBElement} matching a namespace URI and local part from the {@code any} property of the
      * instance.
      *
@@ -2168,6 +2213,45 @@
     public <T> java.util.List<T> getAnyObjects( final Class<T> clazz )
     {
         return this.getAnyObjects( this.getAny(), clazz );
+    }
+
+    /**
+     * Gets a {@code MessageFormat} instance for a given locale.
+     *
+     * @param locale The locale to get a {@code MessageFormat} instance for.
+     *
+     * @return A {@code MessageFormat} instance for {@code locale}.
+     *
+     * @throws NullPointerException if {@code locale} is {@code null}.
+     *
+     * @since 1.2
+     */
+    public java.text.MessageFormat getMessageFormat( final Locale locale )
+    {
+        if ( locale == null )
+        {
+            throw new NullPointerException( "locale" );
+        }
+
+        try
+        {
+            final Text text = this.getTemplate().getText( locale.getLanguage().toLowerCase( Locale.ENGLISH ) );
+            final StringBuilder builder = new StringBuilder( text.getValue().length() );
+            final java.io.BufferedReader reader = new java.io.BufferedReader(
+                new java.io.StringReader( text.getValue() ) );
+
+            String line;
+            while ( ( line = reader.readLine() ) != null )
+            {
+                builder.append( LINE_SEPARATOR ).append( line );
+            }
+
+            return new java.text.MessageFormat( builder.substring( LINE_SEPARATOR.length() ), locale );
+        }
+        catch ( final java.io.IOException e )
+        {
+            throw new AssertionError( e );
+        }
     }]]>
       </ci:code>
     </jaxb:bindings>
@@ -2489,8 +2573,23 @@
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Instance']">
       <ci:code><![CDATA[
+    /**
+     * Empty {@code Class} array.
+     * @since 1.2
+     */
+    @javax.xml.bind.annotation.XmlTransient
+    private static final Class<?>[] NO_CLASSES =
+    {
+    };
+
     /** Maps dependency names to dependency objects. */
     @javax.xml.bind.annotation.XmlTransient private java.util.Map<String, Object> dependencyObjects;
+
+    /**
+     * Maps message names and locales to message format objects.
+     * @since 1.2
+     */
+    @javax.xml.bind.annotation.XmlTransient private java.util.Map<String, java.util.Map<java.util.Locale, java.text.MessageFormat>> messageObjects;
 
     /** Maps property names to property objects. */
     @javax.xml.bind.annotation.XmlTransient private java.util.Map<String, Object> propertyObjects;
@@ -2513,6 +2612,27 @@
     }
 
     /**
+     * Gets a mapping of message names to a mapping of locales to message format objects bound to the instance.
+     * <p>This method returns a reference to the live map, not a snapshot. Any modification you make to the returned map
+     * will be present inside the object.</p>
+     *
+     * @return A mapping of message names to a mapping of locales to message format objects bound to the instance.
+     *
+     * @since 1.2
+     */
+    public java.util.Map<String, java.util.Map<java.util.Locale, java.text.MessageFormat>> getMessageObjects()
+    {
+        if ( this.messageObjects == null )
+        {
+            this.messageObjects =
+                new java.util.HashMap<String, java.util.Map<java.util.Locale, java.text.MessageFormat>>();
+
+        }
+
+        return this.messageObjects;
+    }
+
+    /**
      * Gets a mapping of property names to objects bound to the instance.
      * <p>This method returns a reference to the live map, not a snapshot. Any modification you make to the returned map
      * will be present inside the object.</p>
@@ -2527,6 +2647,258 @@
         }
 
         return this.propertyObjects;
+    }
+
+    /**
+     * Gets the Java class of the instance for a given class loader.
+     *
+     * @param classLoader The class loader to get the Java class from or {@code null}, to get the Java class from the
+     * platform's bootstrap class loader.
+     *
+     * @return The Java class of the instance.
+     *
+     * @throws ClassNotFoundException if the Java class is not found.
+     *
+     * @see #getClazz()
+     *
+     * @since 1.2
+     */
+    public Class<?> getJavaClass( final ClassLoader classLoader ) throws ClassNotFoundException
+    {
+        return Class.forName( this.getClazz(), false, classLoader );
+    }
+
+    /**
+     * Gets the Java classes of all specifications of the instance for a given class loader.
+     *
+     * @param classLoader The class loader to get the Java classes from or {@code null}, to get the Java classes from
+     * the platform's bootstrap class loader.
+     *
+     * @return The Java classes of all specifications of the instance.
+     *
+     * @throws ClassNotFoundException if a Java class is not found.
+     *
+     * @see #getSpecifications()
+     * @see Specification#getClazz()
+     *
+     * @since 1.2
+     */
+    public Class<?>[] getJavaClasses( final ClassLoader classLoader ) throws ClassNotFoundException
+    {
+        final java.util.Set<Class<?>> classes = new java.util.HashSet<Class<?>>();
+
+        if ( this.getSpecifications() != null )
+        {
+            for ( int i = 0, s0 = this.getSpecifications().getSpecification().size(); i < s0; i++ )
+            {
+                final Specification s = this.getSpecifications().getSpecification().get( i );
+                final Class<?> javaClass = s.getJavaClass( classLoader );
+
+                if ( javaClass != null )
+                {
+                    classes.add( javaClass );
+                }
+            }
+        }
+
+        return classes.toArray( new Class<?>[ classes.size() ] );
+    }
+
+    /**
+     * Gets the Java constructor to use for creating objects of the instance.
+     *
+     * @param classLoader The class loader to get the Java class from or {@code null}, to get the Java class from the
+     * platform's bootstrap class loader.
+     *
+     * @return The public default Java constructor of the Java class of the instance or {@code null}, if that class
+     * does not declare such a constructor, is abstract or is not public.
+     *
+     * @throws ClassNotFoundException if the Java class is not found.
+     *
+     * @see #getJavaClass(java.lang.ClassLoader)
+     *
+     * @since 1.2
+     */
+    public java.lang.reflect.Constructor<?> getJavaClassConstructor( final ClassLoader classLoader )
+        throws ClassNotFoundException
+    {
+        java.lang.reflect.Constructor<?> javaConstructor = null;
+        final Class<?> javaClass = this.getJavaClass( classLoader );
+
+        if ( java.lang.reflect.Modifier.isPublic( javaClass.getModifiers() )
+             && !java.lang.reflect.Modifier.isAbstract( javaClass.getModifiers() ) )
+        {
+            try
+            {
+                javaConstructor = javaClass.getConstructor( NO_CLASSES );
+            }
+            catch ( final NoSuchMethodException e )
+            {
+                javaConstructor = null;
+            }
+        }
+
+        return javaConstructor;
+    }
+
+    /**
+     * Gets the name of the Java method to use for creating objects of the instance.
+     *
+     * @return The name of the Java method to use for creating objects of the instance or {@code null}, if no such
+     * method name is supported.
+     *
+     * @see #getName()
+     *
+     * @since 1.2
+     */
+    public String getJavaClassFactoryMethodName()
+    {
+        String methodName = null;
+
+        char[] c = this.getName().toCharArray();
+        c[0] = Character.toUpperCase( c[0] );
+        methodName = "get" + String.valueOf( c );
+
+        boolean javaIdentifier = Character.isJavaIdentifierStart( c[0] );
+        if ( javaIdentifier )
+        {
+            for ( int idx = c.length - 1; idx > 0; idx-- )
+            {
+                if ( !Character.isJavaIdentifierPart( c[idx] ) )
+                {
+                    javaIdentifier = false;
+                    break;
+                }
+            }
+        }
+
+        if ( !javaIdentifier )
+        {
+            methodName = null;
+        }
+
+        return methodName;
+    }
+
+    /**
+     * Gets the Java method to use for creating objects of the instance.
+     *
+     * @param classLoader The class loader to get the Java class from or {@code null}, to get the Java class from the
+     * platform's bootstrap class loader.
+     *
+     * @return The public Java method of the Java class of the instance to use for creating objects of the instance or
+     * {@code null}, if that class does not declare such a method.
+     *
+     * @throws ClassNotFoundException if the Java class is not found.
+     *
+     * @see #getJavaClass(java.lang.ClassLoader)
+     * @see #getJavaClassFactoryMethodName()
+     *
+     * @since 1.2
+     */
+    public java.lang.reflect.Method getJavaClassFactoryMethod( final ClassLoader classLoader )
+        throws ClassNotFoundException
+    {
+        final Class<?> javaClass = this.getJavaClass( classLoader );
+        java.lang.reflect.Method factoryMethod = null;
+        String methodName = this.getJavaClassFactoryMethodName();
+
+        if ( methodName != null )
+        {
+            try
+            {
+                factoryMethod = javaClass.getMethod( methodName, (Class[]) null );
+            }
+            catch ( final NoSuchMethodException e )
+            {
+                factoryMethod = null;
+            }
+        }
+
+        if ( factoryMethod == null )
+        {
+            try
+            {
+                factoryMethod = javaClass.getMethod( "getObject", (Class[]) null );
+            }
+            catch ( final NoSuchMethodException e )
+            {
+                factoryMethod = null;
+            }
+        }
+
+        return factoryMethod;
+    }
+
+    /**
+     * Gets a flag indicating the Java class of the instance is assignable to all Java classes of all specifications of
+     * the instance.
+     *
+     * @param classLoader The class loader to get the Java classes from or {@code null}, to get the Java classes from
+     * the platform's bootstrap class loader.
+     *
+     * @return {@code true}, if the Java class of the instance is assignable to all Java classes of all specifications
+     * of the instance; {@code false}, if the Java class of the instance is not assignable to all Java classes of all
+     * specifications of the instance.
+     *
+     * @throws ClassNotFoundException if a Java class is not found.
+     *
+     * @see #getJavaClass(java.lang.ClassLoader)
+     * @see #getJavaClasses(java.lang.ClassLoader)
+     *
+     * @since 1.2
+     */
+    public boolean isJavaClassAssignable( final ClassLoader classLoader ) throws ClassNotFoundException
+    {
+        boolean assignable = true;
+        final Class<?> javaClass = this.getJavaClass( classLoader );
+        final Class<?>[] javaClasses = this.getJavaClasses( classLoader );
+
+        for ( int i = javaClasses.length - 1; i >= 0; i-- )
+        {
+            if ( !javaClasses[i].isAssignableFrom( javaClass ) )
+            {
+                assignable = false;
+                break;
+            }
+        }
+
+        return assignable;
+    }
+
+    /**
+     * Gets the Java proxy class for a given class loader.
+     *
+     * @param classLoader The class loader to get the Java proxy class from or {@code null}, to get the Java proxy class
+     * from the platform's bootstrap class loader.
+     *
+     * @return The Java proxy class for {@code classLoader} or {@code null}, if the instance does not support a Java
+     * proxy class.
+     *
+     * @throws ClassNotFoundException if a Java class is not found.
+     *
+     * @see #getJavaClasses(java.lang.ClassLoader)
+     *
+     * @since 1.2
+     */
+    public Class<?> getJavaProxyClass( final ClassLoader classLoader ) throws ClassNotFoundException
+    {
+        final Class<?>[] javaClasses = this.getJavaClasses( classLoader );
+        boolean canProxy = javaClasses.length > 0;
+
+        if ( canProxy )
+        {
+            for ( int i = javaClasses.length - 1; i >= 0; i-- )
+            {
+                if ( !javaClasses[i].isInterface() )
+                {
+                    canProxy = false;
+                    break;
+                }
+            }
+        }
+
+        return canProxy ? java.lang.reflect.Proxy.getProxyClass( classLoader, javaClasses ) : null;
     }
 
     /**
@@ -2859,15 +3231,98 @@
      * Constant for the default name of the classpath module.
      * @see #getDefaultClasspathModuleName()
      */
+    @javax.xml.bind.annotation.XmlTransient
     private static final String DEFAULT_CLASSPATH_MODULE_NAME = "Java Classpath";
 
     /** Default classpath module name. */
+    @javax.xml.bind.annotation.XmlTransient
     private static volatile String defaultClasspathModuleName;
 
     /** Empty {@code Class} array. */
+    @javax.xml.bind.annotation.XmlTransient
     private static final Class<?>[] NO_CLASSES =
     {
     };
+
+    /**
+     * Comparator comparing dependency names lexicographically.
+     * @since 1.2
+     */
+    @javax.xml.bind.annotation.XmlTransient
+    private static final java.util.Comparator<Dependency> DEPENDENCY_NAME_COMPARATOR =
+        new java.util.Comparator<Dependency>()
+        {
+
+            public int compare( final Dependency o1, final Dependency o2 )
+            {
+                return o1.getName().compareTo( o2.getName() );
+            }
+
+        };
+
+    /**
+     * Comparator comparing message names lexicographically.
+     * @since 1.2
+     */
+    @javax.xml.bind.annotation.XmlTransient
+    private static final java.util.Comparator<Message> MESSAGE_NAME_COMPARATOR =
+        new java.util.Comparator<Message>()
+        {
+
+            public int compare( final Message o1, final Message o2 )
+            {
+                return o1.getName().compareTo( o2.getName() );
+            }
+
+        };
+
+    /**
+     * Comparator comparing property names lexicographically.
+     * @since 1.2
+     */
+    @javax.xml.bind.annotation.XmlTransient
+    private static final java.util.Comparator<Property> PROPERTY_NAME_COMPARATOR =
+        new java.util.Comparator<Property>()
+        {
+
+            public int compare( final Property o1, final Property o2 )
+            {
+                return o1.getName().compareTo( o2.getName() );
+            }
+
+        };
+
+    /**
+     * Comparator comparing specification identifiers lexicographically.
+     * @since 1.2
+     */
+    @javax.xml.bind.annotation.XmlTransient
+    private static final java.util.Comparator<Specification> SPECIFICATION_IDENTIFIER_COMPARATOR =
+        new java.util.Comparator<Specification>()
+        {
+
+            public int compare( final Specification o1, final Specification o2 )
+            {
+                return o1.getIdentifier().compareTo( o2.getIdentifier() );
+            }
+
+        };
+
+    /**
+     * Comparator comparing specification reference identifiers lexicographically.
+     * @since 1.2
+     */
+    @javax.xml.bind.annotation.XmlTransient
+    private static final java.util.Comparator<SpecificationReference> SPECIFICATION_REFERENCE_IDENTIFIER_COMPARATOR =
+        new java.util.Comparator<SpecificationReference>()
+        {
+
+            public int compare( final SpecificationReference o1, final SpecificationReference o2 )
+            {
+                return o1.getIdentifier().compareTo( o2.getIdentifier() );
+            }
+
+        };
 
     /** Maps objects to {@code Instance}s. */
     @javax.xml.bind.annotation.XmlTransient private java.util.Map<Object, Instance> objects =
@@ -3221,6 +3676,7 @@
      * @see #getImplementation( java.lang.String )
      * @see Implementation#getImplementations()
      * @see Implementations#getReference()
+     * @see Implementation#getSpecifications()
      */
     public Specifications getSpecifications( final String implementation )
     {
@@ -3231,78 +3687,10 @@
 
         final Specifications specs = new Specifications();
         final Implementation impl = this.getImplementation( implementation );
-
-        this.collectSpecifications( impl, specs, new Implementations(), true );
-
-        Implementation declaration = null;
-        if ( impl != null && impl.getClazz() != null && !impl.isClassDeclaration() )
-        {
-            for ( int i = 0, s0 = this.getModule().size(); i < s0; i++ )
-            {
-                final Module m = this.getModule().get( i );
-
-                if ( m.getImplementations() != null )
-                {
-                    for ( int j = 0, s1 = m.getImplementations().getImplementation().size(); j < s1; j++ )
-                    {
-                        final Implementation current = m.getImplementations().getImplementation().get( j );
-
-                        if ( current.getClazz() != null && current.getClazz().equals( impl.getClazz() )
-                             && current.isClassDeclaration() )
-                        {
-                            declaration = current;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-        if ( declaration != null )
-        {
-            final Specifications declaredSpecifications = this.getSpecifications( declaration.getIdentifier() );
-
-            if ( declaredSpecifications != null )
-            {
-                for ( int i = 0, s0 = declaredSpecifications.getReference().size(); i < s0; i++ )
-                {
-                    final SpecificationReference r = declaredSpecifications.getReference().get( i );
-
-                    if ( specs.getReference( r.getIdentifier() ) == null )
-                    {
-                        specs.getReference().add( r );
-
-                        final Specification s = declaredSpecifications.getSpecification( r.getIdentifier() );
-
-                        if ( s != null )
-                        {
-                            specs.getSpecification().add( s );
-                        }
-                    }
-                }
-            }
-        }
-
-        java.util.Collections.sort( specs.getSpecification(), new java.util.Comparator<Specification>()
-        {
-
-            public int compare( final Specification o1, final Specification o2 )
-            {
-                return o1.getIdentifier().compareTo( o2.getIdentifier() );
-            }
-
-        } );
-
-        java.util.Collections.sort( specs.getReference(), new java.util.Comparator<SpecificationReference>()
-        {
-
-            public int compare( final SpecificationReference o1, final SpecificationReference o2 )
-            {
-                return o1.getIdentifier().compareTo( o2.getIdentifier() );
-            }
-
-        } );
-
+        this.collectModelObjects( impl, null, null, null, specs, null, new java.util.HashSet<String>(), true );
+        this.collectClassDeclarationModelObjects( impl, null, null, null, specs, null );
+        java.util.Collections.sort( specs.getSpecification(), SPECIFICATION_IDENTIFIER_COMPARATOR );
+        java.util.Collections.sort( specs.getReference(), SPECIFICATION_REFERENCE_IDENTIFIER_COMPARATOR );
         return specs.getSpecification().isEmpty() && specs.getReference().isEmpty() ? null : specs;
     }
 
@@ -3447,6 +3835,7 @@
      * @see #getImplementation( java.lang.String )
      * @see Implementation#getImplementations()
      * @see Implementations#getReference()
+     * @see Implementation#getDependencies()
      */
     public Dependencies getDependencies( final String implementation )
     {
@@ -3457,61 +3846,9 @@
 
         final Dependencies dependencies = new Dependencies();
         final Implementation impl = this.getImplementation( implementation );
-        this.collectDependencies( impl, dependencies, new Implementations(), true );
-
-        Implementation declaration = null;
-
-        if ( impl != null && impl.getClazz() != null && !impl.isClassDeclaration() )
-        {
-            for ( int i = 0, s0 = this.getModule().size(); i < s0; i++ )
-            {
-                final Module m = this.getModule().get( i );
-
-                if ( m.getImplementations() != null )
-                {
-                    for ( int j = 0, s1 = m.getImplementations().getImplementation().size(); j < s1; j++ )
-                    {
-                        final Implementation current = m.getImplementations().getImplementation().get( j );
-
-                        if ( current.getClazz() != null && current.getClazz().equals( impl.getClazz() )
-                             && current.isClassDeclaration() )
-                        {
-                            declaration = current;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-        if ( declaration != null )
-        {
-            final Dependencies declaredDependencies = this.getDependencies( declaration.getIdentifier() );
-
-            if ( declaredDependencies != null )
-            {
-                for ( int i = 0, s0 = declaredDependencies.getDependency().size(); i < s0; i++ )
-                {
-                    final Dependency d = declaredDependencies.getDependency().get( i );
-
-                    if ( dependencies.getDependency( d.getName() ) == null )
-                    {
-                        dependencies.getDependency().add( d );
-                    }
-                }
-            }
-        }
-
-        java.util.Collections.sort( dependencies.getDependency(), new java.util.Comparator<Dependency>()
-        {
-
-            public int compare( final Dependency o1, final Dependency o2 )
-            {
-                return o1.getName().compareTo( o2.getName() );
-            }
-
-        } );
-
+        this.collectModelObjects( impl, dependencies, null, null, null, null, new java.util.HashSet<String>(), true );
+        this.collectClassDeclarationModelObjects( impl, dependencies, null, null, null, null );
+        java.util.Collections.sort( dependencies.getDependency(), DEPENDENCY_NAME_COMPARATOR );
         return dependencies.getDependency().isEmpty() ? null : dependencies;
     }
 
@@ -3529,6 +3866,7 @@
      * @see #getImplementation( java.lang.String )
      * @see Implementation#getImplementations()
      * @see Implementations#getReference()
+     * @see Implementation#getProperties()
      */
     public Properties getProperties( final String implementation )
     {
@@ -3538,77 +3876,14 @@
         }
 
         final Properties properties = new Properties();
+        final Specifications specifications = new Specifications();
         final Implementation impl = this.getImplementation( implementation );
-        this.collectProperties( impl, properties, new Implementations(), true );
+        this.collectModelObjects(
+            impl, null, null, properties, specifications, null, new java.util.HashSet<String>(), true );
 
-        Implementation declaration = null;
-
-        if ( impl != null && impl.getClazz() != null && !impl.isClassDeclaration() )
-        {
-            for ( int i = 0, s0 = this.getModule().size(); i < s0; i++ )
-            {
-                final Module m = this.getModule().get( i );
-
-                if ( m.getImplementations() != null )
-                {
-                    for ( int j = 0, s1 = m.getImplementations().getImplementation().size(); j < s1; j++ )
-                    {
-                        final Implementation current = m.getImplementations().getImplementation().get( j );
-
-                        if ( current.getClazz() != null && current.getClazz().equals( current.getClazz() )
-                             && current.isClassDeclaration() )
-                        {
-                            declaration = current;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-        if ( declaration != null )
-        {
-            final Properties declaredProperties = this.getProperties( declaration.getIdentifier() );
-
-            if ( declaredProperties != null )
-            {
-                for ( int i = 0, s0 = declaredProperties.getProperty().size(); i < s0; i++ )
-                {
-                    final Property p = declaredProperties.getProperty().get( i );
-
-                    if ( properties.getProperty( p.getName() ) == null )
-                    {
-                        properties.getProperty().add( p );
-                    }
-                }
-            }
-        }
-
-        final Properties specified = this.getSpecifiedProperties( implementation );
-
-        if ( specified != null )
-        {
-            for ( int i = 0, s0 = specified.getProperty().size(); i < s0; i++ )
-            {
-                final Property p = specified.getProperty().get( i );
-
-                if ( properties.getProperty( p.getName() ) == null )
-                {
-                    properties.getProperty().add( p );
-                }
-            }
-        }
-
-        java.util.Collections.sort( properties.getProperty(), new java.util.Comparator<Property>()
-        {
-
-            public int compare( final Property o1, final Property o2 )
-            {
-                return o1.getName().compareTo( o2.getName() );
-            }
-
-        } );
-
+        this.collectClassDeclarationModelObjects( impl, null, null, properties, specifications, null );
+        this.collectSpecifiedModelObjects( specifications, properties );
+        java.util.Collections.sort( properties.getProperty(), PROPERTY_NAME_COMPARATOR );
         return properties.getProperty().isEmpty() ? null : properties;
     }
 
@@ -3649,16 +3924,7 @@
             }
         }
 
-        java.util.Collections.sort( properties.getProperty(), new java.util.Comparator<Property>()
-        {
-
-            public int compare( final Property o1, final Property o2 )
-            {
-                return o1.getName().compareTo( o2.getName() );
-            }
-
-        } );
-
+        java.util.Collections.sort( properties.getProperty(), PROPERTY_NAME_COMPARATOR );
         return properties.getProperty().isEmpty() ? null : properties;
     }
 
@@ -3676,6 +3942,7 @@
      * @see #getImplementation( java.lang.String )
      * @see Implementation#getImplementations()
      * @see Implementations#getReference()
+     * @see Implementation#getMessages()
      */
     public Messages getMessages( final String implementation )
     {
@@ -3686,62 +3953,40 @@
 
         final Messages msgs = new Messages();
         final Implementation impl = this.getImplementation( implementation );
-        this.collectMessages( impl, msgs, new Implementations(), true );
-
-        Implementation declaration = null;
-
-        if ( impl != null && impl.getClazz() != null && !impl.isClassDeclaration() )
-        {
-            for ( int i = 0, s0 = this.getModule().size(); i < s0; i++ )
-            {
-                final Module m = this.getModule().get( i );
-
-                if ( m.getImplementations() != null )
-                {
-                    for ( int j = 0, s1 = m.getImplementations().getImplementation().size(); j < s1; j++ )
-                    {
-                        final Implementation current = m.getImplementations().getImplementation().get( j );
-
-                        if ( current.getClazz() != null && current.getClazz().equals( impl.getClazz() )
-                             && current.isClassDeclaration() )
-                        {
-                            declaration = current;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-        if ( declaration != null )
-        {
-            final Messages declaredMessages = this.getMessages( declaration.getIdentifier() );
-
-            if ( declaredMessages != null )
-            {
-                for ( int i = 0, s0 = declaredMessages.getMessage().size(); i < s0; i++ )
-                {
-                    final Message m = declaredMessages.getMessage().get( i );
-
-                    if ( msgs.getMessage( m.getName() ) == null )
-                    {
-                        msgs.getMessage().add( m );
-                    }
-                }
-            }
-        }
-
-        java.util.Collections.sort( msgs.getMessage(), new java.util.Comparator<Message>()
-        {
-
-            public int compare( final Message o1, final Message o2 )
-            {
-                return o1.getName().compareTo( o2.getName() );
-            }
-
-        } );
-
+        this.collectModelObjects( impl, null, msgs, null, null, null, new java.util.HashSet<String>(), true );
+        this.collectClassDeclarationModelObjects( impl, null, msgs, null, null, null );
+        java.util.Collections.sort( msgs.getMessage(), MESSAGE_NAME_COMPARATOR );
         return msgs.getMessage().isEmpty() ? null : msgs;
+    }
+
+    /**
+     * Gets any objects of an implementation from the list of modules.
+     *
+     * @param implementation The identifier of the implementation to get any objects of.
+     *
+     * @return Any objects of the first matching implementation or {@code null}, if no such implementation is found.
+     *
+     * @throws NullPointerException if {@code implementation} is {@code null}.
+     *
+     * @see #getModule()
+     * @see #getImplementation( java.lang.String )
+     * @see Implementation#getImplementations()
+     * @see Implementations#getReference()
+     *
+     * @since 1.2
+     */
+    public List<Object> getAnyObjects( final String implementation )
+    {
+        if ( implementation == null )
+        {
+            throw new NullPointerException( "implementation" );
+        }
+
+        final Implementation impl = this.getImplementation( implementation );
+        final java.util.List<Object> any = new java.util.LinkedList<Object>();
+        this.collectModelObjects( impl, null, null, null, null, any, new java.util.HashSet<String>(), true );
+        this.collectClassDeclarationModelObjects( impl, null, null, null, null, any );
+        return any;
     }
 
     /**
@@ -3981,6 +4226,11 @@
      *
      * @see #getModule()
      * @see #getImplementation( java.lang.String )
+     * @see #getDependencies(java.lang.String)
+     * @see #getProperties(java.lang.String)
+     * @see #getMessages(java.lang.String)
+     * @see #getSpecifications(java.lang.String)
+     * @see #getAnyObjects(java.lang.String)
      */
     public Instance getInstance( final String implementation )
     {
@@ -4002,7 +4252,7 @@
             instance.setProperties( this.getProperties( implementation ) );
             instance.setMessages( this.getMessages( implementation ) );
             instance.setSpecifications( this.getSpecifications( implementation ) );
-            this.collectAny( i, instance.getAny(), new Implementations(), true );
+            instance.getAny().addAll( this.getAnyObjects( implementation ) );
             return instance;
         }
 
@@ -4116,7 +4366,7 @@
     }
 
     /**
-     * Creates an object for a given instance from the list of modules.
+     * Creates an object of a given instance from the list of modules.
      *
      * @param instance The instance to create an object of.
      * @param classLoader The class loader to use for creating the object or {@code null}, to use the bootstrap class
@@ -4128,6 +4378,11 @@
      * @throws InstantiationException if creating an object fails.
      *
      * @see #getModule()
+     * @see Instance#getJavaClass(java.lang.ClassLoader)
+     * @see Instance#getJavaClassConstructor(java.lang.ClassLoader)
+     * @see Instance#getJavaClassFactoryMethod(java.lang.ClassLoader)
+     * @see Instance#getJavaClassFactoryMethodName()
+     * @see Instance#isJavaClassAssignable(java.lang.ClassLoader)
      */
     public Object createObject( final Instance instance, final ClassLoader classLoader ) throws InstantiationException
     {
@@ -4140,105 +4395,23 @@
 
         try
         {
-            final Class<?> clazz = Class.forName( instance.getClazz(), true, classLoader );
+            final Class<?> clazz = instance.getJavaClass( classLoader );
+            final java.lang.reflect.Constructor<?> ctor = instance.getJavaClassConstructor( classLoader );
 
-            if ( java.lang.reflect.Modifier.isPublic( clazz.getModifiers() ) )
+            if ( ctor != null && instance.isJavaClassAssignable( classLoader ) )
             {
-                java.lang.reflect.Constructor ctor = null;
-
-                if ( !java.lang.reflect.Modifier.isAbstract( clazz.getModifiers() ) )
+                synchronized ( this.objects )
                 {
-                    try
-                    {
-                        ctor = clazz.getConstructor( NO_CLASSES );
-                    }
-                    catch ( final NoSuchMethodException e )
-                    {
-                        ctor = null;
-                    }
+                    object = clazz.newInstance();
+                    this.objects.put( object, instance );
                 }
+            }
+            else
+            {
+                java.lang.reflect.Method factoryMethod = instance.getJavaClassFactoryMethod( classLoader );
 
-                boolean assignable = true;
-                if ( instance.getSpecifications() != null )
+                if ( factoryMethod != null )
                 {
-                    for ( int i = 0, s0 = instance.getSpecifications().getSpecification().size(); i < s0; i++ )
-                    {
-                        final Specification s = instance.getSpecifications().getSpecification().get( i );
-
-                        if ( s.getClazz() != null )
-                        {
-                            final Class<?> specClass = Class.forName( s.getClazz(), true, classLoader );
-
-                            if ( !specClass.isAssignableFrom( clazz ) )
-                            {
-                                assignable = false;
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                if ( ctor != null && assignable )
-                {
-                    synchronized ( this.objects )
-                    {
-                        object = clazz.newInstance();
-                        this.objects.put( object, instance );
-                    }
-                }
-                else
-                {
-                    java.lang.reflect.Method factoryMethod = null;
-                    String methodName = null;
-
-                    char[] c = instance.getName().toCharArray();
-                    c[0] = Character.toUpperCase( c[0] );
-                    methodName = "get" + String.valueOf( c );
-
-                    boolean javaIdentifier = Character.isJavaIdentifierStart( c[0] );
-                    if ( javaIdentifier )
-                    {
-                        for ( int idx = c.length - 1; idx > 0; idx-- )
-                        {
-                            if ( !Character.isJavaIdentifierPart( c[idx] ) )
-                            {
-                                javaIdentifier = false;
-                                break;
-                            }
-                        }
-                    }
-
-                    if ( javaIdentifier )
-                    {
-                        try
-                        {
-                            factoryMethod = clazz.getMethod( methodName, (Class[]) null );
-                        }
-                        catch ( final NoSuchMethodException e )
-                        {
-                            factoryMethod = null;
-                        }
-                    }
-
-                    if ( factoryMethod == null )
-                    {
-                        try
-                        {
-                            factoryMethod = clazz.getMethod( "getObject", (Class[]) null );
-                        }
-                        catch ( final NoSuchMethodException e )
-                        {
-                            factoryMethod = null;
-                        }
-                    }
-
-                    if ( factoryMethod == null )
-                    {
-                        throw new InstantiationException( getMessage( "failedCreatingObject", instance.getIdentifier(),
-                                                                      clazz.getName(), methodName ) );
-
-                    }
-
                     if ( java.lang.reflect.Modifier.isStatic( factoryMethod.getModifiers() ) )
                     {
                         synchronized ( this.objects )
@@ -4272,13 +4445,16 @@
                             }
                         }
                     }
-                    else
-                    {
-                        throw new InstantiationException( getMessage( "failedCreatingObject", instance.getIdentifier(),
-                                                                      clazz.getName(), methodName ) );
-
-                    }
                 }
+            }
+
+            if ( object == null )
+            {
+                throw new InstantiationException( getMessage(
+                    instance.getJavaClassFactoryMethodName() != null
+                    ? "failedCreatingObjectWithMethod" : "failedCreatingObject",
+                    instance.getIdentifier(), clazz.getName(), instance.getJavaClassFactoryMethodName() ) );
+
             }
 
             return object;
@@ -4304,28 +4480,160 @@
         }
     }
 
-    private void collectSpecifications( final Implementation implementation, final Specifications specifications,
-                                        final Implementations seen, final boolean includeDeclared )
+    /** @since 1.2 */
+    private void collectModelObjects( final Implementation implementation, final Dependencies dependencies,
+                                      final Messages messages, final Properties properties,
+                                      final Specifications specifications, final List<Object> any,
+                                      final java.util.Set<String> seen, final boolean includeDeclared )
     {
-        if ( implementation != null && seen.getImplementation( implementation.getIdentifier() ) == null )
+        if ( implementation != null && !seen.contains( implementation.getIdentifier() ) )
         {
-            seen.getImplementation().add( implementation );
+            seen.add( implementation.getIdentifier() );
 
-            if ( includeDeclared && implementation.getSpecifications() != null )
+            if ( includeDeclared )
             {
-                for ( int i = 0, s0 = implementation.getSpecifications().getReference().size(); i < s0; i++ )
+                if ( dependencies != null && implementation.getDependencies() != null )
                 {
-                    final SpecificationReference r = implementation.getSpecifications().getReference().get( i );
-
-                    if ( specifications.getReference( r.getIdentifier() ) == null )
+                    for ( int i = 0, s0 = implementation.getDependencies().getDependency().size(); i < s0; i++ )
                     {
-                        specifications.getReference().add( r );
+                        final Dependency d = implementation.getDependencies().getDependency().get( i );
+                        final Dependency dependency = dependencies.getDependency( d.getName() );
 
-                        final Specification s = this.getSpecification( r.getIdentifier() );
-                        if ( s != null && specifications.getSpecification( s.getIdentifier() ) == null )
+                        if ( dependency == null )
                         {
-                            specifications.getSpecification().add( s );
+                            dependencies.getDependency().add( d );
                         }
+                        else
+                        {
+                            this.collectDependencies( d, dependency );
+                        }
+                    }
+                }
+
+                if ( messages != null && implementation.getMessages() != null )
+                {
+                    for ( int i = 0, s0 = implementation.getMessages().getMessage().size(); i < s0; i++ )
+                    {
+                        final Message msg = implementation.getMessages().getMessage().get( i );
+
+                        if ( messages.getMessage( msg.getName() ) == null )
+                        {
+                            messages.getMessage().add( msg );
+                        }
+                    }
+
+                    if ( !implementation.getMessages().getReference().isEmpty() )
+                    {
+                        final Module m = this.getModuleOfImplementation( implementation.getIdentifier() );
+
+                        if ( m != null )
+                        {
+                            for ( int i = 0, s0 = implementation.getMessages().getReference().size(); i < s0; i++ )
+                            {
+                                final MessageReference ref = implementation.getMessages().getReference().get( i );
+
+                                if ( messages.getMessage( ref.getName() ) == null )
+                                {
+                                    Message referenced = m.getMessages().getMessage( ref.getName() );
+                                    if ( referenced != null )
+                                    {
+                                        referenced = referenced.clone();
+                                        referenced.setDeprecated( ref.isDeprecated() );
+                                        referenced.setFinal( ref.isFinal() );
+                                        referenced.setOverride( ref.isOverride() );
+                                        messages.getMessage().add( referenced );
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if ( properties != null && implementation.getProperties() != null )
+                {
+                    for ( int i = 0, s0 = implementation.getProperties().getProperty().size(); i < s0; i++ )
+                    {
+                        final Property p = implementation.getProperties().getProperty().get( i );
+
+                        if ( properties.getProperty( p.getName() ) == null )
+                        {
+                            properties.getProperty().add( p );
+                        }
+                    }
+
+                    if ( !implementation.getProperties().getReference().isEmpty() )
+                    {
+                        final Module m = this.getModuleOfImplementation( implementation.getIdentifier() );
+
+                        if ( m != null )
+                        {
+                            for ( int i = 0, s0 = implementation.getProperties().getReference().size(); i < s0; i++ )
+                            {
+                                final PropertyReference ref = implementation.getProperties().getReference().get( i );
+
+                                if ( properties.getProperty( ref.getName() ) == null )
+                                {
+                                    Property referenced = m.getProperties().getProperty( ref.getName() );
+                                    if ( referenced != null )
+                                    {
+                                        referenced = referenced.clone();
+                                        referenced.setDeprecated( ref.isDeprecated() );
+                                        referenced.setFinal( ref.isFinal() );
+                                        referenced.setOverride( ref.isOverride() );
+                                        properties.getProperty().add( referenced );
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if ( specifications != null && implementation.getSpecifications() != null )
+                {
+                    for ( int i = 0, s0 = implementation.getSpecifications().getReference().size(); i < s0; i++ )
+                    {
+                        final SpecificationReference r = implementation.getSpecifications().getReference().get( i );
+
+                        if ( specifications.getReference( r.getIdentifier() ) == null )
+                        {
+                            specifications.getReference().add( r );
+
+                            final Specification s = this.getSpecification( r.getIdentifier() );
+                            if ( s != null && specifications.getSpecification( s.getIdentifier() ) == null )
+                            {
+                                specifications.getSpecification().add( s );
+                            }
+                        }
+                    }
+                }
+
+                if ( any != null && !implementation.getAny().isEmpty() )
+                {
+                    for ( int i = 0, s0 = implementation.getAny().size(); i < s0; i++ )
+                    {
+                        final Object o = implementation.getAny().get( i );
+
+                        if ( o instanceof org.w3c.dom.Element )
+                        {
+                            if ( this.getElement( any, (org.w3c.dom.Element) o ) == null )
+                            {
+                                any.add( o );
+                            }
+
+                            continue;
+                        }
+
+                        if ( o instanceof javax.xml.bind.JAXBElement<?> )
+                        {
+                            if ( this.getElement( any, (javax.xml.bind.JAXBElement<?>) o ) == null )
+                            {
+                                any.add( o );
+                            }
+
+                            continue;
+                        }
+
+                        any.add( o );
                     }
                 }
             }
@@ -4335,49 +4643,70 @@
                 for ( int i = 0, s0 = implementation.getImplementations().getReference().size(); i < s0; i++ )
                 {
                     final ImplementationReference r = implementation.getImplementations().getReference().get( i );
-
-                    this.collectSpecifications(
-                        this.getImplementation( r.getIdentifier() ), specifications, seen, true );
+                    this.collectModelObjects( this.getImplementation( r.getIdentifier() ), dependencies, messages,
+                                              properties, specifications, any, seen, true );
 
                 }
             }
         }
     }
 
-    private void collectDependencies( final Implementation implementation, final Dependencies dependencies,
-                                      final Implementations seen, final boolean includeDeclared )
+    /** @since 1.2 */
+    private void collectClassDeclarationModelObjects( final Implementation implementation,
+                                                      final Dependencies dependencies, final Messages messages,
+                                                      final Properties properties, final Specifications specifications,
+                                                      final List<Object> any )
     {
-        if ( implementation != null && seen.getImplementation( implementation.getIdentifier() ) == null )
+        Implementation declaration = null;
+
+        if ( implementation != null && implementation.getClazz() != null && !implementation.isClassDeclaration() )
         {
-            seen.getImplementation().add( implementation );
-
-            if ( includeDeclared && implementation.getDependencies() != null )
+            for ( int i = 0, s0 = this.getModule().size(); i < s0; i++ )
             {
-                for ( int i = 0, s0 = implementation.getDependencies().getDependency().size(); i < s0; i++ )
-                {
-                    final Dependency d = implementation.getDependencies().getDependency().get( i );
-                    final Dependency dependency = dependencies.getDependency( d.getName() );
+                final Module m = this.getModule().get( i );
 
-                    if ( dependency == null )
+                if ( m.getImplementations() != null )
+                {
+                    for ( int j = 0, s1 = m.getImplementations().getImplementation().size(); j < s1; j++ )
                     {
-                        dependencies.getDependency().add( d );
-                    }
-                    else
-                    {
-                        this.collectDependencies( d, dependency );
+                        final Implementation current = m.getImplementations().getImplementation().get( j );
+
+                        if ( current.getClazz() != null && current.getClazz().equals( implementation.getClazz() )
+                             && current.isClassDeclaration() )
+                        {
+                            declaration = current;
+                            break;
+                        }
                     }
                 }
             }
+        }
 
-            if ( implementation.getImplementations() != null )
+        if ( declaration != null )
+        {
+            this.collectModelObjects( declaration, dependencies, messages, properties, specifications, any,
+                                      new java.util.HashSet<String>(), true );
+
+        }
+    }
+
+    /** @since 1.2 */
+    private void collectSpecifiedModelObjects( final Specifications specifications, final Properties properties )
+    {
+        for ( int i = 0, s0 = specifications.getSpecification().size(); i < s0; i++ )
+        {
+            final Specification s = specifications.getSpecification().get( i );
+
+            if ( s.getProperties() != null )
             {
-                for ( int i = 0, s0 = implementation.getImplementations().getReference().size(); i < s0; i++ )
+                for ( int j = 0, s1 = s.getProperties().getProperty().size(); j < s1; j++ )
                 {
-                    final ImplementationReference r = implementation.getImplementations().getReference().get( i );
+                    final Property p = s.getProperties().getProperty().get( j );
 
-                    this.collectDependencies(
-                        this.getImplementation( r.getIdentifier() ), dependencies, seen, true );
-
+                    if ( properties.getProperty( p.getName() ) == null )
+                    {
+                        properties.getProperty().add( p );
+                    }
                 }
             }
         }
@@ -4440,168 +4769,6 @@
                 else
                 {
                     this.collectDependencies( sd, td );
-                }
-            }
-        }
-    }
-
-    private void collectProperties( final Implementation implementation, final Properties properties,
-                                    final Implementations seen, final boolean includeDeclared )
-    {
-        if ( implementation != null && seen.getImplementation( implementation.getIdentifier() ) == null )
-        {
-            seen.getImplementation().add( implementation );
-
-            if ( includeDeclared && implementation.getProperties() != null )
-            {
-                for ( int i = 0, s0 = implementation.getProperties().getProperty().size(); i < s0; i++ )
-                {
-                    final Property p = implementation.getProperties().getProperty().get( i );
-
-                    if ( properties.getProperty( p.getName() ) == null )
-                    {
-                        properties.getProperty().add( p );
-                    }
-                }
-
-                if ( !implementation.getProperties().getReference().isEmpty() )
-                {
-                    final Module m = this.getModuleOfImplementation( implementation.getIdentifier() );
-
-                    if ( m != null )
-                    {
-                        for ( int i = 0, s0 = implementation.getProperties().getReference().size(); i < s0; i++ )
-                        {
-                            final PropertyReference ref = implementation.getProperties().getReference().get( i );
-
-                            if ( properties.getProperty( ref.getName() ) == null )
-                            {
-                                Property referenced = m.getProperties().getProperty( ref.getName() );
-                                if ( referenced != null )
-                                {
-                                    referenced = referenced.clone();
-                                    referenced.setDeprecated( ref.isDeprecated() );
-                                    referenced.setFinal( ref.isFinal() );
-                                    referenced.setOverride( ref.isOverride() );
-                                    properties.getProperty().add( referenced );
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            if ( implementation.getImplementations() != null )
-            {
-                for ( int i = 0, s0 = implementation.getImplementations().getReference().size(); i < s0; i++ )
-                {
-                    final ImplementationReference r = implementation.getImplementations().getReference().get( i );
-                    this.collectProperties( this.getImplementation( r.getIdentifier() ), properties, seen, true );
-                }
-            }
-        }
-    }
-
-    private void collectMessages( final Implementation implementation, final Messages messages,
-                                  final Implementations seen, final boolean includeDeclared )
-    {
-        if ( implementation != null && seen.getImplementation( implementation.getIdentifier() ) == null )
-        {
-            seen.getImplementation().add( implementation );
-
-            if ( includeDeclared && implementation.getMessages() != null )
-            {
-                for ( int i = 0, s0 = implementation.getMessages().getMessage().size(); i < s0; i++ )
-                {
-                    final Message msg = implementation.getMessages().getMessage().get( i );
-
-                    if ( messages.getMessage( msg.getName() ) == null )
-                    {
-                        messages.getMessage().add( msg );
-                    }
-                }
-
-                if ( !implementation.getMessages().getReference().isEmpty() )
-                {
-                    final Module m = this.getModuleOfImplementation( implementation.getIdentifier() );
-
-                    if ( m != null )
-                    {
-                        for ( int i = 0, s0 = implementation.getMessages().getReference().size(); i < s0; i++ )
-                        {
-                            final MessageReference ref = implementation.getMessages().getReference().get( i );
-
-                            if ( messages.getMessage( ref.getName() ) == null )
-                            {
-                                Message referenced = m.getMessages().getMessage( ref.getName() );
-                                if ( referenced != null )
-                                {
-                                    referenced = referenced.clone();
-                                    referenced.setDeprecated( ref.isDeprecated() );
-                                    referenced.setFinal( ref.isFinal() );
-                                    referenced.setOverride( ref.isOverride() );
-                                    messages.getMessage().add( referenced );
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            if ( implementation.getImplementations() != null )
-            {
-                for ( int i = 0, s0 = implementation.getImplementations().getReference().size(); i < s0; i++ )
-                {
-                    final ImplementationReference r = implementation.getImplementations().getReference().get( i );
-                    this.collectMessages( this.getImplementation( r.getIdentifier() ), messages, seen, true );
-                }
-            }
-        }
-    }
-
-    private void collectAny( final Implementation implementation, final List<Object> any, final Implementations seen,
-                             final boolean includeDeclared )
-    {
-        if ( implementation != null && seen.getImplementation( implementation.getIdentifier() ) == null )
-        {
-            seen.getImplementation().add( implementation );
-
-            if ( includeDeclared && !implementation.getAny().isEmpty() )
-            {
-                for ( int i = 0, s0 = implementation.getAny().size(); i < s0; i++ )
-                {
-                    final Object o = implementation.getAny().get( i );
-
-                    if ( o instanceof org.w3c.dom.Element )
-                    {
-                        if ( this.getElement( any, (org.w3c.dom.Element) o ) == null )
-                        {
-                            any.add( o );
-                        }
-
-                        continue;
-                    }
-
-                    if ( o instanceof javax.xml.bind.JAXBElement )
-                    {
-                        if ( this.getElement( any, (javax.xml.bind.JAXBElement) o ) == null )
-                        {
-                            any.add( o );
-                        }
-
-                        continue;
-                    }
-
-                    any.add( o );
-                }
-            }
-
-            if ( implementation.getImplementations() != null )
-            {
-                for ( int i = 0, s0 = implementation.getImplementations().getReference().size(); i < s0; i++ )
-                {
-                    final ImplementationReference r = implementation.getImplementations().getReference().get( i );
-                    this.collectAny( this.getImplementation( r.getIdentifier() ), any, seen, true );
                 }
             }
         }
