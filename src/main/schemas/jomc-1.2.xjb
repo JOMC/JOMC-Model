@@ -2216,17 +2216,19 @@
     }
 
     /**
-     * Gets a {@code MessageFormat} instance for a given locale.
+     * Gets a Java {@code MessageFormat} instance for a given locale.
      *
-     * @param locale The locale to get a {@code MessageFormat} instance for.
+     * @param locale The locale to get a Java {@code MessageFormat} instance for.
      *
-     * @return A {@code MessageFormat} instance for {@code locale}.
+     * @return A Java {@code MessageFormat} instance for {@code locale}.
      *
      * @throws NullPointerException if {@code locale} is {@code null}.
      *
+     * @see #getTemplate()
+     *
      * @since 1.2
      */
-    public java.text.MessageFormat getMessageFormat( final Locale locale )
+    public java.text.MessageFormat getJavaMessage( final Locale locale )
     {
         if ( locale == null )
         {
