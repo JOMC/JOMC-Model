@@ -4400,4 +4400,180 @@
     <detail identifier="IMPLEMENTATION_PROPERTY_MULTIPLE_INHERITANCE_CONSTRAINT" count="1"/>
   </modules-constraints-test>
 
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="MCT0105">
+    <modules valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <implementations>
+            <implementation identifier="Parent 1" name="Parent Name 1">
+              <unbound-xml-element xmlns="OTHER"/>
+            </implementation>
+            <implementation identifier="Parent 2" name="Parent Name 2">
+              <unbound-xml-element xmlns="OTHER"/>
+            </implementation>
+            <implementation identifier="Implementation" name="Implementation Name">
+              <implementations>
+                <reference identifier="Parent 1"/>
+                <reference identifier="Parent 2"/>
+              </implementations>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="IMPLEMENTATION_XML_ELEMENT_MULTIPLE_INHERITANCE_CONSTRAINT" count="1"/>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="MCT0106">
+    <modules valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <implementations>
+            <implementation identifier="Parent 1" name="Parent Name 1">
+              <unbound-xml-element xmlns="OTHER"/>
+            </implementation>
+            <implementation identifier="Parent 2" name="Parent Name  2">
+              <unbound-xml-element xmlns="OTHER"/>
+            </implementation>
+            <implementation identifier="Parent 3" name="Parent Name  3">
+              <implementations>
+                <reference identifier="Parent 1"/>
+                <reference identifier="Parent 2"/>
+              </implementations>
+              <unbound-xml-element xmlns="OTHER"/>
+            </implementation>
+            <implementation identifier="Implementation" name="Implementation Name">
+              <implementations>
+                <reference identifier="Parent 1"/>
+                <reference identifier="Parent 3"/>
+              </implementations>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="IMPLEMENTATION_XML_ELEMENT_MULTIPLE_INHERITANCE_CONSTRAINT" count="1"/>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="MCT0107">
+    <modules valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <implementations>
+            <implementation identifier="Parent 1" name="Parent Name 1">
+              <unbound-xml-element xmlns="OTHER"/>
+            </implementation>
+            <implementation identifier="Parent 2" name="Parent Name  2">
+              <unbound-xml-element xmlns="OTHER"/>
+            </implementation>
+            <implementation identifier="Parent 3" name="Parent Name  3">
+              <implementations>
+                <reference identifier="Parent 1"/>
+                <reference identifier="Parent 2"/>
+              </implementations>
+            </implementation>
+            <implementation identifier="Implementation" name="Implementation Name">
+              <implementations>
+                <reference identifier="Parent 1"/>
+                <reference identifier="Parent 3"/>
+              </implementations>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="IMPLEMENTATION_XML_ELEMENT_MULTIPLE_INHERITANCE_CONSTRAINT" count="2"/>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="MCT0108">
+    <modules valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <implementations>
+            <implementation identifier="Parent 1" name="Parent Name 1">
+              <testsuite xmlns="http://jomc.org/model/test"/>
+            </implementation>
+            <implementation identifier="Parent 2" name="Parent Name 2">
+              <testsuite xmlns="http://jomc.org/model/test"/>
+            </implementation>
+            <implementation identifier="Implementation" name="Implementation Name">
+              <implementations>
+                <reference identifier="Parent 1"/>
+                <reference identifier="Parent 2"/>
+              </implementations>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="IMPLEMENTATION_JAXB_ELEMENT_MULTIPLE_INHERITANCE_CONSTRAINT" count="1"/>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="MCT0109">
+    <modules valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <implementations>
+            <implementation identifier="Parent 1" name="Parent Name 1">
+              <testsuite xmlns="http://jomc.org/model/test"/>
+            </implementation>
+            <implementation identifier="Parent 2" name="Parent Name  2">
+              <testsuite xmlns="http://jomc.org/model/test"/>
+            </implementation>
+            <implementation identifier="Parent 3" name="Parent Name  3">
+              <implementations>
+                <reference identifier="Parent 1"/>
+                <reference identifier="Parent 2"/>
+              </implementations>
+              <testsuite xmlns="http://jomc.org/model/test"/>
+            </implementation>
+            <implementation identifier="Implementation" name="Implementation Name">
+              <implementations>
+                <reference identifier="Parent 1"/>
+                <reference identifier="Parent 3"/>
+              </implementations>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="IMPLEMENTATION_JAXB_ELEMENT_MULTIPLE_INHERITANCE_CONSTRAINT" count="1"/>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="MCT0110">
+    <modules valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <implementations>
+            <implementation identifier="Parent 1" name="Parent Name 1">
+              <testsuite xmlns="http://jomc.org/model/test"/>
+            </implementation>
+            <implementation identifier="Parent 2" name="Parent Name  2">
+              <testsuite xmlns="http://jomc.org/model/test"/>
+            </implementation>
+            <implementation identifier="Parent 3" name="Parent Name  3">
+              <implementations>
+                <reference identifier="Parent 1"/>
+                <reference identifier="Parent 2"/>
+              </implementations>
+            </implementation>
+            <implementation identifier="Implementation" name="Implementation Name">
+              <implementations>
+                <reference identifier="Parent 1"/>
+                <reference identifier="Parent 3"/>
+              </implementations>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="IMPLEMENTATION_JAXB_ELEMENT_MULTIPLE_INHERITANCE_CONSTRAINT" count="2"/>
+  </modules-constraints-test>
+
 </testsuite>

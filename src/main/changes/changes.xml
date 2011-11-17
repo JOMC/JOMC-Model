@@ -112,6 +112,9 @@
       model context attribute <code>org.jomc.model.modlet.DefaultModelProvider.validatingAttribute</code>.
       See the <a href="http://jomc.sourceforge.net/jomc/1.2/jomc-model-1.2/clirr-report.html">CLIRR report</a>.]]>
       </action>
+      <action dev="schulte2005" type="fix"><![CDATA[Updated class
+      <code>org.jomc.model.modlet.DefaultModelValidator</code> to additionally validate inheritance of any elements.]]>
+      </action>
     </release>
   </body>
 </document>

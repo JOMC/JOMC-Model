@@ -45,6 +45,7 @@ import java.util.logging.Level;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.util.JAXBSource;
+import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import org.jomc.model.Dependency;
 import org.jomc.model.Implementation;
@@ -72,6 +73,7 @@ import org.jomc.modlet.ModelValidator;
 import org.jomc.util.ParseException;
 import org.jomc.util.TokenMgrError;
 import org.jomc.util.VersionParser;
+import org.w3c.dom.Element;
 
 /**
  * Default object management and configuration {@code ModelValidator} implementation.
@@ -871,6 +873,59 @@ public class DefaultModelValidator implements ModelValidator
                                     }
                                 }
                             }
+                        }
+                    }
+                }
+
+                final Map<String, List<InheritanceModel.Node<Element>>> xmlElementNodes =
+                    inheritanceModel.getEffectiveXmlElements();
+
+                if ( xmlElementNodes != null )
+                {
+                    for ( Map.Entry<String, List<InheritanceModel.Node<Element>>> e : xmlElementNodes.entrySet() )
+                    {
+                        if ( e.getValue().size() > 1 )
+                        {
+                            final StringBuilder path = new StringBuilder( e.getValue().size() * 255 );
+
+                            for ( int j = 0, s1 = e.getValue().size(); j < s1; j++ )
+                            {
+                                path.append( ", " ).append( e.getValue().get( j ).pathToString() );
+                            }
+
+                            addDetail( validationContext.getReport(),
+                                       "IMPLEMENTATION_XML_ELEMENT_MULTIPLE_INHERITANCE_CONSTRAINT",
+                                       Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                       "implementationMultipleInheritanceXmlElementConstraint",
+                                       impl.getIdentifier(), e.getKey(), path.substring( 2 ) );
+
+                        }
+                    }
+                }
+
+                final Map<String, List<InheritanceModel.Node<JAXBElement<?>>>> jaxbElementNodes =
+                    inheritanceModel.getEffectiveJaxbElements();
+
+                if ( jaxbElementNodes != null )
+                {
+                    for ( Map.Entry<String, List<InheritanceModel.Node<JAXBElement<?>>>> e :
+                          jaxbElementNodes.entrySet() )
+                    {
+                        if ( e.getValue().size() > 1 )
+                        {
+                            final StringBuilder path = new StringBuilder( e.getValue().size() * 255 );
+
+                            for ( int j = 0, s1 = e.getValue().size(); j < s1; j++ )
+                            {
+                                path.append( ", " ).append( e.getValue().get( j ).pathToString() );
+                            }
+
+                            addDetail( validationContext.getReport(),
+                                       "IMPLEMENTATION_JAXB_ELEMENT_MULTIPLE_INHERITANCE_CONSTRAINT",
+                                       Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                       "implementationMultipleInheritanceJaxbElementConstraint",
+                                       impl.getIdentifier(), e.getKey(), path.substring( 2 ) );
+
                         }
                     }
                 }
@@ -1695,7 +1750,7 @@ public class DefaultModelValidator implements ModelValidator
     {
 
         /** @since 1.2 */
-        private static class Node<T extends ModelObject>
+        private static class Node<T>
         {
 
             private final Implementation implementation;
@@ -1831,6 +1886,14 @@ public class DefaultModelValidator implements ModelValidator
         private final Map<String, List<Node<ImplementationReference>>> implReferences = newMap();
 
         private final Map<String, Map<String, List<Node<ImplementationReference>>>> effectiveImplReferences = newMap();
+
+        private final Map<String, List<Node<Element>>> xmlElements = newMap();
+
+        private final Map<String, Map<String, List<Node<Element>>>> effectiveXmlElements = newMap();
+
+        private final Map<String, List<Node<JAXBElement<?>>>> jaxbElements = newMap();
+
+        private final Map<String, Map<String, List<Node<JAXBElement<?>>>>> effectiveJaxbElements = newMap();
 
         private final Map<String, Implementation> implementations = newMap();
 
@@ -2023,6 +2086,29 @@ public class DefaultModelValidator implements ModelValidator
 
         }
 
+//        private boolean isEffectiveXmlElementOverridden( final String qname )
+//        {
+//            return isEffectiveModelObjectOverridden(
+//                this.effectiveXmlElements, this.implementation.getIdentifier(), qname );
+//
+//        }
+//
+//        private boolean isAncestorXmlElementOverridden( final String qname )
+//        {
+//            return isAncestorModelObjectOverridden( this.xmlElements, this.implementation.getIdentifier(), qname );
+//        }
+//
+//        private boolean isEffectiveJaxbElementOverridden( final String qname )
+//        {
+//            return isEffectiveModelObjectOverridden(
+//                this.effectiveJaxbElements, this.implementation.getIdentifier(), qname );
+//
+//        }
+//
+//        private boolean isAncestorJaxbElementOverridden( final String qname )
+//        {
+//            return isAncestorModelObjectOverridden( this.jaxbElements, this.implementation.getIdentifier(), qname );
+//        }
         private Set<String> getFinalAncestorImplementations()
         {
             final Set<String> set = newSet( this.implementations.size() );
@@ -2065,6 +2151,16 @@ public class DefaultModelValidator implements ModelValidator
             return getDeclarationNodes( this.implReferences, i );
         }
 
+        private Map<String, List<Node<Element>>> getDeclaredXmlElements( final String i )
+        {
+            return getDeclarationNodes( this.xmlElements, i );
+        }
+
+        private Map<String, List<Node<JAXBElement<?>>>> getDeclaredJaxbElements( final String i )
+        {
+            return getDeclarationNodes( this.jaxbElements, i );
+        }
+
         private Map<String, List<Node<Dependency>>> getEffectiveDependencies()
         {
             return this.effectiveDependencies.get( this.implementation.getIdentifier() );
@@ -2088,6 +2184,16 @@ public class DefaultModelValidator implements ModelValidator
         private Map<String, List<Node<ImplementationReference>>> getEffectiveImplementationReferences()
         {
             return this.effectiveImplReferences.get( this.implementation.getIdentifier() );
+        }
+
+        private Map<String, List<Node<Element>>> getEffectiveXmlElements()
+        {
+            return this.effectiveXmlElements.get( this.implementation.getIdentifier() );
+        }
+
+        private Map<String, List<Node<JAXBElement<?>>>> getEffectiveJaxbElements()
+        {
+            return this.effectiveJaxbElements.get( this.implementation.getIdentifier() );
         }
 
         private void inheritDependencies( final Map<String, List<Node<Dependency>>> ancestor, final String descendant )
@@ -2117,6 +2223,17 @@ public class DefaultModelValidator implements ModelValidator
             inheritModelObjects( this.effectiveImplReferences, ancestor, descendant );
         }
 
+        private void inheritXmlElements( final Map<String, List<Node<Element>>> ancestor, final String descendant )
+        {
+            inheritModelObjects( this.effectiveXmlElements, ancestor, descendant );
+        }
+
+        private void inheritJaxbElements(
+            final Map<String, List<Node<JAXBElement<?>>>> ancestor, final String descendant )
+        {
+            inheritModelObjects( this.effectiveJaxbElements, ancestor, descendant );
+        }
+
         private void addDependencyNode( final Node<Dependency> node )
         {
             addNode( this.dependencies, node, node.getModelObject().getName() );
@@ -2140,6 +2257,16 @@ public class DefaultModelValidator implements ModelValidator
         private void addImplementationReferenceNode( final Node<ImplementationReference> node )
         {
             addNode( this.implReferences, node, node.getModelObject().getIdentifier() );
+        }
+
+        private void addXmlElementNode( final Node<Element> node )
+        {
+            addNode( this.xmlElements, node, getXmlElementKey( node.getModelObject() ) );
+        }
+
+        private void addJaxbElementNode( final Node<JAXBElement<?>> node )
+        {
+            addNode( this.jaxbElements, node, getJaxbElementKey( node.getModelObject() ) );
         }
 
         private void collectNodes(
@@ -2274,6 +2401,32 @@ public class DefaultModelValidator implements ModelValidator
                     }
                 }
 
+                if ( !declaration.getAny().isEmpty() )
+                {
+                    for ( int i = 0, s0 = declaration.getAny().size(); i < s0; i++ )
+                    {
+                        final Object any = declaration.getAny().get( i );
+
+                        if ( any instanceof Element )
+                        {
+                            final Element e = (Element) any;
+                            this.addXmlElementNode( new Node<Element>(
+                                declaration, null, null, e, false, false, path ) );
+
+                            continue;
+                        }
+
+                        if ( any instanceof JAXBElement<?> )
+                        {
+                            final JAXBElement<?> e = (JAXBElement<?>) any;
+                            this.addJaxbElementNode( new Node<JAXBElement<?>>(
+                                declaration, null, null, e, false, false, path ) );
+
+                            continue;
+                        }
+                    }
+                }
+
                 if ( declaration.getImplementations() != null
                      && !declaration.getImplementations().getReference().isEmpty() )
                 {
@@ -2367,6 +2520,32 @@ public class DefaultModelValidator implements ModelValidator
                 }
             }
 
+            final Map<String, List<Node<Element>>> xmlElementDeclarations =
+                this.getDeclaredXmlElements( declaration.getIdentifier() );
+
+            for ( Map.Entry<String, List<Node<Element>>> e : xmlElementDeclarations.entrySet() )
+            {
+                for ( int i = 0, s0 = e.getValue().size(); i < s0; i++ )
+                {
+                    addEffectiveDeclarationNode( this.effectiveXmlElements, e.getValue().get( i ),
+                                                 getXmlElementKey( e.getValue().get( i ).getModelObject() ) );
+
+                }
+            }
+
+            final Map<String, List<Node<JAXBElement<?>>>> jaxbElementDeclarations =
+                this.getDeclaredJaxbElements( declaration.getIdentifier() );
+
+            for ( Map.Entry<String, List<Node<JAXBElement<?>>>> e : jaxbElementDeclarations.entrySet() )
+            {
+                for ( int i = 0, s0 = e.getValue().size(); i < s0; i++ )
+                {
+                    addEffectiveDeclarationNode( this.effectiveJaxbElements, e.getValue().get( i ),
+                                                 getJaxbElementKey( e.getValue().get( i ).getModelObject() ) );
+
+                }
+            }
+
             this.declareClassDeclarationModelObjects( declaration );
 
             final Map<String, List<Node<SpecificationReference>>> ancestorSpecificationReferences =
@@ -2383,6 +2562,12 @@ public class DefaultModelValidator implements ModelValidator
 
             final Map<String, List<Node<ImplementationReference>>> ancestorImplementationReferences =
                 this.effectiveImplReferences.get( declaration.getIdentifier() );
+
+            final Map<String, List<Node<Element>>> ancestorXmlElements =
+                this.effectiveXmlElements.get( declaration.getIdentifier() );
+
+            final Map<String, List<Node<JAXBElement<?>>>> ancestorJaxbElements =
+                this.effectiveJaxbElements.get( declaration.getIdentifier() );
 
             for ( Implementation descendant : this.descendants.get( declaration.getIdentifier() ) )
             {
@@ -2416,6 +2601,16 @@ public class DefaultModelValidator implements ModelValidator
                     this.inheritImplementationReferences(
                         ancestorImplementationReferences, descendant.getIdentifier() );
 
+                }
+
+                if ( ancestorXmlElements != null )
+                {
+                    this.inheritXmlElements( ancestorXmlElements, descendant.getIdentifier() );
+                }
+
+                if ( ancestorJaxbElements != null )
+                {
+                    this.inheritJaxbElements( ancestorJaxbElements, descendant.getIdentifier() );
                 }
 
                 collectEffectiveNodes( descendant );
@@ -2624,7 +2819,7 @@ public class DefaultModelValidator implements ModelValidator
             return declaration;
         }
 
-        private static <T extends ModelObject> void addNode(
+        private static <T> void addNode(
             final Map<String, List<Node<T>>> map, final Node<T> node, final String key )
         {
             List<Node<T>> list = map.get( key );
@@ -2637,7 +2832,7 @@ public class DefaultModelValidator implements ModelValidator
             list.add( node );
         }
 
-        private static <T extends ModelObject> void addEffectiveDeclarationNode(
+        private static <T> void addEffectiveDeclarationNode(
             final Map<String, Map<String, List<Node<T>>>> map, final Node<T> node, final String nodeKey )
         {
             Map<String, List<Node<T>>> nodeMap = map.get( node.getImplementation().getIdentifier() );
@@ -2717,7 +2912,7 @@ public class DefaultModelValidator implements ModelValidator
             }
         }
 
-        private static <T extends ModelObject> Map<String, List<Node<T>>> getDeclarationNodes(
+        private static <T> Map<String, List<Node<T>>> getDeclarationNodes(
             final Map<String, List<Node<T>>> map, final String origin )
         {
             final Map<String, List<Node<T>>> declarationMap = newMap( map.size() );
@@ -2746,7 +2941,7 @@ public class DefaultModelValidator implements ModelValidator
             return declarationMap;
         }
 
-        private static <T extends ModelObject> void inheritModelObjects(
+        private static <T> void inheritModelObjects(
             final Map<String, Map<String, List<Node<T>>>> effective, final Map<String, List<Node<T>>> ancestor,
             final String descendant )
         {
@@ -2794,7 +2989,7 @@ public class DefaultModelValidator implements ModelValidator
             }
         }
 
-        private static <T extends ModelObject> boolean isAncestorModelObjectOverridden(
+        private static <T> boolean isAncestorModelObjectOverridden(
             final Map<String, List<Node<T>>> modelObjects, final String implementation, final String modelObject )
         {
             List<Node<T>> nodes = modelObjects.get( modelObject );
@@ -2814,7 +3009,7 @@ public class DefaultModelValidator implements ModelValidator
             return false;
         }
 
-        private static <T extends ModelObject> boolean isFinalAncestorModelObjectOverridden(
+        private static <T> boolean isFinalAncestorModelObjectOverridden(
             final Map<String, List<Node<T>>> modelObjects, final String implementation, final String modelObject )
         {
             List<Node<T>> nodes = modelObjects.get( modelObject );
@@ -2834,7 +3029,7 @@ public class DefaultModelValidator implements ModelValidator
             return false;
         }
 
-        private static <T extends ModelObject> boolean isEffectiveModelObjectOverridden(
+        private static <T> boolean isEffectiveModelObjectOverridden(
             final Map<String, Map<String, List<Node<T>>>> modelObjects, final String implementation,
             final String modelObject )
         {
@@ -2843,7 +3038,7 @@ public class DefaultModelValidator implements ModelValidator
 
         }
 
-        private static <T extends ModelObject> boolean isFinalEffectiveModelObjectOverridden(
+        private static <T> boolean isFinalEffectiveModelObjectOverridden(
             final Map<String, Map<String, List<Node<T>>>> modelObjects, final String implementation,
             final String modelObject )
         {
@@ -2897,6 +3092,23 @@ public class DefaultModelValidator implements ModelValidator
         private static <T> Set<T> newSet( final int initialCapacity )
         {
             return new HashSet<T>( initialCapacity );
+        }
+
+        private static String getXmlElementKey( final Element e )
+        {
+            if ( e.getNamespaceURI() != null )
+            {
+                return new QName( e.getNamespaceURI(), e.getLocalName() ).toString();
+            }
+            else
+            {
+                return new QName( e.getLocalName() ).toString();
+            }
+        }
+
+        private static String getJaxbElementKey( final JAXBElement<?> e )
+        {
+            return e.getName().toString();
         }
 
     }
