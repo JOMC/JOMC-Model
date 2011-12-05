@@ -85,6 +85,67 @@
     <pluginManagement>
       <plugins>
         <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>xml-maven-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>default-transform-testsuite</id>
+              <phase>generate-test-sources</phase>
+              <goals>
+                <goal>transform</goal>
+              </goals>
+              <configuration>
+                <transformationSets>
+                  <transformationSet>
+                    <stylesheet>src/test/xslt/ModulesTestSuite.xsl</stylesheet>
+                    <dir>src/test/resources/org/jomc/model/test</dir>
+                    <outputDir>${project.build.directory}/generated-test-sources/testsuite/org/jomc/model/test</outputDir>
+                    <includes>
+                      <include>ModulesTestSuite.xml</include>
+                    </includes>
+                    <fileMappers>
+                      <fileMapper implementation="org.codehaus.plexus.components.io.filemappers.FileExtensionMapper">
+                        <targetExtension>.java</targetExtension>
+                      </fileMapper>
+                    </fileMappers>
+                  </transformationSet>
+                  <transformationSet>
+                    <stylesheet>src/test/xslt/DefaultModelValidatorTestSuite.xsl</stylesheet>
+                    <dir>src/test/resources/org/jomc/model/modlet/test</dir>
+                    <outputDir>${project.build.directory}/generated-test-sources/testsuite/org/jomc/model/modlet/test</outputDir>
+                    <includes>
+                      <include>DefaultModelValidatorTestSuite.xml</include>
+                    </includes>
+                    <fileMappers>
+                      <fileMapper implementation="org.codehaus.plexus.components.io.filemappers.FileExtensionMapper">
+                        <targetExtension>.java</targetExtension>
+                      </fileMapper>
+                    </fileMappers>
+                  </transformationSet>
+                </transformationSets>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>build-helper-maven-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>default-add-test-source</id>
+              <phase>generate-test-sources</phase>
+              <goals>
+                <goal>add-test-source</goal>
+              </goals>
+              <configuration>
+                <sources>
+                  <source>${project.build.directory}/generated-test-sources/testsuite</source>
+                </sources>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-resources-plugin</artifactId>
           <executions>

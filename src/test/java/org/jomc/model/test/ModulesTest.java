@@ -57,7 +57,6 @@ import org.jomc.modlet.ModelContext;
 import org.jomc.modlet.ModelException;
 import org.jomc.modlet.ModelValidationReport;
 import org.junit.Assert;
-import org.junit.Test;
 
 /**
  * Test cases for class {@code org.jomc.model.Modules}.
@@ -113,7 +112,7 @@ public class ModulesTest
         {
             return ( (JAXBElement<TestSuite>) this.getModelContext().createUnmarshaller(
                     ModelObject.MODEL_PUBLIC_ID ).unmarshal( this.getClass().getResource(
-                    ABSOLUTE_RESOURCE_NAME_PREFIX + "testsuite.xml" ) ) ).getValue();
+                    ABSOLUTE_RESOURCE_NAME_PREFIX + "ModulesTestSuite.xml" ) ) ).getValue();
 
         }
         catch ( final JAXBException e )
@@ -177,133 +176,169 @@ public class ModulesTest
         }
     }
 
-    @Test
-    public final void testImplementations() throws Exception
+    /**
+     * Runs a {@code ImplementationTestType} test.
+     *
+     * @param identifier The identifier of the {@code ImplementationTestType} to run.
+     *
+     * @throws Exception if running the test fails.
+     */
+    public final void testImplementation( final String identifier ) throws Exception
     {
+        Assert.assertNotNull( "identifier", identifier );
+
+        ImplementationTestType test = null;
+
+        for ( ImplementationTestType candidate : this.getTestSuite().getImplementationTest() )
+        {
+            if ( identifier.equals( candidate.getIdentifier() ) )
+            {
+                test = candidate;
+                break;
+            }
+        }
+
+        Assert.assertNotNull( "Implementation test '" + identifier + "' not found.", test );
+
         final JAXBContext jaxbContext = this.getModelContext().createContext( ModelObject.MODEL_PUBLIC_ID );
 
-        for ( ImplementationTestType test : this.getTestSuite().getImplementationTest() )
+        System.out.println( "ImplementationTest: " + test.getIdentifier() );
+
+        final JAXBElement<Modules> modules = (JAXBElement<Modules>) test.getModules().getAny();
+        final Model model = new Model();
+        model.setIdentifier( ModelObject.MODEL_PUBLIC_ID );
+        ModelHelper.setModules( model, modules.getValue() );
+
+        final ModelValidationReport modulesReport = this.getModelContext().validateModel( model );
+
+        if ( !modulesReport.isModelValid() )
         {
-            System.out.println( "ImplementationTest: " + test.getIdentifier() );
-
-            final JAXBElement<Modules> modules = (JAXBElement<Modules>) test.getModules().getAny();
-            final Model model = new Model();
-            model.setIdentifier( ModelObject.MODEL_PUBLIC_ID );
-            ModelHelper.setModules( model, modules.getValue() );
-
-            final ModelValidationReport modulesReport = this.getModelContext().validateModel( model );
-
-            if ( !modulesReport.isModelValid() )
-            {
-                log( modulesReport );
-            }
-
-            Assert.assertTrue( "[" + test.getIdentifier() + "] Unexpected invalid modules.",
-                               modulesReport.isModelValid() );
-
-            final JAXBElement<Implementation> expected =
-                (JAXBElement<Implementation>) test.getImplementation().getAny();
-
-            final ModelValidationReport implementationReport = this.getModelContext().validateModel(
-                ModelObject.MODEL_PUBLIC_ID, new JAXBSource( jaxbContext, expected ) );
-
-            if ( !implementationReport.isModelValid() )
-            {
-                log( implementationReport );
-            }
-
-            Assert.assertTrue( "[" + test.getIdentifier() + "] Unexpected invalid implementation.",
-                               implementationReport.isModelValid() );
-
-            final Implementation i = modules.getValue().getImplementation( expected.getValue().getIdentifier() );
-
-            Assert.assertNotNull( i );
-            assertEquals( expected.getValue(), i );
-            assertEquals( expected.getValue().getDependencies(),
-                          modules.getValue().getDependencies( expected.getValue().getIdentifier() ) );
-
-            assertEquals( expected.getValue().getMessages(),
-                          modules.getValue().getMessages( expected.getValue().getIdentifier() ) );
-
-            assertEquals( expected.getValue().getProperties(),
-                          modules.getValue().getProperties( expected.getValue().getIdentifier() ) );
-
-            assertEquals( expected.getValue().getSpecifications(),
-                          modules.getValue().getSpecifications( expected.getValue().getIdentifier() ) );
-
+            log( modulesReport );
         }
+
+        Assert.assertTrue( "[" + test.getIdentifier() + "] Unexpected invalid modules.",
+                           modulesReport.isModelValid() );
+
+        final JAXBElement<Implementation> expected =
+            (JAXBElement<Implementation>) test.getImplementation().getAny();
+
+        final ModelValidationReport implementationReport = this.getModelContext().validateModel(
+            ModelObject.MODEL_PUBLIC_ID, new JAXBSource( jaxbContext, expected ) );
+
+        if ( !implementationReport.isModelValid() )
+        {
+            log( implementationReport );
+        }
+
+        Assert.assertTrue( "[" + test.getIdentifier() + "] Unexpected invalid implementation.",
+                           implementationReport.isModelValid() );
+
+        final Implementation i = modules.getValue().getImplementation( expected.getValue().getIdentifier() );
+
+        Assert.assertNotNull( i );
+        assertEquals( expected.getValue(), i );
+        assertEquals( expected.getValue().getDependencies(),
+                      modules.getValue().getDependencies( expected.getValue().getIdentifier() ) );
+
+        assertEquals( expected.getValue().getMessages(),
+                      modules.getValue().getMessages( expected.getValue().getIdentifier() ) );
+
+        assertEquals( expected.getValue().getProperties(),
+                      modules.getValue().getProperties( expected.getValue().getIdentifier() ) );
+
+        assertEquals( expected.getValue().getSpecifications(),
+                      modules.getValue().getSpecifications( expected.getValue().getIdentifier() ) );
+
     }
 
-    @Test
-    public final void testInstances() throws Exception
+    /**
+     * Runs a {@code InstanceTestType} test.
+     *
+     * @param identifier The identifier of the {@code InstanceTestType} to run.
+     *
+     * @throws Exception if running the test fails.
+     */
+    public final void testInstance( final String identifier ) throws Exception
     {
-        for ( InstanceTestType test : this.getTestSuite().getInstanceTest() )
+        Assert.assertNotNull( "identifier", identifier );
+
+        InstanceTestType test = null;
+
+        for ( InstanceTestType candidate : this.getTestSuite().getInstanceTest() )
         {
-            System.out.println( "InstanceTest: " + test.getIdentifier() );
-
-            final JAXBElement<Modules> modules = (JAXBElement<Modules>) test.getModules().getAny();
-            final Model model = new Model();
-            model.setIdentifier( ModelObject.MODEL_PUBLIC_ID );
-            ModelHelper.setModules( model, modules.getValue() );
-
-            ModelValidationReport validationReport = this.getModelContext().validateModel( model );
-
-            if ( !validationReport.isModelValid() )
+            if ( identifier.equals( candidate.getIdentifier() ) )
             {
-                log( validationReport );
+                test = candidate;
+                break;
             }
-
-            Assert.assertTrue( "[" + test.getIdentifier() + "] Unexpected invalid modules.",
-                               validationReport.isModelValid() );
-
-            final JAXBElement<Instance> expected = (JAXBElement<Instance>) test.getInstance().getAny();
-            validationReport = this.getModelContext().validateModel(
-                ModelObject.MODEL_PUBLIC_ID,
-                new JAXBSource( this.getModelContext().createContext( ModelObject.MODEL_PUBLIC_ID ), expected ) );
-
-            if ( !validationReport.isModelValid() )
-            {
-                log( validationReport );
-            }
-
-            Assert.assertTrue( "[" + test.getIdentifier() + "] Unexpected invalid instance.",
-                               validationReport.isModelValid() );
-
-            Instance instance = null;
-
-            if ( test.getDependencyName() != null )
-            {
-                final Dependencies dependencies =
-                    modules.getValue().getDependencies( test.getImplementationIdentifier() );
-
-                Assert.assertNotNull( "[" + test.getIdentifier() + "] No dependencies for implementation '"
-                                      + test.getImplementationIdentifier() + "' not found.", dependencies );
-
-                final Dependency d = dependencies.getDependency( test.getDependencyName() );
-                Assert.assertNotNull( "[" + test.getIdentifier() + "] Dependency '" + test.getDependencyName()
-                                      + "' not found.", d );
-
-                Assert.assertNotNull( "[" + test.getIdentifier() + "] Expected implementation name of dependency '"
-                                      + test.getDependencyName() + "' not set.", d.getImplementationName() );
-
-                final Implementations implementations = modules.getValue().getImplementations( d.getIdentifier() );
-                Assert.assertNotNull( "[" + test.getIdentifier() + "] Expected implementations of dependency '"
-                                      + test.getDependencyName() + "' not found.", implementations );
-
-                final Implementation i = implementations.getImplementationByName( d.getImplementationName() );
-                Assert.assertNotNull( "[" + test.getIdentifier() + "] Expected '" + d.getImplementationName()
-                                      + "' implementation not found.", i );
-
-                instance = modules.getValue().getInstance( i.getIdentifier(), d );
-            }
-            else
-            {
-                instance = modules.getValue().getInstance( test.getImplementationIdentifier() );
-            }
-
-            Assert.assertNotNull( "[" + test.getIdentifier() + "] Expected instance not found.", instance );
-            assertEquals( expected.getValue(), instance );
         }
+
+        Assert.assertNotNull( "Instance test '" + identifier + "' not found.", test );
+
+        System.out.println( "InstanceTest: " + test.getIdentifier() );
+
+        final JAXBElement<Modules> modules = (JAXBElement<Modules>) test.getModules().getAny();
+        final Model model = new Model();
+        model.setIdentifier( ModelObject.MODEL_PUBLIC_ID );
+        ModelHelper.setModules( model, modules.getValue() );
+
+        ModelValidationReport validationReport = this.getModelContext().validateModel( model );
+
+        if ( !validationReport.isModelValid() )
+        {
+            log( validationReport );
+        }
+
+        Assert.assertTrue( "[" + test.getIdentifier() + "] Unexpected invalid modules.",
+                           validationReport.isModelValid() );
+
+        final JAXBElement<Instance> expected = (JAXBElement<Instance>) test.getInstance().getAny();
+        validationReport = this.getModelContext().validateModel(
+            ModelObject.MODEL_PUBLIC_ID,
+            new JAXBSource( this.getModelContext().createContext( ModelObject.MODEL_PUBLIC_ID ), expected ) );
+
+        if ( !validationReport.isModelValid() )
+        {
+            log( validationReport );
+        }
+
+        Assert.assertTrue( "[" + test.getIdentifier() + "] Unexpected invalid instance.",
+                           validationReport.isModelValid() );
+
+        Instance instance = null;
+
+        if ( test.getDependencyName() != null )
+        {
+            final Dependencies dependencies =
+                modules.getValue().getDependencies( test.getImplementationIdentifier() );
+
+            Assert.assertNotNull( "[" + test.getIdentifier() + "] No dependencies for implementation '"
+                                  + test.getImplementationIdentifier() + "' not found.", dependencies );
+
+            final Dependency d = dependencies.getDependency( test.getDependencyName() );
+            Assert.assertNotNull( "[" + test.getIdentifier() + "] Dependency '" + test.getDependencyName()
+                                  + "' not found.", d );
+
+            Assert.assertNotNull( "[" + test.getIdentifier() + "] Expected implementation name of dependency '"
+                                  + test.getDependencyName() + "' not set.", d.getImplementationName() );
+
+            final Implementations implementations = modules.getValue().getImplementations( d.getIdentifier() );
+            Assert.assertNotNull( "[" + test.getIdentifier() + "] Expected implementations of dependency '"
+                                  + test.getDependencyName() + "' not found.", implementations );
+
+            final Implementation i = implementations.getImplementationByName( d.getImplementationName() );
+            Assert.assertNotNull( "[" + test.getIdentifier() + "] Expected '" + d.getImplementationName()
+                                  + "' implementation not found.", i );
+
+            instance = modules.getValue().getInstance( i.getIdentifier(), d );
+        }
+        else
+        {
+            instance = modules.getValue().getInstance( test.getImplementationIdentifier() );
+        }
+
+        Assert.assertNotNull( "[" + test.getIdentifier() + "] Expected instance not found.", instance );
+        assertEquals( expected.getValue(), instance );
     }
 
     public static void assertEquals( final ModelObject expected, final ModelObject computed ) throws Exception

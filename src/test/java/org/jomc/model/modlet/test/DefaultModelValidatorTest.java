@@ -187,7 +187,7 @@ public class DefaultModelValidatorTest
         {
             return ( (JAXBElement<TestSuite>) this.getModelContext().createUnmarshaller(
                     ModelObject.MODEL_PUBLIC_ID ).unmarshal( this.getClass().getResource(
-                    ABSOLUTE_RESOURCE_NAME_PREFIX + "testsuite.xml" ) ) ).getValue();
+                    ABSOLUTE_RESOURCE_NAME_PREFIX + "DefaultModelValidatorTestSuite.xml" ) ) ).getValue();
 
         }
         catch ( final JAXBException e )
@@ -234,67 +234,98 @@ public class DefaultModelValidatorTest
 
     }
 
-    @Test
-    public final void testSchemaConstraints() throws Exception
+    /**
+     * Runs a {@code SchemaConstraintsTestType} test.
+     *
+     * @param identifier The identifier of the {@code SchemaConstraintsTestType} to run.
+     *
+     * @throws Exception if running the test fails.
+     */
+    public final void testSchemaConstraints( final String identifier ) throws Exception
     {
+        SchemaConstraintsTestType test = null;
+
+        for ( SchemaConstraintsTestType candidate : this.getTestSuite().getSchemaConstraintsTest() )
+        {
+            if ( identifier.equals( candidate.getIdentifier() ) )
+            {
+                test = candidate;
+                break;
+            }
+        }
+
+        assertNotNull( "Schema constraints test '" + identifier + "' not found.", test );
+
         final ModelContext context = this.getModelContext();
         final JAXBContext jaxbContext = context.createContext( ModelObject.MODEL_PUBLIC_ID );
 
-        for ( SchemaConstraintsTestType test : this.getTestSuite().getSchemaConstraintsTest() )
-        {
-            System.out.println( "SchemaConstraintsTest: " + test.getIdentifier() );
+        System.out.println( "SchemaConstraintsTest: " + test.getIdentifier() );
 
-            final JAXBElement<? extends ModelObject> modelObject =
-                (JAXBElement<? extends ModelObject>) test.getModelObject().getAny();
+        final JAXBElement<? extends ModelObject> modelObject =
+            (JAXBElement<? extends ModelObject>) test.getModelObject().getAny();
 
-            final JAXBSource source = new JAXBSource( jaxbContext, modelObject );
-            final ModelValidationReport report = context.validateModel( ModelObject.MODEL_PUBLIC_ID, source );
+        final JAXBSource source = new JAXBSource( jaxbContext, modelObject );
+        final ModelValidationReport report = context.validateModel( ModelObject.MODEL_PUBLIC_ID, source );
 
-            log( report );
+        log( report );
 
-            assertEquals( "[" + test.getIdentifier() + "]", test.getModelObject().isValid(), report.isModelValid() );
-        }
+        assertEquals( "[" + test.getIdentifier() + "]", test.getModelObject().isValid(), report.isModelValid() );
     }
 
-    @Test
-    public final void testModulesConstraints() throws Exception
+    /**
+     * Runs a {@code ModulesConstraintsTestType} test.
+     *
+     * @param identifier The identifier of the {@code ModulesConstraintsTestType} to run.
+     *
+     * @throws Exception if running the test fails.
+     */
+    public final void testModulesConstraints( final String identifier ) throws Exception
     {
-        final ModelContext context = this.getModelContext();
+        ModulesConstraintsTestType test = null;
 
-        for ( ModulesConstraintsTestType test : this.getTestSuite().getModulesConstraintsTest() )
+        for ( ModulesConstraintsTestType candidate : this.getTestSuite().getModulesConstraintsTest() )
         {
-            System.out.println( "ModulesConstraintsTest: " + test.getIdentifier() );
-
-            final JAXBElement<Modules> modules = (JAXBElement<Modules>) test.getModules().getAny();
-            final Model model = new Model();
-            model.setIdentifier( ModelObject.MODEL_PUBLIC_ID );
-            ModelHelper.setModules( model, modules.getValue() );
-
-            final ModelValidationReport report = this.getModelValidator().validateModel( context, model );
-
-            log( report );
-
-            assertEquals( "[" + test.getIdentifier() + "] Unexpected model validity.",
-                          test.getModules().isValid(), report.isModelValid() );
-
-            for ( ModelValidationReportDetail expectedDetail : test.getDetail() )
+            if ( identifier.equals( candidate.getIdentifier() ) )
             {
-                final List<ModelValidationReport.Detail> reportedDetails =
-                    report.getDetails( expectedDetail.getIdentifier() );
-
-                assertTrue( "[" + test.getIdentifier() + "] Expected " + expectedDetail.getCount() + " "
-                            + expectedDetail.getIdentifier() + " details but got " + reportedDetails.size()
-                            + ".", expectedDetail.getCount() == reportedDetails.size() );
-
-                report.getDetails().removeAll( reportedDetails );
+                test = candidate;
+                break;
             }
+        }
 
-            if ( !report.getDetails().isEmpty() )
+        assertNotNull( "Modules constraints test '" + identifier + "' not found.", test );
+
+        final ModelContext context = this.getModelContext();
+        System.out.println( "ModulesConstraintsTest: " + test.getIdentifier() );
+
+        final JAXBElement<Modules> modules = (JAXBElement<Modules>) test.getModules().getAny();
+        final Model model = new Model();
+        model.setIdentifier( ModelObject.MODEL_PUBLIC_ID );
+        ModelHelper.setModules( model, modules.getValue() );
+
+        final ModelValidationReport report = this.getModelValidator().validateModel( context, model );
+
+        log( report );
+
+        assertEquals( "[" + test.getIdentifier() + "] Unexpected model validity.",
+                      test.getModules().isValid(), report.isModelValid() );
+
+        for ( ModelValidationReportDetail expectedDetail : test.getDetail() )
+        {
+            final List<ModelValidationReport.Detail> reportedDetails =
+                report.getDetails( expectedDetail.getIdentifier() );
+
+            assertTrue( "[" + test.getIdentifier() + "] Expected " + expectedDetail.getCount() + " "
+                        + expectedDetail.getIdentifier() + " details but got " + reportedDetails.size()
+                        + ".", expectedDetail.getCount() == reportedDetails.size() );
+
+            report.getDetails().removeAll( reportedDetails );
+        }
+
+        if ( !report.getDetails().isEmpty() )
+        {
+            for ( ModelValidationReport.Detail d : report.getDetails() )
             {
-                for ( ModelValidationReport.Detail d : report.getDetails() )
-                {
-                    fail( "[" + test.getIdentifier() + "] Unexpected " + d.getIdentifier() + " detail." );
-                }
+                fail( "[" + test.getIdentifier() + "] Unexpected " + d.getIdentifier() + " detail." );
             }
         }
     }
