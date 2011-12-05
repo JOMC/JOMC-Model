@@ -274,38 +274,26 @@ public class DefaultModelValidatorTest
 
             log( report );
 
-            if ( test.getModules().isValid() )
+            assertEquals( "[" + test.getIdentifier() + "] Unexpected model validity.",
+                          test.getModules().isValid(), report.isModelValid() );
+
+            for ( ModelValidationReportDetail expectedDetail : test.getDetail() )
             {
-                if ( !report.isModelValid() )
-                {
-                    fail( "[" + test.getIdentifier() + "] Unexpected invalid model object." );
-                }
+                final List<ModelValidationReport.Detail> reportedDetails =
+                    report.getDetails( expectedDetail.getIdentifier() );
+
+                assertTrue( "[" + test.getIdentifier() + "] Expected " + expectedDetail.getCount() + " "
+                            + expectedDetail.getIdentifier() + " details but got " + reportedDetails.size()
+                            + ".", expectedDetail.getCount() == reportedDetails.size() );
+
+                report.getDetails().removeAll( reportedDetails );
             }
-            else
+
+            if ( !report.getDetails().isEmpty() )
             {
-                if ( report.isModelValid() )
+                for ( ModelValidationReport.Detail d : report.getDetails() )
                 {
-                    fail( "[" + test.getIdentifier() + "] Unexpected valid model object." );
-                }
-
-                for ( ModelValidationReportDetail expectedDetail : test.getDetail() )
-                {
-                    final List<ModelValidationReport.Detail> reportedDetails =
-                        report.getDetails( expectedDetail.getIdentifier() );
-
-                    assertTrue( "[" + test.getIdentifier() + "] Expected " + expectedDetail.getCount() + " "
-                                + expectedDetail.getIdentifier() + " details but got " + reportedDetails.size()
-                                + ".", expectedDetail.getCount() == reportedDetails.size() );
-
-                    report.getDetails().removeAll( reportedDetails );
-                }
-
-                if ( !report.getDetails().isEmpty() )
-                {
-                    for ( ModelValidationReport.Detail d : report.getDetails() )
-                    {
-                        fail( "[" + test.getIdentifier() + "] Unexpected " + d.getIdentifier() + " detail." );
-                    }
+                    fail( "[" + test.getIdentifier() + "] Unexpected " + d.getIdentifier() + " detail." );
                 }
             }
         }

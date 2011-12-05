@@ -57,8 +57,8 @@
     <release version="1.2">
       <action dev="schulte2005" type="add"><![CDATA[Added a <code>META-INF/sun-jaxb.episode</code> file.]]>
       </action>
-      <action dev="schulte2005" type="add"><![CDATA[Added <code>type</code> attribute to <code>Text</code> complex type
-      of the <code>jomc-1.2.xsd</code> schema.]]>
+      <action dev="schulte2005" type="add"><![CDATA[Added a <code>type</code> attribute to the <code>Text</code> complex
+      type of the <code>jomc-1.2.xsd</code> schema.]]>
       </action>
       <action dev="schulte2005" type="fix"><![CDATA[Corrected method <code>findTransformers</code> of class
       <code>org.jomc.model.modlet.DefaultModelProcessor</code> to create <code>Transformers</code> supporting resolution

@@ -35,6 +35,7 @@
                xmlns:xs="http://www.w3.org/2001/XMLSchema"
                xmlns:jomc="http://jomc.org/model"
                xmlns:ci="http://jaxb.dev.java.net/plugin/code-injector"
+               xmlns:inheritance="http://jaxb2-commons.dev.java.net/basic/inheritance"
                version="2.0">
 
   <jaxb:bindings schemaLocation="jomc-1.2.xsd">
@@ -991,6 +992,9 @@
         <jaxb:javadoc>{@code true}, if this specification reference is intended to override a super specification reference.</jaxb:javadoc>
       </jaxb:property>
     </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='SpecificationReference']">
+      <inheritance:implements>org.jomc.model.Inheritable</inheritance:implements>
+    </jaxb:bindings>
     <!-- *********************************************************************************************************** -->
     <jaxb:bindings node="xs:complexType[@name='Implementations']">
       <ci:code><![CDATA[
@@ -1405,6 +1409,9 @@
         <jaxb:javadoc>{@code true}, if this implementation reference is intended to override a super implementation reference.</jaxb:javadoc>
       </jaxb:property>
     </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='ImplementationReference']">
+      <inheritance:implements>org.jomc.model.Inheritable</inheritance:implements>
+    </jaxb:bindings>
     <!-- *********************************************************************************************************** -->
     <jaxb:bindings node="xs:complexType[@name='Dependencies']">
       <ci:code><![CDATA[
@@ -1780,6 +1787,9 @@
       </jaxb:property>
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Property']">
+      <inheritance:implements>org.jomc.model.Inheritable</inheritance:implements>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Property']">
       <ci:code><![CDATA[
     /**
      * Gets the Java value of the property.
@@ -2042,6 +2052,9 @@
         <jaxb:javadoc>{@code true}, if this property reference is intended to override a super property reference.</jaxb:javadoc>
       </jaxb:property>
     </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='PropertyReference']">
+      <inheritance:implements>org.jomc.model.Inheritable</inheritance:implements>
+    </jaxb:bindings>
     <!-- *********************************************************************************************************** -->
     <jaxb:bindings node="xs:complexType[@name='Messages']">
       <ci:code><![CDATA[
@@ -2135,6 +2148,9 @@
       <jaxb:property>
         <jaxb:javadoc>{@code true}, if this message is intended to override a super message.</jaxb:javadoc>
       </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='Message']">
+      <inheritance:implements>org.jomc.model.Inheritable</inheritance:implements>
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Message']">
       <ci:code><![CDATA[
@@ -2337,6 +2353,9 @@
       <jaxb:property>
         <jaxb:javadoc>{@code true}, if this message reference is intended to override a super message reference.</jaxb:javadoc>
       </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='MessageReference']">
+      <inheritance:implements>org.jomc.model.Inheritable</inheritance:implements>
     </jaxb:bindings>
     <!-- *********************************************************************************************************** -->
     <jaxb:bindings node="xs:complexType[@name='Arguments']">

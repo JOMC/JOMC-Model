@@ -598,36 +598,36 @@
           <implementations>
             <implementation identifier="Implementation" name="Implementation Name">
               <messages>
-                <message name="Message 1">
+                <message name="Message 1" override="true">
                   <template defaultLanguage="en">
                     <text language="en">Text 1</text>
                   </template>
                 </message>
-                <message name="Message 2">
+                <message name="Message 2" override="true">
                   <template defaultLanguage="en">
                     <text language="en">Text 2</text>
                   </template>
                 </message>
-                <message name="Message 3">
+                <message name="Message 3" override="true">
                   <template defaultLanguage="en">
                     <text language="en">Text 3</text>
                   </template>
                 </message>
-                <message name="Message 4">
+                <message name="Message 4" override="true">
                   <template defaultLanguage="en">
                     <text language="en">Text 4</text>
                   </template>
                 </message>
-                <message name="Message 5">
+                <message name="Message 5" override="true">
                   <template defaultLanguage="en">
                     <text language="en">Text 5</text>
                   </template>
                 </message>
-                <reference name="Message 1"/>
-                <reference name="Message 2"/>
-                <reference name="Message 3"/>
-                <reference name="Message 4"/>
-                <reference name="Message 5"/>
+                <reference name="Message 1" override="true"/>
+                <reference name="Message 2" override="true"/>
+                <reference name="Message 3" override="true"/>
+                <reference name="Message 4" override="true"/>
+                <reference name="Message 5" override="true"/>
               </messages>
             </implementation>
           </implementations>
@@ -661,6 +661,8 @@
         </module>
       </modules>
     </modules>
+    <detail identifier="IMPLEMENTATION_MESSAGE_MULTIPLE_INHERITANCE_CONSTRAINT" count="5"/>
+    <detail identifier="IMPLEMENTATION_MESSAGE_OVERRIDE_CONSTRAINT" count="20"/>
     <detail identifier="IMPLEMENTATION_MESSAGES_UNIQUENESS_CONSTRAINT" count="5"/>
   </modules-constraints-test>
 
@@ -672,16 +674,16 @@
           <implementations>
             <implementation identifier="Implementation" name="Implementation Name">
               <properties>
-                <property name="Property 1"/>
-                <property name="Property 2"/>
-                <property name="Property 3"/>
-                <property name="Property 4"/>
-                <property name="Property 5"/>
-                <reference name="Property 1"/>
-                <reference name="Property 2"/>
-                <reference name="Property 3"/>
-                <reference name="Property 4"/>
-                <reference name="Property 5"/>
+                <property name="Property 1" override="true"/>
+                <property name="Property 2" override="true"/>
+                <property name="Property 3" override="true"/>
+                <property name="Property 4" override="true"/>
+                <property name="Property 5" override="true"/>
+                <reference name="Property 1" override="true"/>
+                <reference name="Property 2" override="true"/>
+                <reference name="Property 3" override="true"/>
+                <reference name="Property 4" override="true"/>
+                <reference name="Property 5" override="true"/>
               </properties>
             </implementation>
           </implementations>
@@ -695,6 +697,8 @@
         </module>
       </modules>
     </modules>
+    <detail identifier="IMPLEMENTATION_PROPERTY_MULTIPLE_INHERITANCE_CONSTRAINT" count="5"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_OVERRIDE_CONSTRAINT" count="20"/>
     <detail identifier="IMPLEMENTATION_PROPERTIES_UNIQUENESS_CONSTRAINT" count="5"/>
   </modules-constraints-test>
 
@@ -1224,6 +1228,7 @@
         </module>
       </modules>
     </modules>
+    <detail identifier="IMPLEMENTATION_IMPLEMENTATION_REFERENCE_OVERRIDE_WARNING" count="1"/>
     <detail identifier="IMPLEMENTATION_IMPLEMENTATION_REFERENCE_INHERITANCE_CONSTRAINT" count="1"/>
   </modules-constraints-test>
 
@@ -1296,7 +1301,8 @@
         </module>
       </modules>
     </modules>
-    <detail identifier="IMPLEMENTATION_SPECIFICATION_INHERITANCE_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_SPECIFICATION_REFERENCE_OVERRIDE_WARNING" count="5"/>
+    <detail identifier="IMPLEMENTATION_SPECIFICATION_INHERITANCE_CONSTRAINT" count="5"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
@@ -1349,7 +1355,8 @@
         </module>
       </modules>
     </modules>
-    <detail identifier="IMPLEMENTATION_DEPENDENCY_INHERITANCE_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_OVERRIDE_WARNING" count="5"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_INHERITANCE_CONSTRAINT" count="5"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
@@ -1420,6 +1427,7 @@
         </module>
       </modules>
     </modules>
+    <detail identifier="IMPLEMENTATION_PROPERTY_OVERRIDE_WARNING" count="10"/>
     <detail identifier="IMPLEMENTATION_PROPERTY_INHERITANCE_CONSTRAINT" count="10"/>
   </modules-constraints-test>
 
@@ -1491,6 +1499,7 @@
         </module>
       </modules>
     </modules>
+    <detail identifier="IMPLEMENTATION_PROPERTY_OVERRIDE_WARNING" count="10"/>
     <detail identifier="IMPLEMENTATION_PROPERTY_INHERITANCE_CONSTRAINT" count="10"/>
   </modules-constraints-test>
 
@@ -1642,6 +1651,7 @@
         </module>
       </modules>
     </modules>
+    <detail identifier="IMPLEMENTATION_MESSAGE_OVERRIDE_WARNING" count="10"/>
     <detail identifier="IMPLEMENTATION_MESSAGE_INHERITANCE_CONSTRAINT" count="10"/>
   </modules-constraints-test>
 
@@ -1773,6 +1783,7 @@
         </module>
       </modules>
     </modules>
+    <detail identifier="IMPLEMENTATION_MESSAGE_OVERRIDE_WARNING" count="10"/>
     <detail identifier="IMPLEMENTATION_MESSAGE_INHERITANCE_CONSTRAINT" count="10"/>
   </modules-constraints-test>
 
@@ -2120,6 +2131,8 @@
         </module>
       </modules>
     </modules>
+    <detail identifier="IMPLEMENTATION_SPECIFICATION_REFERENCE_OVERRIDE_WARNING" count="2"/>
+    <detail identifier="IMPLEMENTATION_IMPLEMENTATION_REFERENCE_OVERRIDE_WARNING" count="1"/>
     <detail identifier="IMPLEMENTATION_SPECIFICATION_MULTIPLE_INHERITANCE_CONSTRAINT" count="1"/>
   </modules-constraints-test>
 
@@ -2160,6 +2173,7 @@
         </module>
       </modules>
     </modules>
+    <detail identifier="IMPLEMENTATION_SPECIFICATION_REFERENCE_OVERRIDE_WARNING" count="2"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
@@ -2232,6 +2246,8 @@
         </module>
       </modules>
     </modules>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_OVERRIDE_WARNING" count="2"/>
+    <detail identifier="IMPLEMENTATION_IMPLEMENTATION_REFERENCE_OVERRIDE_WARNING" count="1"/>
     <detail identifier="IMPLEMENTATION_DEPENDENCY_MULTIPLE_INHERITANCE_CONSTRAINT" count="1"/>
   </modules-constraints-test>
 
@@ -2272,6 +2288,7 @@
         </module>
       </modules>
     </modules>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_OVERRIDE_WARNING" count="2"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
@@ -2358,6 +2375,8 @@
         </module>
       </modules>
     </modules>
+    <detail identifier="IMPLEMENTATION_MESSAGE_OVERRIDE_WARNING" count="2"/>
+    <detail identifier="IMPLEMENTATION_IMPLEMENTATION_REFERENCE_OVERRIDE_WARNING" count="1"/>
     <detail identifier="IMPLEMENTATION_MESSAGE_MULTIPLE_INHERITANCE_CONSTRAINT" count="1"/>
   </modules-constraints-test>
 
@@ -2407,6 +2426,7 @@
         </module>
       </modules>
     </modules>
+    <detail identifier="IMPLEMENTATION_MESSAGE_OVERRIDE_WARNING" count="2"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
@@ -2473,6 +2493,8 @@
         </module>
       </modules>
     </modules>
+    <detail identifier="IMPLEMENTATION_PROPERTY_OVERRIDE_WARNING" count="2"/>
+    <detail identifier="IMPLEMENTATION_IMPLEMENTATION_REFERENCE_OVERRIDE_WARNING" count="1"/>
     <detail identifier="IMPLEMENTATION_PROPERTY_MULTIPLE_INHERITANCE_CONSTRAINT" count="1"/>
   </modules-constraints-test>
 
@@ -2510,6 +2532,7 @@
         </module>
       </modules>
     </modules>
+    <detail identifier="IMPLEMENTATION_PROPERTY_OVERRIDE_WARNING" count="2"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
@@ -2681,6 +2704,7 @@
         </module>
       </modules>
     </modules>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_OVERRIDE_PROPERTY_WARNING" count="1"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
@@ -2780,6 +2804,9 @@
         </module>
       </modules>
     </modules>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_OVERRIDE_DEPENDENCY_WARNING" count="1"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_OVERRIDE_MESSAGE_WARNING" count="1"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_OVERRIDE_PROPERTY_WARNING" count="1"/>
     <detail identifier="IMPLEMENTATION_DEPENDENCY_FINAL_DEPENDENCY_CONSTRAINT" count="1"/>
     <detail identifier="IMPLEMENTATION_DEPENDENCY_OVERRIDE_DEPENDENCY_CONSTRAINT" count="1"/>
     <detail identifier="IMPLEMENTATION_DEPENDENCY_FINAL_MESSAGE_CONSTRAINT" count="1"/>
@@ -2868,6 +2895,7 @@
         </module>
       </modules>
     </modules>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_OVERRIDE_WARNING" count="2"/>
     <detail identifier="IMPLEMENTATION_DEPENDENCY_SPECIFICATION_CLASS_CONSTRAINT" count="3"/>
   </modules-constraints-test>
 
@@ -3700,6 +3728,7 @@
         </module>
       </modules>
     </modules>
+    <detail identifier="IMPLEMENTATION_IMPLEMENTATION_REFERENCE_OVERRIDE_WARNING" count="1"/>
     <detail identifier="IMPLEMENTATION_SPECIFICATION_MULTIPLE_INHERITANCE_CONSTRAINT" count="2"/>
   </modules-constraints-test>
 
@@ -3874,6 +3903,7 @@
               </dependencies>
               <properties>
                 <property name="Class Declaration Property" override="true"/>
+                <property name="Specified Property" override="true"/>
               </properties>
               <messages>
                 <message name="Class Declaration Message" override="true">
@@ -4129,7 +4159,7 @@
 
   <!-- ********************************************************************* -->
   <modules-constraints-test identifier="MCT0100">
-    <modules valid="false">
+    <modules valid="true">
       <modules xmlns="http://jomc.org/model">
         <module name="Module">
           <specifications>
@@ -4173,7 +4203,6 @@
         </module>
       </modules>
     </modules>
-    <detail identifier="IMPLEMENTATION_PROPERTY_MULTIPLE_INHERITANCE_CONSTRAINT" count="1"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
@@ -4454,6 +4483,7 @@
         </module>
       </modules>
     </modules>
+    <detail identifier="IMPLEMENTATION_IMPLEMENTATION_REFERENCE_OVERRIDE_WARNING" count="1"/>
     <detail identifier="IMPLEMENTATION_XML_ELEMENT_MULTIPLE_INHERITANCE_CONSTRAINT" count="1"/>
   </modules-constraints-test>
 
@@ -4485,6 +4515,7 @@
         </module>
       </modules>
     </modules>
+    <detail identifier="IMPLEMENTATION_IMPLEMENTATION_REFERENCE_OVERRIDE_WARNING" count="1"/>
     <detail identifier="IMPLEMENTATION_XML_ELEMENT_MULTIPLE_INHERITANCE_CONSTRAINT" count="2"/>
   </modules-constraints-test>
 
@@ -4495,10 +4526,10 @@
         <module name="Module">
           <implementations>
             <implementation identifier="Parent 1" name="Parent Name 1">
-              <testsuite xmlns="http://jomc.org/model/test"/>
+              <test-inheritable xmlns="http://jomc.org/model/test"/>
             </implementation>
             <implementation identifier="Parent 2" name="Parent Name 2">
-              <testsuite xmlns="http://jomc.org/model/test"/>
+              <test-inheritable xmlns="http://jomc.org/model/test"/>
             </implementation>
             <implementation identifier="Implementation" name="Implementation Name">
               <implementations>
@@ -4520,17 +4551,17 @@
         <module name="Module">
           <implementations>
             <implementation identifier="Parent 1" name="Parent Name 1">
-              <testsuite xmlns="http://jomc.org/model/test"/>
+              <test-inheritable xmlns="http://jomc.org/model/test"/>
             </implementation>
             <implementation identifier="Parent 2" name="Parent Name  2">
-              <testsuite xmlns="http://jomc.org/model/test"/>
+              <test-inheritable xmlns="http://jomc.org/model/test"/>
             </implementation>
             <implementation identifier="Parent 3" name="Parent Name  3">
               <implementations>
                 <reference identifier="Parent 1"/>
                 <reference identifier="Parent 2"/>
               </implementations>
-              <testsuite xmlns="http://jomc.org/model/test"/>
+              <test-inheritable xmlns="http://jomc.org/model/test"/>
             </implementation>
             <implementation identifier="Implementation" name="Implementation Name">
               <implementations>
@@ -4542,6 +4573,8 @@
         </module>
       </modules>
     </modules>
+    <detail identifier="IMPLEMENTATION_JAXB_ELEMENT_OVERRIDE_WARNING" count="2"/>
+    <detail identifier="IMPLEMENTATION_IMPLEMENTATION_REFERENCE_OVERRIDE_WARNING" count="1"/>
     <detail identifier="IMPLEMENTATION_JAXB_ELEMENT_MULTIPLE_INHERITANCE_CONSTRAINT" count="1"/>
   </modules-constraints-test>
 
@@ -4552,10 +4585,10 @@
         <module name="Module">
           <implementations>
             <implementation identifier="Parent 1" name="Parent Name 1">
-              <testsuite xmlns="http://jomc.org/model/test"/>
+              <test-inheritable xmlns="http://jomc.org/model/test"/>
             </implementation>
             <implementation identifier="Parent 2" name="Parent Name  2">
-              <testsuite xmlns="http://jomc.org/model/test"/>
+              <test-inheritable xmlns="http://jomc.org/model/test"/>
             </implementation>
             <implementation identifier="Parent 3" name="Parent Name  3">
               <implementations>
@@ -4573,7 +4606,309 @@
         </module>
       </modules>
     </modules>
+    <detail identifier="IMPLEMENTATION_IMPLEMENTATION_REFERENCE_OVERRIDE_WARNING" count="1"/>
     <detail identifier="IMPLEMENTATION_JAXB_ELEMENT_MULTIPLE_INHERITANCE_CONSTRAINT" count="2"/>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="MCT0111">
+    <modules valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <specifications>
+            <specification identifier="Specification" class="java.lang.Object"/>
+          </specifications>
+          <implementations>
+            <implementation identifier="Implementation" name="Implementation Name">
+              <test-inheritable xmlns="http://jomc.org/model/test" override="true"/>
+              <test-inheritable xmlns="http://jomc.org/model/test" override="true"/>
+              <test-inheritable xmlns="http://jomc.org/model/test" override="true"/>
+              <test-inheritable xmlns="http://jomc.org/model/test" override="true"/>
+              <test-inheritable xmlns="http://jomc.org/model/test" override="true"/>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="IMPLEMENTATION_JAXB_ELEMENT_MULTIPLE_INHERITANCE_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_JAXB_ELEMENT_OVERRIDE_CONSTRAINT" count="25"/>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="MCT0112">
+    <modules valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <specifications>
+            <specification identifier="Specification" class="java.lang.Object"/>
+          </specifications>
+          <implementations>
+            <implementation identifier="Final 1" name="Final 1">
+              <test-inheritable xmlns="http://jomc.org/model/test" final="true"/>
+            </implementation>
+            <implementation identifier="Final 2" name="Final 2">
+              <test-inheritable xmlns="http://jomc.org/model/test" final="true"/>
+            </implementation>
+            <implementation identifier="Final 3" name="Final 3">
+              <test-inheritable xmlns="http://jomc.org/model/test" final="true"/>
+            </implementation>
+            <implementation identifier="Final 4" name="Final 4">
+              <test-inheritable xmlns="http://jomc.org/model/test" final="true"/>
+            </implementation>
+            <implementation identifier="Final 5" name="Final 5">
+              <test-inheritable xmlns="http://jomc.org/model/test" final="true"/>
+            </implementation>
+            <implementation identifier="Implementation" name="Implementation Name" final="true">
+              <implementations>
+                <reference identifier="Final 1"/>
+                <reference identifier="Final 2"/>
+                <reference identifier="Final 3"/>
+                <reference identifier="Final 4"/>
+                <reference identifier="Final 5"/>
+              </implementations>
+              <test-inheritable xmlns="http://jomc.org/model/test" final="true"/>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="IMPLEMENTATION_JAXB_ELEMENT_OVERRIDE_WARNING" count="5"/>
+    <detail identifier="IMPLEMENTATION_JAXB_ELEMENT_INHERITANCE_CONSTRAINT" count="5"/>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="MCT0113">
+    <modules valid="true">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <specifications>
+            <specification identifier="Class Declaration Specification" class="java.lang.Object">
+              <properties>
+                <property name="Specified Property"/>
+              </properties>
+            </specification>
+          </specifications>
+          <implementations>
+            <implementation identifier="Class Declaration" name="Class Declaration Name" class="java.lang.Object"
+                            classDeclaration="true">
+              <specifications>
+                <reference identifier="Class Declaration Specification"/>
+              </specifications>
+              <dependencies>
+                <dependency name="Class Declaration Dependency" identifier="Class Declaration Specification"/>
+              </dependencies>
+              <properties>
+                <property name="Class Declaration Property"/>
+              </properties>
+              <messages>
+                <message name="Class Declaration Message">
+                  <template defaultLanguage="en">
+                    <text language="en">Declaration Text</text>
+                  </template>
+                </message>
+              </messages>
+            </implementation>
+            <implementation identifier="Override" name="Override Name" class="java.lang.Object">
+              <specifications>
+                <reference identifier="Class Declaration Specification"/>
+              </specifications>
+              <dependencies>
+                <dependency name="Class Declaration Dependency" identifier="Class Declaration Specification"/>
+              </dependencies>
+              <properties>
+                <property name="Class Declaration Property"/>
+              </properties>
+              <messages>
+                <message name="Class Declaration Message">
+                  <template defaultLanguage="en">
+                    <text language="en">Declaration Text</text>
+                  </template>
+                </message>
+              </messages>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_OVERRIDE_WARNING" count="1"/>
+    <detail identifier="IMPLEMENTATION_MESSAGE_OVERRIDE_WARNING" count="1"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_OVERRIDE_WARNING" count="1"/>
+    <detail identifier="IMPLEMENTATION_SPECIFICATION_REFERENCE_OVERRIDE_WARNING" count="1"/>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="MCT0114">
+    <modules valid="true">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <specifications>
+            <specification identifier="Class Declaration Parent Specification" class="java.lang.Object">
+              <properties>
+                <property name="Class Declaration Parent Specification Property"/>
+              </properties>
+            </specification>
+            <specification identifier="Class Declaration Specification" class="java.lang.Object">
+              <properties>
+                <property name="Class Declaration Specification Property"/>
+              </properties>
+            </specification>
+          </specifications>
+          <implementations>
+            <implementation identifier="Class Declaration Parent" name="Class Declaration Parent Name">
+              <specifications>
+                <reference identifier="Class Declaration Parent Specification"/>
+              </specifications>
+              <dependencies>
+                <dependency name="Class Declaration Parent Dependency"
+                            identifier="Class Declaration Parent Specification"/>
+
+              </dependencies>
+              <properties>
+                <property name="Class Declaration Parent Property"/>
+              </properties>
+              <messages>
+                <message name="Class Declaration Parent Message">
+                  <template defaultLanguage="en">
+                    <text language="en">Declaration Parent Text</text>
+                  </template>
+                </message>
+              </messages>
+            </implementation>
+            <implementation identifier="Class Declaration" name="Class Declaration Name" class="java.lang.Object"
+                            classDeclaration="true">
+              <specifications>
+                <reference identifier="Class Declaration Specification"/>
+              </specifications>
+              <implementations>
+                <reference identifier="Class Declaration Parent"/>
+              </implementations>
+              <dependencies>
+                <dependency name="Class Declaration Dependency" identifier="Class Declaration Specification"/>
+              </dependencies>
+              <properties>
+                <property name="Class Declaration Property"/>
+              </properties>
+              <messages>
+                <message name="Class Declaration Message">
+                  <template defaultLanguage="en">
+                    <text language="en">Declaration Text</text>
+                  </template>
+                </message>
+              </messages>
+            </implementation>
+            <implementation identifier="Override" name="Override Name" class="java.lang.Object">
+              <specifications>
+                <reference identifier="Class Declaration Parent Specification"/>
+                <reference identifier="Class Declaration Specification"/>
+              </specifications>
+              <dependencies>
+                <dependency name="Class Declaration Parent Dependency"
+                            identifier="Class Declaration Parent Specification"/>
+                <dependency name="Class Declaration Dependency" identifier="Class Declaration Specification"/>
+              </dependencies>
+              <properties>
+                <property name="Class Declaration Parent Specification Property"/>
+                <property name="Class Declaration Specification Property"/>
+                <property name="Class Declaration Parent Property"/>
+                <property name="Class Declaration Property"/>
+              </properties>
+              <messages>
+                <message name="Class Declaration Parent Message">
+                  <template defaultLanguage="en">
+                    <text language="en">Declaration Text</text>
+                  </template>
+                </message>
+                <message name="Class Declaration Message">
+                  <template defaultLanguage="en">
+                    <text language="en">Declaration Text</text>
+                  </template>
+                </message>
+              </messages>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_OVERRIDE_WARNING" count="2"/>
+    <detail identifier="IMPLEMENTATION_MESSAGE_OVERRIDE_WARNING" count="2"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_OVERRIDE_WARNING" count="6"/>
+    <detail identifier="IMPLEMENTATION_SPECIFICATION_REFERENCE_OVERRIDE_WARNING" count="2"/>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="MCT0115">
+    <modules valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <specifications>
+            <specification identifier="Specification 1" class="java.lang.Object">
+              <properties>
+                <property name="Specified Property"/>
+              </properties>
+            </specification>
+            <specification identifier="Specification 2" class="java.lang.Object">
+              <properties>
+                <property name="Specified Property"/>
+              </properties>
+            </specification>
+          </specifications>
+          <implementations>
+            <implementation identifier="Ancestor Implementation" name="Ancestor Implementation Name">
+              <specifications>
+                <reference identifier="Specification 1"/>
+                <reference identifier="Specification 2"/>
+              </specifications>
+            </implementation>
+            <implementation identifier="Implementation" name="Implementation Name">
+              <implementations>
+                <reference identifier="Ancestor Implementation"/>
+              </implementations>
+              <properties>
+                <property name="Specified Property"/>
+              </properties>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="IMPLEMENTATION_PROPERTY_OVERRIDE_WARNING" count="2"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_MULTIPLE_INHERITANCE_CONSTRAINT" count="1"/>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="MCT0116">
+    <modules valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <specifications>
+            <specification identifier="Specification 1" class="java.lang.Object">
+              <properties>
+                <property name="Specified Property"/>
+              </properties>
+            </specification>
+            <specification identifier="Specification 2" class="java.lang.Object">
+              <properties>
+                <property name="Specified Property"/>
+              </properties>
+            </specification>
+          </specifications>
+          <implementations>
+            <implementation identifier="Ancestor Implementation" name="Ancestor Implementation Name">
+              <specifications>
+                <reference identifier="Specification 1"/>
+                <reference identifier="Specification 2"/>
+              </specifications>
+            </implementation>
+            <implementation identifier="Implementation" name="Implementation Name">
+              <implementations>
+                <reference identifier="Ancestor Implementation"/>
+              </implementations>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="IMPLEMENTATION_PROPERTY_MULTIPLE_INHERITANCE_CONSTRAINT" count="2"/>
   </modules-constraints-test>
 
 </testsuite>

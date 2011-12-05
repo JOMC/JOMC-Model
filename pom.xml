@@ -194,6 +194,7 @@
                   <arg>-copy-constructor</arg>
                   <arg>-mark-generated</arg>
                   <arg>-Xinject-code</arg>
+                  <arg>-Xinheritance</arg>
                 </args>
                 <addCompileSourceRoot>false</addCompileSourceRoot>
                 <addTestCompileSourceRoot>true</addTestCompileSourceRoot>
@@ -203,6 +204,11 @@
                 <readOnly>true</readOnly>
                 <schemaDirectory>src/test/schemas</schemaDirectory>
                 <plugins>
+                  <plugin>
+                    <groupId>org.jvnet.jaxb2_commons</groupId>
+                    <artifactId>jaxb2-basics</artifactId>
+                    <version>${jaxb2-basics.version}</version>
+                  </plugin>
                   <plugin>
                     <groupId>net.sourceforge.ccxjc</groupId>
                     <artifactId>cc-xjc-plugin</artifactId>
