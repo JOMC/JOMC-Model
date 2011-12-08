@@ -695,7 +695,7 @@ public class DefaultModelValidator implements ModelValidator
                                 addDetail( validationContext.getReport(), "IMPLEMENTATION_MESSAGE_OVERRIDE_CONSTRAINT",
                                            Level.SEVERE, new ObjectFactory().createImplementation( impl ),
                                            "implementationMessageOverrideConstraint", impl.getIdentifier(),
-                                           r.getName() );
+                                           moduleOfImpl.getName(), r.getName() );
 
                             }
 
@@ -716,7 +716,8 @@ public class DefaultModelValidator implements ModelValidator
                                     addDetail( validationContext.getReport(), "IMPLEMENTATION_MESSAGE_OVERRIDE_WARNING",
                                                Level.WARNING, new ObjectFactory().createImplementation( impl ),
                                                "implementationMessageOverrideWarning", impl.getIdentifier(),
-                                               r.getName(), overriddenImplementation.getIdentifier(),
+                                               moduleOfImpl.getName(), r.getName(),
+                                               overriddenImplementation.getIdentifier(),
                                                moduleOfMessage.getName(), getNodePathString( overriddenMessage ) );
 
                                 }
@@ -739,7 +740,8 @@ public class DefaultModelValidator implements ModelValidator
                                 addDetail( validationContext.getReport(),
                                            "IMPLEMENTATION_MESSAGE_INHERITANCE_CONSTRAINT",
                                            Level.SEVERE, new ObjectFactory().createImplementation( impl ),
-                                           "implementationMessageFinalConstraint", impl.getIdentifier(), r.getName(),
+                                           "implementationMessageFinalConstraint", impl.getIdentifier(),
+                                           moduleOfImpl.getName(), r.getName(),
                                            overriddenImplementation.getIdentifier(),
                                            moduleOfMessage.getName(), getNodePathString( overriddenMessage ) );
 
@@ -815,7 +817,7 @@ public class DefaultModelValidator implements ModelValidator
                                 addDetail( validationContext.getReport(), "IMPLEMENTATION_PROPERTY_OVERRIDE_CONSTRAINT",
                                            Level.SEVERE, new ObjectFactory().createImplementation( impl ),
                                            "implementationPropertyOverrideConstraint", impl.getIdentifier(),
-                                           p.getName() );
+                                           moduleOfImpl.getName(), p.getName() );
 
                             }
 
@@ -887,7 +889,7 @@ public class DefaultModelValidator implements ModelValidator
                                 addDetail( validationContext.getReport(), "IMPLEMENTATION_PROPERTY_OVERRIDE_CONSTRAINT",
                                            Level.SEVERE, new ObjectFactory().createImplementation( impl ),
                                            "implementationPropertyOverrideConstraint", impl.getIdentifier(),
-                                           r.getName() );
+                                           moduleOfImpl.getName(), r.getName() );
 
                             }
 
@@ -974,7 +976,7 @@ public class DefaultModelValidator implements ModelValidator
                                            "IMPLEMENTATION_SPECIFICATION_OVERRIDE_CONSTRAINT", Level.SEVERE,
                                            new ObjectFactory().createImplementation( impl ),
                                            "implementationSpecificationOverrideConstraint", impl.getIdentifier(),
-                                           r.getIdentifier() );
+                                           moduleOfImpl.getName(), r.getIdentifier() );
 
                             }
 
