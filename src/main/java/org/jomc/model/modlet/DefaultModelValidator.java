@@ -825,24 +825,46 @@ public class DefaultModelValidator implements ModelValidator
                             {
                                 for ( final InheritanceModel.Node<Property> overriddenProperty : overriddenProperties )
                                 {
-                                    Implementation overriddenImplementation = overriddenProperty.getImplementation();
-                                    if ( overriddenProperty.getClassDeclaration() != null )
+                                    if ( overriddenProperty.getSpecification() != null )
                                     {
-                                        overriddenImplementation = overriddenProperty.getClassDeclaration();
+                                        final Module moduleOfProperty =
+                                            validationContext.getModules().getModuleOfSpecification(
+                                            overriddenProperty.getSpecification().getIdentifier() );
+
+                                        addDetail( validationContext.getReport(),
+                                                   "IMPLEMENTATION_PROPERTY_OVERRIDE_WARNING", Level.WARNING,
+                                                   new ObjectFactory().createImplementation( impl ),
+                                                   "implementationSpecificationPropertyOverrideWarning",
+                                                   impl.getIdentifier(), moduleOfImpl.getName(), p.getName(),
+                                                   overriddenProperty.getSpecification().getIdentifier(),
+                                                   moduleOfProperty.getName(),
+                                                   getNodePathString( overriddenProperty ) );
+
                                     }
+                                    else
+                                    {
+                                        Implementation overriddenImplementation =
+                                            overriddenProperty.getImplementation();
 
-                                    final Module moduleOfProperty =
-                                        validationContext.getModules().getModuleOfImplementation(
-                                        overriddenImplementation.getIdentifier() );
+                                        if ( overriddenProperty.getClassDeclaration() != null )
+                                        {
+                                            overriddenImplementation = overriddenProperty.getClassDeclaration();
+                                        }
 
-                                    addDetail( validationContext.getReport(),
-                                               "IMPLEMENTATION_PROPERTY_OVERRIDE_WARNING", Level.WARNING,
-                                               new ObjectFactory().createImplementation( impl ),
-                                               "implementationPropertyOverrideWarning", impl.getIdentifier(),
-                                               moduleOfImpl.getName(), p.getName(),
-                                               overriddenImplementation.getIdentifier(),
-                                               moduleOfProperty.getName(), getNodePathString( overriddenProperty ) );
+                                        final Module moduleOfProperty =
+                                            validationContext.getModules().getModuleOfImplementation(
+                                            overriddenImplementation.getIdentifier() );
 
+                                        addDetail( validationContext.getReport(),
+                                                   "IMPLEMENTATION_PROPERTY_OVERRIDE_WARNING", Level.WARNING,
+                                                   new ObjectFactory().createImplementation( impl ),
+                                                   "implementationPropertyOverrideWarning", impl.getIdentifier(),
+                                                   moduleOfImpl.getName(), p.getName(),
+                                                   overriddenImplementation.getIdentifier(),
+                                                   moduleOfProperty.getName(),
+                                                   getNodePathString( overriddenProperty ) );
+
+                                    }
                                 }
                             }
 
