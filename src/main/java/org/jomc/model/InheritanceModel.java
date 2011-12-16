@@ -808,8 +808,8 @@ public class InheritanceModel
 
     }
 
-    private void collectNodes( final String context, final Implementation declaration, Node<Implementation> descendant,
-                               LinkedList<Node<Implementation>> path )
+    private void collectNodes( final String context, final Implementation declaration,
+                               final Node<Implementation> descendant, LinkedList<Node<Implementation>> path )
     {
         if ( path == null )
         {
@@ -1157,27 +1157,27 @@ public class InheritanceModel
             Map<QName, Set<Node<JAXBElement<?>>>> effectiveJaxbElements =
                 getEffectiveNodes( this.effJaxbElements, context, node.getModelObject().getIdentifier() );
 
-            Map<String, Set<Node<Dependency>>> declDependencies =
+            final Map<String, Set<Node<Dependency>>> declDependencies =
                 getEffectiveNodes( this.effDependencies, classDeclaration.getIdentifier(),
                                    classDeclaration.getIdentifier() );
 
-            Map<String, Set<Node<Message>>> declMessages =
+            final Map<String, Set<Node<Message>>> declMessages =
                 getEffectiveNodes( this.effMessages, classDeclaration.getIdentifier(),
                                    classDeclaration.getIdentifier() );
 
-            Map<String, Set<Node<Property>>> declProperties =
+            final Map<String, Set<Node<Property>>> declProperties =
                 getEffectiveNodes( this.effProperties, classDeclaration.getIdentifier(),
                                    classDeclaration.getIdentifier() );
 
-            Map<String, Set<Node<SpecificationReference>>> declSpecReferences =
+            final Map<String, Set<Node<SpecificationReference>>> declSpecReferences =
                 getEffectiveNodes( this.effSpecReferences, classDeclaration.getIdentifier(),
                                    classDeclaration.getIdentifier() );
 
-            Map<QName, Set<Node<Element>>> declXmlElements =
+            final Map<QName, Set<Node<Element>>> declXmlElements =
                 getEffectiveNodes( this.effXmlElements, classDeclaration.getIdentifier(),
                                    classDeclaration.getIdentifier() );
 
-            Map<QName, Set<Node<JAXBElement<?>>>> declJaxbElements =
+            final Map<QName, Set<Node<JAXBElement<?>>>> declJaxbElements =
                 getEffectiveNodes( this.effJaxbElements, classDeclaration.getIdentifier(),
                                    classDeclaration.getIdentifier() );
 

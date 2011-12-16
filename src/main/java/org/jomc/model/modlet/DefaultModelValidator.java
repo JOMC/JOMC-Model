@@ -2257,7 +2257,7 @@ public class DefaultModelValidator implements ModelValidator
     }
 
     /** @since 1.2 */
-    private static class ValidationContext
+    private static final class ValidationContext
     {
 
         private final ModelContext modelContext;
