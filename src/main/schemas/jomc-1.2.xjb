@@ -2805,7 +2805,7 @@
      *
      * @since 1.2
      */
-    public java.lang.reflect.Constructor<?> getJavaClassConstructor( final ClassLoader classLoader )
+    public java.lang.reflect.Constructor<?> getJavaConstructor( final ClassLoader classLoader )
         throws ClassNotFoundException
     {
         java.lang.reflect.Constructor<?> javaConstructor = null;
@@ -2837,7 +2837,7 @@
      *
      * @since 1.2
      */
-    public String getJavaClassFactoryMethodName()
+    public String getJavaFactoryMethodName()
     {
         String methodName = null;
 
@@ -2878,16 +2878,16 @@
      * @throws ClassNotFoundException if the Java class is not found.
      *
      * @see #getJavaClass(java.lang.ClassLoader)
-     * @see #getJavaClassFactoryMethodName()
+     * @see #getJavaFactoryMethodName()
      *
      * @since 1.2
      */
-    public java.lang.reflect.Method getJavaClassFactoryMethod( final ClassLoader classLoader )
+    public java.lang.reflect.Method getJavaFactoryMethod( final ClassLoader classLoader )
         throws ClassNotFoundException
     {
         final Class<?> javaClass = this.getJavaClass( classLoader );
         java.lang.reflect.Method factoryMethod = null;
-        String methodName = this.getJavaClassFactoryMethodName();
+        String methodName = this.getJavaFactoryMethodName();
 
         if ( methodName != null )
         {
@@ -4466,9 +4466,9 @@
      *
      * @see #getModule()
      * @see Instance#getJavaClass(java.lang.ClassLoader)
-     * @see Instance#getJavaClassConstructor(java.lang.ClassLoader)
-     * @see Instance#getJavaClassFactoryMethod(java.lang.ClassLoader)
-     * @see Instance#getJavaClassFactoryMethodName()
+     * @see Instance#getJavaConstructor(java.lang.ClassLoader)
+     * @see Instance#getJavaFactoryMethodName()
+     * @see Instance#getJavaFactoryMethod(java.lang.ClassLoader)
      * @see Instance#isJavaClassAssignable(java.lang.ClassLoader)
      */
     public Object createObject( final Instance instance, final ClassLoader classLoader ) throws InstantiationException
@@ -4483,7 +4483,7 @@
         try
         {
             final Class<?> clazz = instance.getJavaClass( classLoader );
-            final java.lang.reflect.Constructor<?> ctor = instance.getJavaClassConstructor( classLoader );
+            final java.lang.reflect.Constructor<?> ctor = instance.getJavaConstructor( classLoader );
 
             if ( ctor != null && instance.isJavaClassAssignable( classLoader ) )
             {
@@ -4495,7 +4495,7 @@
             }
             else
             {
-                java.lang.reflect.Method factoryMethod = instance.getJavaClassFactoryMethod( classLoader );
+                java.lang.reflect.Method factoryMethod = instance.getJavaFactoryMethod( classLoader );
 
                 if ( factoryMethod != null )
                 {
@@ -4538,9 +4538,9 @@
             if ( object == null )
             {
                 throw new InstantiationException( getMessage(
-                    instance.getJavaClassFactoryMethodName() != null
+                    instance.getJavaFactoryMethodName() != null
                     ? "failedCreatingObjectWithMethod" : "failedCreatingObject",
-                    instance.getIdentifier(), clazz.getName(), instance.getJavaClassFactoryMethodName() ) );
+                    instance.getIdentifier(), clazz.getName(), instance.getJavaFactoryMethodName() ) );
 
             }
 
