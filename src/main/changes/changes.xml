@@ -72,10 +72,10 @@
       <code>org.jomc.model.Modules</code> to also resolve specifications specified by overridden dependencies.]]>
       </action>
       <action dev="schulte2005" type="fix"><![CDATA[Updated class
-      <code>org.jomc.model.modlet.DefaultModelValidator</code> to correctly validate model object inheritance.]]>
+      <code>org.jomc.model.modlet.DefaultModelValidator</code> to additionally validate inheritance of any elements.]]>
       </action>
-      <action dev="schulte2005" type="remove"><![CDATA[Removed the <code>jomc-1.0.xsd</code> schema deprecated by the
-      <code>jomc-1.2.xsd</code> schema.]]>
+      <action dev="schulte2005" type="fix"><![CDATA[Updated class
+      <code>org.jomc.model.modlet.DefaultModelValidator</code> to correctly validate model object inheritance.]]>
       </action>
       <action dev="schulte2005" type="update"><![CDATA[Updated methods <code>isDefaultEnabled</code> and
       <code>getDefaultTransformerLocation</code> of class <code>org.jomc.model.modlet.DefaultModelProcessor</code>
@@ -112,8 +112,8 @@
       model context attribute <code>org.jomc.model.modlet.DefaultModelProvider.validatingAttribute</code>.
       See the <a href="http://jomc.sourceforge.net/jomc/1.2/jomc-model-1.2/clirr-report.html">CLIRR report</a>.]]>
       </action>
-      <action dev="schulte2005" type="fix"><![CDATA[Updated class
-      <code>org.jomc.model.modlet.DefaultModelValidator</code> to additionally validate inheritance of any elements.]]>
+      <action dev="schulte2005" type="remove"><![CDATA[Removed the <code>jomc-1.0.xsd</code> schema deprecated by the
+      <code>jomc-1.2.xsd</code> schema.]]>
       </action>
     </release>
   </body>
