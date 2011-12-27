@@ -154,6 +154,8 @@ public class InheritanceModel
          * Gets the direct descendant node of the node.
          *
          * @return The direct descendant node of the node or {@code null}.
+         *
+         * @see InheritanceModel#getSourceNodes(java.lang.String)
          */
         public final Node<Implementation> getDescendant()
         {
@@ -236,6 +238,15 @@ public class InheritanceModel
 
     }
 
+    /** Enumeration of context states. */
+    private enum ContextState
+    {
+
+        PREPARING,
+        PREPARED
+
+    }
+
     /** The modules backing the model. */
     private final Modules modules;
 
@@ -290,15 +301,6 @@ public class InheritanceModel
     /** Source nodes of a hierarchy by context and implementation identifier. */
     private final Map<String, Map<String, Node<Implementation>>> sourceNodes = newMap();
 
-    /** Enumeration of context states. */
-    private enum ContextState
-    {
-
-        PREPARING,
-        PREPARED
-
-    }
-
     /** Context states by context identifier. */
     private final Map<String, ContextState> contextStates = newMap();
 
@@ -308,6 +310,8 @@ public class InheritanceModel
      * @param modules The modules backing the model.
      *
      * @throws NullPointerException if {@code modules} is {@code null}.
+     *
+     * @see Modules#clone()
      */
     public InheritanceModel( final Modules modules )
     {
@@ -319,52 +323,6 @@ public class InheritanceModel
         }
 
         this.modules = modules.clone();
-    }
-
-    /**
-     * Gets a set holding all implementation nodes of an implementation.
-     *
-     * @param implementation The identifier of the implementation to get all implementation nodes of.
-     *
-     * @return An unmodifiable set holding all implementation nodes of the implementation identified by
-     * {@code implementation}.
-     *
-     * @throws NullPointerException if {@code implementation} is {@code null}.
-     */
-    public Set<Node<Implementation>> getImplementationNodes( final String implementation )
-    {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-
-        this.prepareContext( implementation );
-        final Collection<Node<Implementation>> col = map( this.implementations, implementation ).values();
-        return Collections.unmodifiableSet( newSet( col ) );
-    }
-
-    /**
-     * Gets a set holding source implementation nodes of an implementation.
-     *
-     * @param implementation The identifier of the implementation to get source implementation nodes of.
-     *
-     * @return An unmodifiable set holding source implementation nodes of the implementation identified by
-     * {@code implementation}.
-     *
-     * @throws NullPointerException if {@code implementation} is {@code null}.
-     *
-     * @see Node#getDescendant()
-     */
-    public Set<Node<Implementation>> getSourceImplementationNodes( final String implementation )
-    {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-
-        this.prepareContext( implementation );
-        final Collection<Node<Implementation>> col = map( this.sourceNodes, implementation ).values();
-        return unmodifiableSet( newSet( col ) );
     }
 
     /**
@@ -401,7 +359,7 @@ public class InheritanceModel
      *
      * @see #getDependencyNames(java.lang.String)
      */
-    public Set<Node<Dependency>> getEffectiveDependencyNodes( final String implementation, final String name )
+    public Set<Node<Dependency>> getDependencyNodes( final String implementation, final String name )
     {
         if ( implementation == null )
         {
@@ -461,8 +419,8 @@ public class InheritanceModel
      *
      * @see #getImplementationReferenceIdentifiers(java.lang.String)
      */
-    public Set<Node<ImplementationReference>> getEffectiveImplementationReferenceNodes( final String implementation,
-                                                                                        final String identifier )
+    public Set<Node<ImplementationReference>> getImplementationReferenceNodes( final String implementation,
+                                                                               final String identifier )
     {
         if ( implementation == null )
         {
@@ -481,6 +439,64 @@ public class InheritanceModel
         if ( map != null )
         {
             set = map.get( identifier );
+        }
+
+        return unmodifiableSet( set );
+    }
+
+    /**
+     * Gets a set holding the qualified names of all XML elements of an implementation.
+     *
+     * @param implementation The identifier of the implementation to get the qualified names of all XML elements of.
+     *
+     * @return An unmodifiable set holding the qualified names of all XML elements of the implementation identified by
+     * {@code implementation}.
+     *
+     * @throws NullPointerException if {@code implementation} is {@code null}.
+     */
+    public Set<QName> getJaxbElementNames( final String implementation )
+    {
+        if ( implementation == null )
+        {
+            throw new NullPointerException( "implementation" );
+        }
+
+        this.prepareContext( implementation );
+        return Collections.unmodifiableSet( map( this.jaxbElements, implementation ).keySet() );
+    }
+
+    /**
+     * Gets a set holding effective JAXB element nodes of an implementation.
+     *
+     * @param implementation The identifier of the implementation to get effective JAXB element nodes of.
+     * @param name The qualified JAXB element name to get effective nodes for.
+     *
+     * @return An unmodifiable set holding effective JAXB element nodes matching {@code name} of the implementation
+     * identified by {@code implementation}.
+     *
+     * @throws NullPointerException if {@code implementation} or {@code name} is {@code null}.
+     *
+     * @see #getJaxbElementNames(java.lang.String)
+     */
+    public Set<Node<JAXBElement<?>>> getJaxbElementNodes( final String implementation, final QName name )
+    {
+        if ( implementation == null )
+        {
+            throw new NullPointerException( "implementation" );
+        }
+        if ( name == null )
+        {
+            throw new NullPointerException( "name" );
+        }
+
+        this.prepareContext( implementation );
+        Set<Node<JAXBElement<?>>> set = null;
+        final Map<QName, Set<Node<JAXBElement<?>>>> map =
+            getEffectiveNodes( this.effJaxbElements, implementation, implementation );
+
+        if ( map != null )
+        {
+            set = map.get( name );
         }
 
         return unmodifiableSet( set );
@@ -520,7 +536,7 @@ public class InheritanceModel
      *
      * @see #getMessageNames(java.lang.String)
      */
-    public Set<Node<Message>> getEffectiveMessageNodes( final String implementation, final String name )
+    public Set<Node<Message>> getMessageNodes( final String implementation, final String name )
     {
         if ( implementation == null )
         {
@@ -578,7 +594,7 @@ public class InheritanceModel
      *
      * @see #getPropertyNames(java.lang.String)
      */
-    public Set<Node<Property>> getEffectivePropertyNodes( final String implementation, final String name )
+    public Set<Node<Property>> getPropertyNodes( final String implementation, final String name )
     {
         if ( implementation == null )
         {
@@ -600,6 +616,29 @@ public class InheritanceModel
         }
 
         return unmodifiableSet( set );
+    }
+
+    /**
+     * Gets a set holding source nodes of an implementation.
+     *
+     * @param implementation The identifier of the implementation to get source nodes of.
+     *
+     * @return An unmodifiable set holding source nodes of the implementation identified by {@code implementation}.
+     *
+     * @throws NullPointerException if {@code implementation} is {@code null}.
+     *
+     * @see Node#getDescendant()
+     */
+    public Set<Node<Implementation>> getSourceNodes( final String implementation )
+    {
+        if ( implementation == null )
+        {
+            throw new NullPointerException( "implementation" );
+        }
+
+        this.prepareContext( implementation );
+        final Collection<Node<Implementation>> col = map( this.sourceNodes, implementation ).values();
+        return unmodifiableSet( newSet( col ) );
     }
 
     /**
@@ -637,8 +676,8 @@ public class InheritanceModel
      *
      * @see #getSpecificationReferenceIdentifiers(java.lang.String)
      */
-    public Set<Node<SpecificationReference>> getEffectiveSpecificationReferenceNodes( final String implementation,
-                                                                                      final String identifier )
+    public Set<Node<SpecificationReference>> getSpecificationReferenceNodes( final String implementation,
+                                                                             final String identifier )
     {
         if ( implementation == null )
         {
@@ -696,7 +735,7 @@ public class InheritanceModel
      *
      * @see #getXmlElementNames(java.lang.String)
      */
-    public Set<Node<Element>> getEffectiveXmlElementNodes( final String implementation, final QName name )
+    public Set<Node<Element>> getXmlElementNodes( final String implementation, final QName name )
     {
         if ( implementation == null )
         {
@@ -711,64 +750,6 @@ public class InheritanceModel
         Set<Node<Element>> set = null;
         final Map<QName, Set<Node<Element>>> map =
             getEffectiveNodes( this.effXmlElements, implementation, implementation );
-
-        if ( map != null )
-        {
-            set = map.get( name );
-        }
-
-        return unmodifiableSet( set );
-    }
-
-    /**
-     * Gets a set holding the qualified names of all XML elements of an implementation.
-     *
-     * @param implementation The identifier of the implementation to get the qualified names of all XML elements of.
-     *
-     * @return An unmodifiable set holding the qualified names of all XML elements of the implementation identified by
-     * {@code implementation}.
-     *
-     * @throws NullPointerException if {@code implementation} is {@code null}.
-     */
-    public Set<QName> getJaxbElementNames( final String implementation )
-    {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-
-        this.prepareContext( implementation );
-        return Collections.unmodifiableSet( map( this.jaxbElements, implementation ).keySet() );
-    }
-
-    /**
-     * Gets a set holding effective JAXB element nodes of an implementation.
-     *
-     * @param implementation The identifier of the implementation to get effective JAXB element nodes of.
-     * @param name The qualified JAXB element name to get effective nodes for.
-     *
-     * @return An unmodifiable set holding effective JAXB element nodes matching {@code name} of the implementation
-     * identified by {@code implementation}.
-     *
-     * @throws NullPointerException if {@code implementation} or {@code name} is {@code null}.
-     *
-     * @see #getJaxbElementNames(java.lang.String)
-     */
-    public Set<Node<JAXBElement<?>>> getEffectiveJaxbElementNodes( final String implementation, final QName name )
-    {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-        if ( name == null )
-        {
-            throw new NullPointerException( "name" );
-        }
-
-        this.prepareContext( implementation );
-        Set<Node<JAXBElement<?>>> set = null;
-        final Map<QName, Set<Node<JAXBElement<?>>>> map =
-            getEffectiveNodes( this.effJaxbElements, implementation, implementation );
 
         if ( map != null )
         {

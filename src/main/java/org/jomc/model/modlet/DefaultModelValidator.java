@@ -381,7 +381,7 @@ public class DefaultModelValidator implements ModelValidator
                         final Dependency d = impl.getDependencies().getDependency().get( j );
 
                         final Set<InheritanceModel.Node<Dependency>> effDependencies =
-                            imodel.getEffectiveDependencyNodes( impl.getIdentifier(), d.getName() );
+                            imodel.getDependencyNodes( impl.getIdentifier(), d.getName() );
 
                         for ( final InheritanceModel.Node<Dependency> effDependency : effDependencies )
                         {
@@ -458,21 +458,24 @@ public class DefaultModelValidator implements ModelValidator
 
                 if ( impl.getImplementations() != null )
                 {
-                    final Set<InheritanceModel.Node<Implementation>> finalImplementations = retainFinalNodes(
-                        modifiableSet( imodel.getImplementationNodes( impl.getIdentifier() ) ) );
+                    final Set<String> effImplementationReferences =
+                        imodel.getImplementationReferenceIdentifiers( impl.getIdentifier() );
 
-                    for ( final InheritanceModel.Node<Implementation> finalImplementation : finalImplementations )
+                    for ( final String effImplementationReference : effImplementationReferences )
                     {
-                        if ( !finalImplementation.getModelObject().getIdentifier().equals( impl.getIdentifier() ) )
+                        final Implementation ancestorImplementation =
+                            validationContext.getModules().getImplementation( effImplementationReference );
+
+                        if ( ancestorImplementation != null && ancestorImplementation.isFinal() )
                         {
                             final Module moduleOfFinal = validationContext.getModules().getModuleOfImplementation(
-                                finalImplementation.getModelObject().getIdentifier() );
+                                ancestorImplementation.getIdentifier() );
 
                             addDetail( validationContext.getReport(),
                                        "IMPLEMENTATION_IMPLEMENTATION_INHERITANCE_CONSTRAINT", Level.SEVERE,
                                        new ObjectFactory().createImplementation( impl ),
                                        "implementationFinalImplementationConstraint", impl.getIdentifier(),
-                                       moduleOfImpl.getName(), finalImplementation.getModelObject().getIdentifier(),
+                                       moduleOfImpl.getName(), ancestorImplementation.getIdentifier(),
                                        moduleOfFinal.getName() );
 
                         }
@@ -495,7 +498,7 @@ public class DefaultModelValidator implements ModelValidator
                         final ImplementationReference r = impl.getImplementations().getReference().get( j );
 
                         final Set<InheritanceModel.Node<ImplementationReference>> effReferences =
-                            imodel.getEffectiveImplementationReferenceNodes( impl.getIdentifier(), r.getIdentifier() );
+                            imodel.getImplementationReferenceNodes( impl.getIdentifier(), r.getIdentifier() );
 
                         for ( final InheritanceModel.Node<ImplementationReference> effReference : effReferences )
                         {
@@ -613,7 +616,7 @@ public class DefaultModelValidator implements ModelValidator
                         }
 
                         final Set<InheritanceModel.Node<Message>> effMessages =
-                            imodel.getEffectiveMessageNodes( impl.getIdentifier(), m.getName() );
+                            imodel.getMessageNodes( impl.getIdentifier(), m.getName() );
 
                         for ( final InheritanceModel.Node<Message> effMessage : effMessages )
                         {
@@ -683,7 +686,7 @@ public class DefaultModelValidator implements ModelValidator
                         final MessageReference r = impl.getMessages().getReference().get( j );
 
                         final Set<InheritanceModel.Node<Message>> effMessages =
-                            imodel.getEffectiveMessageNodes( impl.getIdentifier(), r.getName() );
+                            imodel.getMessageNodes( impl.getIdentifier(), r.getName() );
 
                         for ( final InheritanceModel.Node<Message> effMessage : effMessages )
                         {
@@ -805,7 +808,7 @@ public class DefaultModelValidator implements ModelValidator
                         }
 
                         final Set<InheritanceModel.Node<Property>> effProperties =
-                            imodel.getEffectivePropertyNodes( impl.getIdentifier(), p.getName() );
+                            imodel.getPropertyNodes( impl.getIdentifier(), p.getName() );
 
                         for ( final InheritanceModel.Node<Property> effProperty : effProperties )
                         {
@@ -899,7 +902,7 @@ public class DefaultModelValidator implements ModelValidator
                         final PropertyReference r = impl.getProperties().getReference().get( j );
 
                         final Set<InheritanceModel.Node<Property>> effProperties =
-                            imodel.getEffectivePropertyNodes( impl.getIdentifier(), r.getName() );
+                            imodel.getPropertyNodes( impl.getIdentifier(), r.getName() );
 
                         for ( final InheritanceModel.Node<Property> effProperty : effProperties )
                         {
@@ -985,7 +988,7 @@ public class DefaultModelValidator implements ModelValidator
                         final SpecificationReference r = impl.getSpecifications().getReference().get( j );
 
                         final Set<InheritanceModel.Node<SpecificationReference>> effReferences =
-                            imodel.getEffectiveSpecificationReferenceNodes( impl.getIdentifier(), r.getIdentifier() );
+                            imodel.getSpecificationReferenceNodes( impl.getIdentifier(), r.getIdentifier() );
 
                         for ( final InheritanceModel.Node<SpecificationReference> effReference : effReferences )
                         {
@@ -1073,7 +1076,7 @@ public class DefaultModelValidator implements ModelValidator
                             }
 
                             final Set<InheritanceModel.Node<JAXBElement<?>>> effElements =
-                                imodel.getEffectiveJaxbElementNodes( impl.getIdentifier(), jaxbElement.getName() );
+                                imodel.getJaxbElementNodes( impl.getIdentifier(), jaxbElement.getName() );
 
                             for ( final InheritanceModel.Node<JAXBElement<?>> effElement : effElements )
                             {
@@ -1150,7 +1153,7 @@ public class DefaultModelValidator implements ModelValidator
                 for ( String dependencyName : dependencyNames )
                 {
                     final Set<InheritanceModel.Node<Dependency>> dependencyNodes =
-                        imodel.getEffectiveDependencyNodes( impl.getIdentifier(), dependencyName );
+                        imodel.getDependencyNodes( impl.getIdentifier(), dependencyName );
 
                     if ( dependencyNodes.size() > 1 )
                     {
@@ -1168,7 +1171,7 @@ public class DefaultModelValidator implements ModelValidator
                 for ( String messageName : messageNames )
                 {
                     final Set<InheritanceModel.Node<Message>> messageNodes =
-                        imodel.getEffectiveMessageNodes( impl.getIdentifier(), messageName );
+                        imodel.getMessageNodes( impl.getIdentifier(), messageName );
 
                     if ( messageNodes.size() > 1 )
                     {
@@ -1186,7 +1189,7 @@ public class DefaultModelValidator implements ModelValidator
                 for ( String propertyName : propertyNames )
                 {
                     final Set<InheritanceModel.Node<Property>> propertyNodes =
-                        imodel.getEffectivePropertyNodes( impl.getIdentifier(), propertyName );
+                        imodel.getPropertyNodes( impl.getIdentifier(), propertyName );
 
                     if ( propertyNodes.size() > 1 )
                     {
@@ -1205,8 +1208,7 @@ public class DefaultModelValidator implements ModelValidator
                 for ( String specificationRefereneIdentifier : specificationReferenceIdentifiers )
                 {
                     final Set<InheritanceModel.Node<SpecificationReference>> specificationReferenceNodes =
-                        imodel.getEffectiveSpecificationReferenceNodes(
-                        impl.getIdentifier(), specificationRefereneIdentifier );
+                        imodel.getSpecificationReferenceNodes( impl.getIdentifier(), specificationRefereneIdentifier );
 
                     if ( specificationReferenceNodes.size() > 1 )
                     {
@@ -1225,7 +1227,7 @@ public class DefaultModelValidator implements ModelValidator
                 for ( QName xmlElementName : xmlElementNames )
                 {
                     final Set<InheritanceModel.Node<Element>> xmlElementNodes =
-                        imodel.getEffectiveXmlElementNodes( impl.getIdentifier(), xmlElementName );
+                        imodel.getXmlElementNodes( impl.getIdentifier(), xmlElementName );
 
                     if ( xmlElementNodes.size() > 1 )
                     {
@@ -1244,7 +1246,7 @@ public class DefaultModelValidator implements ModelValidator
                 for ( QName jaxbElementName : jaxbElementNames )
                 {
                     final Set<InheritanceModel.Node<JAXBElement<?>>> jaxbElementNodes =
-                        imodel.getEffectiveJaxbElementNodes( impl.getIdentifier(), jaxbElementName );
+                        imodel.getJaxbElementNodes( impl.getIdentifier(), jaxbElementName );
 
                     if ( jaxbElementNodes.size() > 1 )
                     {
@@ -1264,8 +1266,8 @@ public class DefaultModelValidator implements ModelValidator
                 for ( String implementationReferenceIdentifier : implementationReferenceIdentifiers )
                 {
                     final Set<InheritanceModel.Node<ImplementationReference>> implementationReferenceNodes =
-                        imodel.getEffectiveImplementationReferenceNodes( impl.getIdentifier(),
-                                                                         implementationReferenceIdentifier );
+                        imodel.getImplementationReferenceNodes( impl.getIdentifier(),
+                                                                implementationReferenceIdentifier );
 
                     for ( final InheritanceModel.Node<ImplementationReference> node : implementationReferenceNodes )
                     {
@@ -1769,7 +1771,7 @@ public class DefaultModelValidator implements ModelValidator
                         final Dependency override = dependency.getDependencies().getDependency().get( j );
 
                         final Set<InheritanceModel.Node<Dependency>> effDependencies =
-                            imodel.getEffectiveDependencyNodes( a.getIdentifier(), override.getName() );
+                            imodel.getDependencyNodes( a.getIdentifier(), override.getName() );
 
                         final Set<InheritanceModel.Node<Dependency>> overriddenDependencies =
                             modifiableSet( effDependencies );
@@ -1922,8 +1924,8 @@ public class DefaultModelValidator implements ModelValidator
                     {
                         final Message override = dependency.getMessages().getMessage().get( j );
 
-                        final Set<InheritanceModel.Node<Message>> overriddenMessages = modifiableSet(
-                            imodel.getEffectiveMessageNodes( a.getIdentifier(), override.getName() ) );
+                        final Set<InheritanceModel.Node<Message>> overriddenMessages =
+                            modifiableSet( imodel.getMessageNodes( a.getIdentifier(), override.getName() ) );
 
                         if ( override.isOverride() && overriddenMessages.isEmpty() )
                         {
@@ -1973,8 +1975,8 @@ public class DefaultModelValidator implements ModelValidator
                     {
                         final Property override = dependency.getProperties().getProperty().get( j );
 
-                        final Set<InheritanceModel.Node<Property>> overriddenProperties = modifiableSet(
-                            imodel.getEffectivePropertyNodes( a.getIdentifier(), override.getName() ) );
+                        final Set<InheritanceModel.Node<Property>> overriddenProperties =
+                            modifiableSet( imodel.getPropertyNodes( a.getIdentifier(), override.getName() ) );
 
                         if ( override.isOverride() && overriddenProperties.isEmpty() )
                         {
