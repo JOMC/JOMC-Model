@@ -36,6 +36,7 @@ import org.jomc.model.modlet.DefaultModelProcessor;
 import org.jomc.model.modlet.ModelHelper;
 import org.jomc.modlet.Model;
 import org.jomc.modlet.ModelContext;
+import org.jomc.modlet.ModelContextFactory;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -94,7 +95,7 @@ public class DefaultModelProcessorTest
     @Test
     public final void testFindTransformers() throws Exception
     {
-        final ModelContext context = ModelContext.createModelContext( this.getClass().getClassLoader() );
+        final ModelContext context = ModelContextFactory.newInstance().newModelContext();
 
         try
         {
@@ -139,7 +140,7 @@ public class DefaultModelProcessorTest
     @Test
     public final void testProcessModel() throws Exception
     {
-        final ModelContext context = ModelContext.createModelContext( this.getClass().getClassLoader() );
+        final ModelContext context = ModelContextFactory.newInstance().newModelContext();
         final Model model = new Model();
         model.setIdentifier( ModelObject.MODEL_PUBLIC_ID );
 
@@ -234,16 +235,12 @@ public class DefaultModelProcessorTest
         this.getModelProcessor().setEnabled( null );
         assertTrue( this.getModelProcessor().isEnabled() );
 
-        this.getModelProcessor().processModel(
-            ModelContext.createModelContext( this.getClass().getClassLoader() ), model );
-
+        this.getModelProcessor().processModel( ModelContextFactory.newInstance().newModelContext(), model );
         DefaultModelProcessor.setDefaultEnabled( false );
         this.getModelProcessor().setEnabled( null );
         assertFalse( this.getModelProcessor().isEnabled() );
 
-        this.getModelProcessor().processModel(
-            ModelContext.createModelContext( this.getClass().getClassLoader() ), model );
-
+        this.getModelProcessor().processModel( ModelContextFactory.newInstance().newModelContext(), model );
         DefaultModelProcessor.setDefaultEnabled( null );
         this.getModelProcessor().setEnabled( null );
     }

@@ -54,6 +54,7 @@ import org.jomc.model.Texts;
 import org.jomc.model.modlet.ModelHelper;
 import org.jomc.modlet.Model;
 import org.jomc.modlet.ModelContext;
+import org.jomc.modlet.ModelContextFactory;
 import org.jomc.modlet.ModelException;
 import org.jomc.modlet.ModelValidationReport;
 import org.junit.Assert;
@@ -111,8 +112,8 @@ public class ModulesTest
         try
         {
             return ( (JAXBElement<TestSuite>) this.getModelContext().createUnmarshaller(
-                    ModelObject.MODEL_PUBLIC_ID ).unmarshal( this.getClass().getResource(
-                    ABSOLUTE_RESOURCE_NAME_PREFIX + "ModulesTestSuite.xml" ) ) ).getValue();
+                ModelObject.MODEL_PUBLIC_ID ).unmarshal( this.getClass().getResource(
+                ABSOLUTE_RESOURCE_NAME_PREFIX + "ModulesTestSuite.xml" ) ) ).getValue();
 
         }
         catch ( final JAXBException e )
@@ -166,14 +167,7 @@ public class ModulesTest
      */
     protected ModelContext newModelContext()
     {
-        try
-        {
-            return ModelContext.createModelContext( this.getClass().getClassLoader() );
-        }
-        catch ( final ModelException e )
-        {
-            throw new AssertionError( e );
-        }
+        return ModelContextFactory.newInstance().newModelContext();
     }
 
     /**

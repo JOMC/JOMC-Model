@@ -34,6 +34,7 @@ import org.jomc.model.ModelObject;
 import org.jomc.model.modlet.DefaultModelProvider;
 import org.jomc.modlet.Model;
 import org.jomc.modlet.ModelContext;
+import org.jomc.modlet.ModelContextFactory;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -92,7 +93,7 @@ public class DefaultModelProviderTest
     @Test
     public final void testFindModules() throws Exception
     {
-        final ModelContext context = ModelContext.createModelContext( this.getClass().getClassLoader() );
+        final ModelContext context = ModelContextFactory.newInstance().newModelContext();
 
         try
         {
@@ -129,8 +130,7 @@ public class DefaultModelProviderTest
 
         DefaultModelProvider.setDefaultModuleLocation( null );
         this.getModelProvider().setModuleLocation( null );
-        assertEquals( 1,
-                      this.getModelProvider().findModules(
+        assertEquals( 1, this.getModelProvider().findModules(
             context, ModelObject.MODEL_PUBLIC_ID, DefaultModelProvider.getDefaultModuleLocation() ).getModule().size() );
 
         assertEquals( 1, this.getModelProvider().findModules(
@@ -152,7 +152,7 @@ public class DefaultModelProviderTest
     @Test
     public final void testFindModel() throws Exception
     {
-        final ModelContext context = ModelContext.createModelContext( this.getClass().getClassLoader() );
+        final ModelContext context = ModelContextFactory.newInstance().newModelContext();
         final Model model = new Model();
         model.setIdentifier( ModelObject.MODEL_PUBLIC_ID );
 
@@ -225,14 +225,12 @@ public class DefaultModelProviderTest
         this.getModelProvider().setEnabled( null );
         assertTrue( this.getModelProvider().isEnabled() );
 
-        this.getModelProvider().findModel( ModelContext.createModelContext( this.getClass().getClassLoader() ), model );
-
+        this.getModelProvider().findModel( ModelContextFactory.newInstance().newModelContext(), model );
         DefaultModelProvider.setDefaultEnabled( false );
         this.getModelProvider().setEnabled( null );
         assertFalse( this.getModelProvider().isEnabled() );
 
-        this.getModelProvider().findModel( ModelContext.createModelContext( this.getClass().getClassLoader() ), model );
-
+        this.getModelProvider().findModel( ModelContextFactory.newInstance().newModelContext(), model );
         DefaultModelProvider.setDefaultEnabled( null );
         this.getModelProvider().setEnabled( null );
     }
