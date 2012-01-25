@@ -416,7 +416,8 @@ public class DefaultModelProvider implements ModelProvider
         try
         {
             boolean contextValidating = this.isValidating();
-            if ( DEFAULT_VALIDATING == contextValidating && context.getAttribute( VALIDATING_ATTRIBUTE_NAME ) != null )
+            if ( DEFAULT_VALIDATING == contextValidating
+                 && context.getAttribute( VALIDATING_ATTRIBUTE_NAME ) instanceof Boolean )
             {
                 contextValidating = (Boolean) context.getAttribute( VALIDATING_ATTRIBUTE_NAME );
             }
@@ -541,14 +542,14 @@ public class DefaultModelProvider implements ModelProvider
         Model found = null;
 
         boolean contextEnabled = this.isEnabled();
-        if ( DEFAULT_ENABLED == contextEnabled && context.getAttribute( ENABLED_ATTRIBUTE_NAME ) != null )
+        if ( DEFAULT_ENABLED == contextEnabled && context.getAttribute( ENABLED_ATTRIBUTE_NAME ) instanceof Boolean )
         {
             contextEnabled = (Boolean) context.getAttribute( ENABLED_ATTRIBUTE_NAME );
         }
 
         String contextModuleLocation = this.getModuleLocation();
         if ( DEFAULT_MODULE_LOCATION.equals( contextModuleLocation )
-             && context.getAttribute( MODULE_LOCATION_ATTRIBUTE_NAME ) != null )
+             && context.getAttribute( MODULE_LOCATION_ATTRIBUTE_NAME ) instanceof String )
         {
             contextModuleLocation = (String) context.getAttribute( MODULE_LOCATION_ATTRIBUTE_NAME );
         }

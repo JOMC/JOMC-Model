@@ -414,14 +414,15 @@ public class DefaultModelProcessor implements ModelProcessor
             Model processed = model;
 
             boolean contextEnabled = this.isEnabled();
-            if ( DEFAULT_ENABLED == contextEnabled && context.getAttribute( ENABLED_ATTRIBUTE_NAME ) != null )
+            if ( DEFAULT_ENABLED == contextEnabled
+                 && context.getAttribute( ENABLED_ATTRIBUTE_NAME ) instanceof Boolean )
             {
                 contextEnabled = (Boolean) context.getAttribute( ENABLED_ATTRIBUTE_NAME );
             }
 
             String contextTransformerLocation = this.getTransformerLocation();
             if ( DEFAULT_TRANSFORMER_LOCATION.equals( contextTransformerLocation )
-                 && context.getAttribute( TRANSFORMER_LOCATION_ATTRIBUTE_NAME ) != null )
+                 && context.getAttribute( TRANSFORMER_LOCATION_ATTRIBUTE_NAME ) instanceof String )
             {
                 contextTransformerLocation = (String) context.getAttribute( TRANSFORMER_LOCATION_ATTRIBUTE_NAME );
             }
