@@ -39,6 +39,8 @@ System Properties Reference
 *---------------------------------------------*-------------------------------*----------------------------------------*
 | <<System Property>>                         | <<Type>>                      | <<Default>>                            |
 *---------------------------------------------*-------------------------------*----------------------------------------*
+| <<<org.jomc.model.Modules.defaultClasspathModuleName>>> | <<<java.lang.String>>> | <<<Java Classpath>>>              |
+*---------------------------------------------*-------------------------------*----------------------------------------*
 | <<<org.jomc.model.modlet.DefaultModelProcessor.defaultTransformerLocation>>> | <<<java.lang.String>>> | <<<META-INF/jomc.xsl>>> |
 *---------------------------------------------*-------------------------------*----------------------------------------*
 | <<<org.jomc.model.modlet.DefaultModelProcessor.defaultEnabled>>> | <<<java.lang.Boolean>>> | <<<true>>>              |
