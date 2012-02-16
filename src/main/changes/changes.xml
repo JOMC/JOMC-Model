@@ -54,7 +54,7 @@
       </action>
     </release>
     <!-- *********************************************************************************************************** -->
-    <release version="1.2">
+    <release version="1.2" date="2012-02-16">
       <action dev="schulte2005" type="add"><![CDATA[Added a <code>META-INF/sun-jaxb.episode</code> file.]]>
       </action>
       <action dev="schulte2005" type="add"><![CDATA[Added a <code>type</code> attribute to the <code>Text</code> complex
