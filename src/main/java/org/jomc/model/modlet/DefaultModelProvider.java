@@ -75,13 +75,6 @@ public class DefaultModelProvider implements ModelProvider
         "org.jomc.model.modlet.DefaultModelProvider.defaultEnabled";
 
     /**
-     * Constant for the name of the deprecated system property controlling property {@code defaultEnabled}.
-     * @see #isDefaultEnabled()
-     */
-    private static final String DEPRECATED_DEFAULT_ENABLED_PROPERTY_NAME =
-        "org.jomc.model.DefaultModelProvider.defaultEnabled";
-
-    /**
      * Default value of the flag indicating the provider is enabled by default.
      * @see #isDefaultEnabled()
      * @since 1.2
@@ -109,13 +102,6 @@ public class DefaultModelProvider implements ModelProvider
      */
     private static final String DEFAULT_MODULE_LOCATION_PROPERTY_NAME =
         "org.jomc.model.modlet.DefaultModelProvider.defaultModuleLocation";
-
-    /**
-     * Constant for the name of the deprecated system property controlling property {@code defaultModuleLocation}.
-     * @see #getDefaultModuleLocation()
-     */
-    private static final String DEPRECATED_DEFAULT_MODULE_LOCATION_PROPERTY_NAME =
-        "org.jomc.model.DefaultModelProvider.defaultModuleLocation";
 
     /**
      * Class path location searched for modules by default.
@@ -186,10 +172,8 @@ public class DefaultModelProvider implements ModelProvider
     {
         if ( defaultEnabled == null )
         {
-            defaultEnabled =
-                Boolean.valueOf( System.getProperty( DEFAULT_ENABLED_PROPERTY_NAME,
-                                                     System.getProperty( DEPRECATED_DEFAULT_ENABLED_PROPERTY_NAME,
-                                                                         Boolean.toString( DEFAULT_ENABLED ) ) ) );
+            defaultEnabled = Boolean.valueOf( System.getProperty( DEFAULT_ENABLED_PROPERTY_NAME,
+                                                                  Boolean.toString( DEFAULT_ENABLED ) ) );
 
         }
 
@@ -253,9 +237,7 @@ public class DefaultModelProvider implements ModelProvider
         if ( defaultModuleLocation == null )
         {
             defaultModuleLocation =
-                System.getProperty( DEFAULT_MODULE_LOCATION_PROPERTY_NAME,
-                                    System.getProperty( DEPRECATED_DEFAULT_MODULE_LOCATION_PROPERTY_NAME,
-                                                        DEFAULT_MODULE_LOCATION ) );
+                System.getProperty( DEFAULT_MODULE_LOCATION_PROPERTY_NAME, DEFAULT_MODULE_LOCATION );
 
         }
 

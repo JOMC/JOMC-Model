@@ -117,6 +117,14 @@
       </action>
     </release>
     <!-- *********************************************************************************************************** -->
-    <release version="2.0"/>
+    <release version="2.0">
+      <action dev="schulte2005" type="remove"><![CDATA[Removed support of deprecated system properties<ul>
+      <li><code>org.jomc.model.DefaultModelProvider.defaultEnabled</code></li>
+      <li><code>org.jomc.model.DefaultModelProvider.defaultModuleLocation</code></li>
+      <li><code>org.jomc.model.DefaultModelProcessor.defaultEnabled</code></li>
+      <li><code>org.jomc.model.DefaultModelProcessor.defaultTransformerLocation</code></li>
+      </ul>.]]>
+      </action>
+    </release>
   </body>
 </document>

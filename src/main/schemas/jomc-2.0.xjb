@@ -135,125 +135,6 @@
      * @param any The list to search.
      * @param namespaceURI The namespace URI of the {@code JAXBElement} to return.
      * @param localPart The local part of the {@code JAXBElement} to return.
-     *
-     * @return The {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any} list or
-     * {@code null} if no such element is found.
-     *
-     * @throws NullPointerException if {@code any}, {@code namespaceURI} or {@code localPart} is {@code null}.
-     * @throws IllegalStateException if {@code any} contains more than one matching element.
-     *
-     * @deprecated As of JOMC 1.1, please use method {@link #getAnyElement(java.util.List, java.lang.String, java.lang.String, java.lang.Class)}.
-     * This method will be removed in version 2.0.
-     */
-    @Deprecated
-    protected javax.xml.bind.JAXBElement getAnyElement( final java.util.List<Object> any, final String namespaceURI,
-                                                        final String localPart )
-    {
-        if ( any == null )
-        {
-            throw new NullPointerException( "any" );
-        }
-        if ( namespaceURI == null )
-        {
-            throw new NullPointerException( "namespaceURI" );
-        }
-        if ( localPart == null )
-        {
-            throw new NullPointerException( "localPart" );
-        }
-
-        javax.xml.bind.JAXBElement<?> anyElement = null;
-
-        for ( int i = 0, s0 = any.size(); i < s0; i++ )
-        {
-            final Object o = any.get( i );
-
-            if ( o instanceof javax.xml.bind.JAXBElement<?> )
-            {
-                final javax.xml.bind.JAXBElement<?> e = (javax.xml.bind.JAXBElement<?>) o;
-
-                if ( namespaceURI.equals( e.getName().getNamespaceURI() )
-                     && localPart.equals( e.getName().getLocalPart() ) )
-                {
-                    if ( anyElement == null )
-                    {
-                        anyElement = e;
-                    }
-                    else
-                    {
-                        throw new IllegalStateException( getMessage( "nonUniqueElement", this.getClass().getName(),
-                                                                     namespaceURI, localPart ) );
-
-                    }
-                }
-            }
-        }
-
-        return anyElement;
-    }
-
-    /**
-     * Gets a list containing all {@code JAXBElement}s matching a namespace URI and local part from a given list of
-     * objects.
-     *
-     * @param any The list to search.
-     * @param namespaceURI The namespace URI of the {@code JAXBElement}s to return.
-     * @param localPart The local part of the {@code JAXBElement}s to return.
-     *
-     * @return An unmodifiable list of all {@code JAXBElement}s matching {@code namespaceURI} and {@code localPart} from
-     * the {@code any} list - an empty list if no such elements are found.
-     *
-     * @throws NullPointerException if {@code any}, {@code namespaceURI} or {@code localPart} is {@code null}.
-     *
-     * @deprecated As of JOMC 1.1, please use method {@link #getAnyElements(java.util.List, java.lang.String, java.lang.String, java.lang.Class)}.
-     * This method will be removed in version 2.0.
-     */
-    @Deprecated
-    protected java.util.List<javax.xml.bind.JAXBElement> getAnyElements( final java.util.List<Object> any,
-                                                                         final String namespaceURI,
-                                                                         final String localPart )
-    {
-        if ( any == null )
-        {
-            throw new NullPointerException( "any" );
-        }
-        if ( namespaceURI == null )
-        {
-            throw new NullPointerException( "namespaceURI" );
-        }
-        if ( localPart == null )
-        {
-            throw new NullPointerException( "localPart" );
-        }
-
-        final java.util.List<javax.xml.bind.JAXBElement> anyElements =
-            new java.util.ArrayList<javax.xml.bind.JAXBElement>( any.size() );
-
-        for ( int i = 0, s0 = any.size(); i < s0; i++ )
-        {
-            final Object o = any.get( i );
-
-            if ( o instanceof javax.xml.bind.JAXBElement<?> )
-            {
-                final javax.xml.bind.JAXBElement<?> e = (javax.xml.bind.JAXBElement<?>) o;
-
-                if ( namespaceURI.equals( e.getName().getNamespaceURI() )
-                     && localPart.equals( e.getName().getLocalPart() ) )
-                {
-                    anyElements.add( e );
-                }
-            }
-        }
-
-        return java.util.Collections.unmodifiableList( anyElements );
-    }
-
-    /**
-     * Gets a single {@code JAXBElement} matching a namespace URI and local part from a given list of objects.
-     *
-     * @param any The list to search.
-     * @param namespaceURI The namespace URI of the {@code JAXBElement} to return.
-     * @param localPart The local part of the {@code JAXBElement} to return.
      * @param type The class of the type the element is bound to.
      * @param <T> The type the element is bound to.
      *
@@ -542,54 +423,6 @@
      *
      * @param namespaceURI The namespace URI of the {@code JAXBElement} to return.
      * @param localPart The local part of the {@code JAXBElement} to return.
-     *
-     * @return The {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any} property
-     * of the instance or {@code null}, if no such element is found.
-     *
-     * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
-     * @throws IllegalStateException if the {@code any} property contains more than one matching element.
-     *
-     * @see #getAnyElement(java.util.List, java.lang.String, java.lang.String)
-     *
-     * @deprecated As of JOMC 1.1, please use method {@link #getAnyElement(java.lang.String, java.lang.String, java.lang.Class)}.
-     * This method will be removed in version 2.0.
-     */
-    @Deprecated
-    public javax.xml.bind.JAXBElement getAnyElement( final String namespaceURI, final String localPart )
-    {
-        return this.getAnyElement( this.getAny(), namespaceURI, localPart );
-    }
-
-    /**
-     * Gets a list containing all {@code JAXBElement}s matching a namespace URI and local part from the {@code any}
-     * property of the instance.
-     *
-     * @param namespaceURI The namespace URI of the {@code JAXBElement}s to return.
-     * @param localPart The local part of the {@code JAXBElement}s to return.
-     *
-     * @return An unmodifiable list of all {@code JAXBElement}s matching {@code namespaceURI} and {@code localPart} from
-     * the {@code any} property of the instance - an empty list if no such elements are found.
-     *
-     * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
-     *
-     * @see #getAnyElements(java.util.List, java.lang.String, java.lang.String)
-     *
-     * @deprecated As of JOMC 1.1, please use method {@link #getAnyElements(java.lang.String, java.lang.String, java.lang.Class)}.
-     * This method will be removed in version 2.0.
-     */
-    @Deprecated
-    public java.util.List<javax.xml.bind.JAXBElement> getAnyElements( final String namespaceURI,
-                                                                      final String localPart )
-    {
-        return this.getAnyElements( this.getAny(), namespaceURI, localPart );
-    }
-
-    /**
-     * Gets a single {@code JAXBElement} matching a namespace URI and local part from the {@code any} property of the
-     * instance.
-     *
-     * @param namespaceURI The namespace URI of the {@code JAXBElement} to return.
-     * @param localPart The local part of the {@code JAXBElement} to return.
      * @param type The class of the type the element is bound to.
      * @param <T> The type the element is bound to.
      *
@@ -833,54 +666,6 @@
     public Class<?> getJavaClass( final ClassLoader classLoader ) throws ClassNotFoundException
     {
         return this.getClazz() != null ? Class.forName( this.getClazz(), false, classLoader ) : null;
-    }
-
-    /**
-     * Gets a single {@code JAXBElement} matching a namespace URI and local part from the {@code any} property of the
-     * instance.
-     *
-     * @param namespaceURI The namespace URI of the {@code JAXBElement} to return.
-     * @param localPart The local part of the {@code JAXBElement} to return.
-     *
-     * @return The {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any} property
-     * of the instance or {@code null} if no such element is found.
-     *
-     * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
-     * @throws IllegalStateException if the {@code any} property contains more than one matching element.
-     *
-     * @see #getAnyElement(java.util.List, java.lang.String, java.lang.String)
-     *
-     * @deprecated As of JOMC 1.1, please use method {@link #getAnyElement(java.lang.String, java.lang.String, java.lang.Class)}.
-     * This method will be removed in version 2.0.
-     */
-    @Deprecated
-    public javax.xml.bind.JAXBElement getAnyElement( final String namespaceURI, final String localPart )
-    {
-        return this.getAnyElement( this.getAny(), namespaceURI, localPart );
-    }
-
-    /**
-     * Gets a list containing all {@code JAXBElement}s matching a namespace URI and local part from the {@code any}
-     * property of the instance.
-     *
-     * @param namespaceURI The namespace URI of the {@code JAXBElement}s to return.
-     * @param localPart The local part of the {@code JAXBElement}s to return.
-     *
-     * @return An unmodifiable list of all {@code JAXBElement}s matching {@code namespaceURI} and {@code localPart} from
-     * the {@code any} property of the instance - an empty list if no such elements are found.
-     *
-     * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
-     *
-     * @see #getAnyElements(java.util.List, java.lang.String, java.lang.String)
-     *
-     * @deprecated As of JOMC 1.1, please use method {@link #getAnyElements(java.lang.String, java.lang.String, java.lang.Class)}.
-     * This method will be removed in version 2.0.
-     */
-    @Deprecated
-    public java.util.List<javax.xml.bind.JAXBElement> getAnyElements( final String namespaceURI,
-                                                                      final String localPart )
-    {
-        return this.getAnyElements( this.getAny(), namespaceURI, localPart );
     }
 
     /**
@@ -1258,54 +1043,6 @@
      *
      * @param namespaceURI The namespace URI of the {@code JAXBElement} to return.
      * @param localPart The local part of the {@code JAXBElement} to return.
-     *
-     * @return The {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any} property
-     * of the instance or {@code null}, if no such element is found.
-     *
-     * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
-     * @throws IllegalStateException if the {@code any} property contains more than one matching element.
-     *
-     * @see #getAnyElement(java.util.List, java.lang.String, java.lang.String)
-     *
-     * @deprecated As of JOMC 1.1, please use method {@link #getAnyElement(java.lang.String, java.lang.String, java.lang.Class)}.
-     * This method will be removed in version 2.0.
-     */
-    @Deprecated
-    public javax.xml.bind.JAXBElement getAnyElement( final String namespaceURI, final String localPart )
-    {
-        return this.getAnyElement( this.getAny(), namespaceURI, localPart );
-    }
-
-    /**
-     * Gets a list containing all {@code JAXBElement}s matching a namespace URI and local part from the {@code any}
-     * property of the instance.
-     *
-     * @param namespaceURI The namespace URI of the {@code JAXBElement}s to return.
-     * @param localPart The local part of the {@code JAXBElement}s to return.
-     *
-     * @return An unmodifiable list of all {@code JAXBElement}s matching {@code namespaceURI} and {@code localPart} from
-     * the {@code any} property of the instance - an empty list if no such elements are found.
-     *
-     * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
-     *
-     * @see #getAnyElements(java.util.List, java.lang.String, java.lang.String)
-     *
-     * @deprecated As of JOMC 1.1, please use method {@link #getAnyElements(java.lang.String, java.lang.String, java.lang.Class)}.
-     * This method will be removed in version 2.0.
-     */
-    @Deprecated
-    public java.util.List<javax.xml.bind.JAXBElement> getAnyElements( final String namespaceURI,
-                                                                      final String localPart )
-    {
-        return this.getAnyElements( this.getAny(), namespaceURI, localPart );
-    }
-
-    /**
-     * Gets a single {@code JAXBElement} matching a namespace URI and local part from the {@code any} property of the
-     * instance.
-     *
-     * @param namespaceURI The namespace URI of the {@code JAXBElement} to return.
-     * @param localPart The local part of the {@code JAXBElement} to return.
      * @param type The class of the type the element is bound to.
      * @param <T> The type the element is bound to.
      *
@@ -1522,54 +1259,6 @@
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Dependency']">
       <ci:code><![CDATA[
-    /**
-     * Gets a single {@code JAXBElement} matching a namespace URI and local part from the {@code any} property of the
-     * instance.
-     *
-     * @param namespaceURI The namespace URI of the {@code JAXBElement} to return.
-     * @param localPart The local part of the {@code JAXBElement} to return.
-     *
-     * @return The {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any} property
-     * of the instance or {@code null}, if no such element is found.
-     *
-     * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
-     * @throws IllegalStateException if the {@code any} property contains more than one matching element.
-     *
-     * @see #getAnyElement(java.util.List, java.lang.String, java.lang.String)
-     *
-     * @deprecated As of JOMC 1.1, please use method {@link #getAnyElement(java.lang.String, java.lang.String, java.lang.Class)}.
-     * This method will be removed in version 2.0.
-     */
-    @Deprecated
-    public javax.xml.bind.JAXBElement getAnyElement( final String namespaceURI, final String localPart )
-    {
-        return this.getAnyElement( this.getAny(), namespaceURI, localPart );
-    }
-
-    /**
-     * Gets a list containing all {@code JAXBElement}s matching a namespace URI and local part from the {@code any}
-     * property of the instance.
-     *
-     * @param namespaceURI The namespace URI of the {@code JAXBElement}s to return.
-     * @param localPart The local part of the {@code JAXBElement}s to return.
-     *
-     * @return An unmodifiable list of all {@code JAXBElement}s matching {@code namespaceURI} and {@code localPart} from
-     * the {@code any} property of the instance - an empty list if no such elements are found.
-     *
-     * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
-     *
-     * @see #getAnyElements(java.util.List, java.lang.String, java.lang.String)
-     *
-     * @deprecated As of JOMC 1.1, please use method {@link #getAnyElements(java.lang.String, java.lang.String, java.lang.Class)}.
-     * This method will be removed in version 2.0.
-     */
-    @Deprecated
-    public java.util.List<javax.xml.bind.JAXBElement> getAnyElements( final String namespaceURI,
-                                                                      final String localPart )
-    {
-        return this.getAnyElements( this.getAny(), namespaceURI, localPart );
-    }
-
     /**
      * Gets a single {@code JAXBElement} matching a namespace URI and local part from the {@code any} property of the
      * instance.
@@ -2167,54 +1856,6 @@
      *
      * @param namespaceURI The namespace URI of the {@code JAXBElement} to return.
      * @param localPart The local part of the {@code JAXBElement} to return.
-     *
-     * @return The {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any} property
-     * of the instance or {@code null}, if no such element is found.
-     *
-     * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
-     * @throws IllegalStateException if the {@code any} property contains more than one matching element.
-     *
-     * @see #getAnyElement(java.util.List, java.lang.String, java.lang.String)
-     *
-     * @deprecated As of JOMC 1.1, please use method {@link #getAnyElement(java.lang.String, java.lang.String, java.lang.Class)}.
-     * This method will be removed in version 2.0.
-     */
-    @Deprecated
-    public javax.xml.bind.JAXBElement getAnyElement( final String namespaceURI, final String localPart )
-    {
-        return this.getAnyElement( this.getAny(), namespaceURI, localPart );
-    }
-
-    /**
-     * Gets a list containing all {@code JAXBElement}s matching a namespace URI and local part from the {@code any}
-     * property of the instance.
-     *
-     * @param namespaceURI The namespace URI of the {@code JAXBElement}s to return.
-     * @param localPart The local part of the {@code JAXBElement}s to return.
-     *
-     * @return An unmodifiable list of all {@code JAXBElement}s matching {@code namespaceURI} and {@code localPart} from
-     * the {@code any} property of the instance - an empty list if no such elements are found.
-     *
-     * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
-     *
-     * @see #getAnyElements(java.util.List, java.lang.String, java.lang.String)
-     *
-     * @deprecated As of JOMC 1.1, please use method {@link #getAnyElements(java.lang.String, java.lang.String, java.lang.Class)}.
-     * This method will be removed in version 2.0.
-     */
-    @Deprecated
-    public java.util.List<javax.xml.bind.JAXBElement> getAnyElements( final String namespaceURI,
-                                                                      final String localPart )
-    {
-        return this.getAnyElements( this.getAny(), namespaceURI, localPart );
-    }
-
-    /**
-     * Gets a single {@code JAXBElement} matching a namespace URI and local part from the {@code any} property of the
-     * instance.
-     *
-     * @param namespaceURI The namespace URI of the {@code JAXBElement} to return.
-     * @param localPart The local part of the {@code JAXBElement} to return.
      * @param type The class of the type the element is bound to.
      * @param <T> The type the element is bound to.
      *
@@ -2444,54 +2085,6 @@
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Argument']">
       <ci:code><![CDATA[
-    /**
-     * Gets a single {@code JAXBElement} matching a namespace URI and local part from the {@code any} property of the
-     * instance.
-     *
-     * @param namespaceURI The namespace URI of the {@code JAXBElement} to return.
-     * @param localPart The local part of the {@code JAXBElement} to return.
-     *
-     * @return The {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any} property
-     * of the instance or {@code null}, if no such element is found.
-     *
-     * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
-     * @throws IllegalStateException if the {@code any} property contains more than one matching element.
-     *
-     * @see #getAnyElement(java.util.List, java.lang.String, java.lang.String)
-     *
-     * @deprecated As of JOMC 1.1, please use method {@link #getAnyElement(java.lang.String, java.lang.String, java.lang.Class)}.
-     * This method will be removed in version 2.0.
-     */
-    @Deprecated
-    public javax.xml.bind.JAXBElement getAnyElement( final String namespaceURI, final String localPart )
-    {
-        return this.getAnyElement( this.getAny(), namespaceURI, localPart );
-    }
-
-    /**
-     * Gets a list containing all {@code JAXBElement}s matching a namespace URI and local part from the {@code any}
-     * property of the instance.
-     *
-     * @param namespaceURI The namespace URI of the {@code JAXBElement}s to return.
-     * @param localPart The local part of the {@code JAXBElement}s to return.
-     *
-     * @return An unmodifiable list of all {@code JAXBElement}s matching {@code namespaceURI} and {@code localPart} from
-     * the {@code any} property of the instance - an empty list if no such elements are found.
-     *
-     * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
-     *
-     * @see #getAnyElements(java.util.List, java.lang.String, java.lang.String)
-     *
-     * @deprecated As of JOMC 1.1, please use method {@link #getAnyElements(java.lang.String, java.lang.String, java.lang.Class)}.
-     * This method will be removed in version 2.0.
-     */
-    @Deprecated
-    public java.util.List<javax.xml.bind.JAXBElement> getAnyElements( final String namespaceURI,
-                                                                      final String localPart )
-    {
-        return this.getAnyElements( this.getAny(), namespaceURI, localPart );
-    }
-
     /**
      * Gets a single {@code JAXBElement} matching a namespace URI and local part from the {@code any} property of the
      * instance.
@@ -2993,54 +2586,6 @@
      *
      * @param namespaceURI The namespace URI of the {@code JAXBElement} to return.
      * @param localPart The local part of the {@code JAXBElement} to return.
-     *
-     * @return The {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any} property
-     * of the instance or {@code null}, if no such element is found.
-     *
-     * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
-     * @throws IllegalStateException if the {@code any} property contains more than one matching element.
-     *
-     * @see #getAnyElement(java.util.List, java.lang.String, java.lang.String)
-     *
-     * @deprecated As of JOMC 1.1, please use method {@link #getAnyElement(java.lang.String, java.lang.String, java.lang.Class)}.
-     * This method will be removed in version 2.0.
-     */
-    @Deprecated
-    public javax.xml.bind.JAXBElement getAnyElement( final String namespaceURI, final String localPart )
-    {
-        return this.getAnyElement( this.getAny(), namespaceURI, localPart );
-    }
-
-    /**
-     * Gets a list containing all {@code JAXBElement}s matching a namespace URI and local part from the {@code any}
-     * property of the instance.
-     *
-     * @param namespaceURI The namespace URI of the {@code JAXBElement}s to return.
-     * @param localPart The local part of the {@code JAXBElement}s to return.
-     *
-     * @return An unmodifiable list of all {@code JAXBElement}s matching {@code namespaceURI} and {@code localPart} from
-     * the {@code any} property of the instance - an empty list if no such elements are found.
-     *
-     * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
-     *
-     * @see #getAnyElements(java.util.List, java.lang.String, java.lang.String)
-     *
-     * @deprecated As of JOMC 1.1, please use method {@link #getAnyElements(java.lang.String, java.lang.String, java.lang.Class)}.
-     * This method will be removed in version 2.0.
-     */
-    @Deprecated
-    public java.util.List<javax.xml.bind.JAXBElement> getAnyElements( final String namespaceURI,
-                                                                      final String localPart )
-    {
-        return this.getAnyElements( this.getAny(), namespaceURI, localPart );
-    }
-
-    /**
-     * Gets a single {@code JAXBElement} matching a namespace URI and local part from the {@code any} property of the
-     * instance.
-     *
-     * @param namespaceURI The namespace URI of the {@code JAXBElement} to return.
-     * @param localPart The local part of the {@code JAXBElement} to return.
      * @param type The class of the type the element is bound to.
      * @param <T> The type the element is bound to.
      *
@@ -3136,54 +2681,6 @@
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='Person']">
       <ci:code><![CDATA[
-    /**
-     * Gets a single {@code JAXBElement} matching a namespace URI and local part from the {@code any} property of the
-     * instance.
-     *
-     * @param namespaceURI The namespace URI of the {@code JAXBElement} to return.
-     * @param localPart The local part of the {@code JAXBElement} to return.
-     *
-     * @return The {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any} property
-     * of the instance or {@code null}, if no such element is found.
-     *
-     * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
-     * @throws IllegalStateException if the {@code any} property contains more than one matching element.
-     *
-     * @see #getAnyElement(java.util.List, java.lang.String, java.lang.String)
-     *
-     * @deprecated As of JOMC 1.1, please use method {@link #getAnyElement(java.lang.String, java.lang.String, java.lang.Class)}.
-     * This method will be removed in version 2.0.
-     */
-    @Deprecated
-    public javax.xml.bind.JAXBElement getAnyElement( final String namespaceURI, final String localPart )
-    {
-        return this.getAnyElement( this.getAny(), namespaceURI, localPart );
-    }
-
-    /**
-     * Gets a list containing all {@code JAXBElement}s matching a namespace URI and local part from the {@code any}
-     * property of the instance.
-     *
-     * @param namespaceURI The namespace URI of the {@code JAXBElement}s to return.
-     * @param localPart The local part of the {@code JAXBElement}s to return.
-     *
-     * @return An unmodifiable list of all {@code JAXBElement}s matching {@code namespaceURI} and {@code localPart} from
-     * the {@code any} property of the instance - an empty list if no such elements are found.
-     *
-     * @throws NullPointerException if {@code namespaceURI} or {@code localPart} is {@code null}.
-     *
-     * @see #getAnyElements(java.util.List, java.lang.String, java.lang.String)
-     *
-     * @deprecated As of JOMC 1.1, please use method {@link #getAnyElements(java.lang.String, java.lang.String, java.lang.Class)}.
-     * This method will be removed in version 2.0.
-     */
-    @Deprecated
-    public java.util.List<javax.xml.bind.JAXBElement> getAnyElements( final String namespaceURI,
-                                                                      final String localPart )
-    {
-        return this.getAnyElements( this.getAny(), namespaceURI, localPart );
-    }
-
     /**
      * Gets a single {@code JAXBElement} matching a namespace URI and local part from the {@code any} property of the
      * instance.
