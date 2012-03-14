@@ -1997,8 +1997,8 @@ public class DefaultModelValidator implements ModelValidator
                                            "IMPLEMENTATION_DEPENDENCY_OVERRIDE_PROPERTY_WARNING", Level.WARNING,
                                            new ObjectFactory().createImplementation( implementation ),
                                            "implementationDependencyOverridePropertyWarning",
-                                           implementation.getIdentifier(), dependency.getName(), override.getName(),
-                                           a.getIdentifier(), moduleOfA.getName(),
+                                           implementation.getIdentifier(), moduleOfImpl.getName(), dependency.getName(),
+                                           override.getName(), a.getIdentifier(), moduleOfA.getName(),
                                            getNodePathString( overriddenProperty ) );
 
                             }
@@ -2301,4 +2301,5 @@ public class DefaultModelValidator implements ModelValidator
         }
 
     }
+
 }
