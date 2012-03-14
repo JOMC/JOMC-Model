@@ -117,10 +117,13 @@
       </action>
     </release>
     <!-- *********************************************************************************************************** -->
-    <release version="2.0">
+    <release version="1.2.1" date="2012-03-14">
       <action dev="schulte2005" type="fix"><![CDATA[Corrected the message of the model validation report detail
       with identifier <code>IMPLEMENTATION_DEPENDENCY_OVERRIDE_PROPERTY_WARNING</code>.]]>
       </action>
+    </release>
+    <!-- *********************************************************************************************************** -->
+    <release version="2.0">
       <action dev="schulte2005" type="remove"><![CDATA[Removed support of deprecated system properties<ul>
       <li><code>org.jomc.model.DefaultModelProvider.defaultEnabled</code></li>
       <li><code>org.jomc.model.DefaultModelProvider.defaultModuleLocation</code></li>
