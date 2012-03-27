@@ -124,6 +124,10 @@
     </release>
     <!-- *********************************************************************************************************** -->
     <release version="2.0">
+      <action dev="schulte2005" type="fix"><![CDATA[Updated method <code>createObject</code> of class
+      <code>org.jomc.model.Modules</code> to correct a synchronization issue causing deadlocks when an object is
+      starting threads during instantiation re-entering the method blocking the instantiation from completing.]]>
+      </action>
       <action dev="schulte2005" type="remove"><![CDATA[Removed support of deprecated system properties<ul>
       <li><code>org.jomc.model.DefaultModelProvider.defaultEnabled</code></li>
       <li><code>org.jomc.model.DefaultModelProvider.defaultModuleLocation</code></li>
