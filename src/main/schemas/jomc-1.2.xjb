@@ -4487,9 +4487,10 @@
 
             if ( ctor != null && instance.isJavaClassAssignable( classLoader ) )
             {
+                object = clazz.newInstance();
+
                 synchronized ( this.objects )
                 {
-                    object = clazz.newInstance();
                     this.objects.put( object, instance );
                 }
             }
@@ -4501,10 +4502,11 @@
                 {
                     if ( java.lang.reflect.Modifier.isStatic( factoryMethod.getModifiers() ) )
                     {
-                        synchronized ( this.objects )
+                        object = factoryMethod.invoke( null, (Object[]) null );
+
+                        if ( object != null )
                         {
-                            object = factoryMethod.invoke( null, (Object[]) null );
-                            if ( object != null )
+                            synchronized ( this.objects )
                             {
                                 this.objects.put( object, instance );
                             }
@@ -4512,23 +4514,27 @@
                     }
                     else if ( ctor != null )
                     {
+                        final Object o = ctor.newInstance();
+
                         synchronized ( this.objects )
                         {
-                            final Object o = ctor.newInstance();
                             this.objects.put( o, instance );
+                        }
 
-                            try
-                            {
-                                object = factoryMethod.invoke( o, (Object[]) null );
-                            }
-                            finally
+                        try
+                        {
+                            object = factoryMethod.invoke( o, (Object[]) null );
+                        }
+                        finally
+                        {
+                            synchronized ( this.objects )
                             {
                                 this.objects.remove( o );
-                            }
 
-                            if ( object != null )
-                            {
-                                this.objects.put( object, instance );
+                                if ( object != null )
+                                {
+                                    this.objects.put( object, instance );
+                                }
                             }
                         }
                     }
