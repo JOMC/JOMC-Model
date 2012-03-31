@@ -123,18 +123,13 @@
       </action>
     </release>
     <!-- *********************************************************************************************************** -->
-    <release version="1.3">
+    <release version="1.2.2" date="2012-03-28">
       <action dev="schulte2005" type="fix"><![CDATA[Updated method <code>createObject</code> of class
       <code>org.jomc.model.Modules</code> to correct a synchronization issue causing deadlocks when an object is
       starting threads during instantiation re-entering the method blocking the instantiation from completing.]]>
       </action>
-      <action dev="schulte2005" type="remove"><![CDATA[Removed support of deprecated system properties<ul>
-      <li><code>org.jomc.model.DefaultModelProvider.defaultEnabled</code></li>
-      <li><code>org.jomc.model.DefaultModelProvider.defaultModuleLocation</code></li>
-      <li><code>org.jomc.model.DefaultModelProcessor.defaultEnabled</code></li>
-      <li><code>org.jomc.model.DefaultModelProcessor.defaultTransformerLocation</code></li>
-      </ul>.]]>
-      </action>
     </release>
+    <!-- *********************************************************************************************************** -->
+    <release version="1.3"/>
   </body>
 </document>
