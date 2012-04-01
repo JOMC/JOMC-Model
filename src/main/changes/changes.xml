@@ -130,6 +130,13 @@
       </action>
     </release>
     <!-- *********************************************************************************************************** -->
+    <release version="1.2.3" date="2012-04-01">
+      <action dev="schulte2005" type="fix"><![CDATA[Updated the version of the <code>jomc-modlet</code> dependency from
+      <code>1.2</code> to <code>1.2.1<code>.
+      See the <a href="http://jomc.sourceforge.net/jomc/1.2/jomc-modlet-1.2.1/changes-report.html">Changes report</a>.]]>
+      </action>
+    </release>
+    <!-- *********************************************************************************************************** -->
     <release version="2.0">
       <action dev="schulte2005" type="remove"><![CDATA[Removed support of deprecated system properties<ul>
       <li><code>org.jomc.model.DefaultModelProvider.defaultEnabled</code></li>
