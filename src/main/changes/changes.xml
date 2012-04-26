@@ -137,6 +137,12 @@
       </action>
     </release>
     <!-- *********************************************************************************************************** -->
-    <release version="1.3"/>
+    <release version="1.3">
+      <action dev="schulte2005" type="fix"><![CDATA[Updated method <code>getJavaMessage</code> of class
+      <code>org.jomc.model.Message</code> to correct a
+      <code>java.lang.StringIndexOutOfBoundsException: String index out of range: -1</code> exception caused by empty
+      messages.]]>
+      </action>
+    </release>
   </body>
 </document>
