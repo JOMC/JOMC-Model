@@ -1970,7 +1970,10 @@
                 builder.append( LINE_SEPARATOR ).append( line );
             }
 
-            return new java.text.MessageFormat( builder.substring( LINE_SEPARATOR.length() ), locale );
+            return new java.text.MessageFormat( builder.length() > 0
+                                                ? builder.substring( LINE_SEPARATOR.length() )
+                                                : builder.toString(), locale );
+
         }
         catch ( final java.io.IOException e )
         {
