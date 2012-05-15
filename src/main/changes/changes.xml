@@ -137,12 +137,15 @@
       </action>
     </release>
     <!-- *********************************************************************************************************** -->
-    <release version="2.0">
+    <release version="1.2.4" date="2012-04-26">
       <action dev="schulte2005" type="fix"><![CDATA[Updated method <code>getJavaMessage</code> of class
       <code>org.jomc.model.Message</code> to correct a
       <code>java.lang.StringIndexOutOfBoundsException: String index out of range: -1</code> exception caused by empty
       messages.]]>
       </action>
+    </release>
+    <!-- *********************************************************************************************************** -->
+    <release version="2.0">
       <action dev="schulte2005" type="remove"><![CDATA[Removed support of deprecated system properties<ul>
       <li><code>org.jomc.model.DefaultModelProvider.defaultEnabled</code></li>
       <li><code>org.jomc.model.DefaultModelProvider.defaultModuleLocation</code></li>
