@@ -46,7 +46,7 @@
       </action>
       <action dev="schulte2005" type="add"><![CDATA[Added methods <code>getAnyElement</code> and
       <code>getAnyElements</code> taking a type.
-      See the <a href="http://jomc.sourceforge.net/jomc/1.1/jomc-model-1.1/clirr-report.html">CLIRR report</a>.]]>
+      See the <a href="http://www.jomc.org/jomc/1.1/jomc-model-1.1/clirr-report.html">CLIRR report</a>.]]>
       </action>
       <action dev="schulte2005" type="fix"><![CDATA[Corrected a <code>ClassCastExpcetion</code> thrown by class
       <code>org.jomc.model.modlet.DefaultModelProcessor</code> when transforming models using stylesheets producing
@@ -99,18 +99,18 @@
       <code>org.jomc.model.modlet.DefaultModelProcessor</code> to support model context attributes
       <code>org.jomc.model.modlet.DefaultModelProcessor.enabledAttribute</code> and
       <code>org.jomc.model.modlet.DefaultModelProcessor.transformerLocationAttribute</code>.
-      See the <a href="http://jomc.sourceforge.net/jomc/1.2/jomc-model-1.2/clirr-report.html">CLIRR report</a>.]]>
+      See the <a href="http://www.jomc.org/jomc/1.2/jomc-model-1.2/clirr-report.html">CLIRR report</a>.]]>
       </action>
       <action dev="schulte2005" type="update"><![CDATA[Updated method <code>findModel</code> of class
       <code>org.jomc.model.modlet.DefaultModelProvider</code> to support model context attributes
       <code>org.jomc.model.modlet.DefaultModelProvider.enabledAttribute</code> and
       <code>org.jomc.model.modlet.DefaultModelProvider.moduleLocationAttribute</code>.
-      See the <a href="http://jomc.sourceforge.net/jomc/1.2/jomc-model-1.2/clirr-report.html">CLIRR report</a>.]]>
+      See the <a href="http://www.jomc.org/jomc/1.2/jomc-model-1.2/clirr-report.html">CLIRR report</a>.]]>
       </action>
       <action dev="schulte2005" type="update"><![CDATA[Added property <code>validating</code> to class
       <code>org.jomc.model.modlet.DefaultModelProvider</code> and updated method <code>findModules</code> to support
       model context attribute <code>org.jomc.model.modlet.DefaultModelProvider.validatingAttribute</code>.
-      See the <a href="http://jomc.sourceforge.net/jomc/1.2/jomc-model-1.2/clirr-report.html">CLIRR report</a>.]]>
+      See the <a href="http://www.jomc.org/jomc/1.2/jomc-model-1.2/clirr-report.html">CLIRR report</a>.]]>
       </action>
       <action dev="schulte2005" type="remove"><![CDATA[Removed the <code>jomc-1.0.xsd</code> schema deprecated by the
       <code>jomc-1.2.xsd</code> schema.]]>
@@ -133,7 +133,7 @@
     <release version="1.2.3" date="2012-04-01">
       <action dev="schulte2005" type="fix"><![CDATA[Updated the version of the <code>jomc-modlet</code> dependency from
       <code>1.2</code> to <code>1.2.1</code>.
-      See the <a href="http://jomc.sourceforge.net/jomc/1.2/jomc-modlet-1.2.1/changes-report.html">Changes report</a>.]]>
+      See the <a href="http://www.jomc.org/jomc/1.2/jomc-modlet-1.2.1/changes-report.html">Changes report</a>.]]>
       </action>
     </release>
     <!-- *********************************************************************************************************** -->

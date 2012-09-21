@@ -42,7 +42,7 @@ import org.jomc.modlet.Model;
 /**
  * Object management and configuration {@code Model} helper.
  *
- * @author <a href="mailto:schulte2005@users.sourceforge.net">Christian Schulte</a>
+ * @author <a href="mailto:cs@schulte.it">Christian Schulte</a>
  * @version $JOMC$
  */
 public abstract class ModelHelper

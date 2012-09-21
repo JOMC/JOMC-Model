@@ -14,7 +14,7 @@
     o Apache Maven 3.x
 
       The following link redirects to the official Apache Maven website.
-      http://jomc.sourceforge.net/redirect/mng
+      http://www.jomc.org/redirect/mng
 
   In order to build JOMC release artifacts, the following software needs to be
   installed in addition.
@@ -22,7 +22,7 @@
     o GnuPG
 
       The following link redirects to the official GnuPG website.
-      http://jomc.sourceforge.net/redirect/gpg
+      http://www.jomc.org/redirect/gpg
 
 
   Building Snapshot Artifacts
@@ -52,7 +52,7 @@
     done by using the '-D' command line option. To minimize the number of '-D'
     options, a profile can be added to the local Maven settings.xml file. The
     following link redirects to the official Maven settings reference.
-    http://jomc.sourceforge.net/redirect/msettings
+    http://www.jomc.org/redirect/msettings
 
     <profile>
       <id>jomc.org</id>
@@ -66,14 +66,14 @@
         <!-- user used for authentication with the project source code       -->
         <!-- management system.                                              -->
         <!--                                                                 -->
-        <jomc.scm.username>Sourceforge Username</jomc.scm.username>
+        <jomc.scm.username>Username</jomc.scm.username>
         <!--                                                                 -->
         <!-- The 'jomc.scm.password' property must be set to the password    -->
         <!-- used for authentication with the project source code management -->
         <!-- system. To avoid storing cleartext passwords, this property     -->
         <!-- should be set using the '-D' command line option.               -->
         <!--                                                                 -->
-        <jomc.scm.password>Sourceforge Password</jomc.scm.password>
+        <jomc.scm.password>Password</jomc.scm.password>
         <!--                                                                 -->
         <!--                                                                 -->
         <!-- Code Signing Properties                                         -->
@@ -81,7 +81,7 @@
         <!--                                                                 -->
         <!-- Code signing is backed by the 'maven-jarsigner-plugin'.         -->
         <!-- The following link redirects to the official documentation of   -->
-        <!-- that plugin. http://jomc.sourceforge.net/redirect/mjarsigner    -->
+        <!-- that plugin. http://www.jomc.org/redirect/mjarsigner    -->
         <!--                                                                 -->
         <!--                                                                 -->
         <!-- The 'jarsigner.keystore' property may be set to the location of -->
@@ -122,7 +122,7 @@
         <!--                                                                 -->
         <!-- Artifact signing is backed by the 'maven-gpg-plugin'.           -->
         <!-- The following link redirects to the official documentation of   -->
-        <!-- that plugin. http://jomc.sourceforge.net/redirect/mgpg          -->
+        <!-- that plugin. http://www.jomc.org/redirect/mgpg          -->
         <!--                                                                 -->
         <!--                                                                 -->
         <!-- The 'gpg.keyname' property may be set to the name of the GPG    -->
@@ -209,7 +209,7 @@
     cmd> mvn -Poss.sonatype.org site
 
     The following link redirects to the repository hosting service used by this
-    project. http://jomc.sourceforge.net/redirect/oss
+    project. http://www.jomc.org/redirect/oss
 
   Deploying Release Artifacts
   ---------------------------
@@ -235,9 +235,9 @@
     the project web server.
 
     <server>
-      <id>jomc.sourceforge.net</id>
-      <username>Sourceforge Username,jomc</username>
-      <password>Sourceforge Password</password>
+      <id>jomc.org</id>
+      <username>Username</username>
+      <password>Password</password>
     </server>
 
     The project web site is deployed by executing:
@@ -248,11 +248,11 @@
 
     The release process is backed by the 'maven-release-plugin'. The following
     link redirects to the official documentation of that plugin.
-    http://jomc.sourceforge.net/redirect/mrelease
+    http://www.jomc.org/redirect/mrelease
 
     Releases are prepared by executing:
     cmd> mvn release:prepare -Pjomc-release,jomc.org
 
     Releases are performed by executing:
-    cmd> mvn release:perform -Darguments="-Pjomc-release,jomc-sourceforge-release,jomc.org"
+    cmd> mvn release:perform -Darguments="-Pjomc-release,jomc.org"
 
