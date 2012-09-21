@@ -32,11 +32,11 @@
 -->
 <modlet xmlns="http://jomc.org/modlet"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://jomc.org/modlet http://jomc.sourceforge.net/modlet/jomc-modlet-1.3.xsd"
+        xsi:schemaLocation="http://jomc.org/modlet http://xml.jomc.org/modlet/jomc-modlet-1.3.xsd"
         name="${project.name}" model="http://jomc.org/model" vendor="${project.organization.name}" version="${project.version}">
 
   <schemas>
-    <schema public-id="http://jomc.org/model" system-id="http://jomc.sourceforge.net/model/jomc-1.2.xsd"
+    <schema public-id="http://jomc.org/model" system-id="http://xml.jomc.org/model/jomc-1.2.xsd"
             context-id="org.jomc.model" classpath-id="org/jomc/model/jomc-1.2.xsd"/>
 
   </schemas>

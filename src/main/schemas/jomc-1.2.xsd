@@ -29,7 +29,7 @@
 
   $JOMC$
 
-  Location: http://jomc.sourceforge.net/model/jomc-1.2.xsd
+  Location: http://xml.jomc.org/model/jomc-1.2.xsd
 
 -->
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
@@ -68,7 +68,7 @@
 
   $JOMC$
 
-  Location: http://jomc.sourceforge.net/model/jomc-1.2.xsd
+  Location: http://xml.jomc.org/model/jomc-1.2.xsd
 
 ]]>
     </xsd:documentation>
