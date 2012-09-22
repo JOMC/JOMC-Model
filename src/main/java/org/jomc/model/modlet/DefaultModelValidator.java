@@ -81,7 +81,7 @@ import org.w3c.dom.Element;
 /**
  * Default object management and configuration {@code ModelValidator} implementation.
  *
- * @author <a href="mailto:schulte2005@users.sourceforge.net">Christian Schulte</a>
+ * @author <a href="mailto:cs@schulte.it">Christian Schulte</a>
  * @version $JOMC$
  * @see ModelContext#validateModel(org.jomc.modlet.Model)
  */

@@ -46,7 +46,7 @@ import org.w3c.dom.Element;
 /**
  * Inheritance model.
  *
- * @author <a href="mailto:schulte2005@users.sourceforge.net">Christian Schulte</a>
+ * @author <a href="mailto:cs@schulte.it">Christian Schulte</a>
  * @version $JOMC$
  * @since 1.2
  */
@@ -58,7 +58,7 @@ public class InheritanceModel
      *
      * @param <T> The type of the model object of the node.
      *
-     * @author <a href="mailto:schulte2005@users.sourceforge.net">Christian Schulte</a>
+     * @author <a href="mailto:cs@schulte.it">Christian Schulte</a>
      * @version $JOMC$
      * @since 1.2
      */

@@ -72,7 +72,7 @@ package org.jomc.model.test;
 /**
  * Test cases for class {@code org.jomc.model.Modules}.
  *
- * @author &lt;a href="mailto:schulte2005@users.sourceforge.net">Christian Schulte&lt;/a>
+ * @author &lt;a href="mailto:cs@schulte.it">Christian Schulte&lt;/a>
  * @version $JOMC$
  */
 public class ModulesTestSuite extends ModulesTest

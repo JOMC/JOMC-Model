@@ -58,7 +58,7 @@ import static org.junit.Assert.fail;
 /**
  * Test cases for class {@code org.jomc.model.modlet.DefaultModelValidator} implementations.
  *
- * @author <a href="mailto:schulte2005@users.sourceforge.net">Christian Schulte</a> 1.0
+ * @author <a href="mailto:cs@schulte.it">Christian Schulte</a> 1.0
  * @version $JOMC$
  */
 public class DefaultModelValidatorTest

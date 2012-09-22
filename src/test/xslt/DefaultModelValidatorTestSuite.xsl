@@ -72,7 +72,7 @@ package org.jomc.model.modlet.test;
 /**
  * Test cases for class {@code org.jomc.model.modlet.DefaultModelValidator} implementations.
  *
- * @author &lt;a href="mailto:schulte2005@users.sourceforge.net">Christian Schulte&lt;/a>
+ * @author &lt;a href="mailto:cs@schulte.it">Christian Schulte&lt;/a>
  * @version $JOMC$
  */
 public class DefaultModelValidatorTestSuite extends DefaultModelValidatorTest

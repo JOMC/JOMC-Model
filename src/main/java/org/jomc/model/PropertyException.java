@@ -33,7 +33,7 @@ package org.jomc.model;
 /**
  * Gets thrown whenever getting a {@code Property}'s value fails unexpectedly.
  *
- * @author <a href="mailto:schulte2005@users.sourceforge.net">Christian Schulte</a>
+ * @author <a href="mailto:cs@schulte.it">Christian Schulte</a>
  * @version $JOMC$
  *
  * @see Property#getJavaValue(java.lang.ClassLoader)

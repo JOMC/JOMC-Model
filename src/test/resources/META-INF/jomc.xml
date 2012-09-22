@@ -32,7 +32,7 @@
 -->
 <module xmlns="http://jomc.org/model"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://jomc.org/model http://jomc.sourceforge.net/model/jomc-1.2.xsd"
+        xsi:schemaLocation="http://jomc.org/model http://xml.jomc.org/model/jomc-1.2.xsd"
         name="${project.name} Tests" version="${project.version}" vendor="${project.organization.name}"
         modelVersion="1.2">
 
