@@ -38,7 +38,7 @@
       a {@code ModelContext}. The {@code any} property of a {@code Model} instance searched using that public id will
       hold a {@code JAXBElement<Modules>} instance to access using the {@code getAnyElement} method of class
       {@code Model}.<blockquote><pre>
-final ModelContext modelContext = ModelContext.createModelContext( a class loader );
+final ModelContext modelContext = ModelContextFactory.newInstance().newModelContext( a class loader );
 final Model model = modelContext.findModel( ModelObject.MODEL_PUBLIC_ID );
 final Model processed = modelContext.processModel( model );
 final ModelValidationReport validationReport = modelContext.validateModel( processed );
