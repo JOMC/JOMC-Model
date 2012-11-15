@@ -232,9 +232,9 @@
               <configuration>
                 <fromDir>${basedir}/src/main/schemas</fromDir>
                 <includes>*.xsd</includes>
-                <serverId>${jomc.xsd.distribution.id}</serverId>
+                <serverId>${jomc.xml.distribution.id}</serverId>
                 <toDir>model</toDir>
-                <url>${jomc.xsd.distribution.url}</url>
+                <url>${jomc.xml.distribution.url}</url>
               </configuration>
             </execution>
           </executions>
