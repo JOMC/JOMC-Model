@@ -6,7 +6,7 @@
   In order to build JOMC artifacts, the following software needs to be
   installed.
 
-    o Java Development Kit (JDK), Version 1.6 or higher
+    o Java Development Kit (JDK), Version 1.7 or higher
 
       Please consult the operating system documentation on how to install a Java
       development kit.
@@ -74,6 +74,23 @@
         <!-- should be set using the '-D' command line option.               -->
         <!--                                                                 -->
         <jomc.scm.password>Password</jomc.scm.password>
+        <!--                                                                 -->
+        <!--                                                                 -->
+        <!-- Issue Management System Properties                              -->
+        <!-- ========================================                        -->
+        <!--                                                                 -->
+        <!-- The 'jomc.trac.username' property must be set to the name of    -->
+        <!-- the user used for authentication with the project issue         -->
+        <!-- management system.                                              -->
+        <!--                                                                 -->
+        <jomc.trac.username>Username</jomc.trac.username>
+        <!--                                                                 -->
+        <!-- The 'jomc.trac.password' property must be set to the password   -->
+        <!-- used for authentication with the project issue management       -->
+        <!-- system. To avoid storing cleartext passwords, this property     -->
+        <!-- should be set using the '-D' command line option.               -->
+        <!--                                                                 -->
+        <jomc.trac.password>Password</jomc.trac.password>
         <!--                                                                 -->
         <!--                                                                 -->
         <!-- Code Signing Properties                                         -->
@@ -214,14 +231,27 @@
   Deploying Release Artifacts
   ---------------------------
 
-    For deploying release artifacts, a server definition needs to be specified
-    in the local Maven settings.xml file used for authentication with the remote
-    staging repository.
+    For deploying releases, various server definitions need to be specified in
+    the local Maven settings.xml file used for authentication with the remote
+    staging repository, the remote file release server and the remote XML schema
+    server.
 
     <server>
       <id>sonatype-nexus-staging</id>
       <username>OSS Username</username>
       <password>OSS Password</password>
+    </server>
+
+    <server>
+      <id>frs.jomc.org</id>
+      <username>FRS Username</username>
+      <password>FRS Password</password>
+    </server>
+
+    <server>
+      <id>xml.jomc.org</id>
+      <username>XML Username</username>
+      <password>XML Password</password>
     </server>
 
     Release artifacts are deployed by executing:
@@ -235,7 +265,7 @@
     the project web server.
 
     <server>
-      <id>jomc.org</id>
+      <id>www.jomc.org</id>
       <username>Username</username>
       <password>Password</password>
     </server>
@@ -251,8 +281,7 @@
     http://www.jomc.org/redirect/mrelease
 
     Releases are prepared by executing:
-    cmd> mvn release:prepare -Pjomc-release,jomc.org
+    cmd> mvn release:prepare -Pjomc.org
 
     Releases are performed by executing:
-    cmd> mvn release:perform -Darguments="-Pjomc-release,jomc.org"
-
+    cmd> mvn release:perform -Pjomc-release,jomc.org
