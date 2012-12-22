@@ -1,5 +1,5 @@
 /*
- *   Copyright (C) Christian Schulte, 2005-206
+ *   Copyright (C) Christian Schulte, 2012-341
  *   All rights reserved.
  *
  *   Redistribution and use in source and binary forms, with or without
@@ -28,49 +28,58 @@
  *   $JOMC$
  *
  */
-package org.jomc.model.test;
+package org.jomc.model;
 
-import java.io.ObjectInputStream;
-import org.jomc.model.PropertyException;
-import org.junit.Test;
-import static org.junit.Assert.assertEquals;
+import org.jomc.modlet.ModelException;
 
 /**
- * Test cases for class {@code org.jomc.model.PropertyException}.
+ * Gets thrown by methods of {@code ModelObject}s when failing unexpectedly.
  *
- * @author <a href="mailto:cs@schulte.it">Christian Schulte</a> 1.0
+ * @author <a href="mailto:cs@schulte.it">Christian Schulte</a>
  * @version $JOMC$
+ * @since 1.4
  */
-public class PropertyExceptionTest
+public class ModelObjectException extends ModelException
 {
 
-    /** Constant to prefix relative resource names with. */
-    private static final String ABSOLUTE_RESOURCE_NAME_PREFIX = "/org/jomc/model/test/";
+    /** Serial version UID for backwards compatibility with 1.4 object streams. */
+    private static final long serialVersionUID = -8515159053275601138L;
 
-    /** Creates a new {@code PropertyExceptionTest} instance. */
-    public PropertyExceptionTest()
+    /** Creates a new {@code ModelObjectException} instance. */
+    public ModelObjectException()
     {
         super();
     }
 
-    @Test
-    public final void testSerializabe() throws Exception
+    /**
+     * Creates a new {@code ModelObjectException} instance taking a message.
+     *
+     * @param message The message of the exception.
+     */
+    public ModelObjectException( final String message )
     {
-        ObjectInputStream in = null;
+        super( message );
+    }
 
-        try
-        {
-            in = new ObjectInputStream( this.getClass().getResourceAsStream(
-                ABSOLUTE_RESOURCE_NAME_PREFIX + "PropertyException.ser" ) );
+    /**
+     * Creates a new {@code ModelObjectException} instance taking a cause.
+     *
+     * @param cause The cause of the exception.
+     */
+    public ModelObjectException( final Throwable cause )
+    {
+        super( cause );
+    }
 
-            final PropertyException e = (PropertyException) in.readObject();
-            assertEquals( "PropertyException", e.getMessage() );
-            System.out.println( e );
-        }
-        finally
-        {
-            in.close();
-        }
+    /**
+     * Creates a new {@code ModelObjectException} instance taking a message and a cause.
+     *
+     * @param message The message of the exception.
+     * @param cause The cause of the exception.
+     */
+    public ModelObjectException( final String message, final Throwable cause )
+    {
+        super( message, cause );
     }
 
 }

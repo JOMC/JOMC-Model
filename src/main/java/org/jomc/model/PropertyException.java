@@ -38,7 +38,7 @@ package org.jomc.model;
  *
  * @see Property#getJavaValue(java.lang.ClassLoader)
  */
-public class PropertyException extends Exception
+public class PropertyException extends ModelObjectException
 {
 
     /** Serial version UID for backwards compatibility with 1.0.x object streams. */

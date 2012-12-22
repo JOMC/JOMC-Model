@@ -79,11 +79,52 @@
         {
             final Text t = this.getText().get( i );
 
-            if ( t.getLanguage().equals( this.getDefaultLanguage() ) )
+            if ( t.getLanguage().equalsIgnoreCase( this.getDefaultLanguage() ) )
             {
                 defaultText = t;
             }
-            if ( t.getLanguage().equals( language ) )
+            if ( t.getLanguage().equalsIgnoreCase( language ) )
+            {
+                return t;
+            }
+        }
+
+        return defaultText;
+    }
+
+    /**
+     * Gets a text for a given locale from the list of texts.
+     *
+     * @param locale The locale of the text to return.
+     *
+     * @return The first matching text or the default text, if no such text is found.
+     *
+     * @throws NullPointerException if {@code locale} is {@code null}.
+     *
+     * @see #getText()
+     * @see #getDefaultLanguage()
+     * @see Text#getLanguage()
+     *
+     * @since 1.4
+     */
+    public Text getText( final java.util.Locale locale )
+    {
+        if ( locale == null )
+        {
+            throw new NullPointerException( "locale" );
+        }
+
+        Text defaultText = null;
+
+        for ( int i = 0, s0 = this.getText().size(); i < s0; i++ )
+        {
+            final Text t = this.getText().get( i );
+
+            if ( t.getLanguage().equalsIgnoreCase( this.getDefaultLanguage() ) )
+            {
+                defaultText = t;
+            }
+            if ( t.getLanguage().equalsIgnoreCase( locale.getLanguage() ) )
             {
                 return t;
             }
@@ -97,6 +138,137 @@
       <jaxb:property>
         <jaxb:javadoc>Default text of this list.</jaxb:javadoc>
       </jaxb:property>
+    </jaxb:bindings>
+    <!-- *********************************************************************************************************** -->
+    <jaxb:bindings node="xs:complexType[@name='Text']">
+      <ci:code><![CDATA[
+    /**
+     * Gets the mime-type of the text.
+     *
+     * @return The mime-type of the text.
+     *
+     * @throws ModelObjectException if compiling the type to a {@code MimeType} fails.
+     *
+     * @see #getType()
+     *
+     * @since 1.4
+     */
+    public javax.activation.MimeType getMimeType() throws ModelObjectException
+    {
+        try
+        {
+            return new javax.activation.MimeType( this.getType() );
+        }
+        catch ( final javax.activation.MimeTypeParseException e )
+        {
+            throw new ModelObjectException( getMessage( "mimeTypeParseException", this.getType(),
+                                                        getMessage( e ) ), e );
+
+        }
+    }
+
+    /**
+     * Formats the text to a Javadoc comment.
+     *
+     * @param lineSeparator String to use for separating lines.
+     * @param indentation String to prepend any lines with.
+     *
+     * @return The Javadoc comment of the text or {@code null}.
+     *
+     * @throws NullPointerException if {@code lineSeparator} or {@code indentation} is {@code null}.
+     * @throws ModelObjectException if compiling the referenced type to a {@code MimeType} fails.
+     *
+     * @since 1.4
+     */
+    public String getJavadocComment( final String lineSeparator, final String indentation ) throws ModelObjectException
+    {
+        if ( lineSeparator == null )
+        {
+            throw new NullPointerException( "lineSeparator" );
+        }
+        if ( indentation == null )
+        {
+            throw new NullPointerException( "indentation" );
+        }
+
+        java.io.BufferedReader reader = null;
+
+        try
+        {
+            String javadocComment = null;
+
+            if ( this.getValue() != null )
+            {
+                reader = new java.io.BufferedReader( new java.io.StringReader( this.getValue() ) );
+                final StringBuilder builder = new StringBuilder( this.getValue().length() );
+                final boolean escapeHtml = !this.getMimeType().match( "text/html" );
+
+                String line;
+                while ( ( line = reader.readLine() ) != null )
+                {
+                    if ( escapeHtml )
+                    {
+                        builder.append( lineSeparator ).append( indentation ).append( " * " ).
+                            append( line.replace( "<", "&lt;" ).replace( ">", "&gt;" ).replace( "&", "&amp;" ).
+                            replace( "\"", "&quot;" ).replace( "*", "&lowast;" ) );
+
+                    }
+                    else
+                    {
+                        builder.append( lineSeparator ).append( indentation ).append( " * " ).append( line );
+                    }
+                }
+
+                if ( builder.length() > 0 )
+                {
+                    javadocComment =
+                        builder.substring( lineSeparator.length() + indentation.length() + " * ".length() );
+
+                }
+
+                reader.close();
+                reader = null;
+            }
+
+            return javadocComment;
+        }
+        catch ( final javax.activation.MimeTypeParseException e )
+        {
+            throw new AssertionError( e );
+        }
+        catch ( final java.io.IOException e )
+        {
+            throw new AssertionError( e );
+        }
+        finally
+        {
+            try
+            {
+                if ( reader != null )
+                {
+                    reader.close();
+                }
+            }
+            catch ( final java.io.IOException e )
+            {
+                throw new AssertionError( e );
+            }
+        }
+    }
+
+    private static String getMessage( final Throwable t )
+    {
+        return t != null ? t.getMessage() != null ? t.getMessage() : getMessage( t.getCause() ) : null;
+    }
+
+    private static String getMessage( final String key, final Object... arguments )
+    {
+        return java.text.MessageFormat.format( java.util.ResourceBundle.getBundle(
+            Text.class.getName().replace( '.', '/' ), java.util.Locale.getDefault() ).
+            getString( key ), arguments );
+
+    }]]>
+      </ci:code>
     </jaxb:bindings>
     <!-- *********************************************************************************************************** -->
     <jaxb:bindings node="xs:complexType[@name='ModelObject']/xs:sequence/xs:element[@ref='jomc:documentation']">
@@ -545,15 +717,17 @@
      *
      * @param specification The class of the specification to return.
      *
-     * @return The first matching specification or {@code null}, if no such specification is found.
+     * @return The first matching specification declaring {@code specification} or {@code null}, if no such
+     * specification is found.
      *
      * @throws NullPointerException if {@code specification} is {@code null}.
+     * @throws ModelObjectException if compiling the name of a referenced type to a {@code JavaTypeName} fails.
      *
      * @see #getSpecification()
      * @see Specification#isClassDeclaration()
      * @see Specification#getClazz()
      */
-    public Specification getSpecification( final Class<?> specification )
+    public Specification getSpecification( final Class<?> specification ) throws ModelObjectException
     {
         if ( specification == null )
         {
@@ -564,9 +738,12 @@
         {
             final Specification s = this.getSpecification().get( i );
 
-            if ( s.isClassDeclaration() && specification.getName().equals( s.getClazz() ) )
+            if ( s.isClassDeclaration() && s.getClazz() != null )
             {
-                return s;
+                if ( specification.getName().equals( s.getJavaTypeName().getClassName() ) )
+                {
+                    return s;
+                }
             }
         }
 
@@ -650,22 +827,67 @@
     <jaxb:bindings node="xs:complexType[@name='Specification']">
       <ci:code><![CDATA[
     /**
-     * Gets the Java class of the specification for a given class loader.
+     * Gets the Java class of the type referenced by the specification for a given class loader.
      *
      * @param classLoader The class loader to get the Java class from or {@code null}, to get the Java class from the
      * platform's bootstrap class loader.
      *
-     * @return The Java class of the specification or {@code null}, if the specification does not declare a class.
+     * @return The Java class of the type referenced by the specification or {@code null}, if the specification does not
+     * reference a type.
      *
      * @throws ClassNotFoundException if the Java class is not found.
+     * @throws ModelObjectException if compiling the name of the referenced type to a {@code JavaTypeName} fails.
      *
      * @see #getClazz()
+     * @see #getJavaTypeName()
      *
      * @since 1.2
      */
-    public Class<?> getJavaClass( final ClassLoader classLoader ) throws ClassNotFoundException
+    public Class<?> getJavaClass( final ClassLoader classLoader )
+        throws ClassNotFoundException, ModelObjectException
     {
-        return this.getClazz() != null ? Class.forName( this.getClazz(), false, classLoader ) : null;
+        Class<?> javaClass = null;
+        final JavaTypeName javaTypeName = this.getJavaTypeName();
+
+        if ( javaTypeName != null )
+        {
+            javaClass = javaTypeName.getClass( classLoader, false );
+        }
+
+        return javaClass;
+    }
+
+    /**
+     * Gets the Java type name of the type referenced by the specification.
+     *
+     * @return The Java type name of the type referenced by the specification or {@code null}, if the specification does
+     * not reference a type.
+     *
+     * @throws ModelObjectException if compiling the name of the referenced type to a {@code JavaTypeName} fails.
+     *
+     * @see #getClazz()
+     *
+     * @since 1.4
+     */
+    public JavaTypeName getJavaTypeName() throws ModelObjectException
+    {
+        try
+        {
+            JavaTypeName javaTypeName = null;
+
+            if ( this.getClazz() != null )
+            {
+                javaTypeName = JavaTypeName.parse( this.getClazz() );
+            }
+
+            return javaTypeName;
+        }
+        catch ( final java.text.ParseException e )
+        {
+            throw new ModelObjectException( getMessage( "javaTypeNameParseException", this.getClazz(),
+                                                        getMessage( e ) ), e );
+
+        }
     }
 
     /**
@@ -753,6 +975,19 @@
     public <T> java.util.List<T> getAnyObjects( final Class<T> clazz )
     {
         return this.getAnyObjects( this.getAny(), clazz );
+    }
+
+    private static String getMessage( final Throwable t )
+    {
+        return t != null ? t.getMessage() != null ? t.getMessage() : getMessage( t.getCause() ) : null;
+    }
+
+    private static String getMessage( final String key, final Object... arguments )
+    {
+        return java.text.MessageFormat.format( java.util.ResourceBundle.getBundle(
+            Specification.class.getName().replace( '.', '/' ), java.util.Locale.getDefault() ).
+            getString( key ), arguments );
+
     }]]>
       </ci:code>
     </jaxb:bindings>
@@ -820,15 +1055,17 @@
      *
      * @param implementation The class of the implementation to return.
      *
-     * @return The first matching implementation or {@code null}, if no such implementation is found.
+     * @return The first matching implementation declaring {@code implementation} or {@code null}, if no such
+     * implementation is found.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
+     * @throws ModelObjectException if compiling the name of a referenced type to a {@code JavaTypeName} fails.
      *
      * @see #getImplementation()
      * @see Implementation#isClassDeclaration()
      * @see Implementation#getClazz()
      */
-    public Implementation getImplementation( final Class<?> implementation )
+    public Implementation getImplementation( final Class<?> implementation ) throws ModelObjectException
     {
         if ( implementation == null )
         {
@@ -839,9 +1076,12 @@
         {
             final Implementation current = this.getImplementation().get( i );
 
-            if ( current.isClassDeclaration() && implementation.getName().equals( current.getClazz() ) )
+            if ( current.isClassDeclaration() && current.getClazz() != null )
             {
-                return current;
+                if ( implementation.getName().equals( current.getJavaTypeName().getClassName() ) )
+                {
+                    return current;
+                }
             }
         }
 
@@ -992,22 +1232,67 @@
     <jaxb:bindings node="xs:complexType[@name='Implementation']">
       <ci:code><![CDATA[
     /**
-     * Gets the Java class of the implementation for a given class loader.
+     * Gets the Java class of the type referenced by the implementation for a given class loader.
      *
      * @param classLoader The class loader to get the Java class from or {@code null}, to get the Java class from the
      * platform's bootstrap class loader.
      *
-     * @return The Java class of the implementation or {@code null}, if the implementation does not declare a class.
+     * @return The Java class of the type referenced by the implementation or {@code null}, if the implementation does
+     * not reference a type.
      *
      * @throws ClassNotFoundException if the Java class is not found.
+     * @throws ModelObjectException if compiling the name of the referenced type to a {@code JavaTypeName} fails.
      *
      * @see #getClazz()
+     * @see #getJavaTypeName()
      *
      * @since 1.2
      */
-    public Class<?> getJavaClass( final ClassLoader classLoader ) throws ClassNotFoundException
+    public Class<?> getJavaClass( final ClassLoader classLoader )
+        throws ClassNotFoundException, ModelObjectException
     {
-        return this.getClazz() != null ? Class.forName( this.getClazz(), false, classLoader ) : null;
+        Class<?> javaClass = null;
+        final JavaTypeName javaTypeName = this.getJavaTypeName();
+
+        if ( javaTypeName != null )
+        {
+            javaClass = javaTypeName.getClass( classLoader, false );
+        }
+
+        return javaClass;
+    }
+
+    /**
+     * Gets the Java type name of the type referenced by the implementation.
+     *
+     * @return The Java type name of the type referenced by the implementation or {@code null}, if the implementation
+     * does not reference a type.
+     *
+     * @throws ModelObjectException if compiling the name of the referenced type to a {@code JavaTypeName} fails.
+     *
+     * @see #getClazz()
+     *
+     * @since 1.4
+     */
+    public JavaTypeName getJavaTypeName() throws ModelObjectException
+    {
+        try
+        {
+            JavaTypeName javaTypeName = null;
+
+            if ( this.getClazz() != null )
+            {
+                javaTypeName = JavaTypeName.parse( this.getClazz() );
+            }
+
+            return javaTypeName;
+        }
+        catch ( final java.text.ParseException e )
+        {
+            throw new ModelObjectException( getMessage( "javaTypeNameParseException", this.getClazz(),
+                                                        getMessage( e ) ), e );
+
+        }
     }
 
     /**
@@ -1016,9 +1301,11 @@
      * @return The location URI used for locating instances of this implementation or {@code null}, if instances of this
      * implementation do not need to be located.
      *
+     * @throws ModelObjectException if compiling the location to an {@code URI} object fails.
+     *
      * @see #getLocation()
      */
-    public java.net.URI getLocationUri()
+    public java.net.URI getLocationUri() throws ModelObjectException
     {
         try
         {
@@ -1033,7 +1320,9 @@
         }
         catch ( final java.net.URISyntaxException e )
         {
-            throw new AssertionError( e );
+            throw new ModelObjectException( getMessage( "uriSyntaxException", this.getLocation(),
+                                                        getMessage( e ) ), e );
+
         }
     }
 
@@ -1122,6 +1411,19 @@
     public <T> java.util.List<T> getAnyObjects( final Class<T> clazz )
     {
         return this.getAnyObjects( this.getAny(), clazz );
+    }
+
+    private static String getMessage( final Throwable t )
+    {
+        return t != null ? t.getMessage() != null ? t.getMessage() : getMessage( t.getCause() ) : null;
+    }
+
+    private static String getMessage( final String key, final Object... arguments )
+    {
+        return java.text.MessageFormat.format( java.util.ResourceBundle.getBundle(
+            Implementation.class.getName().replace( '.', '/' ), java.util.Locale.getDefault() ).
+            getString( key ), arguments );
+
     }]]>
       </ci:code>
     </jaxb:bindings>
@@ -1260,6 +1562,114 @@
     <jaxb:bindings node="xs:complexType[@name='Dependency']">
       <ci:code><![CDATA[
     /**
+     * Gets the Java getter method name of the dependency.
+     *
+     * @return The Java getter method name of the dependency.
+     *
+     * @throws ModelObjectException if compiling the name of the dependency to a {@code JavaIdentifier} fails.
+     *
+     * @since 1.4
+     *
+     * @see #getName()
+     */
+    public JavaIdentifier getJavaGetterMethodName() throws ModelObjectException
+    {
+        try
+        {
+            return JavaIdentifier.parse( "get" + JavaIdentifier.normalize(
+                this.getName() != null ? this.getName() : "", JavaIdentifier.NormalizationMode.CAMEL_CASE ) );
+
+        }
+        catch ( final java.text.ParseException e )
+        {
+            throw new ModelObjectException( getMessage( "javaIdentifierParseException", this.getName(),
+                                                        getMessage( e ) ), e );
+
+        }
+    }
+
+    /**
+     * Gets the Java setter method name of the dependency.
+     *
+     * @return The Java setter method name of the dependency.
+     *
+     * @throws ModelObjectException if compiling the name of the dependency to a {@code JavaIdentifier} fails.
+     *
+     * @since 1.4
+     *
+     * @see #getName()
+     */
+    public JavaIdentifier getJavaSetterMethodName() throws ModelObjectException
+    {
+        try
+        {
+            return JavaIdentifier.parse( "set" + JavaIdentifier.normalize(
+                this.getName() != null ? this.getName() : "", JavaIdentifier.NormalizationMode.CAMEL_CASE ) );
+
+        }
+        catch ( final java.text.ParseException e )
+        {
+            throw new ModelObjectException( getMessage( "javaIdentifierParseException", this.getName(),
+                                                        getMessage( e ) ), e );
+
+        }
+    }
+
+    /**
+     * Gets the Java variable name of the dependency.
+     *
+     * @return The Java variable name of the dependency.
+     *
+     * @throws ModelObjectException if compiling the name of the dependency to a {@code JavaIdentifier} fails.
+     *
+     * @since 1.4
+     *
+     * @see #getName()
+     */
+    public JavaIdentifier getJavaVariableName() throws ModelObjectException
+    {
+        try
+        {
+            return JavaIdentifier.normalize( this.getName() != null ? this.getName() : "",
+                                             JavaIdentifier.NormalizationMode.VARIABLE_NAME_CONVENTION );
+
+        }
+        catch ( final java.text.ParseException e )
+        {
+            throw new ModelObjectException( getMessage( "javaIdentifierParseException", this.getName(),
+                                                        getMessage( e ) ), e );
+
+        }
+    }
+
+    /**
+     * Gets the Java constant name of the dependency.
+     *
+     * @return The Java constant name of the dependency.
+     *
+     * @throws ModelObjectException if compiling the name of the dependency to a {@code JavaIdentifier} fails.
+     *
+     * @since 1.4
+     *
+     * @see #getName()
+     */
+    public JavaIdentifier getJavaConstantName() throws ModelObjectException
+    {
+        try
+        {
+            return JavaIdentifier.normalize( this.getName() != null ? this.getName() : "",
+                                             JavaIdentifier.NormalizationMode.CONSTANT_NAME_CONVENTION );
+
+        }
+        catch ( final java.text.ParseException e )
+        {
+            throw new ModelObjectException( getMessage( "javaIdentifierParseException", this.getName(),
+                                                        getMessage( e ) ), e );
+
+        }
+    }
+
+    /**
      * Gets a single {@code JAXBElement} matching a namespace URI and local part from the {@code any} property of the
      * instance.
      *
@@ -1344,6 +1754,19 @@
     public <T> java.util.List<T> getAnyObjects( final Class<T> clazz )
     {
         return this.getAnyObjects( this.getAny(), clazz );
+    }
+
+    private static String getMessage( final Throwable t )
+    {
+        return t != null ? t.getMessage() != null ? t.getMessage() : getMessage( t.getCause() ) : null;
+    }
+
+    private static String getMessage( final String key, final Object... arguments )
+    {
+        return java.text.MessageFormat.format( java.util.ResourceBundle.getBundle(
+            Dependency.class.getName().replace( '.', '/' ), java.util.Locale.getDefault() ).
+            getString( key ), arguments );
+
     }]]>
       </ci:code>
     </jaxb:bindings>
@@ -1506,9 +1929,12 @@
      *
      * @return The Java value of the property or {@code null}.
      *
+     * @throws ModelObjectException if compiling the name of the type to a {@code JavaTypeName} fails.
      * @throws PropertyException if getting the Java value of the property fails unexpectedly.
+     *
+     * @see #getJavaTypeName()
      */
-    public Object getJavaValue( final ClassLoader classLoader ) throws PropertyException
+    public Object getJavaValue( final ClassLoader classLoader ) throws ModelObjectException, PropertyException
     {
         try
         {
@@ -1519,88 +1945,174 @@
                     throw new PropertyException( getMessage( "mandatoryType", this.getName() ) );
                 }
 
-                String typeName = this.getType();
-                final int idx = typeName.indexOf( "<" );
-                if ( idx != -1 )
-                {
-                    typeName = typeName.substring( 0, idx );
-                }
-
-                final Class<?> javaType = Class.forName( typeName, false, classLoader );
                 final Object anyObject = this.getAny() instanceof JAXBElement
                                          ? ( (JAXBElement) this.getAny() ).getValue() : this.getAny();
 
-                return this.getJavaValue( classLoader, anyObject, javaType );
+                return this.getJavaValue( classLoader, anyObject,
+                                          this.getJavaTypeName().getClass( classLoader, false ) );
+
             }
-
-            Class<?> javaType = String.class;
-            boolean primitive = false;
-
-            if ( this.getType() != null )
+            else
             {
-                if ( Boolean.TYPE.getName().equals( this.getType() ) )
+                if ( this.getJavaTypeName().isPrimitive() && this.getValue() == null )
                 {
-                    javaType = Boolean.class;
-                    primitive = true;
-                }
-                else if ( Byte.TYPE.getName().equals( this.getType() ) )
-                {
-                    javaType = Byte.class;
-                    primitive = true;
-                }
-                else if ( Character.TYPE.getName().equals( this.getType() ) )
-                {
-                    javaType = Character.class;
-                    primitive = true;
-                }
-                else if ( Double.TYPE.getName().equals( this.getType() ) )
-                {
-                    javaType = Double.class;
-                    primitive = true;
-                }
-                else if ( Float.TYPE.getName().equals( this.getType() ) )
-                {
-                    javaType = Float.class;
-                    primitive = true;
-                }
-                else if ( Integer.TYPE.getName().equals( this.getType() ) )
-                {
-                    javaType = Integer.class;
-                    primitive = true;
-                }
-                else if ( Long.TYPE.getName().equals( this.getType() ) )
-                {
-                    javaType = Long.class;
-                    primitive = true;
-                }
-                else if ( Short.TYPE.getName().equals( this.getType() ) )
-                {
-                    javaType = Short.class;
-                    primitive = true;
-                }
-                else
-                {
-                    String typeName = this.getType();
-                    final int idx = typeName.indexOf( "<" );
-                    if ( idx != -1 )
-                    {
-                        typeName = typeName.substring( 0, idx );
-                    }
+                    throw new PropertyException( getMessage( "mandatoryPrimitiveValue", this.getName(),
+                                                             this.getType() ) );
 
-                    javaType = Class.forName( typeName, false, classLoader );
                 }
+
+                return this.getJavaValue( this.getJavaTypeName().isPrimitive()
+                                          ? this.getJavaTypeName().getBoxedName().getClass( classLoader, false )
+                                          : this.getJavaTypeName().getClass( classLoader, false ),
+                                          this.getValue() );
+
             }
-
-            if ( this.getValue() == null && primitive )
-            {
-                throw new PropertyException( getMessage( "mandatoryPrimitiveValue", this.getName(), this.getType() ) );
-            }
-
-            return this.getJavaValue( javaType, this.getValue() );
         }
         catch ( final ClassNotFoundException e )
         {
             throw new PropertyException( getMessage( "classNotFound", this.getName(), this.getType() ), e );
+        }
+    }
+
+    /**
+     * Gets the Java type name of the property.
+     *
+     * @return The Java type name of the type referenced by the property or {@code null}, if the property does not
+     * reference a type.
+     *
+     * @throws ModelObjectException if compiling the name of the type referenced by the property to a
+     * {@code JavaTypeName} fails.
+     *
+     * @since 1.4
+     */
+    public JavaTypeName getJavaTypeName() throws ModelObjectException
+    {
+        final String typeName = this.getType() == null
+                                ? this.getAny() == null
+                                  ? String.class.getName()
+                                  : Object.class.getName()
+                                : this.getType();
+
+        try
+        {
+            return JavaTypeName.parse( typeName );
+        }
+        catch ( final java.text.ParseException e )
+        {
+            throw new ModelObjectException( getMessage( "javaTypeNameParseException", typeName, getMessage( e ) ), e );
+        }
+    }
+
+    /**
+     * Gets the Java getter method name of the property.
+     *
+     * @return The Java getter method name of the property.
+     *
+     * @throws ModelObjectException if compiling the name of the type referenced by the property to a
+     * {@code JavaTypeName} fails or if compiling the name of the property to a {@code JavaIdentifier} fails.
+     *
+     * @since 1.4
+     *
+     * @see #getName()
+     */
+    public JavaIdentifier getJavaGetterMethodName() throws ModelObjectException
+    {
+        try
+        {
+            final JavaTypeName javaType = this.getJavaTypeName();
+            final String prefix = javaType.runtimeEquals( JavaTypeName.BOOLEAN )
+                                  || javaType.runtimeEquals( JavaTypeName.BOOLEAN_TYPE ) ? "is" : "get";
+
+            return JavaIdentifier.parse( prefix + JavaIdentifier.normalize(
+                this.getName() != null ? this.getName() : "", JavaIdentifier.NormalizationMode.CAMEL_CASE ) );
+
+        }
+        catch ( final java.text.ParseException e )
+        {
+            throw new ModelObjectException( getMessage( "javaIdentifierParseException", this.getName(),
+                                                        getMessage( e ) ), e );
+
+        }
+    }
+
+    /**
+     * Gets the Java setter method name of the property.
+     *
+     * @return The Java setter method name of the property.
+     *
+     * @throws ModelObjectException if compiling the name of the property to a {@code JavaIdentifier} fails.
+     *
+     * @since 1.4
+     *
+     * @see #getName()
+     */
+    public JavaIdentifier getJavaSetterMethodName() throws ModelObjectException
+    {
+        try
+        {
+            return JavaIdentifier.parse( "set" + JavaIdentifier.normalize(
+                this.getName() != null ? this.getName() : "", JavaIdentifier.NormalizationMode.CAMEL_CASE ) );
+
+        }
+        catch ( final java.text.ParseException e )
+        {
+            throw new ModelObjectException( getMessage( "javaIdentifierParseException", this.getName(),
+                                                        getMessage( e ) ), e );
+
+        }
+    }
+
+    /**
+     * Gets the Java variable name of the property.
+     *
+     * @return The Java variable name of the property.
+     *
+     * @throws ModelObjectException if compiling the name of the property to a {@code JavaIdentifier} fails.
+     *
+     * @since 1.4
+     *
+     * @see #getName()
+     */
+    public JavaIdentifier getJavaVariableName() throws ModelObjectException
+    {
+        try
+        {
+            return JavaIdentifier.normalize( this.getName() != null ? this.getName() : "",
+                                             JavaIdentifier.NormalizationMode.VARIABLE_NAME_CONVENTION );
+
+        }
+        catch ( final java.text.ParseException e )
+        {
+            throw new ModelObjectException( getMessage( "javaIdentifierParseException", this.getName(),
+                                                        getMessage( e ) ), e );
+
+        }
+    }
+
+    /**
+     * Gets the Java constant name of the message.
+     *
+     * @return The Java constant name of the message.
+     *
+     * @throws ModelObjectException if compiling the name of the property to a {@code JavaIdentifier} fails.
+     *
+     * @since 1.4
+     *
+     * @see #getName()
+     */
+    public JavaIdentifier getJavaConstantName() throws ModelObjectException
+    {
+        try
+        {
+            return JavaIdentifier.normalize( this.getName() != null ? this.getName() : "",
+                                             JavaIdentifier.NormalizationMode.CONSTANT_NAME_CONVENTION );
+
+        }
+        catch ( final java.text.ParseException e )
+        {
+            throw new ModelObjectException( getMessage( "javaIdentifierParseException", this.getName(),
+                                                        getMessage( e ) ), e );
+
         }
     }
 
@@ -1715,6 +2227,11 @@
         }
 
         return value;
+    }
+
+    private static String getMessage( final Throwable t )
+    {
+        return t != null ? t.getMessage() != null ? t.getMessage() : getMessage( t.getCause() ) : null;
     }
 
     private static String getMessage( final String key, final Object... arguments )
@@ -1945,24 +2462,28 @@
      * @return A Java {@code MessageFormat} instance for {@code locale}.
      *
      * @throws NullPointerException if {@code locale} is {@code null}.
+     * @throws ModelObjectException if compiling the template of the message for {@code locale} to a
+     * {@code MessageFormat} fails.
      *
      * @see #getTemplate()
      *
      * @since 1.2
      */
-    public java.text.MessageFormat getJavaMessage( final Locale locale )
+    public java.text.MessageFormat getJavaMessage( final Locale locale ) throws ModelObjectException
     {
         if ( locale == null )
         {
             throw new NullPointerException( "locale" );
         }
 
+        final Text text = this.getTemplate().getText( locale.getLanguage().toLowerCase( Locale.ENGLISH ) );
+        final StringBuilder builder = new StringBuilder( text.getValue().length() );
+        String pattern = null;
+
         try
         {
-            final Text text = this.getTemplate().getText( locale.getLanguage().toLowerCase( Locale.ENGLISH ) );
-            final StringBuilder builder = new StringBuilder( text.getValue().length() );
-            final java.io.BufferedReader reader = new java.io.BufferedReader(
-                new java.io.StringReader( text.getValue() ) );
+            final java.io.BufferedReader reader =
+                new java.io.BufferedReader( new java.io.StringReader( text.getValue() ) );
 
             String line;
             while ( ( line = reader.readLine() ) != null )
@@ -1970,15 +2491,139 @@
                 builder.append( LINE_SEPARATOR ).append( line );
             }
 
-            return new java.text.MessageFormat( builder.length() > 0
-                                                ? builder.substring( LINE_SEPARATOR.length() )
-                                                : builder.toString(), locale );
+            pattern = builder.length() > 0 ? builder.substring( LINE_SEPARATOR.length() ) : builder.toString();
+            return new java.text.MessageFormat( pattern, locale );
 
+        }
+        catch ( final IllegalArgumentException e )
+        {
+            throw new ModelObjectException( getMessage( "javaMessageParseException", pattern, getMessage( e ) ), e );
         }
         catch ( final java.io.IOException e )
         {
             throw new AssertionError( e );
         }
+    }
+
+    /**
+     * Gets the Java getter method name of the message.
+     *
+     * @return The Java getter method name of the message.
+     *
+     * @throws ModelObjectException if compiling the name of the message to a {@code JavaIdentifier} fails.
+     *
+     * @since 1.4
+     *
+     * @see #getName()
+     */
+    public JavaIdentifier getJavaGetterMethodName() throws ModelObjectException
+    {
+        try
+        {
+            return JavaIdentifier.parse( "get" + JavaIdentifier.normalize(
+                this.getName() != null ? this.getName() : "", JavaIdentifier.NormalizationMode.CAMEL_CASE ) );
+
+        }
+        catch ( final java.text.ParseException e )
+        {
+            throw new ModelObjectException( getMessage( "javaIdentifierParseException", this.getName(),
+                                                        getMessage( e ) ), e );
+
+        }
+    }
+
+    /**
+     * Gets the Java setter method name of the message.
+     *
+     * @return The Java setter method name of the message.
+     *
+     * @throws ModelObjectException if compiling the name of the message to a {@code JavaIdentifier} fails.
+     *
+     * @since 1.4
+     *
+     * @see #getName()
+     */
+    public JavaIdentifier getJavaSetterMethodName() throws ModelObjectException
+    {
+        try
+        {
+            return JavaIdentifier.parse( "set" + JavaIdentifier.normalize(
+                this.getName() != null ? this.getName() : "", JavaIdentifier.NormalizationMode.CAMEL_CASE ) );
+
+        }
+        catch ( final java.text.ParseException e )
+        {
+            throw new ModelObjectException( getMessage( "javaIdentifierParseException", this.getName(),
+                                                        getMessage( e ) ), e );
+
+        }
+    }
+
+    /**
+     * Gets the Java variable name of the message.
+     *
+     * @return The Java variable name of the message.
+     *
+     * @throws ModelObjectException if compiling the name of the message to a {@code JavaIdentifier} fails.
+     *
+     * @since 1.4
+     *
+     * @see #getName()
+     */
+    public JavaIdentifier getJavaVariableName() throws ModelObjectException
+    {
+        try
+        {
+            return JavaIdentifier.normalize( this.getName() != null ? this.getName() : "",
+                                             JavaIdentifier.NormalizationMode.VARIABLE_NAME_CONVENTION );
+
+        }
+        catch ( final java.text.ParseException e )
+        {
+            throw new ModelObjectException( getMessage( "javaIdentifierParseException", this.getName(),
+                                                        getMessage( e ) ), e );
+
+        }
+    }
+
+    /**
+     * Gets the Java constant name of the message.
+     *
+     * @return The Java constant name of the message.
+     *
+     * @throws ModelObjectException if compiling the name of the message to a {@code JavaIdentifier} fails.
+     *
+     * @since 1.4
+     *
+     * @see #getName()
+     */
+    public JavaIdentifier getJavaConstantName() throws ModelObjectException
+    {
+        try
+        {
+            return JavaIdentifier.normalize( this.getName() != null ? this.getName() : "",
+                                             JavaIdentifier.NormalizationMode.CONSTANT_NAME_CONVENTION );
+
+        }
+        catch ( final java.text.ParseException e )
+        {
+            throw new ModelObjectException( getMessage( "javaIdentifierParseException", this.getName(),
+                                                        getMessage( e ) ), e );
+
+        }
+    }
+
+    private static String getMessage( final Throwable t )
+    {
+        return t != null ? t.getMessage() != null ? t.getMessage() : getMessage( t.getCause() ) : null;
+    }
+
+    private static String getMessage( final String key, final Object... arguments )
+    {
+        return java.text.MessageFormat.format( java.util.ResourceBundle.getBundle(
+            Message.class.getName().replace( '.', '/' ), java.util.Locale.getDefault() ).
+            getString( key ), arguments );
+
     }]]>
       </ci:code>
     </jaxb:bindings>
@@ -2089,6 +2734,70 @@
     <jaxb:bindings node="xs:complexType[@name='Argument']">
       <ci:code><![CDATA[
     /**
+     * Gets the Java type name of the type referenced by the argument.
+     *
+     * @return The Java type name of the type referenced by the argument or {@code null}, if the argument does not
+     * reference a type.
+     *
+     * @throws ModelObjectException if compiling the name of the referenced type to a {@code JavaTypeName} fails.
+     *
+     * @since 1.4
+     *
+     * @see #getType()
+     */
+    public JavaTypeName getJavaTypeName() throws ModelObjectException
+    {
+        try
+        {
+            String typeName = "java.lang.String";
+
+            if ( this.getType() == ArgumentType.DATE || this.getType() == ArgumentType.TIME )
+            {
+                typeName = "java.util.Date";
+            }
+            else if ( this.getType() == ArgumentType.NUMBER )
+            {
+                typeName = "java.lang.Number";
+            }
+
+            return JavaTypeName.parse( typeName );
+        }
+        catch ( final java.text.ParseException e )
+        {
+            throw new ModelObjectException( getMessage( "javaTypeNameParseException", this.getType(), getMessage( e ) ),
+                                            e );
+
+        }
+    }
+
+    /**
+     * Gets the Java variable name of the argument.
+     *
+     * @return The Java variable name of the argument.
+     *
+     * @throws ModelObjectException if compiling the name of the argument to a {@code JavaIdentifier} fails.
+     *
+     * @since 1.4
+     *
+     * @see #getName()
+     */
+    public JavaIdentifier getJavaVariableName() throws ModelObjectException
+    {
+        try
+        {
+            return JavaIdentifier.normalize( this.getName() != null ? this.getName() : "",
+                                             JavaIdentifier.NormalizationMode.VARIABLE_NAME_CONVENTION );
+
+        }
+        catch ( final java.text.ParseException e )
+        {
+            throw new ModelObjectException( getMessage( "javaMethodParameterNameParseException", this.getName(),
+                                                        getMessage( e ) ), e );
+
+        }
+    }
+
+    /**
      * Gets a single {@code JAXBElement} matching a namespace URI and local part from the {@code any} property of the
      * instance.
      *
@@ -2173,6 +2882,19 @@
     public <T> java.util.List<T> getAnyObjects( final Class<T> clazz )
     {
         return this.getAnyObjects( this.getAny(), clazz );
+    }
+
+    private static String getMessage( final Throwable t )
+    {
+        return t != null ? t.getMessage() != null ? t.getMessage() : getMessage( t.getCause() ) : null;
+    }
+
+    private static String getMessage( final String key, final Object... arguments )
+    {
+        return java.text.MessageFormat.format( java.util.ResourceBundle.getBundle(
+            Argument.class.getName().replace( '.', '/' ), java.util.Locale.getDefault() ).
+            getString( key ), arguments );
+
     }]]>
       </ci:code>
     </jaxb:bindings>
@@ -2332,40 +3054,55 @@
     }
 
     /**
-     * Gets the Java class of the instance for a given class loader.
+     * Gets the Java class of the type referenced by the instance for a given class loader.
      *
      * @param classLoader The class loader to get the Java class from or {@code null}, to get the Java class from the
      * platform's bootstrap class loader.
      *
-     * @return The Java class of the instance.
+     * @return The Java class of the type referenced by the instance or {@code null}, if the instance does not reference
+     * a type.
      *
      * @throws ClassNotFoundException if the Java class is not found.
+     * @throws ModelObjectException if compiling the name of the referenced type to a {@code JavaTypeName} fails.
      *
      * @see #getClazz()
+     * @see #getJavaTypeName()
      *
      * @since 1.2
      */
-    public Class<?> getJavaClass( final ClassLoader classLoader ) throws ClassNotFoundException
+    public Class<?> getJavaClass( final ClassLoader classLoader )
+        throws ClassNotFoundException, ModelObjectException
     {
-        return Class.forName( this.getClazz(), false, classLoader );
+        Class<?> javaClass = null;
+        final JavaTypeName javaTypeName = this.getJavaTypeName();
+
+        if ( javaTypeName != null )
+        {
+            javaClass = javaTypeName.getClass( classLoader, false );
+        }
+
+        return javaClass;
     }
 
     /**
-     * Gets the Java classes of all specifications of the instance for a given class loader.
+     * Gets the Java classes of all types referenced by the specifications of the instance for a given class loader.
      *
      * @param classLoader The class loader to get the Java classes from or {@code null}, to get the Java classes from
      * the platform's bootstrap class loader.
      *
-     * @return The Java classes of all specifications of the instance.
+     * @return The Java classes of all types referenced by the specifications of the instance.
      *
      * @throws ClassNotFoundException if a Java class is not found.
+     * @throws ModelObjectException if parsing a name of a referenced type to a {@code JavaTypeName} fails.
      *
      * @see #getSpecifications()
      * @see Specification#getClazz()
+     * @see Specification#getJavaClass(java.lang.ClassLoader)
      *
      * @since 1.2
      */
-    public Class<?>[] getJavaClasses( final ClassLoader classLoader ) throws ClassNotFoundException
+    public Class<?>[] getJavaClasses( final ClassLoader classLoader )
+        throws ClassNotFoundException, ModelObjectException
     {
         final java.util.Set<Class<?>> classes = new java.util.HashSet<Class<?>>();
 
@@ -2374,11 +3111,11 @@
             for ( int i = 0, s0 = this.getSpecifications().getSpecification().size(); i < s0; i++ )
             {
                 final Specification s = this.getSpecifications().getSpecification().get( i );
-                final Class<?> javaClass = s.getJavaClass( classLoader );
+                final JavaTypeName javaTypeName = s.getJavaTypeName();
 
-                if ( javaClass != null )
+                if ( javaTypeName != null )
                 {
-                    classes.add( javaClass );
+                    classes.add( javaTypeName.getClass( classLoader, false ) );
                 }
             }
         }
@@ -2392,31 +3129,38 @@
      * @param classLoader The class loader to get the Java class from or {@code null}, to get the Java class from the
      * platform's bootstrap class loader.
      *
-     * @return The public default Java constructor of the Java class of the instance or {@code null}, if that class
-     * does not declare such a constructor, is abstract or is not public.
+     * @return The public default Java constructor of the Java class of the instance or {@code null}, if the instance
+     * does not reference a type, or if the class is not accessible or abstract or does not declare such a constructor.
      *
      * @throws ClassNotFoundException if the Java class is not found.
+     * @throws ModelObjectException if compiling the name of the type referenced by the instance to a
+     * {@code JavaTypeName} fails.
      *
      * @see #getJavaClass(java.lang.ClassLoader)
      *
      * @since 1.2
      */
     public java.lang.reflect.Constructor<?> getJavaConstructor( final ClassLoader classLoader )
-        throws ClassNotFoundException
+        throws ClassNotFoundException, ModelObjectException
     {
         java.lang.reflect.Constructor<?> javaConstructor = null;
-        final Class<?> javaClass = this.getJavaClass( classLoader );
+        final JavaTypeName javaTypeName = this.getJavaTypeName();
 
-        if ( java.lang.reflect.Modifier.isPublic( javaClass.getModifiers() )
-             && !java.lang.reflect.Modifier.isAbstract( javaClass.getModifiers() ) )
+        if ( javaTypeName != null )
         {
-            try
+            final Class<?> javaClass = javaTypeName.getClass( classLoader, false );
+
+            if ( java.lang.reflect.Modifier.isPublic( javaClass.getModifiers() )
+                 && !java.lang.reflect.Modifier.isAbstract( javaClass.getModifiers() ) )
             {
-                javaConstructor = javaClass.getConstructor( NO_CLASSES );
-            }
-            catch ( final NoSuchMethodException e )
-            {
-                javaConstructor = null;
+                try
+                {
+                    javaConstructor = javaClass.getConstructor( NO_CLASSES );
+                }
+                catch ( final NoSuchMethodException e )
+                {
+                    javaConstructor = null;
+                }
             }
         }
 
@@ -2429,37 +3173,34 @@
      * @return The name of the Java method to use for creating objects of the instance or {@code null}, if no such
      * method name is supported.
      *
+     * @throws ModelObjectException if compiling the name of the instance to a {@code JavaIdentifier} fails.
+     *
      * @see #getName()
      *
      * @since 1.2
      */
-    public String getJavaFactoryMethodName()
+    public String getJavaFactoryMethodName() throws ModelObjectException
     {
-        String methodName = null;
-
-        char[] c = this.getName().toCharArray();
-        c[0] = Character.toUpperCase( c[0] );
-        methodName = "get" + String.valueOf( c );
-
-        boolean javaIdentifier = Character.isJavaIdentifierStart( c[0] );
-        if ( javaIdentifier )
+        try
         {
-            for ( int idx = c.length - 1; idx > 0; idx-- )
+            String javaFactoryMethodName = null;
+
+            if ( this.getName() != null )
             {
-                if ( !Character.isJavaIdentifierPart( c[idx] ) )
-                {
-                    javaIdentifier = false;
-                    break;
-                }
+                javaFactoryMethodName =
+                    JavaIdentifier.parse( "get" + JavaIdentifier.normalize(
+                    this.getName(), JavaIdentifier.NormalizationMode.CAMEL_CASE ) ).toString();
+
             }
-        }
 
-        if ( !javaIdentifier )
+            return javaFactoryMethodName;
+        }
+        catch ( final java.text.ParseException e )
         {
-            methodName = null;
-        }
+            throw new ModelObjectException( getMessage( "javaIdentifierParseException", this.getName(),
+                                                        getMessage( e ) ), e );
 
-        return methodName;
+        }
     }
 
     /**
@@ -2469,9 +3210,11 @@
      * platform's bootstrap class loader.
      *
      * @return The public Java method of the Java class of the instance to use for creating objects of the instance or
-     * {@code null}, if that class does not declare such a method.
+     * {@code null}, if the instance does not reference a type or no such method is supported.
      *
      * @throws ClassNotFoundException if the Java class is not found.
+     * @throws ModelObjectException if compiling the name of the type referenced by the instance to a
+     * {@code JavaTypeName} or if compiling the name of the instance to a {@code JavaIdentifier} fails.
      *
      * @see #getJavaClass(java.lang.ClassLoader)
      * @see #getJavaFactoryMethodName()
@@ -2479,33 +3222,38 @@
      * @since 1.2
      */
     public java.lang.reflect.Method getJavaFactoryMethod( final ClassLoader classLoader )
-        throws ClassNotFoundException
+        throws ClassNotFoundException, ModelObjectException
     {
-        final Class<?> javaClass = this.getJavaClass( classLoader );
+        final JavaTypeName javaTypeName = this.getJavaTypeName();
         java.lang.reflect.Method factoryMethod = null;
-        String methodName = this.getJavaFactoryMethodName();
 
-        if ( methodName != null )
+        if ( javaTypeName != null )
         {
-            try
-            {
-                factoryMethod = javaClass.getMethod( methodName, (Class[]) null );
-            }
-            catch ( final NoSuchMethodException e )
-            {
-                factoryMethod = null;
-            }
-        }
+            final Class<?> javaClass = javaTypeName.getClass( classLoader, false );
+            final String methodName = this.getJavaFactoryMethodName();
 
-        if ( factoryMethod == null )
-        {
-            try
+            if ( methodName != null )
             {
-                factoryMethod = javaClass.getMethod( "getObject", (Class[]) null );
+                try
+                {
+                    factoryMethod = javaClass.getMethod( methodName, (Class[]) null );
+                }
+                catch ( final NoSuchMethodException e )
+                {
+                    factoryMethod = null;
+                }
             }
-            catch ( final NoSuchMethodException e )
+
+            if ( factoryMethod == null )
             {
-                factoryMethod = null;
+                try
+                {
+                    factoryMethod = javaClass.getMethod( "getObject", (Class[]) null );
+                }
+                catch ( final NoSuchMethodException e )
+                {
+                    factoryMethod = null;
+                }
             }
         }
 
@@ -2524,24 +3272,32 @@
      * specifications of the instance.
      *
      * @throws ClassNotFoundException if a Java class is not found.
+     * @throws ModelObjectException if compiling a name of a referenced type to a {@code JavaTypeName} fails.
      *
      * @see #getJavaClass(java.lang.ClassLoader)
      * @see #getJavaClasses(java.lang.ClassLoader)
+     * @see Class#isAssignableFrom(java.lang.Class)
      *
      * @since 1.2
      */
-    public boolean isJavaClassAssignable( final ClassLoader classLoader ) throws ClassNotFoundException
+    public boolean isJavaClassAssignable( final ClassLoader classLoader )
+        throws ClassNotFoundException, ModelObjectException
     {
-        boolean assignable = true;
-        final Class<?> javaClass = this.getJavaClass( classLoader );
-        final Class<?>[] javaClasses = this.getJavaClasses( classLoader );
+        final JavaTypeName javaTypeName = this.getJavaTypeName();
+        boolean assignable = javaTypeName != null;
 
-        for ( int i = javaClasses.length - 1; i >= 0; i-- )
+        if ( assignable )
         {
-            if ( !javaClasses[i].isAssignableFrom( javaClass ) )
+            final Class<?> javaClass = javaTypeName.getClass( classLoader, false );
+            final Class<?>[] javaClasses = this.getJavaClasses( classLoader );
+
+            for ( int i = javaClasses.length - 1; i >= 0; i-- )
             {
-                assignable = false;
-                break;
+                if ( !javaClasses[i].isAssignableFrom( javaClass ) )
+                {
+                    assignable = false;
+                    break;
+                }
             }
         }
 
@@ -2558,12 +3314,15 @@
      * proxy class.
      *
      * @throws ClassNotFoundException if a Java class is not found.
+     * @throws ModelObjectException if compiling a name of a referenced type to a {@code JavaTypeName} fails.
      *
      * @see #getJavaClasses(java.lang.ClassLoader)
+     * @see Class#isInterface()
      *
      * @since 1.2
      */
-    public Class<?> getJavaProxyClass( final ClassLoader classLoader ) throws ClassNotFoundException
+    public Class<?> getJavaProxyClass( final ClassLoader classLoader )
+        throws ClassNotFoundException, ModelObjectException
     {
         final Class<?>[] javaClasses = this.getJavaClasses( classLoader );
         boolean canProxy = javaClasses.length > 0;
@@ -2581,6 +3340,39 @@
         }
 
         return canProxy ? java.lang.reflect.Proxy.getProxyClass( classLoader, javaClasses ) : null;
+    }
+
+    /**
+     * Gets the Java type name of the type referenced by the instance.
+     *
+     * @return The Java type name of the type referenced by the instance or {@code null}, if the instance does not
+     * reference a type.
+     *
+     * @throws ModelObjectException if compiling the name of the referenced type to a {@code JavaTypeName} fails.
+     *
+     * @see #getClazz()
+     *
+     * @since 1.4
+     */
+    public JavaTypeName getJavaTypeName() throws ModelObjectException
+    {
+        try
+        {
+            JavaTypeName javaTypeName = null;
+
+            if ( this.getClazz() != null )
+            {
+                javaTypeName = JavaTypeName.parse( this.getClazz() );
+            }
+
+            return javaTypeName;
+        }
+        catch ( final java.text.ParseException e )
+        {
+            throw new ModelObjectException( getMessage( "javaTypeNameParseException", this.getClazz(),
+                                                        getMessage( e ) ), e );
+
+        }
     }
 
     /**
@@ -2668,6 +3460,19 @@
     public <T> java.util.List<T> getAnyObjects( final Class<T> clazz )
     {
         return this.getAnyObjects( this.getAny(), clazz );
+    }
+
+    private static String getMessage( final Throwable t )
+    {
+        return t != null ? t.getMessage() != null ? t.getMessage() : getMessage( t.getCause() ) : null;
+    }
+
+    private static String getMessage( final String key, final Object... arguments )
+    {
+        return java.text.MessageFormat.format( java.util.ResourceBundle.getBundle(
+            Instance.class.getName().replace( '.', '/' ), java.util.Locale.getDefault() ).
+            getString( key ), arguments );
+
     }]]>
       </ci:code>
     </jaxb:bindings>
@@ -2837,14 +3642,14 @@
     @javax.xml.bind.annotation.XmlTransient
     private static final java.util.Comparator<Dependency> DEPENDENCY_NAME_COMPARATOR =
         new java.util.Comparator<Dependency>()
+    {
+
+        public int compare( final Dependency o1, final Dependency o2 )
         {
+            return o1.getName().compareTo( o2.getName() );
+        }
 
-            public int compare( final Dependency o1, final Dependency o2 )
-            {
-                return o1.getName().compareTo( o2.getName() );
-            }
-
-        };
+    };
 
     /**
      * Comparator comparing message names lexicographically.
@@ -2853,14 +3658,14 @@
     @javax.xml.bind.annotation.XmlTransient
     private static final java.util.Comparator<Message> MESSAGE_NAME_COMPARATOR =
         new java.util.Comparator<Message>()
+    {
+
+        public int compare( final Message o1, final Message o2 )
         {
+            return o1.getName().compareTo( o2.getName() );
+        }
 
-            public int compare( final Message o1, final Message o2 )
-            {
-                return o1.getName().compareTo( o2.getName() );
-            }
-
-        };
+    };
 
     /**
      * Comparator comparing property names lexicographically.
@@ -2869,14 +3674,14 @@
     @javax.xml.bind.annotation.XmlTransient
     private static final java.util.Comparator<Property> PROPERTY_NAME_COMPARATOR =
         new java.util.Comparator<Property>()
+    {
+
+        public int compare( final Property o1, final Property o2 )
         {
+            return o1.getName().compareTo( o2.getName() );
+        }
 
-            public int compare( final Property o1, final Property o2 )
-            {
-                return o1.getName().compareTo( o2.getName() );
-            }
-
-        };
+    };
 
     /**
      * Comparator comparing specification identifiers lexicographically.
@@ -2885,14 +3690,14 @@
     @javax.xml.bind.annotation.XmlTransient
     private static final java.util.Comparator<Specification> SPECIFICATION_IDENTIFIER_COMPARATOR =
         new java.util.Comparator<Specification>()
+    {
+
+        public int compare( final Specification o1, final Specification o2 )
         {
+            return o1.getIdentifier().compareTo( o2.getIdentifier() );
+        }
 
-            public int compare( final Specification o1, final Specification o2 )
-            {
-                return o1.getIdentifier().compareTo( o2.getIdentifier() );
-            }
-
-        };
+    };
 
     /**
      * Comparator comparing specification reference identifiers lexicographically.
@@ -2901,14 +3706,30 @@
     @javax.xml.bind.annotation.XmlTransient
     private static final java.util.Comparator<SpecificationReference> SPECIFICATION_REFERENCE_IDENTIFIER_COMPARATOR =
         new java.util.Comparator<SpecificationReference>()
+    {
+
+        public int compare( final SpecificationReference o1, final SpecificationReference o2 )
         {
+            return o1.getIdentifier().compareTo( o2.getIdentifier() );
+        }
 
-            public int compare( final SpecificationReference o1, final SpecificationReference o2 )
-            {
-                return o1.getIdentifier().compareTo( o2.getIdentifier() );
-            }
+    };
 
-        };
+    /**
+     * Comparator comparing {@code JavaTypeName} names lexicographically.
+     * @since 1.4
+     */
+    @javax.xml.bind.annotation.XmlTransient
+    private static final java.util.Comparator<JavaTypeName> JAVA_TYPE_NAME_COMPARATOR =
+        new java.util.Comparator<JavaTypeName>()
+    {
+
+        public int compare( final JavaTypeName o1, final JavaTypeName o2 )
+        {
+            return o1.getName( true ).compareTo( o2.getName( true ) );
+        }
+
+    };
 
     /** Maps objects to {@code Instance}s. */
     @javax.xml.bind.annotation.XmlTransient private java.util.Map<Object, Instance> objects =
@@ -3211,19 +4032,21 @@
     }
 
     /**
-     * Gets a specification for a given class from the list of modules.
+     * Gets a specification declaring a given class from the list of modules.
      *
      * @param specification The class of the specification to return.
      *
-     * @return The first matching specification or {@code null}, if no such specification is found.
+     * @return The first matching specification declaring the given class or {@code null}, if no such specification is
+     * found.
      *
      * @throws NullPointerException if {@code specification} is {@code null}.
+     * @throws ModelObjectException if compiling a name of a referenced type to a {@code JavaTypeName} fails.
      *
      * @see #getModule()
      * @see Module#getSpecifications()
      * @see Specifications#getSpecification( java.lang.Class )
      */
-    public Specification getSpecification( final Class<?> specification )
+    public Specification getSpecification( final Class<?> specification ) throws ModelObjectException
     {
         if ( specification == null )
         {
@@ -3281,6 +4104,54 @@
     }
 
     /**
+     * Gets a list holding all {@code JavaTypeName}s an implementation implements from the list of modules.
+     *
+     * @param implementation The identifier of the implementation to get all implemented specifications of.
+     *
+     * @return An unmodifiable list holding all {@code JavaTypeName}s implemented by the first matching implementation
+     * or {@code null}, if no such implementation is found or if that implementation does not implement any
+     * {@code JavaTypeName}.
+     *
+     * @throws ModelObjectException if compiling the name of a referenced type to a {@code JavaTypeName} fails.
+     *
+     * @see #getSpecifications(java.lang.String)
+     * @see Specification#getJavaTypeName()
+     *
+     * @since 1.4
+     */
+    public List<JavaTypeName> getImplementedJavaTypeNames( final String implementation ) throws ModelObjectException
+    {
+        if ( implementation == null )
+        {
+            throw new NullPointerException( "implementation" );
+        }
+
+        final Specifications implemented = this.getSpecifications( implementation );
+        java.util.List<JavaTypeName> javaTypeNames = null;
+
+        if ( implemented != null )
+        {
+            javaTypeNames = new java.util.ArrayList<JavaTypeName>( implemented.getSpecification().size() );
+
+            for ( int i = 0, s0 = implemented.getSpecification().size(); i < s0; i++ )
+            {
+                final Specification s = implemented.getSpecification().get( i );
+                final JavaTypeName javaTypeName = s.getJavaTypeName();
+
+                if ( javaTypeName != null && !javaTypeNames.contains( javaTypeName ) )
+                {
+                    javaTypeNames.add( javaTypeName );
+                }
+            }
+
+            java.util.Collections.sort( javaTypeNames, JAVA_TYPE_NAME_COMPARATOR );
+            javaTypeNames = java.util.Collections.unmodifiableList( javaTypeNames );
+        }
+
+        return javaTypeNames;
+    }
+
+    /**
      * Gets an implementation for a given identifier from the list of modules.
      *
      * @param implementation The identifier of the implementation to return.
@@ -3319,19 +4190,21 @@
     }
 
     /**
-     * Gets an implementation for a given class from the list of modules.
+     * Gets an implementation declaring a given class from the list of modules.
      *
      * @param implementation The class of the implementation to return.
      *
-     * @return The first matching implementation or {@code null}, if no such implementation is found.
+     * @return The first matching implementation declaring the given class or {@code null}, if no such implementation is
+     * found.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
+     * @throws ModelObjectException if compiling a name of a referenced type to a {@code JavaTypeName} fails.
      *
      * @see #getModule()
      * @see Module#getImplementations()
      * @see Implementations#getImplementation( java.lang.Class )
      */
-    public Implementation getImplementation( final Class<?> implementation )
+    public Implementation getImplementation( final Class<?> implementation ) throws ModelObjectException
     {
         if ( implementation == null )
         {
@@ -3364,11 +4237,12 @@
      * @return The first matching implementation or {@code null}, if no such implementation is found.
      *
      * @throws NullPointerException if {@code object} is {@code null}.
+     * @throws ModelObjectException if compiling a name of a referenced type to a {@code JavaTypeName} fails.
      *
      * @see #getModule()
      * @see #getImplementation( java.lang.Class )
      */
-    public Implementation getImplementation( final Object object )
+    public Implementation getImplementation( final Object object ) throws ModelObjectException
     {
         return this.collectImplementation( object.getClass() );
     }
@@ -3436,6 +4310,120 @@
         this.collectClassDeclarationModelObjects( impl, dependencies, null, null, null, null );
         java.util.Collections.sort( dependencies.getDependency(), DEPENDENCY_NAME_COMPARATOR );
         return dependencies.getDependency().isEmpty() ? null : dependencies;
+    }
+
+    /**
+     * Gets the Java type name of a dependency.
+     *
+     * @param implementation The identifier of the implementation of the dependency.
+     * @param dependency The name of the dependency to get the Java type name of.
+     *
+     * @return The Java type name of the dependency named {@code dependency } of the first matching implementation
+     * identified by {@code implementation} or {@code null}, if the implementation, the dependency or the referenced
+     * specification is not found or does not reference a Java type.
+     *
+     * @throws NullPointerException if {@code implementation} or {@code dependency} is {@code null}.
+     * @throws ModelObjectException if compiling the name of the referenced type to a {@code JavaTypeName} fails.
+     *
+     * @since 1.4
+     *
+     * @see #getDependencies(java.lang.String)
+     * @see Dependencies#getDependency(java.lang.String)
+     * @see #getSpecification(java.lang.String)
+     * @see Specification#getJavaTypeName()
+     */
+    public JavaTypeName getDependencyJavaTypeName( final String implementation, final String dependency )
+        throws ModelObjectException
+    {
+        if ( implementation == null )
+        {
+            throw new NullPointerException( "implementation" );
+        }
+        if ( dependency == null )
+        {
+            throw new NullPointerException( "dependency" );
+        }
+
+        String typeName = null;
+
+        try
+        {
+            JavaTypeName javaTypeName = null;
+            final Dependencies dependencies = this.getDependencies( implementation );
+
+            if ( dependencies != null )
+            {
+                final Dependency d = dependencies.getDependency( dependency );
+
+                if ( d != null )
+                {
+                    final Specification specification = this.getSpecification( d.getIdentifier() );
+
+                    if ( specification != null && specification.getClazz() != null )
+                    {
+                        typeName = specification.getClazz();
+
+                        if ( specification.getMultiplicity() == Multiplicity.MANY
+                             && d.getImplementationName() == null )
+                        {
+                            typeName += "[]";
+                        }
+
+                        javaTypeName = JavaTypeName.parse( typeName );
+                    }
+                }
+            }
+
+            return javaTypeName;
+        }
+        catch ( final java.text.ParseException e )
+        {
+            throw new ModelObjectException( getMessage( "dependencyJavaTypeNameParseException", typeName,
+                                                        getMessage( e ) ), e );
+
+        }
+    }
+
+    /**
+     * Gets the Java modifier name of a dependency.
+     *
+     * @param implementation The identifier of the implementation of the dependency.
+     * @param dependency The name of the dependency to get the Java modifier name of.
+     *
+     * @return The Java modifier name of the dependency named {@code dependency} of the first matching implementation
+     * identified by {@code implementation} or {@code null}, if the implementation or the dependency is not found.
+     *
+     * @throws NullPointerException if {@code implementation} or {@code dependency} is {@code null}.
+     *
+     * @since 1.4
+     *
+     * @see #getDependencies(java.lang.String)
+     * @see Dependencies#getDependency(java.lang.String)
+     */
+    public String getDependencyJavaModifierName( final String implementation, final String dependency )
+    {
+        if ( implementation == null )
+        {
+            throw new NullPointerException( "implementation" );
+        }
+        if ( dependency == null )
+        {
+            throw new NullPointerException( "dependency" );
+        }
+
+        final Dependencies dependencies = this.getDependencies( implementation );
+
+        if ( dependencies != null )
+        {
+            final Dependency d = dependencies.getDependency( dependency );
+
+            if ( d != null )
+            {
+                return "private";
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -3515,6 +4503,50 @@
     }
 
     /**
+     * Gets the Java modifier name of a property.
+     *
+     * @param implementation The identifier of the implementation of the property.
+     * @param property The name of the property to get the Java modifier name of.
+     *
+     * @return The Java modifier name of the property named {@code property} of the first matching implementation
+     * identified by {@code implementation} or {@code null}, if the implementation or the property is not found.
+     *
+     * @throws NullPointerException if {@code implementation} or {@code dependency} is {@code null}.
+     *
+     * @since 1.4
+     *
+     * @see #getProperties(java.lang.String)
+     * @see Properties#getProperty(java.lang.String)
+     */
+    public String getPropertyJavaModifierName( final String implementation, final String property )
+    {
+        if ( implementation == null )
+        {
+            throw new NullPointerException( "implementation" );
+        }
+        if ( property == null )
+        {
+            throw new NullPointerException( "property" );
+        }
+
+        final Properties properties = this.getProperties( implementation );
+
+        if ( properties != null )
+        {
+            final Property p = properties.getProperty( property );
+
+            if ( p != null )
+            {
+                final Properties specified = this.getSpecifiedProperties( implementation );
+
+                return specified != null && specified.getProperty( property ) != null ? "public" : "private";
+            }
+        }
+
+        return null;
+    }
+     
+    /**
      * Gets all messages of an implementation from the list of modules.
      *
      * @param implementation The identifier of the implementation to get all messages of.
@@ -3543,6 +4575,48 @@
         this.collectClassDeclarationModelObjects( impl, null, msgs, null, null, null );
         java.util.Collections.sort( msgs.getMessage(), MESSAGE_NAME_COMPARATOR );
         return msgs.getMessage().isEmpty() ? null : msgs;
+    }
+
+    /**
+     * Gets the Java modifier name of a message.
+     *
+     * @param implementation The identifier of the implementation of the message.
+     * @param message The name of the message to get the Java modifier name of.
+     *
+     * @return The Java modifier name of the message named {@code message} of the first matching implementation
+     * identified by {@code implementation} or {@code null}, if the implementation or the message is not found.
+     *
+     * @throws NullPointerException if {@code implementation} or {@code message} is {@code null}.
+     *
+     * @since 1.4
+     *
+     * @see #getMessages(java.lang.String)
+     * @see Messages#getMessage(java.lang.String)
+     */
+    public String getMessageJavaModifierName( final String implementation, final String message )
+    {
+        if ( implementation == null )
+        {
+            throw new NullPointerException( "implementation" );
+        }
+        if ( message == null )
+        {
+            throw new NullPointerException( "message" );
+        }
+
+        final Messages messages = this.getMessages( implementation );
+
+        if ( messages != null )
+        {
+            final Message m = messages.getMessage( message );
+
+            if ( m != null )
+            {
+                return "private";
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -3767,13 +4841,14 @@
      * @return The instance of {@code object} or {@code null}, if no such instance is found.
      *
      * @throws NullPointerException if {@code object} is {@code null}.
+     * @throws ModelObjectException if compiling a name of a referenced type to a {@code JavaTypeName} fails.
      *
      * @see #getModule()
      * @see #getImplementation( java.lang.Object )
      * @see #getInstance( java.lang.String )
      * @see #createObject(org.jomc.model.Instance instance, java.lang.ClassLoader classLoader)
      */
-    public Instance getInstance( final Object object )
+    public Instance getInstance( final Object object ) throws ModelObjectException
     {
         if ( object == null )
         {
@@ -3961,7 +5036,8 @@
      *
      * @return A new object of {@code instance}.
      *
-     * @throws NullPointerException if {@code instance}  is {@code null},
+     * @throws NullPointerException if {@code instance}  is {@code null}.
+     * @throws ModelObjectException if compiling the name of a referenced type to a {@code JavaTypeName} fails.
      * @throws InstantiationException if creating an object fails.
      *
      * @see #getModule()
@@ -3971,7 +5047,8 @@
      * @see Instance#getJavaFactoryMethod(java.lang.ClassLoader)
      * @see Instance#isJavaClassAssignable(java.lang.ClassLoader)
      */
-    public Object createObject( final Instance instance, final ClassLoader classLoader ) throws InstantiationException
+    public Object createObject( final Instance instance, final ClassLoader classLoader )
+        throws ModelObjectException, InstantiationException
     {
         if ( instance == null )
         {
@@ -3982,12 +5059,11 @@
 
         try
         {
-            final Class<?> clazz = instance.getJavaClass( classLoader );
             final java.lang.reflect.Constructor<?> ctor = instance.getJavaConstructor( classLoader );
 
             if ( ctor != null && instance.isJavaClassAssignable( classLoader ) )
             {
-                object = clazz.newInstance();
+                object = instance.getJavaTypeName().getClass( classLoader, true ).newInstance();
 
                 synchronized ( this.objects )
                 {
@@ -4046,7 +5122,7 @@
                 throw new InstantiationException( getMessage(
                     instance.getJavaFactoryMethodName() != null
                     ? "failedCreatingObjectWithMethod" : "failedCreatingObject",
-                    instance.getIdentifier(), clazz.getName(), instance.getJavaFactoryMethodName() ) );
+                    instance.getIdentifier(), instance.getJavaTypeName(), instance.getJavaFactoryMethodName() ) );
 
             }
 
@@ -4367,9 +5443,10 @@
         }
     }
 
-    private Implementation collectImplementation( final Class<?> clazz )
+    private Implementation collectImplementation( final Class<?> clazz ) throws ModelObjectException
     {
         Implementation i = this.getImplementation( clazz );
+
         if ( i == null && clazz.getSuperclass() != null )
         {
             i = this.collectImplementation( clazz.getSuperclass() );
@@ -4511,7 +5588,9 @@
         {
             try
             {
-                final Class<?> classpathSpec = Class.forName( identifier, false, classLoader );
+                final JavaTypeName javaTypeName = JavaTypeName.parse( identifier );
+                final Class<?> classpathSpec = javaTypeName.getClass( classLoader, false );
+
                 if ( java.lang.reflect.Modifier.isPublic( classpathSpec.getModifiers() ) )
                 {
                     classpathSpecification = true;
@@ -4526,7 +5605,7 @@
 
                     specification = new Specification();
                     specification.setIdentifier( identifier );
-                    specification.setClazz( classpathSpec.getName() );
+                    specification.setClazz( javaTypeName.getName( true ) );
                     specification.setMultiplicity( Multiplicity.MANY );
                     specification.setVendor( vendor );
                     specification.setVersion( version );
@@ -4542,6 +5621,10 @@
                 }
             }
             catch ( final ClassNotFoundException e )
+            {
+                classpathSpecification = false;
+            }
+            catch ( final java.text.ParseException e )
             {
                 classpathSpecification = false;
             }
@@ -4569,7 +5652,8 @@
 
             try
             {
-                final Class<?> classpathImpl = Class.forName( specification.getClazz(), false, classLoader );
+                final JavaTypeName javaTypeName = JavaTypeName.parse( specification.getClazz() );
+                final Class<?> classpathImpl = javaTypeName.getClass( classLoader, false );
 
                 if ( java.lang.reflect.Modifier.isPublic( classpathImpl.getModifiers() ) )
                 {
@@ -4628,7 +5712,7 @@
                         implementation.setFinal( true );
                         implementation.setName( name );
                         implementation.setIdentifier( specification.getIdentifier() );
-                        implementation.setClazz( classpathImpl.getName() );
+                        implementation.setClazz( javaTypeName.getName( true ) );
                         implementation.setVersion( version );
 
                         final Specifications implemented = new Specifications();
@@ -4648,6 +5732,10 @@
                 }
             }
             catch ( final ClassNotFoundException e )
+            {
+                classpathImplementation = false;
+            }
+            catch ( final java.text.ParseException e )
             {
                 classpathImplementation = false;
             }
@@ -4673,6 +5761,11 @@
         }
 
         return factoryMethod;
+    }
+
+    private static String getMessage( final Throwable t )
+    {
+        return t != null ? t.getMessage() != null ? t.getMessage() : getMessage( t.getCause() ) : null;
     }
 
     private static String getMessage( final String key, final Object... args )

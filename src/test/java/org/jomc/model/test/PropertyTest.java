@@ -31,9 +31,12 @@
 package org.jomc.model.test;
 
 import java.lang.reflect.InvocationTargetException;
+import org.jomc.model.JavaIdentifier;
+import org.jomc.model.ModelObjectException;
 import org.jomc.model.Property;
 import org.jomc.model.PropertyException;
 import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -285,6 +288,86 @@ public class PropertyTest
             assertNotNull( e.getMessage() );
             System.out.println( e );
         }
+    }
+
+    @Test
+    public final void JavaConstantName() throws Exception
+    {
+        final Property p = new Property();
+
+        try
+        {
+            p.getJavaConstantName();
+            fail( "Expected 'ModelObjectException' not thrown." );
+        }
+        catch ( final ModelObjectException e )
+        {
+            assertNotNull( e.getMessage() );
+            System.out.println( e.toString() );
+        }
+
+        p.setName( "test test" );
+        assertEquals( JavaIdentifier.valueOf( "TEST_TEST" ), p.getJavaConstantName() );
+    }
+
+    @Test
+    public final void JavaGetterMethodName() throws Exception
+    {
+        final Property p = new Property();
+
+        try
+        {
+            p.getJavaGetterMethodName();
+            fail( "Expected 'ModelObjectException' not thrown." );
+        }
+        catch ( final ModelObjectException e )
+        {
+            assertNotNull( e.getMessage() );
+            System.out.println( e.toString() );
+        }
+
+        p.setName( "TEST TEST" );
+        assertEquals( JavaIdentifier.valueOf( "getTestTest" ), p.getJavaGetterMethodName() );
+    }
+
+    @Test
+    public final void JavaSetterMethodName() throws Exception
+    {
+        final Property p = new Property();
+
+        try
+        {
+            p.getJavaSetterMethodName();
+            fail( "Expected 'ModelObjectException' not thrown." );
+        }
+        catch ( final ModelObjectException e )
+        {
+            assertNotNull( e.getMessage() );
+            System.out.println( e.toString() );
+        }
+
+        p.setName( "TEST TEST" );
+        assertEquals( JavaIdentifier.valueOf( "setTestTest" ), p.getJavaSetterMethodName() );
+    }
+
+    @Test
+    public final void JavaVariableName() throws Exception
+    {
+        final Property p = new Property();
+
+        try
+        {
+            p.getJavaVariableName();
+            fail( "Expected 'ModelObjectException' not thrown." );
+        }
+        catch ( final ModelObjectException e )
+        {
+            assertNotNull( e.getMessage() );
+            System.out.println( e.toString() );
+        }
+
+        p.setName( "TEST TEST" );
+        assertEquals( JavaIdentifier.valueOf( "testTest" ), p.getJavaVariableName() );
     }
 
 }
