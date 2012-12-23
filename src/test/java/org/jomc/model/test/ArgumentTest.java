@@ -1,5 +1,5 @@
 /*
- *   Copyright (C) Christian Schulte, 2005-206
+ *   Copyright (C) Christian Schulte, 2012-353
  *   All rights reserved.
  *
  *   Redistribution and use in source and binary forms, with or without
@@ -30,47 +30,48 @@
  */
 package org.jomc.model.test;
 
-import java.io.ObjectInputStream;
-import org.jomc.model.PropertyException;
+import org.jomc.model.Argument;
+import org.jomc.model.JavaIdentifier;
+import org.jomc.model.ModelObjectException;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 /**
- * Test cases for class {@code org.jomc.model.PropertyException}.
+ * Test cases for class {@code org.jomc.model.Argument}.
  *
- * @author <a href="mailto:cs@schulte.it">Christian Schulte</a> 1.0
+ * @author <a href="mailto:cs@schulte.it">Christian Schulte</a>
  * @version $JOMC$
+ * @since 1.4
  */
-public class PropertyExceptionTest
+public class ArgumentTest
 {
 
-    /** Constant to prefix relative resource names with. */
-    private static final String ABSOLUTE_RESOURCE_NAME_PREFIX = "/org/jomc/model/test/";
-
-    /** Creates a new {@code PropertyExceptionTest} instance. */
-    public PropertyExceptionTest()
+    /** Creates a new {@code ArgumentTest} instance. */
+    public ArgumentTest()
     {
         super();
     }
 
     @Test
-    public final void testSerializabe() throws Exception
+    public final void JavaVariableName() throws Exception
     {
-        ObjectInputStream in = null;
+        final Argument argument = new Argument();
 
         try
         {
-            in = new ObjectInputStream( this.getClass().getResourceAsStream(
-                ABSOLUTE_RESOURCE_NAME_PREFIX + "PropertyException.ser" ) );
-
-            final PropertyException e = (PropertyException) in.readObject();
-            assertEquals( "PropertyException", e.getMessage() );
-            System.out.println( e );
+            argument.getJavaVariableName();
+            fail( "Expected 'ModelObjectException' not thrown." );
         }
-        finally
+        catch ( final ModelObjectException e )
         {
-            in.close();
+            assertNotNull( e.getMessage() );
+            System.out.println( e.toString() );
         }
+
+        argument.setName( "TEST TEST" );
+        assertEquals( JavaIdentifier.valueOf( "testTest" ), argument.getJavaVariableName() );
     }
 
 }

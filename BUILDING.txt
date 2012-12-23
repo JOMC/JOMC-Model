@@ -98,7 +98,7 @@
         <!--                                                                 -->
         <!-- Code signing is backed by the 'maven-jarsigner-plugin'.         -->
         <!-- The following link redirects to the official documentation of   -->
-        <!-- that plugin. http://www.jomc.org/redirect/mjarsigner    -->
+        <!-- that plugin. http://www.jomc.org/redirect/mjarsigner            -->
         <!--                                                                 -->
         <!--                                                                 -->
         <!-- The 'jarsigner.keystore' property may be set to the location of -->
