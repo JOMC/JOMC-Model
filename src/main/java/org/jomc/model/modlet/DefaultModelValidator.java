@@ -48,6 +48,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.util.JAXBSource;
 import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
+import org.jomc.model.Argument;
 import org.jomc.model.Dependency;
 import org.jomc.model.Implementation;
 import org.jomc.model.ImplementationReference;
@@ -88,10 +89,122 @@ import org.w3c.dom.Element;
 public class DefaultModelValidator implements ModelValidator
 {
 
+    /**
+     * Constant for the name of the model context attribute backing property {@code validateJava}.
+     * @see ModelContext#getAttribute(java.lang.String)
+     * @since 1.4
+     */
+    public static final String VALIDATE_JAVA_ATTRIBUTE_NAME =
+        "org.jomc.model.modlet.DefaultModelValidator.validateJavaAttribute";
+
+    /**
+     * Constant for the name of the system property controlling property {@code defaultValidateJava}.
+     * @see #isDefaultValidateJava()
+     * @since 1.4
+     */
+    private static final String DEFAULT_VALIDATE_JAVA_PROPERTY_NAME =
+        "org.jomc.model.modlet.DefaultModelValidator.defaultValidateJava";
+
+    /**
+     * Default value of the flag indicating the validator is performing Java related validation by default.
+     * @see #isDefaultValidateJava()
+     * @since 1.4
+     */
+    private static final Boolean DEFAULT_VALIDATE_JAVA = Boolean.TRUE;
+
+    /**
+     * Flag indicating the validator is performing Java related validation by default.
+     * @since 1.4
+     */
+    private static volatile Boolean defaultValidateJava;
+
+    /**
+     * Flag indicating the validator is performing Java related validation.
+     * @since 1.4
+     */
+    private Boolean validateJava;
+
     /** Creates a new {@code DefaultModelValidator} instance. */
     public DefaultModelValidator()
     {
         super();
+    }
+
+    /**
+     * Gets a flag indicating the validator is performing Java related validation by default.
+     * <p>The default validate Java flag is controlled by system property
+     * {@code org.jomc.model.modlet.DefaultModelValidator.defaultValidateJava} holding a value indicating the validator
+     * is performing Java related validation by default. If that property is not set, the {@code true} default is
+     * returned.</p>
+     *
+     * @return {@code true}, if the validator is performing Java related validation by default; {@code false}, if the
+     * validator is not performing Java related validation by default.
+     *
+     * @see #setDefaultValidateJava(java.lang.Boolean)
+     *
+     * @since 1.4
+     */
+    public static boolean isDefaultValidateJava()
+    {
+        if ( defaultValidateJava == null )
+        {
+            defaultValidateJava = Boolean.valueOf( System.getProperty( DEFAULT_VALIDATE_JAVA_PROPERTY_NAME,
+                                                                       Boolean.toString( DEFAULT_VALIDATE_JAVA ) ) );
+
+        }
+
+        return defaultValidateJava;
+    }
+
+    /**
+     * Sets the flag indicating the validator is performing Java related validation by default.
+     *
+     * @param value The new value of the flag indicating the validator is performing Java related validation by default
+     * or {@code null}.
+     *
+     * @see #isDefaultValidateJava()
+     *
+     * @since 1.4
+     */
+    public static void setDefaultValidateJava( final Boolean value )
+    {
+        defaultValidateJava = value;
+    }
+
+    /**
+     * Gets a flag indicating the validator is performing Java related validation.
+     *
+     * @return {@code true}, if the validator is performing Java related validation; {@code false}, if the the validator
+     * is not performing Java related validation.
+     *
+     * @see #isDefaultValidateJava()
+     * @see #setValidateJava(java.lang.Boolean)
+     *
+     * @since 1.4
+     */
+    public final boolean isValidateJava()
+    {
+        if ( this.validateJava == null )
+        {
+            this.validateJava = isDefaultValidateJava();
+        }
+
+        return this.validateJava;
+    }
+
+    /**
+     * Sets the flag indicating the validator is performing Java related validation.
+     *
+     * @param value The new value of the flag indicating the validator is performing Java related validation or
+     * {@code null}.
+     *
+     * @see #isValidateJava()
+     *
+     * @since 1.4
+     */
+    public final void setValidateJava( final Boolean value )
+    {
+        this.validateJava = value;
     }
 
     public ModelValidationReport validateModel( final ModelContext context, final Model model ) throws ModelException
@@ -105,6 +218,13 @@ public class DefaultModelValidator implements ModelValidator
             throw new NullPointerException( "model" );
         }
 
+        boolean contextValidateJava = this.isValidateJava();
+        if ( DEFAULT_VALIDATE_JAVA == contextValidateJava
+             && context.getAttribute( VALIDATE_JAVA_ATTRIBUTE_NAME ) instanceof Boolean )
+        {
+            contextValidateJava = (Boolean) context.getAttribute( VALIDATE_JAVA_ATTRIBUTE_NAME );
+        }
+
         try
         {
             final Source source = new JAXBSource( context.createContext( model.getIdentifier() ),
@@ -115,7 +235,9 @@ public class DefaultModelValidator implements ModelValidator
 
             if ( modules != null )
             {
-                final ValidationContext validationContext = new ValidationContext( context, modules, report );
+                final ValidationContext validationContext =
+                    new ValidationContext( context, modules, report, contextValidateJava );
+
                 assertModulesValid( validationContext );
                 assertSpecificationsValid( validationContext );
                 assertImplementationsValid( validationContext );
@@ -180,6 +302,93 @@ public class DefaultModelValidator implements ModelValidator
 
                     }
 
+                    if ( validationContext.isValidateJava() )
+                    {
+                        try
+                        {
+                            msg.getJavaConstantName();
+                        }
+                        catch ( final ModelObjectException e )
+                        {
+                            final String message = getMessage( e );
+
+                            if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                            {
+                                validationContext.getModelContext().log( Level.FINE, message, e );
+                            }
+
+                            addDetail( validationContext.getReport(),
+                                       "MODULE_MESSAGE_JAVA_CONSTANT_NAME_CONSTRAINT",
+                                       Level.SEVERE, new ObjectFactory().createModule( m ),
+                                       "moduleMessageJavaConstantNameConstraint", m.getName(), msg.getName(),
+                                       message != null && message.length() > 0 ? " " + message : "" );
+
+                        }
+
+                        try
+                        {
+                            msg.getJavaGetterMethodName();
+                        }
+                        catch ( final ModelObjectException e )
+                        {
+                            final String message = getMessage( e );
+
+                            if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                            {
+                                validationContext.getModelContext().log( Level.FINE, message, e );
+                            }
+
+                            addDetail( validationContext.getReport(),
+                                       "MODULE_MESSAGE_JAVA_GETTER_METHOD_NAME_CONSTRAINT",
+                                       Level.SEVERE, new ObjectFactory().createModule( m ),
+                                       "moduleMessageJavaGetterMethodNameConstraint", m.getName(), msg.getName(),
+                                       message != null && message.length() > 0 ? " " + message : "" );
+
+                        }
+
+                        try
+                        {
+                            msg.getJavaSetterMethodName();
+                        }
+                        catch ( final ModelObjectException e )
+                        {
+                            final String message = getMessage( e );
+
+                            if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                            {
+                                validationContext.getModelContext().log( Level.FINE, message, e );
+                            }
+
+                            addDetail( validationContext.getReport(),
+                                       "MODULE_MESSAGE_JAVA_SETTER_METHOD_NAME_CONSTRAINT",
+                                       Level.SEVERE, new ObjectFactory().createModule( m ),
+                                       "moduleMessageJavaSetterMethodNameConstraint", m.getName(), msg.getName(),
+                                       message != null && message.length() > 0 ? " " + message : "" );
+
+                        }
+
+                        try
+                        {
+                            msg.getJavaVariableName();
+                        }
+                        catch ( final ModelObjectException e )
+                        {
+                            final String message = getMessage( e );
+
+                            if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                            {
+                                validationContext.getModelContext().log( Level.FINE, message, e );
+                            }
+
+                            addDetail( validationContext.getReport(),
+                                       "MODULE_MESSAGE_JAVA_VARIABLE_NAME_CONSTRAINT",
+                                       Level.SEVERE, new ObjectFactory().createModule( m ),
+                                       "moduleMessageJavaVariableNameConstraint", m.getName(), msg.getName(),
+                                       message != null && message.length() > 0 ? " " + message : "" );
+
+                        }
+                    }
+
                     if ( msg.getTemplate() != null )
                     {
                         for ( int k = 0, s2 = msg.getTemplate().getText().size(); k < s2; k++ )
@@ -188,9 +397,9 @@ public class DefaultModelValidator implements ModelValidator
 
                             try
                             {
-                                new MessageFormat( t.getValue(), new Locale( t.getLanguage() ) );
+                                t.getMimeType();
                             }
-                            catch ( final IllegalArgumentException e )
+                            catch ( final ModelObjectException e )
                             {
                                 final String message = getMessage( e );
 
@@ -199,11 +408,92 @@ public class DefaultModelValidator implements ModelValidator
                                     validationContext.getModelContext().log( Level.FINE, message, e );
                                 }
 
-                                addDetail( validationContext.getReport(), "MODULE_MESSAGE_TEMPLATE_CONSTRAINT",
+                                addDetail( validationContext.getReport(),
+                                           "MODULE_MESSAGE_TEMPLATE_MIME_TYPE_CONSTRAINT",
                                            Level.SEVERE, new ObjectFactory().createModule( m ),
-                                           "moduleMessageTemplateConstraint", m.getName(), msg.getName(), t.getValue(),
-                                           message );
+                                           "moduleMessageTemplateMimeTypeConstraint", m.getName(), msg.getName(),
+                                           t.getLanguage(),
+                                           message != null && message.length() > 0 ? " " + message : "" );
 
+                            }
+
+                            if ( validationContext.isValidateJava() )
+                            {
+                                try
+                                {
+                                    new MessageFormat( t.getValue(), new Locale( t.getLanguage() ) );
+                                }
+                                catch ( final IllegalArgumentException e )
+                                {
+                                    final String message = getMessage( e );
+
+                                    if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                                    {
+                                        validationContext.getModelContext().log( Level.FINE, message, e );
+                                    }
+
+                                    addDetail( validationContext.getReport(), "MODULE_MESSAGE_TEMPLATE_CONSTRAINT",
+                                               Level.SEVERE, new ObjectFactory().createModule( m ),
+                                               "moduleMessageTemplateConstraint", m.getName(), msg.getName(),
+                                               t.getValue(),
+                                               message != null && message.length() > 0 ? " " + message : "" );
+
+                                }
+                            }
+                        }
+                    }
+
+                    if ( msg.getArguments() != null )
+                    {
+                        for ( int k = 0, s2 = msg.getArguments().getArgument().size(); k < s2; k++ )
+                        {
+                            final Argument a = msg.getArguments().getArgument( k );
+
+                            if ( validationContext.isValidateJava() )
+                            {
+                                try
+                                {
+                                    a.getJavaTypeName();
+                                }
+                                catch ( final ModelObjectException e )
+                                {
+                                    final String message = getMessage( e );
+
+                                    if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                                    {
+                                        validationContext.getModelContext().log( Level.FINE, message, e );
+                                    }
+
+                                    addDetail( validationContext.getReport(),
+                                               "MODULE_MESSAGE_ARGUMENT_JAVA_TYPE_NAME_CONSTRAINT",
+                                               Level.SEVERE, new ObjectFactory().createModule( m ),
+                                               "moduleMessageArgumentJavaTypeNameConstraint", m.getName(),
+                                               msg.getName(), a.getIndex(),
+                                               message != null && message.length() > 0 ? " " + message : "" );
+
+                                }
+
+                                try
+                                {
+                                    a.getJavaVariableName();
+                                }
+                                catch ( final ModelObjectException e )
+                                {
+                                    final String message = getMessage( e );
+
+                                    if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                                    {
+                                        validationContext.getModelContext().log( Level.FINE, message, e );
+                                    }
+
+                                    addDetail( validationContext.getReport(),
+                                               "MODULE_MESSAGE_ARGUMENT_JAVA_VARIABLE_NAME_CONSTRAINT",
+                                               Level.SEVERE, new ObjectFactory().createModule( m ),
+                                               "moduleMessageArgumentJavaVariableNameConstraint", m.getName(),
+                                               msg.getName(), a.getIndex(),
+                                               message != null && message.length() > 0 ? " " + message : "" );
+
+                                }
                             }
                         }
                     }
@@ -257,23 +547,132 @@ public class DefaultModelValidator implements ModelValidator
 
                     }
 
-                    try
+                    if ( validationContext.isValidateJava() )
                     {
-                        p.getJavaValue( validationContext.getModelContext().getClassLoader() );
-                    }
-                    catch ( final ModelObjectException e )
-                    {
-                        final String message = getMessage( e );
-
-                        if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                        try
                         {
-                            validationContext.getModelContext().log( Level.FINE, message, e );
+                            p.getJavaConstantName();
+                        }
+                        catch ( final ModelObjectException e )
+                        {
+                            final String message = getMessage( e );
+
+                            if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                            {
+                                validationContext.getModelContext().log( Level.FINE, message, e );
+                            }
+
+                            addDetail( validationContext.getReport(),
+                                       "MODULE_PROPERTY_JAVA_CONSTANT_NAME_CONSTRAINT",
+                                       Level.SEVERE, new ObjectFactory().createModule( m ),
+                                       "modulePropertyJavaConstantNameConstraint", m.getName(), p.getName(),
+                                       message != null && message.length() > 0 ? " " + message : "" );
+
                         }
 
-                        addDetail( validationContext.getReport(), "MODULE_PROPERTY_JAVA_VALUE_CONSTRAINT", Level.SEVERE,
-                                   new ObjectFactory().createModule( m ), "modulePropertyJavaValueConstraint",
-                                   m.getName(), p.getName(), message );
+                        try
+                        {
+                            p.getJavaGetterMethodName();
+                        }
+                        catch ( final ModelObjectException e )
+                        {
+                            final String message = getMessage( e );
 
+                            if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                            {
+                                validationContext.getModelContext().log( Level.FINE, message, e );
+                            }
+
+                            addDetail( validationContext.getReport(),
+                                       "MODULE_PROPERTY_JAVA_GETTER_METHOD_NAME_CONSTRAINT",
+                                       Level.SEVERE, new ObjectFactory().createModule( m ),
+                                       "modulePropertyJavaGetterMethodNameConstraint", m.getName(), p.getName(),
+                                       message != null && message.length() > 0 ? " " + message : "" );
+
+                        }
+
+                        try
+                        {
+                            p.getJavaSetterMethodName();
+                        }
+                        catch ( final ModelObjectException e )
+                        {
+                            final String message = getMessage( e );
+
+                            if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                            {
+                                validationContext.getModelContext().log( Level.FINE, message, e );
+                            }
+
+                            addDetail( validationContext.getReport(),
+                                       "MODULE_PROPERTY_JAVA_SETTER_METHOD_NAME_CONSTRAINT",
+                                       Level.SEVERE, new ObjectFactory().createModule( m ),
+                                       "modulePropertyJavaSetterMethodNameConstraint", m.getName(), p.getName(),
+                                       message != null && message.length() > 0 ? " " + message : "" );
+
+                        }
+
+                        try
+                        {
+                            p.getJavaTypeName();
+                        }
+                        catch ( final ModelObjectException e )
+                        {
+                            final String message = getMessage( e );
+
+                            if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                            {
+                                validationContext.getModelContext().log( Level.FINE, message, e );
+                            }
+
+                            addDetail( validationContext.getReport(),
+                                       "MODULE_PROPERTY_JAVA_TYPE_NAME_CONSTRAINT",
+                                       Level.SEVERE, new ObjectFactory().createModule( m ),
+                                       "modulePropertyJavaTypeNameConstraint", m.getName(), p.getName(),
+                                       message != null && message.length() > 0 ? " " + message : "" );
+
+                        }
+
+                        try
+                        {
+                            p.getJavaVariableName();
+                        }
+                        catch ( final ModelObjectException e )
+                        {
+                            final String message = getMessage( e );
+
+                            if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                            {
+                                validationContext.getModelContext().log( Level.FINE, message, e );
+                            }
+
+                            addDetail( validationContext.getReport(),
+                                       "MODULE_PROPERTY_JAVA_VARIABLE_NAME_CONSTRAINT",
+                                       Level.SEVERE, new ObjectFactory().createModule( m ),
+                                       "modulePropertyJavaVariableNameConstraint", m.getName(), p.getName(),
+                                       message != null && message.length() > 0 ? " " + message : "" );
+
+                        }
+
+                        try
+                        {
+                            p.getJavaValue( validationContext.getModelContext().getClassLoader() );
+                        }
+                        catch ( final ModelObjectException e )
+                        {
+                            final String message = getMessage( e );
+
+                            if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                            {
+                                validationContext.getModelContext().log( Level.FINE, message, e );
+                            }
+
+                            addDetail( validationContext.getReport(), "MODULE_PROPERTY_JAVA_VALUE_CONSTRAINT",
+                                       Level.SEVERE, new ObjectFactory().createModule( m ),
+                                       "modulePropertyJavaValueConstraint", m.getName(), p.getName(),
+                                       message != null && message.length() > 0 ? " " + message : "" );
+
+                        }
                     }
                 }
 
@@ -308,6 +707,8 @@ public class DefaultModelValidator implements ModelValidator
         if ( implementations != null )
         {
             final Map<String, Implementation> implementationClassDeclarations = new HashMap<String, Implementation>();
+            final Map<String, Implementation> implementationJavaClassDeclarations =
+                new HashMap<String, Implementation>();
 
             for ( int i = 0, s0 = implementations.getImplementation().size(); i < s0; i++ )
             {
@@ -331,6 +732,30 @@ public class DefaultModelValidator implements ModelValidator
                                "implementationInheritanceCycleConstraint", impl.getIdentifier(),
                                moduleOfImpl.getName(), b.substring( " -> ".length() ) );
 
+                }
+
+                if ( validationContext.isValidateJava() )
+                {
+                    try
+                    {
+                        impl.getJavaTypeName();
+                    }
+                    catch ( final ModelObjectException e )
+                    {
+                        final String message = getMessage( e );
+
+                        if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                        {
+                            validationContext.getModelContext().log( Level.FINE, message, e );
+                        }
+
+                        addDetail( validationContext.getReport(),
+                                   "IMPLEMENTATION_JAVA_TYPE_NAME_CONSTRAINT",
+                                   Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                   "implementationJavaTypeNameConstraint", impl.getIdentifier(),
+                                   moduleOfImpl.getName(), impl.getClazz(), message );
+
+                    }
                 }
 
                 if ( impl.isClassDeclaration() )
@@ -361,6 +786,39 @@ public class DefaultModelValidator implements ModelValidator
                         else
                         {
                             implementationClassDeclarations.put( impl.getClazz(), impl );
+                        }
+
+                        if ( validationContext.isValidateJava() )
+                        {
+                            try
+                            {
+                                final Implementation java =
+                                    implementationJavaClassDeclarations.get( impl.getJavaTypeName().getClassName() );
+
+                                if ( java != null && !java.getIdentifier().equals( impl.getIdentifier() ) )
+                                {
+                                    final Module moduleOfJava = validationContext.getModules().
+                                        getModuleOfImplementation( java.getIdentifier() );
+
+                                    addDetail( validationContext.getReport(),
+                                               "IMPLEMENTATION_JAVA_CLASS_DECLARATION_CONSTRAINT",
+                                               Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                               "implementationJavaClassDeclarationConstraint", impl.getIdentifier(),
+                                               moduleOfImpl.getName(), impl.getJavaTypeName().getClassName(),
+                                               java.getIdentifier(), moduleOfJava.getName() );
+
+                                }
+                                else
+                                {
+                                    implementationJavaClassDeclarations.put( impl.getJavaTypeName().getClassName(),
+                                                                             impl );
+
+                                }
+                            }
+                            catch ( final ModelObjectException e )
+                            {
+                                // Already validated above.
+                            }
                         }
                     }
                 }
@@ -448,6 +906,97 @@ public class DefaultModelValidator implements ModelValidator
                                            overriddenImplementation.getIdentifier(),
                                            moduleOfDependency.getName(),
                                            getNodePathString( overriddenDependency ) );
+
+                            }
+                        }
+
+                        if ( validationContext.isValidateJava() )
+                        {
+                            try
+                            {
+                                d.getJavaConstantName();
+                            }
+                            catch ( final ModelObjectException e )
+                            {
+                                final String message = getMessage( e );
+
+                                if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                                {
+                                    validationContext.getModelContext().log( Level.FINE, message, e );
+                                }
+
+                                addDetail( validationContext.getReport(),
+                                           "IMPLEMENTATION_DEPENDENCY_JAVA_CONSTANT_NAME_CONSTRAINT",
+                                           Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                           "implementationDependencyJavaConstantNameConstraint", impl.getIdentifier(),
+                                           moduleOfImpl.getName(), d.getName(),
+                                           message != null && message.length() > 0 ? " " + message : "" );
+
+                            }
+
+                            try
+                            {
+                                d.getJavaGetterMethodName();
+                            }
+                            catch ( final ModelObjectException e )
+                            {
+                                final String message = getMessage( e );
+
+                                if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                                {
+                                    validationContext.getModelContext().log( Level.FINE, message, e );
+                                }
+
+                                addDetail( validationContext.getReport(),
+                                           "IMPLEMENTATION_DEPENDENCY_JAVA_GETTER_METHOD_NAME_CONSTRAINT",
+                                           Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                           "implementationDependencyJavaGetterMethodNameConstraint",
+                                           impl.getIdentifier(), moduleOfImpl.getName(), d.getName(),
+                                           message != null && message.length() > 0 ? " " + message : "" );
+
+                            }
+
+                            try
+                            {
+                                d.getJavaSetterMethodName();
+                            }
+                            catch ( final ModelObjectException e )
+                            {
+                                final String message = getMessage( e );
+
+                                if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                                {
+                                    validationContext.getModelContext().log( Level.FINE, message, e );
+                                }
+
+                                addDetail( validationContext.getReport(),
+                                           "IMPLEMENTATION_DEPENDENCY_JAVA_SETTER_METHOD_NAME_CONSTRAINT",
+                                           Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                           "implementationDependencyJavaSetterMethodNameConstraint",
+                                           impl.getIdentifier(), moduleOfImpl.getName(), d.getName(),
+                                           message != null && message.length() > 0 ? " " + message : "" );
+
+                            }
+
+                            try
+                            {
+                                d.getJavaVariableName();
+                            }
+                            catch ( final ModelObjectException e )
+                            {
+                                final String message = getMessage( e );
+
+                                if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                                {
+                                    validationContext.getModelContext().log( Level.FINE, message, e );
+                                }
+
+                                addDetail( validationContext.getReport(),
+                                           "IMPLEMENTATION_DEPENDENCY_JAVA_VARIABLE_NAME_CONSTRAINT",
+                                           Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                           "implementationDependencyJavaVariableNameConstraint",
+                                           impl.getIdentifier(), moduleOfImpl.getName(), d.getName(),
+                                           message != null && message.length() > 0 ? " " + message : "" );
 
                             }
                         }
@@ -585,6 +1134,97 @@ public class DefaultModelValidator implements ModelValidator
 
                         }
 
+                        if ( validationContext.isValidateJava() )
+                        {
+                            try
+                            {
+                                m.getJavaConstantName();
+                            }
+                            catch ( final ModelObjectException e )
+                            {
+                                final String message = getMessage( e );
+
+                                if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                                {
+                                    validationContext.getModelContext().log( Level.FINE, message, e );
+                                }
+
+                                addDetail( validationContext.getReport(),
+                                           "IMPLEMENTATION_MESSAGE_JAVA_CONSTANT_NAME_CONSTRAINT", Level.SEVERE,
+                                           new ObjectFactory().createImplementation( impl ),
+                                           "implementationMessageJavaConstantNameConstraint", impl.getIdentifier(),
+                                           moduleOfImpl.getName(), m.getName(),
+                                           message != null && message.length() > 0 ? " " + message : "" );
+
+                            }
+
+                            try
+                            {
+                                m.getJavaGetterMethodName();
+                            }
+                            catch ( final ModelObjectException e )
+                            {
+                                final String message = getMessage( e );
+
+                                if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                                {
+                                    validationContext.getModelContext().log( Level.FINE, message, e );
+                                }
+
+                                addDetail( validationContext.getReport(),
+                                           "IMPLEMENTATION_MESSAGE_JAVA_GETTER_METHOD_NAME_CONSTRAINT", Level.SEVERE,
+                                           new ObjectFactory().createImplementation( impl ),
+                                           "implementationMessageJavaGetterMethodNameConstraint", impl.getIdentifier(),
+                                           moduleOfImpl.getName(), m.getName(),
+                                           message != null && message.length() > 0 ? " " + message : "" );
+
+                            }
+
+                            try
+                            {
+                                m.getJavaSetterMethodName();
+                            }
+                            catch ( final ModelObjectException e )
+                            {
+                                final String message = getMessage( e );
+
+                                if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                                {
+                                    validationContext.getModelContext().log( Level.FINE, message, e );
+                                }
+
+                                addDetail( validationContext.getReport(),
+                                           "IMPLEMENTATION_MESSAGE_JAVA_SETTER_METHOD_NAME_CONSTRAINT", Level.SEVERE,
+                                           new ObjectFactory().createImplementation( impl ),
+                                           "implementationMessageJavaSetterMethodNameConstraint", impl.getIdentifier(),
+                                           moduleOfImpl.getName(), m.getName(),
+                                           message != null && message.length() > 0 ? " " + message : "" );
+
+                            }
+
+                            try
+                            {
+                                m.getJavaVariableName();
+                            }
+                            catch ( final ModelObjectException e )
+                            {
+                                final String message = getMessage( e );
+
+                                if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                                {
+                                    validationContext.getModelContext().log( Level.FINE, message, e );
+                                }
+
+                                addDetail( validationContext.getReport(),
+                                           "IMPLEMENTATION_MESSAGE_JAVA_VARIABLE_NAME_CONSTRAINT", Level.SEVERE,
+                                           new ObjectFactory().createImplementation( impl ),
+                                           "implementationMessageJavaVariableNameConstraint", impl.getIdentifier(),
+                                           moduleOfImpl.getName(), m.getName(),
+                                           message != null && message.length() > 0 ? " " + message : "" );
+
+                            }
+                        }
+
                         if ( m.getTemplate() != null )
                         {
                             for ( int k = 0, s2 = m.getTemplate().getText().size(); k < s2; k++ )
@@ -593,9 +1233,9 @@ public class DefaultModelValidator implements ModelValidator
 
                                 try
                                 {
-                                    new MessageFormat( t.getValue(), new Locale( t.getLanguage() ) );
+                                    t.getMimeType();
                                 }
-                                catch ( final IllegalArgumentException e )
+                                catch ( final ModelObjectException e )
                                 {
                                     final String message = getMessage( e );
 
@@ -605,12 +1245,37 @@ public class DefaultModelValidator implements ModelValidator
                                     }
 
                                     addDetail( validationContext.getReport(),
-                                               "IMPLEMENTATION_MESSAGE_TEMPLATE_CONSTRAINT", Level.SEVERE,
+                                               "IMPLEMENTATION_MESSAGE_TEMPLATE_MIME_TYPE_CONSTRAINT", Level.SEVERE,
                                                new ObjectFactory().createImplementation( impl ),
-                                               "implementationMessageTemplateConstraint", impl.getIdentifier(),
-                                               moduleOfImpl.getName(), m.getName(), t.getValue(),
+                                               "implementationMessageTemplateMimeTypeConstraint", impl.getIdentifier(),
+                                               moduleOfImpl.getName(), m.getName(), t.getLanguage(),
                                                message != null && message.length() > 0 ? " " + message : "" );
 
+                                }
+
+                                if ( validationContext.isValidateJava() )
+                                {
+                                    try
+                                    {
+                                        new MessageFormat( t.getValue(), new Locale( t.getLanguage() ) );
+                                    }
+                                    catch ( final IllegalArgumentException e )
+                                    {
+                                        final String message = getMessage( e );
+
+                                        if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                                        {
+                                            validationContext.getModelContext().log( Level.FINE, message, e );
+                                        }
+
+                                        addDetail( validationContext.getReport(),
+                                                   "IMPLEMENTATION_MESSAGE_TEMPLATE_CONSTRAINT", Level.SEVERE,
+                                                   new ObjectFactory().createImplementation( impl ),
+                                                   "implementationMessageTemplateConstraint", impl.getIdentifier(),
+                                                   moduleOfImpl.getName(), m.getName(), t.getLanguage(),
+                                                   message != null && message.length() > 0 ? " " + message : "" );
+
+                                    }
                                 }
                             }
                         }
@@ -677,6 +1342,63 @@ public class DefaultModelValidator implements ModelValidator
                                            overriddenImplementation.getIdentifier(),
                                            moduleOfMessage.getName(), getNodePathString( overriddenMessage ) );
 
+                            }
+                        }
+
+                        if ( m.getArguments() != null )
+                        {
+                            for ( int k = 0, s2 = m.getArguments().getArgument().size(); k < s2; k++ )
+                            {
+                                final Argument a = m.getArguments().getArgument().get( k );
+
+                                if ( validationContext.isValidateJava() )
+                                {
+                                    try
+                                    {
+                                        a.getJavaTypeName();
+                                    }
+                                    catch ( final ModelObjectException e )
+                                    {
+                                        final String message = getMessage( e );
+
+                                        if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                                        {
+                                            validationContext.getModelContext().log( Level.FINE, message, e );
+                                        }
+
+                                        addDetail( validationContext.getReport(),
+                                                   "IMPLEMENTATION_MESSAGE_ARGUMENT_JAVA_TYPE_NAME_CONSTRAINT",
+                                                   Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                                   "implementationMessageArgumentJavaTypeNameConstraint",
+                                                   impl.getIdentifier(), moduleOfImpl.getName(), m.getName(),
+                                                   a.getName(),
+                                                   message != null && message.length() > 0 ? " " + message : "" );
+
+                                    }
+
+                                    try
+                                    {
+                                        a.getJavaVariableName();
+                                    }
+                                    catch ( final ModelObjectException e )
+                                    {
+                                        final String message = getMessage( e );
+
+                                        if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                                        {
+                                            validationContext.getModelContext().log( Level.FINE, message, e );
+                                        }
+
+                                        addDetail( validationContext.getReport(),
+                                                   "IMPLEMENTATION_MESSAGE_ARGUMENT_JAVA_VARIABLE_NAME_CONSTRAINT",
+                                                   Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                                   "implementationMessageArgumentJavaVariableNameConstraint",
+                                                   impl.getIdentifier(), moduleOfImpl.getName(), m.getName(),
+                                                   a.getIndex(),
+                                                   message != null && message.length() > 0 ? " " + message : "" );
+
+                                    }
+                                }
                             }
                         }
                     }
@@ -786,25 +1508,139 @@ public class DefaultModelValidator implements ModelValidator
 
                         }
 
-                        try
+                        if ( validationContext.isValidateJava() )
                         {
-                            p.getJavaValue( validationContext.getModelContext().getClassLoader() );
-                        }
-                        catch ( final ModelObjectException e )
-                        {
-                            final String message = getMessage( e );
-
-                            if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                            try
                             {
-                                validationContext.getModelContext().log( Level.FINE, message, e );
+                                p.getJavaConstantName();
+                            }
+                            catch ( final ModelObjectException e )
+                            {
+                                final String message = getMessage( e );
+
+                                if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                                {
+                                    validationContext.getModelContext().log( Level.FINE, message, e );
+                                }
+
+                                addDetail( validationContext.getReport(),
+                                           "IMPLEMENTATION_PROPERTY_JAVA_CONSTANT_NAME_CONSTRAINT",
+                                           Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                           "implementationPropertyJavaConstantNameConstraint", impl.getIdentifier(),
+                                           moduleOfImpl.getName(), p.getName(),
+                                           message != null && message.length() > 0 ? " " + message : "" );
+
                             }
 
-                            addDetail( validationContext.getReport(), "IMPLEMENTATION_PROPERTY_JAVA_VALUE_CONSTRAINT",
-                                       Level.SEVERE, new ObjectFactory().createImplementation( impl ),
-                                       "implementationPropertyJavaValueConstraint", impl.getIdentifier(),
-                                       moduleOfImpl.getName(), p.getName(),
-                                       message != null && message.length() > 0 ? " " + message : "" );
+                            try
+                            {
+                                p.getJavaGetterMethodName();
+                            }
+                            catch ( final ModelObjectException e )
+                            {
+                                final String message = getMessage( e );
 
+                                if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                                {
+                                    validationContext.getModelContext().log( Level.FINE, message, e );
+                                }
+
+                                addDetail( validationContext.getReport(),
+                                           "IMPLEMENTATION_PROPERTY_JAVA_GETTER_METHOD_NAME_CONSTRAINT",
+                                           Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                           "implementationPropertyJavaGetterMethodNameConstraint", impl.getIdentifier(),
+                                           moduleOfImpl.getName(), p.getName(),
+                                           message != null && message.length() > 0 ? " " + message : "" );
+
+                            }
+
+                            try
+                            {
+                                p.getJavaSetterMethodName();
+                            }
+                            catch ( final ModelObjectException e )
+                            {
+                                final String message = getMessage( e );
+
+                                if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                                {
+                                    validationContext.getModelContext().log( Level.FINE, message, e );
+                                }
+
+                                addDetail( validationContext.getReport(),
+                                           "IMPLEMENTATION_PROPERTY_JAVA_SETTER_METHOD_NAME_CONSTRAINT",
+                                           Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                           "implementationPropertyJavaSetterMethodNameConstraint", impl.getIdentifier(),
+                                           moduleOfImpl.getName(), p.getName(),
+                                           message != null && message.length() > 0 ? " " + message : "" );
+
+                            }
+
+                            try
+                            {
+                                p.getJavaTypeName();
+                            }
+                            catch ( final ModelObjectException e )
+                            {
+                                final String message = getMessage( e );
+
+                                if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                                {
+                                    validationContext.getModelContext().log( Level.FINE, message, e );
+                                }
+
+                                addDetail( validationContext.getReport(),
+                                           "IMPLEMENTATION_PROPERTY_JAVA_TYPE_NAME_CONSTRAINT",
+                                           Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                           "implementationPropertyJavaTypeNameConstraint", impl.getIdentifier(),
+                                           moduleOfImpl.getName(), p.getName(),
+                                           message != null && message.length() > 0 ? " " + message : "" );
+
+                            }
+
+                            try
+                            {
+                                p.getJavaVariableName();
+                            }
+                            catch ( final ModelObjectException e )
+                            {
+                                final String message = getMessage( e );
+
+                                if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                                {
+                                    validationContext.getModelContext().log( Level.FINE, message, e );
+                                }
+
+                                addDetail( validationContext.getReport(),
+                                           "IMPLEMENTATION_PROPERTY_JAVA_VARIABLE_NAME_CONSTRAINT",
+                                           Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                           "implementationPropertyJavaVariableNameConstraint", impl.getIdentifier(),
+                                           moduleOfImpl.getName(), p.getName(),
+                                           message != null && message.length() > 0 ? " " + message : "" );
+
+                            }
+
+                            try
+                            {
+                                p.getJavaValue( validationContext.getModelContext().getClassLoader() );
+                            }
+                            catch ( final ModelObjectException e )
+                            {
+                                final String message = getMessage( e );
+
+                                if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                                {
+                                    validationContext.getModelContext().log( Level.FINE, message, e );
+                                }
+
+                                addDetail( validationContext.getReport(),
+                                           "IMPLEMENTATION_PROPERTY_JAVA_VALUE_CONSTRAINT",
+                                           Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                           "implementationPropertyJavaValueConstraint", impl.getIdentifier(),
+                                           moduleOfImpl.getName(), p.getName(),
+                                           message != null && message.length() > 0 ? " " + message : "" );
+
+                            }
                         }
 
                         final Set<InheritanceModel.Node<Property>> effProperties =
@@ -1359,6 +2195,8 @@ public class DefaultModelValidator implements ModelValidator
     {
         final Specifications specifications = validationContext.getModules().getSpecifications();
         final Map<String, Specification> specificationClassDeclarations = new HashMap<String, Specification>();
+        final Map<String, Specification> specificationJavaClassDeclarations =
+            new HashMap<String, Specification>();
 
         if ( specifications != null )
         {
@@ -1367,6 +2205,30 @@ public class DefaultModelValidator implements ModelValidator
                 final Specification s = specifications.getSpecification().get( i );
                 final Implementations impls = validationContext.getModules().getImplementations( s.getIdentifier() );
                 final Module moduleOfS = validationContext.getModules().getModuleOfSpecification( s.getIdentifier() );
+
+                if ( validationContext.isValidateJava() )
+                {
+                    try
+                    {
+                        s.getJavaTypeName();
+                    }
+                    catch ( final ModelObjectException e )
+                    {
+                        final String message = getMessage( e );
+
+                        if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                        {
+                            validationContext.getModelContext().log( Level.FINE, message, e );
+                        }
+
+                        addDetail( validationContext.getReport(),
+                                   "SPECIFICATION_JAVA_TYPE_NAME_CONSTRAINT",
+                                   Level.SEVERE, new ObjectFactory().createSpecification( s ),
+                                   "specificationJavaTypeNameConstraint", s.getIdentifier(),
+                                   moduleOfS.getName(), s.getClazz(), message );
+
+                    }
+                }
 
                 if ( s.isClassDeclaration() )
                 {
@@ -1396,6 +2258,37 @@ public class DefaultModelValidator implements ModelValidator
                         else
                         {
                             specificationClassDeclarations.put( s.getClazz(), s );
+                        }
+
+                        if ( validationContext.isValidateJava() )
+                        {
+                            try
+                            {
+                                final Specification java =
+                                    specificationJavaClassDeclarations.get( s.getJavaTypeName().getClassName() );
+
+                                if ( java != null && !java.getIdentifier().equals( s.getIdentifier() ) )
+                                {
+                                    final Module moduleOfJava = validationContext.getModules().
+                                        getModuleOfSpecification( java.getIdentifier() );
+
+                                    addDetail( validationContext.getReport(),
+                                               "SPECIFICATION_JAVA_CLASS_DECLARATION_CONSTRAINT",
+                                               Level.SEVERE, new ObjectFactory().createSpecification( s ),
+                                               "specificationJavaClassDeclarationConstraint", s.getIdentifier(),
+                                               moduleOfS.getName(), s.getJavaTypeName().getClassName(),
+                                               java.getIdentifier(), moduleOfJava.getName() );
+
+                                }
+                                else
+                                {
+                                    specificationJavaClassDeclarations.put( s.getJavaTypeName().getClassName(), s );
+                                }
+                            }
+                            catch ( final ModelObjectException e )
+                            {
+                                // Already validated above.
+                            }
                         }
                     }
                 }
@@ -1482,25 +2375,139 @@ public class DefaultModelValidator implements ModelValidator
 
                         }
 
-                        try
+                        if ( validationContext.isValidateJava() )
                         {
-                            p.getJavaValue( validationContext.getModelContext().getClassLoader() );
-                        }
-                        catch ( final ModelObjectException e )
-                        {
-                            final String message = getMessage( e );
-
-                            if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                            try
                             {
-                                validationContext.getModelContext().log( Level.FINE, message, e );
+                                p.getJavaConstantName();
+                            }
+                            catch ( final ModelObjectException e )
+                            {
+                                final String message = getMessage( e );
+
+                                if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                                {
+                                    validationContext.getModelContext().log( Level.FINE, message, e );
+                                }
+
+                                addDetail( validationContext.getReport(),
+                                           "SPECIFICATION_PROPERTY_JAVA_CONSTANT_NAME_CONSTRAINT",
+                                           Level.SEVERE, new ObjectFactory().createSpecification( s ),
+                                           "specificationPropertyJavaConstantNameConstraint", s.getIdentifier(),
+                                           moduleOfS.getName(), p.getName(),
+                                           message != null && message.length() > 0 ? " " + message : "" );
+
                             }
 
-                            addDetail( validationContext.getReport(), "SPECIFICATION_PROPERTY_JAVA_VALUE_CONSTRAINT",
-                                       Level.SEVERE, new ObjectFactory().createSpecification( s ),
-                                       "specificationPropertyJavaValueConstraint", s.getIdentifier(),
-                                       moduleOfS.getName(), p.getName(),
-                                       message != null && message.length() > 0 ? " " + message : "" );
+                            try
+                            {
+                                p.getJavaGetterMethodName();
+                            }
+                            catch ( final ModelObjectException e )
+                            {
+                                final String message = getMessage( e );
 
+                                if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                                {
+                                    validationContext.getModelContext().log( Level.FINE, message, e );
+                                }
+
+                                addDetail( validationContext.getReport(),
+                                           "SPECIFICATION_PROPERTY_JAVA_GETTER_METHOD_NAME_CONSTRAINT",
+                                           Level.SEVERE, new ObjectFactory().createSpecification( s ),
+                                           "specificationPropertyJavaGetterMethodNameConstraint", s.getIdentifier(),
+                                           moduleOfS.getName(), p.getName(),
+                                           message != null && message.length() > 0 ? " " + message : "" );
+
+                            }
+
+                            try
+                            {
+                                p.getJavaSetterMethodName();
+                            }
+                            catch ( final ModelObjectException e )
+                            {
+                                final String message = getMessage( e );
+
+                                if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                                {
+                                    validationContext.getModelContext().log( Level.FINE, message, e );
+                                }
+
+                                addDetail( validationContext.getReport(),
+                                           "SPECIFICATION_PROPERTY_JAVA_SETTER_METHOD_NAME_CONSTRAINT",
+                                           Level.SEVERE, new ObjectFactory().createSpecification( s ),
+                                           "specificationPropertyJavaSetterMethodNameConstraint", s.getIdentifier(),
+                                           moduleOfS.getName(), p.getName(),
+                                           message != null && message.length() > 0 ? " " + message : "" );
+
+                            }
+
+                            try
+                            {
+                                p.getJavaTypeName();
+                            }
+                            catch ( final ModelObjectException e )
+                            {
+                                final String message = getMessage( e );
+
+                                if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                                {
+                                    validationContext.getModelContext().log( Level.FINE, message, e );
+                                }
+
+                                addDetail( validationContext.getReport(),
+                                           "SPECIFICATION_PROPERTY_JAVA_TYPE_NAME_CONSTRAINT",
+                                           Level.SEVERE, new ObjectFactory().createSpecification( s ),
+                                           "specificationPropertyJavaTypeNameConstraint", s.getIdentifier(),
+                                           moduleOfS.getName(), p.getName(),
+                                           message != null && message.length() > 0 ? " " + message : "" );
+
+                            }
+
+                            try
+                            {
+                                p.getJavaVariableName();
+                            }
+                            catch ( final ModelObjectException e )
+                            {
+                                final String message = getMessage( e );
+
+                                if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                                {
+                                    validationContext.getModelContext().log( Level.FINE, message, e );
+                                }
+
+                                addDetail( validationContext.getReport(),
+                                           "SPECIFICATION_PROPERTY_JAVA_VARIABLE_NAME_CONSTRAINT",
+                                           Level.SEVERE, new ObjectFactory().createSpecification( s ),
+                                           "specificationPropertyJavaVariableNameConstraint", s.getIdentifier(),
+                                           moduleOfS.getName(), p.getName(),
+                                           message != null && message.length() > 0 ? " " + message : "" );
+
+                            }
+
+                            try
+                            {
+                                p.getJavaValue( validationContext.getModelContext().getClassLoader() );
+                            }
+                            catch ( final ModelObjectException e )
+                            {
+                                final String message = getMessage( e );
+
+                                if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                                {
+                                    validationContext.getModelContext().log( Level.FINE, message, e );
+                                }
+
+                                addDetail( validationContext.getReport(),
+                                           "SPECIFICATION_PROPERTY_JAVA_VALUE_CONSTRAINT",
+                                           Level.SEVERE, new ObjectFactory().createSpecification( s ),
+                                           "specificationPropertyJavaValueConstraint", s.getIdentifier(),
+                                           moduleOfS.getName(), p.getName(),
+                                           message != null && message.length() > 0 ? " " + message : "" );
+
+                            }
                         }
                     }
 
@@ -1676,6 +2683,212 @@ public class DefaultModelValidator implements ModelValidator
 
         if ( dependency.getMessages() != null )
         {
+            for ( int i = 0, s0 = dependency.getMessages().getMessage().size(); i < s0; i++ )
+            {
+                final Message m = dependency.getMessages().getMessage().get( i );
+
+                if ( validationContext.isValidateJava() )
+                {
+                    try
+                    {
+                        m.getJavaConstantName();
+                    }
+                    catch ( final ModelObjectException e )
+                    {
+                        final String message = getMessage( e );
+
+                        if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                        {
+                            validationContext.getModelContext().log( Level.FINE, message, e );
+                        }
+
+                        addDetail( validationContext.getReport(),
+                                   "IMPLEMENTATION_DEPENDENCY_MESSAGE_JAVA_CONSTANT_NAME_CONSTRAINT", Level.SEVERE,
+                                   new ObjectFactory().createImplementation( implementation ),
+                                   "implementationDependencyMessageJavaConstantNameConstraint",
+                                   implementation.getIdentifier(), moduleOfImpl.getName(), dependency.getName(),
+                                   m.getName(), message != null && message.length() > 0 ? " " + message : "" );
+                    }
+
+                    try
+                    {
+                        m.getJavaGetterMethodName();
+                    }
+                    catch ( final ModelObjectException e )
+                    {
+                        final String message = getMessage( e );
+
+                        if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                        {
+                            validationContext.getModelContext().log( Level.FINE, message, e );
+                        }
+
+                        addDetail( validationContext.getReport(),
+                                   "IMPLEMENTATION_DEPENDENCY_MESSAGE_JAVA_GETTER_METHOD_NAME_CONSTRAINT", Level.SEVERE,
+                                   new ObjectFactory().createImplementation( implementation ),
+                                   "implementationDependencyMessageJavaGetterMethodNameConstraint",
+                                   implementation.getIdentifier(), moduleOfImpl.getName(), dependency.getName(),
+                                   m.getName(), message != null && message.length() > 0 ? " " + message : "" );
+                    }
+
+                    try
+                    {
+                        m.getJavaSetterMethodName();
+                    }
+                    catch ( final ModelObjectException e )
+                    {
+                        final String message = getMessage( e );
+
+                        if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                        {
+                            validationContext.getModelContext().log( Level.FINE, message, e );
+                        }
+
+                        addDetail( validationContext.getReport(),
+                                   "IMPLEMENTATION_DEPENDENCY_MESSAGE_JAVA_SETTER_METHOD_NAME_CONSTRAINT", Level.SEVERE,
+                                   new ObjectFactory().createImplementation( implementation ),
+                                   "implementationDependencyMessageJavaSetterMethodNameConstraint",
+                                   implementation.getIdentifier(), moduleOfImpl.getName(), dependency.getName(),
+                                   m.getName(), message != null && message.length() > 0 ? " " + message : "" );
+                    }
+
+                    try
+                    {
+                        m.getJavaVariableName();
+                    }
+                    catch ( final ModelObjectException e )
+                    {
+                        final String message = getMessage( e );
+
+                        if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                        {
+                            validationContext.getModelContext().log( Level.FINE, message, e );
+                        }
+
+                        addDetail( validationContext.getReport(),
+                                   "IMPLEMENTATION_DEPENDENCY_MESSAGE_JAVA_VARIABLE_NAME_CONSTRAINT", Level.SEVERE,
+                                   new ObjectFactory().createImplementation( implementation ),
+                                   "implementationDependencyMessageJavaVariableNameConstraint",
+                                   implementation.getIdentifier(), moduleOfImpl.getName(), dependency.getName(),
+                                   m.getName(), message != null && message.length() > 0 ? " " + message : "" );
+                    }
+                }
+
+                if ( m.getTemplate() != null )
+                {
+                    for ( int j = 0, s1 = m.getTemplate().getText().size(); j < s1; j++ )
+                    {
+                        final Text t = m.getTemplate().getText().get( j );
+
+                        try
+                        {
+                            t.getMimeType();
+                        }
+                        catch ( final ModelObjectException e )
+                        {
+                            final String message = getMessage( e );
+
+                            if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                            {
+                                validationContext.getModelContext().log( Level.FINE, message, e );
+                            }
+
+                            addDetail( validationContext.getReport(),
+                                       "IMPLEMENTATION_DEPENDENCY_MESSAGE_TEMPLATE_MIME_TYPE_CONSTRAINT", Level.SEVERE,
+                                       new ObjectFactory().createImplementation( implementation ),
+                                       "implementationDependencyMessageTemplateMimeTypeConstraint",
+                                       implementation.getIdentifier(), moduleOfImpl.getName(), dependency.getName(),
+                                       m.getName(), t.getLanguage(),
+                                       message != null && message.length() > 0 ? " " + message : "" );
+
+                        }
+
+                        if ( validationContext.isValidateJava() )
+                        {
+                            try
+                            {
+                                new MessageFormat( t.getValue(), new Locale( t.getLanguage() ) );
+                            }
+                            catch ( final IllegalArgumentException e )
+                            {
+                                final String message = getMessage( e );
+
+                                if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                                {
+                                    validationContext.getModelContext().log( Level.FINE, message, e );
+                                }
+
+                                addDetail( validationContext.getReport(),
+                                           "IMPLEMENTATION_DEPENDENCY_MESSAGE_TEMPLATE_CONSTRAINT", Level.SEVERE,
+                                           new ObjectFactory().createImplementation( implementation ),
+                                           "implementationDependencyMessageTemplateConstraint",
+                                           implementation.getIdentifier(), moduleOfImpl.getName(), dependency.getName(),
+                                           m.getName(), t.getLanguage(),
+                                           message != null && message.length() > 0 ? " " + message : "" );
+
+                            }
+                        }
+                    }
+                }
+
+                if ( m.getArguments() != null )
+                {
+                    for ( int j = 0, s1 = m.getArguments().getArgument().size(); j < s1; j++ )
+                    {
+                        final Argument a = m.getArguments().getArgument().get( j );
+
+                        if ( validationContext.isValidateJava() )
+                        {
+                            try
+                            {
+                                a.getJavaTypeName();
+                            }
+                            catch ( final ModelObjectException e )
+                            {
+                                final String message = getMessage( e );
+
+                                if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                                {
+                                    validationContext.getModelContext().log( Level.FINE, message, e );
+                                }
+
+                                addDetail( validationContext.getReport(),
+                                           "IMPLEMENTATION_DEPENDENCY_MESSAGE_ARGUMENT_JAVA_TYPE_NAME_CONSTRAINT",
+                                           Level.SEVERE, new ObjectFactory().createImplementation( implementation ),
+                                           "implementationDependencyMessageArgumentJavaTypeNameConstraint",
+                                           implementation.getIdentifier(), moduleOfImpl.getName(), dependency.getName(),
+                                           m.getName(), a.getName(),
+                                           message != null && message.length() > 0 ? " " + message : "" );
+
+                            }
+
+                            try
+                            {
+                                a.getJavaVariableName();
+                            }
+                            catch ( final ModelObjectException e )
+                            {
+                                final String message = getMessage( e );
+
+                                if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                                {
+                                    validationContext.getModelContext().log( Level.FINE, message, e );
+                                }
+
+                                addDetail( validationContext.getReport(),
+                                           "IMPLEMENTATION_DEPENDENCY_MESSAGE_ARGUMENT_JAVA_VARIABLE_NAME_CONSTRAINT",
+                                           Level.SEVERE, new ObjectFactory().createImplementation( implementation ),
+                                           "implementationDependencyMessageArgumentJavaVariableNameConstraint",
+                                           implementation.getIdentifier(), moduleOfImpl.getName(), dependency.getName(),
+                                           m.getName(), a.getIndex(),
+                                           message != null && message.length() > 0 ? " " + message : "" );
+
+                            }
+                        }
+                    }
+                }
+            }
+
             for ( int i = 0, s0 = dependency.getMessages().getReference().size(); i < s0; i++ )
             {
                 final MessageReference r = dependency.getMessages().getReference().get( i );
@@ -1713,26 +2926,139 @@ public class DefaultModelValidator implements ModelValidator
 
                 }
 
-                try
+                if ( validationContext.isValidateJava() )
                 {
-                    p.getJavaValue( validationContext.getModelContext().getClassLoader() );
-                }
-                catch ( final ModelObjectException e )
-                {
-                    final String message = getMessage( e );
-
-                    if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                    try
                     {
-                        validationContext.getModelContext().log( Level.FINE, message, e );
+                        p.getJavaConstantName();
+                    }
+                    catch ( final ModelObjectException e )
+                    {
+                        final String message = getMessage( e );
+
+                        if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                        {
+                            validationContext.getModelContext().log( Level.FINE, message, e );
+                        }
+
+                        addDetail( validationContext.getReport(),
+                                   "IMPLEMENTATION_DEPENDENCY_PROPERTY_JAVA_CONSTANT_NAME_CONSTRAINT", Level.SEVERE,
+                                   new ObjectFactory().createImplementation( implementation ),
+                                   "implementationDependencyPropertyJavaConstantNameConstraint",
+                                   implementation.getIdentifier(), moduleOfImpl.getName(), dependency.getName(),
+                                   p.getName(), message != null && message.length() > 0 ? " " + message : "" );
+
                     }
 
-                    addDetail( validationContext.getReport(),
-                               "IMPLEMENTATION_DEPENDENCY_PROPERTY_JAVA_VALUE_CONSTRAINT", Level.SEVERE,
-                               new ObjectFactory().createImplementation( implementation ),
-                               "implementationDependencyPropertyJavaValueConstraint", implementation.getIdentifier(),
-                               moduleOfImpl.getName(), dependency.getName(), p.getName(),
-                               message != null && message.length() > 0 ? " " + message : "" );
+                    try
+                    {
+                        p.getJavaGetterMethodName();
+                    }
+                    catch ( final ModelObjectException e )
+                    {
+                        final String message = getMessage( e );
 
+                        if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                        {
+                            validationContext.getModelContext().log( Level.FINE, message, e );
+                        }
+
+                        addDetail( validationContext.getReport(),
+                                   "IMPLEMENTATION_DEPENDENCY_PROPERTY_JAVA_GETTER_METHOD_NAME_CONSTRAINT",
+                                   Level.SEVERE, new ObjectFactory().createImplementation( implementation ),
+                                   "implementationDependencyPropertyJavaGetterMethodNameConstraint",
+                                   implementation.getIdentifier(), moduleOfImpl.getName(), dependency.getName(),
+                                   p.getName(), message != null && message.length() > 0 ? " " + message : "" );
+
+                    }
+
+                    try
+                    {
+                        p.getJavaSetterMethodName();
+                    }
+                    catch ( final ModelObjectException e )
+                    {
+                        final String message = getMessage( e );
+
+                        if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                        {
+                            validationContext.getModelContext().log( Level.FINE, message, e );
+                        }
+
+                        addDetail( validationContext.getReport(),
+                                   "IMPLEMENTATION_DEPENDENCY_PROPERTY_JAVA_SETTER_METHOD_NAME_CONSTRAINT",
+                                   Level.SEVERE, new ObjectFactory().createImplementation( implementation ),
+                                   "implementationDependencyPropertyJavaSetterMethodNameConstraint",
+                                   implementation.getIdentifier(), moduleOfImpl.getName(), dependency.getName(),
+                                   p.getName(), message != null && message.length() > 0 ? " " + message : "" );
+
+                    }
+
+                    try
+                    {
+                        p.getJavaTypeName();
+                    }
+                    catch ( final ModelObjectException e )
+                    {
+                        final String message = getMessage( e );
+
+                        if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                        {
+                            validationContext.getModelContext().log( Level.FINE, message, e );
+                        }
+
+                        addDetail( validationContext.getReport(),
+                                   "IMPLEMENTATION_DEPENDENCY_PROPERTY_JAVA_TYPE_NAME_CONSTRAINT",
+                                   Level.SEVERE, new ObjectFactory().createImplementation( implementation ),
+                                   "implementationDependencyPropertyJavaTypeNameConstraint",
+                                   implementation.getIdentifier(), moduleOfImpl.getName(), dependency.getName(),
+                                   p.getName(), message != null && message.length() > 0 ? " " + message : "" );
+
+                    }
+
+                    try
+                    {
+                        p.getJavaVariableName();
+                    }
+                    catch ( final ModelObjectException e )
+                    {
+                        final String message = getMessage( e );
+
+                        if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                        {
+                            validationContext.getModelContext().log( Level.FINE, message, e );
+                        }
+
+                        addDetail( validationContext.getReport(),
+                                   "IMPLEMENTATION_DEPENDENCY_PROPERTY_JAVA_VARIABLE_NAME_CONSTRAINT",
+                                   Level.SEVERE, new ObjectFactory().createImplementation( implementation ),
+                                   "implementationDependencyPropertyJavaVariableNameConstraint",
+                                   implementation.getIdentifier(), moduleOfImpl.getName(), dependency.getName(),
+                                   p.getName(), message != null && message.length() > 0 ? " " + message : "" );
+
+                    }
+
+                    try
+                    {
+                        p.getJavaValue( validationContext.getModelContext().getClassLoader() );
+                    }
+                    catch ( final ModelObjectException e )
+                    {
+                        final String message = getMessage( e );
+
+                        if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                        {
+                            validationContext.getModelContext().log( Level.FINE, message, e );
+                        }
+
+                        addDetail( validationContext.getReport(),
+                                   "IMPLEMENTATION_DEPENDENCY_PROPERTY_JAVA_VALUE_CONSTRAINT", Level.SEVERE,
+                                   new ObjectFactory().createImplementation( implementation ),
+                                   "implementationDependencyPropertyJavaValueConstraint",
+                                   implementation.getIdentifier(), moduleOfImpl.getName(), dependency.getName(),
+                                   p.getName(), message != null && message.length() > 0 ? " " + message : "" );
+
+                    }
                 }
             }
 
@@ -2026,6 +3352,98 @@ public class DefaultModelValidator implements ModelValidator
             for ( int i = 0, s0 = dependency.getDependencies().getDependency().size(); i < s0; i++ )
             {
                 final Dependency d = dependency.getDependencies().getDependency().get( i );
+
+                if ( validationContext.isValidateJava() )
+                {
+                    try
+                    {
+                        d.getJavaConstantName();
+                    }
+                    catch ( final ModelObjectException e )
+                    {
+                        final String message = getMessage( e );
+
+                        if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                        {
+                            validationContext.getModelContext().log( Level.FINE, message, e );
+                        }
+
+                        addDetail( validationContext.getReport(),
+                                   "IMPLEMENTATION_DEPENDENCY_DEPENDENCY_JAVA_CONSTANT_NAME_CONSTRAINT", Level.SEVERE,
+                                   new ObjectFactory().createImplementation( implementation ),
+                                   "implementationDependencyDependencyJavaConstantNameConstraint",
+                                   implementation.getIdentifier(), moduleOfImpl.getName(), dependency.getName(),
+                                   d.getName(), message != null && message.length() > 0 ? " " + message : "" );
+
+                    }
+
+                    try
+                    {
+                        d.getJavaGetterMethodName();
+                    }
+                    catch ( final ModelObjectException e )
+                    {
+                        final String message = getMessage( e );
+
+                        if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                        {
+                            validationContext.getModelContext().log( Level.FINE, message, e );
+                        }
+
+                        addDetail( validationContext.getReport(),
+                                   "IMPLEMENTATION_DEPENDENCY_DEPENDENCY_JAVA_GETTER_METHOD_NAME_CONSTRAINT",
+                                   Level.SEVERE, new ObjectFactory().createImplementation( implementation ),
+                                   "implementationDependencyDependencyJavaGetterMethodNameConstraint",
+                                   implementation.getIdentifier(), moduleOfImpl.getName(), dependency.getName(),
+                                   d.getName(), message != null && message.length() > 0 ? " " + message : "" );
+
+                    }
+
+                    try
+                    {
+                        d.getJavaSetterMethodName();
+                    }
+                    catch ( final ModelObjectException e )
+                    {
+                        final String message = getMessage( e );
+
+                        if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                        {
+                            validationContext.getModelContext().log( Level.FINE, message, e );
+                        }
+
+                        addDetail( validationContext.getReport(),
+                                   "IMPLEMENTATION_DEPENDENCY_DEPENDENCY_JAVA_SETTER_METHOD_NAME_CONSTRAINT",
+                                   Level.SEVERE, new ObjectFactory().createImplementation( implementation ),
+                                   "implementationDependencyDependencyJavaSetterMethodNameConstraint",
+                                   implementation.getIdentifier(), moduleOfImpl.getName(), dependency.getName(),
+                                   d.getName(), message != null && message.length() > 0 ? " " + message : "" );
+
+                    }
+
+                    try
+                    {
+                        d.getJavaVariableName();
+                    }
+                    catch ( final ModelObjectException e )
+                    {
+                        final String message = getMessage( e );
+
+                        if ( validationContext.getModelContext().isLoggable( Level.FINE ) )
+                        {
+                            validationContext.getModelContext().log( Level.FINE, message, e );
+                        }
+
+                        addDetail( validationContext.getReport(),
+                                   "IMPLEMENTATION_DEPENDENCY_DEPENDENCY_JAVA_VARIABLE_NAME_CONSTRAINT",
+                                   Level.SEVERE, new ObjectFactory().createImplementation( implementation ),
+                                   "implementationDependencyDependencyJavaVariableNameConstraint",
+                                   implementation.getIdentifier(), moduleOfImpl.getName(), dependency.getName(),
+                                   d.getName(), message != null && message.length() > 0 ? " " + message : "" );
+
+                    }
+                }
+
                 assertDependencyValid( validationContext, implementation, d );
             }
         }
@@ -2269,14 +3687,17 @@ public class DefaultModelValidator implements ModelValidator
 
         private final InheritanceModel inheritanceModel;
 
+        private final boolean validateJava;
+
         private ValidationContext( final ModelContext modelContext, final Modules modules,
-                                   final ModelValidationReport report )
+                                   final ModelValidationReport report, final boolean validateJava )
         {
             super();
             this.modelContext = modelContext;
             this.modules = modules;
             this.report = report;
             this.inheritanceModel = new InheritanceModel( modules );
+            this.validateJava = validateJava;
         }
 
         private ModelContext getModelContext()
@@ -2297,6 +3718,11 @@ public class DefaultModelValidator implements ModelValidator
         private InheritanceModel getInheritanceModel()
         {
             return this.inheritanceModel;
+        }
+
+        private boolean isValidateJava()
+        {
+            return this.validateJava;
         }
 
     }

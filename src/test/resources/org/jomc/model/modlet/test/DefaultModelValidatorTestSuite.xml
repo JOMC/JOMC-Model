@@ -2928,11 +2928,14 @@
             <specification identifier="Specification 3" class="java.lang.Object" classDeclaration="true"/>
             <specification identifier="Specification 4" class="java.lang.Object" classDeclaration="true"/>
             <specification identifier="Specification 5" class="java.lang.Object" classDeclaration="true"/>
+            <specification identifier="Specification 6" class="java.lang.Object&lt;java.lang.Object&gt;" classDeclaration="true"/>
+            <specification identifier="Specification 7" class="java.lang.Object&lt;java.lang.String&gt;" classDeclaration="true"/>
           </specifications>
         </module>
       </modules>
     </modules>
     <detail identifier="SPECIFICATION_CLASS_DECLARATION_CONSTRAINT" count="4"/>
+    <detail identifier="SPECIFICATION_JAVA_CLASS_DECLARATION_CONSTRAINT" count="6"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
@@ -2995,11 +2998,14 @@
             <implementation identifier="Implementation 3" name="Implementation Name 3" class="java.lang.Object" classDeclaration="true" />
             <implementation identifier="Implementation 4" name="Implementation Name 4" class="java.lang.Object" classDeclaration="true" />
             <implementation identifier="Implementation 5" name="Implementation Name 5" class="java.lang.Object" classDeclaration="true" />
+            <implementation identifier="Implementation 6" name="Implementation Name 6" class="java.lang.Object&lt;java.lang.Object&gt;" classDeclaration="true" />
+            <implementation identifier="Implementation 7" name="Implementation Name 7" class="java.lang.Object&lt;java.lang.String&gt;" classDeclaration="true" />
           </implementations>
         </module>
       </modules>
     </modules>
     <detail identifier="IMPLEMENTATION_CLASS_DECLARATION_CONSTRAINT" count="4"/>
+    <detail identifier="IMPLEMENTATION_JAVA_CLASS_DECLARATION_CONSTRAINT" count="6"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
@@ -4909,6 +4915,342 @@
       </modules>
     </modules>
     <detail identifier="IMPLEMENTATION_PROPERTY_MULTIPLE_INHERITANCE_CONSTRAINT" count="2"/>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="MCT0117">
+    <modules valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <properties>
+            <property name="&lt;&gt;" type="&lt;&gt;" value="&lt;&gt;"/>
+          </properties>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="MODULE_PROPERTY_JAVA_CONSTANT_NAME_CONSTRAINT" count="1"/>
+    <detail identifier="MODULE_PROPERTY_JAVA_GETTER_METHOD_NAME_CONSTRAINT" count="1"/>
+    <detail identifier="MODULE_PROPERTY_JAVA_SETTER_METHOD_NAME_CONSTRAINT" count="1"/>
+    <detail identifier="MODULE_PROPERTY_JAVA_TYPE_NAME_CONSTRAINT" count="1"/>
+    <detail identifier="MODULE_PROPERTY_JAVA_VARIABLE_NAME_CONSTRAINT" count="1"/>
+    <detail identifier="MODULE_PROPERTY_JAVA_VALUE_CONSTRAINT" count="1"/>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="MCT0118">
+    <modules valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <messages>
+            <message name="&lt;&gt;">
+              <template defaultLanguage="en">
+                <text type="&lt;&gt;" language="en">{illegal pattern}</text>
+              </template>
+              <arguments>
+                <argument index="0" name="&lt;&gt;" type="&lt;&gt;"/>
+              </arguments>
+            </message>
+          </messages>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="W3C XML 1.0 Recommendation - Section 1.2 - Error" count="2"/>
+    <detail identifier="MODULE_MESSAGE_JAVA_CONSTANT_NAME_CONSTRAINT" count="1"/>
+    <detail identifier="MODULE_MESSAGE_JAVA_GETTER_METHOD_NAME_CONSTRAINT" count="1"/>
+    <detail identifier="MODULE_MESSAGE_JAVA_SETTER_METHOD_NAME_CONSTRAINT" count="1"/>
+    <detail identifier="MODULE_MESSAGE_JAVA_VARIABLE_NAME_CONSTRAINT" count="1"/>
+    <detail identifier="MODULE_MESSAGE_TEMPLATE_MIME_TYPE_CONSTRAINT" count="1"/>
+    <detail identifier="MODULE_MESSAGE_TEMPLATE_CONSTRAINT" count="1"/>
+    <!-- detail identifier="MODULE_MESSAGE_ARGUMENT_JAVA_TYPE_NAME_CONSTRAINT" count="1"/ Cannot test -->
+    <detail identifier="MODULE_MESSAGE_ARGUMENT_JAVA_VARIABLE_NAME_CONSTRAINT" count="1"/>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="MCT0119">
+    <modules valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <specifications>
+            <specification identifier="Specification" class="java.lang.Object"/>
+          </specifications>
+          <implementations>
+            <implementation identifier="Implementation 1" name="Implementation 1">
+              <dependencies>
+                <dependency name="&lt;&gt;" identifier="Specification" optional="true"/>
+              </dependencies>
+            </implementation>
+            <implementation identifier="Implementation 2" name="Implementation 2">
+              <dependencies>
+                <dependency name="&lt;&gt;" identifier="Specification" optional="true"/>
+              </dependencies>
+            </implementation>
+            <implementation identifier="Implementation 3" name="Implementation 3">
+              <dependencies>
+                <dependency name="&lt;&gt;" identifier="Specification" optional="true"/>
+              </dependencies>
+            </implementation>
+            <implementation identifier="Implementation 4" name="Implementation 4">
+              <dependencies>
+                <dependency name="&lt;&gt;" identifier="Specification" optional="true"/>
+              </dependencies>
+            </implementation>
+            <implementation identifier="Implementation 5" name="Implementation 5">
+              <dependencies>
+                <dependency name="&lt;&gt;" identifier="Specification" optional="true"/>
+              </dependencies>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_JAVA_CONSTANT_NAME_CONSTRAINT" count="5"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_JAVA_GETTER_METHOD_NAME_CONSTRAINT" count="5"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_JAVA_SETTER_METHOD_NAME_CONSTRAINT" count="5"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_JAVA_VARIABLE_NAME_CONSTRAINT" count="5"/>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="MCT0120">
+    <modules valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <specifications>
+            <specification identifier="Specification" class="java.lang.Object"/>
+          </specifications>
+          <implementations>
+            <implementation identifier="Implementation 1" name="Implementation 1">
+              <messages>
+                <message name="&lt;&gt;">
+                  <template defaultLanguage="en">
+                    <text type="&lt;&gt;" language="en">{illegal pattern}</text>
+                  </template>
+                  <arguments>
+                    <argument index="0" type="&lt;&gt;" name="&lt;&gt;"/>
+                  </arguments>
+                </message>
+              </messages>
+            </implementation>
+            <implementation identifier="Implementation 2" name="Implementation 2">
+              <messages>
+                <message name="&lt;&gt;">
+                  <template defaultLanguage="en">
+                    <text type="&lt;&gt;" language="en">{illegal pattern}</text>
+                  </template>
+                  <arguments>
+                    <argument index="0" type="&lt;&gt;" name="&lt;&gt;"/>
+                  </arguments>
+                </message>
+              </messages>
+            </implementation>
+            <implementation identifier="Implementation 3" name="Implementation 3">
+              <messages>
+                <message name="&lt;&gt;">
+                  <template defaultLanguage="en">
+                    <text type="&lt;&gt;" language="en">{illegal pattern}</text>
+                  </template>
+                  <arguments>
+                    <argument index="0" type="&lt;&gt;" name="&lt;&gt;"/>
+                  </arguments>
+                </message>
+              </messages>
+            </implementation>
+            <implementation identifier="Implementation 4" name="Implementation 4">
+              <messages>
+                <message name="&lt;&gt;">
+                  <template defaultLanguage="en">
+                    <text type="&lt;&gt;" language="en">{illegal pattern}</text>
+                  </template>
+                  <arguments>
+                    <argument index="0" type="&lt;&gt;" name="&lt;&gt;"/>
+                  </arguments>
+                </message>
+              </messages>
+            </implementation>
+            <implementation identifier="Implementation 5" name="Implementation 5">
+              <messages>
+                <message name="&lt;&gt;">
+                  <template defaultLanguage="en">
+                    <text type="&lt;&gt;" language="en">{illegal pattern}</text>
+                  </template>
+                  <arguments>
+                    <argument index="0" type="&lt;&gt;" name="&lt;&gt;"/>
+                  </arguments>
+                </message>
+              </messages>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="W3C XML 1.0 Recommendation - Section 1.2 - Error" count="10"/>
+    <detail identifier="IMPLEMENTATION_MESSAGE_JAVA_CONSTANT_NAME_CONSTRAINT" count="5"/>
+    <detail identifier="IMPLEMENTATION_MESSAGE_JAVA_GETTER_METHOD_NAME_CONSTRAINT" count="5"/>
+    <detail identifier="IMPLEMENTATION_MESSAGE_JAVA_SETTER_METHOD_NAME_CONSTRAINT" count="5"/>
+    <detail identifier="IMPLEMENTATION_MESSAGE_JAVA_VARIABLE_NAME_CONSTRAINT" count="5"/>
+    <detail identifier="IMPLEMENTATION_MESSAGE_TEMPLATE_MIME_TYPE_CONSTRAINT" count="5"/>
+    <detail identifier="IMPLEMENTATION_MESSAGE_TEMPLATE_CONSTRAINT" count="5"/>
+    <!-- detail identifier="IMPLEMENTATION_MESSAGE_ARGUMENT_JAVA_TYPE_NAME_CONSTRAINT" count="5"/ Cannot test. -->
+    <detail identifier="IMPLEMENTATION_MESSAGE_ARGUMENT_JAVA_VARIABLE_NAME_CONSTRAINT" count="5"/>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="MCT0121">
+    <modules valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <implementations>
+            <implementation identifier="Implementation 1" name="Implementation 1">
+              <properties>
+                <property name="&lt;&gt;" type="&lt;&gt;" value="&lt;&gt;"/>
+              </properties>
+            </implementation>
+            <implementation identifier="Implementation 2" name="Implementation 2">
+              <properties>
+                <property name="&lt;&gt;" type="&lt;&gt;" value="&lt;&gt;"/>
+              </properties>
+            </implementation>
+            <implementation identifier="Implementation 3" name="Implementation 3">
+              <properties>
+                <property name="&lt;&gt;" type="&lt;&gt;" value="&lt;&gt;"/>
+              </properties>
+            </implementation>
+            <implementation identifier="Implementation 4" name="Implementation 4">
+              <properties>
+                <property name="&lt;&gt;" type="&lt;&gt;" value="&lt;&gt;"/>
+              </properties>
+            </implementation>
+            <implementation identifier="Implementation 5" name="Implementation 5">
+              <properties>
+                <property name="&lt;&gt;" type="&lt;&gt;" value="&lt;&gt;"/>
+              </properties>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="IMPLEMENTATION_PROPERTY_JAVA_CONSTANT_NAME_CONSTRAINT" count="5"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_JAVA_GETTER_METHOD_NAME_CONSTRAINT" count="5"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_JAVA_SETTER_METHOD_NAME_CONSTRAINT" count="5"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_JAVA_TYPE_NAME_CONSTRAINT" count="5"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_JAVA_VARIABLE_NAME_CONSTRAINT" count="5"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_JAVA_VALUE_CONSTRAINT" count="5"/>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="MCT0122">
+    <modules valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <specifications>
+            <specification identifier="Specification 1">
+              <properties>
+                <property name="&lt;&gt;" type="&lt;&gt;" value="&lt;&gt;"/>
+              </properties>
+            </specification>
+            <specification identifier="Specification 2">
+              <properties>
+                <property name="&lt;&gt;" type="&lt;&gt;" value="&lt;&gt;"/>
+              </properties>
+            </specification>
+            <specification identifier="Specification 3">
+              <properties>
+                <property name="&lt;&gt;" type="&lt;&gt;" value="&lt;&gt;"/>
+              </properties>
+            </specification>
+            <specification identifier="Specification 4">
+              <properties>
+                <property name="&lt;&gt;" type="&lt;&gt;" value="&lt;&gt;"/>
+              </properties>
+            </specification>
+            <specification identifier="Specification 5">
+              <properties>
+                <property name="&lt;&gt;" type="&lt;&gt;" value="&lt;&gt;"/>
+              </properties>
+            </specification>
+          </specifications>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="SPECIFICATION_PROPERTY_JAVA_CONSTANT_NAME_CONSTRAINT" count="5"/>
+    <detail identifier="SPECIFICATION_PROPERTY_JAVA_GETTER_METHOD_NAME_CONSTRAINT" count="5"/>
+    <detail identifier="SPECIFICATION_PROPERTY_JAVA_SETTER_METHOD_NAME_CONSTRAINT" count="5"/>
+    <detail identifier="SPECIFICATION_PROPERTY_JAVA_TYPE_NAME_CONSTRAINT" count="5"/>
+    <detail identifier="SPECIFICATION_PROPERTY_JAVA_VARIABLE_NAME_CONSTRAINT" count="5"/>
+    <detail identifier="SPECIFICATION_PROPERTY_JAVA_VALUE_CONSTRAINT" count="5"/>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="MCT0123">
+    <modules valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <specifications>
+            <specification identifier="Specification" class="java.lang.Object"/>
+          </specifications>
+          <implementations>
+            <implementation identifier="Implementation" name="Implementation Name">
+              <dependencies>
+                <dependency name="Dependency" identifier="Specification" optional="true">
+                  <dependencies>
+                    <dependency name="&lt;&gt;" identifier="Specification" optional="true"/>
+                  </dependencies>
+                  <properties>
+                    <property name="&lt;&gt;" value="&lt;&gt;" type="&lt;&gt;"/>
+                  </properties>
+                  <messages>
+                    <message name="&lt;&gt;">
+                      <template defaultLanguage="en">
+                        <text type="&lt;&gt;" language="en">{illegal pattern}</text>
+                      </template>
+                      <arguments>
+                        <argument index="0" name="&lt;&gt;" type="&lt;&gt;"/>
+                      </arguments>
+                    </message>
+                  </messages>
+                </dependency>
+              </dependencies>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="W3C XML 1.0 Recommendation - Section 1.2 - Error" count="2"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_MESSAGE_JAVA_CONSTANT_NAME_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_MESSAGE_JAVA_GETTER_METHOD_NAME_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_MESSAGE_JAVA_SETTER_METHOD_NAME_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_MESSAGE_JAVA_VARIABLE_NAME_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_MESSAGE_TEMPLATE_MIME_TYPE_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_MESSAGE_TEMPLATE_CONSTRAINT" count="1"/>
+    <!-- detail identifier="IMPLEMENTATION_DEPENDENCY_MESSAGE_ARGUMENT_JAVA_TYPE_NAME_CONSTRAINT" count="1"/ Cannot test. -->
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_MESSAGE_ARGUMENT_JAVA_VARIABLE_NAME_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_PROPERTY_JAVA_CONSTANT_NAME_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_PROPERTY_JAVA_GETTER_METHOD_NAME_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_PROPERTY_JAVA_SETTER_METHOD_NAME_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_PROPERTY_JAVA_TYPE_NAME_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_PROPERTY_JAVA_VARIABLE_NAME_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_PROPERTY_JAVA_VALUE_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_DEPENDENCY_JAVA_CONSTANT_NAME_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_DEPENDENCY_JAVA_GETTER_METHOD_NAME_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_DEPENDENCY_JAVA_SETTER_METHOD_NAME_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_DEPENDENCY_JAVA_VARIABLE_NAME_CONSTRAINT" count="1"/>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="MCT0124">
+    <modules valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <specifications>
+            <specification identifier="Specification" class="&lt;&gt;"/>
+          </specifications>
+          <implementations>
+            <implementation identifier="Implementation" name="Implementation" class="&lt;&gt;"/>
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="SPECIFICATION_JAVA_TYPE_NAME_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_JAVA_TYPE_NAME_CONSTRAINT" count="1"/>
   </modules-constraints-test>
 
 </testsuite>
