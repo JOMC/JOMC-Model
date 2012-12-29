@@ -30,6 +30,7 @@
  */
 package org.jomc.model.test;
 
+import java.io.ObjectInputStream;
 import java.text.ParseException;
 import org.jomc.model.JavaTypeName;
 import org.junit.Test;
@@ -48,6 +49,9 @@ import static org.junit.Assert.fail;
  */
 public class JavaTypeNameTest
 {
+
+    /** Constant to prefix relative resource names with. */
+    private static final String ABSOLUTE_RESOURCE_NAME_PREFIX = "/org/jomc/model/test/";
 
     /** Creates a new {@code JavaTypeNameTest} instance. */
     public JavaTypeNameTest()
@@ -578,6 +582,42 @@ public class JavaTypeNameTest
         assertEquals( "[[[Lvalidpackagename.ReferenceType;",
                       JavaTypeName.parse( "validpackagename.ReferenceType[][][]" ).getClassName() );
 
+    }
+
+    @Test
+    public final void Deserializable() throws Exception
+    {
+        ObjectInputStream in = null;
+
+        try
+        {
+            in = new ObjectInputStream( this.getClass().getResourceAsStream(
+                ABSOLUTE_RESOURCE_NAME_PREFIX + "JavaTypeName.ser" ) );
+
+            final JavaTypeName javaTypeName = (JavaTypeName) in.readObject();
+            assertEquals( "Java<Java>", javaTypeName.getName( true ) );
+            assertEquals( 1, javaTypeName.getArguments().size() );
+            assertEquals( "Java", javaTypeName.getArguments().get( 0 ).getTypeName().getName( true ) );
+            System.out.println( javaTypeName );
+        }
+        finally
+        {
+            in.close();
+        }
+
+        try
+        {
+            in = new ObjectInputStream( this.getClass().getResourceAsStream(
+                ABSOLUTE_RESOURCE_NAME_PREFIX + "JavaTypeNameArgument.ser" ) );
+
+            final JavaTypeName.Argument javaTypeNameArgument = (JavaTypeName.Argument) in.readObject();
+            assertEquals( "Java", javaTypeNameArgument.getTypeName().getName( true ) );
+            System.out.println( javaTypeNameArgument );
+        }
+        finally
+        {
+            in.close();
+        }
     }
 
     private static void assertBasicTypeName( final String typeName )

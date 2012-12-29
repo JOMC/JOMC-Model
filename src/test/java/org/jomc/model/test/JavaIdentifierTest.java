@@ -30,6 +30,7 @@
  */
 package org.jomc.model.test;
 
+import java.io.ObjectInputStream;
 import java.text.ParseException;
 import org.jomc.model.JavaIdentifier;
 import org.junit.Test;
@@ -52,6 +53,9 @@ import static org.junit.Assert.fail;
  */
 public class JavaIdentifierTest
 {
+
+    /** Constant to prefix relative resource names with. */
+    private static final String ABSOLUTE_RESOURCE_NAME_PREFIX = "/org/jomc/model/test/";
 
     /** Creates a new {@code JavaIdentifierTest} instance. */
     public JavaIdentifierTest()
@@ -451,6 +455,26 @@ public class JavaIdentifierTest
         assertInvalidJavaIdentifier( "", VARIABLE_NAME_CONVENTION );
         assertInvalidJavaIdentifier( "@", VARIABLE_NAME_CONVENTION );
         assertInvalidJavaIdentifier( "   ", VARIABLE_NAME_CONVENTION );
+    }
+
+    @Test
+    public final void Deserializable() throws Exception
+    {
+        ObjectInputStream in = null;
+
+        try
+        {
+            in = new ObjectInputStream( this.getClass().getResourceAsStream(
+                ABSOLUTE_RESOURCE_NAME_PREFIX + "JavaIdentifier.ser" ) );
+
+            final JavaIdentifier javaIdentifier = (JavaIdentifier) in.readObject();
+            assertEquals( "Java", javaIdentifier.toString() );
+            System.out.println( javaIdentifier );
+        }
+        finally
+        {
+            in.close();
+        }
     }
 
     private static void assertInvalidJavaIdentifier( final String identifier )
