@@ -90,6 +90,9 @@ public final class JavaTypeName implements Serializable
         /** Cached string representation. */
         private transient String cachedString;
 
+        /** Serial version UID for backwards compatibility with 1.4.x object streams. */
+        private static final long serialVersionUID = -6515267147665760819L;
+
         /** Create a new {@code Argument} instance. */
         private Argument()
         {
@@ -308,6 +311,9 @@ public final class JavaTypeName implements Serializable
 
     /** Mappings of basic type name to class name encoding. */
     private static final Map<String, String> CLASSNAME_ENCODINGS = new HashMap<String, String>( 8 );
+
+    /** Serial version UID for backwards compatibility with 1.4.x object streams. */
+    private static final long serialVersionUID = -4258949347035910249L;
 
     static
     {

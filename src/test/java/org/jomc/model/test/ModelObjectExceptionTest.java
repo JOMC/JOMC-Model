@@ -55,7 +55,7 @@ public class ModelObjectExceptionTest
     }
 
     @Test
-    public final void testSerializabe() throws Exception
+    public final void Deserializable() throws Exception
     {
         ObjectInputStream in = null;
 

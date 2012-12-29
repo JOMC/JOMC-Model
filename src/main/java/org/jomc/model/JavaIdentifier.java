@@ -115,6 +115,9 @@ public final class JavaIdentifier implements CharSequence, Serializable
     /** Cached instances. */
     private static volatile Reference<Map<CacheKey, JavaIdentifier>> cache;
 
+    /** Serial version UID for backwards compatibility with 1.4.x object streams. */
+    private static final long serialVersionUID = 7600377999055800720L;
+
     /** Creates a new {@code JavaIdentifier} instance. */
     private JavaIdentifier()
     {
