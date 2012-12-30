@@ -143,10 +143,10 @@ public class JavaIdentifierTest
         assertEquals( JavaIdentifier.valueOf( "TestTestTest" ),
                       JavaIdentifier.normalize( "test test test  ", CAMEL_CASE ) );
 
-        assertEquals( JavaIdentifier.valueOf( "Test_test_test" ),
+        assertEquals( JavaIdentifier.valueOf( "TestTestTest" ),
                       JavaIdentifier.normalize( "test_test_test", CAMEL_CASE ) );
 
-        assertEquals( JavaIdentifier.valueOf( "Test_test_test" ),
+        assertEquals( JavaIdentifier.valueOf( "TestTestTest" ),
                       JavaIdentifier.normalize( " test_test_test ", CAMEL_CASE ) );
 
         assertEquals( JavaIdentifier.valueOf( "TestTestTest" ),
@@ -169,6 +169,15 @@ public class JavaIdentifierTest
 
         assertEquals( JavaIdentifier.valueOf( "Test" ),
                       JavaIdentifier.normalize( "TEST", CAMEL_CASE ) );
+
+        assertEquals( JavaIdentifier.valueOf( "TestTestTest" ),
+                      JavaIdentifier.normalize( "TestTestTest", CAMEL_CASE ) );
+
+        assertEquals( JavaIdentifier.valueOf( "TestTestTest" ),
+                      JavaIdentifier.normalize( "testTestTest", CAMEL_CASE ) );
+
+        assertEquals( JavaIdentifier.valueOf( "TestTestTest" ),
+                      JavaIdentifier.normalize( "test TeSt Test", CAMEL_CASE ) );
 
         for ( final String keyword : JavaLanguage.KEYWORDS )
         {
@@ -222,6 +231,9 @@ public class JavaIdentifierTest
         assertEquals( JavaIdentifier.valueOf( "TEST_TEST_TEST" ),
                       JavaIdentifier.normalize( " _test _test _test_ ", UPPER_CASE ) );
 
+        assertEquals( JavaIdentifier.valueOf( "TEST_TEST_TEST" ),
+                      JavaIdentifier.normalize( "TEST_TEST_TEST", UPPER_CASE ) );
+
         for ( final String keyword : JavaLanguage.KEYWORDS )
         {
             assertEquals( JavaIdentifier.valueOf( toUpperCase( keyword ) ),
@@ -274,6 +286,9 @@ public class JavaIdentifierTest
         assertEquals( JavaIdentifier.valueOf( "test_test_test" ),
                       JavaIdentifier.normalize( " _TEST _TEST _TEST_ ", LOWER_CASE ) );
 
+        assertEquals( JavaIdentifier.valueOf( "test_test_test" ),
+                      JavaIdentifier.normalize( "test_test_test", LOWER_CASE ) );
+
         for ( final String keyword : JavaLanguage.KEYWORDS )
         {
             assertEquals( JavaIdentifier.valueOf( "_" + toLowerCase( keyword ) ),
@@ -325,6 +340,9 @@ public class JavaIdentifierTest
         assertEquals( JavaIdentifier.valueOf( "TEST_TEST_TEST" ),
                       JavaIdentifier.normalize( " _test _test _test_ ", CONSTANT_NAME_CONVENTION ) );
 
+        assertEquals( JavaIdentifier.valueOf( "TEST_TEST_TEST" ),
+                      JavaIdentifier.normalize( "TEST_TEST_TEST", CONSTANT_NAME_CONVENTION ) );
+
         for ( final String keyword : JavaLanguage.KEYWORDS )
         {
             assertEquals( JavaIdentifier.valueOf( toUpperCase( keyword ) ),
@@ -353,10 +371,10 @@ public class JavaIdentifierTest
         assertEquals( JavaIdentifier.valueOf( "testTestTest" ),
                       JavaIdentifier.normalize( "test test test  ", METHOD_NAME_CONVENTION ) );
 
-        assertEquals( JavaIdentifier.valueOf( "test_test_test" ),
+        assertEquals( JavaIdentifier.valueOf( "testTestTest" ),
                       JavaIdentifier.normalize( "test_test_test", METHOD_NAME_CONVENTION ) );
 
-        assertEquals( JavaIdentifier.valueOf( "test_test_test" ),
+        assertEquals( JavaIdentifier.valueOf( "testTestTest" ),
                       JavaIdentifier.normalize( " test_test_test ", METHOD_NAME_CONVENTION ) );
 
         assertEquals( JavaIdentifier.valueOf( "testTestTest" ),
@@ -379,6 +397,15 @@ public class JavaIdentifierTest
 
         assertEquals( JavaIdentifier.valueOf( "test" ),
                       JavaIdentifier.normalize( "TEST", METHOD_NAME_CONVENTION ) );
+
+        assertEquals( JavaIdentifier.valueOf( "testTestTest" ),
+                      JavaIdentifier.normalize( "TestTestTest", METHOD_NAME_CONVENTION ) );
+
+        assertEquals( JavaIdentifier.valueOf( "testTestTest" ),
+                      JavaIdentifier.normalize( "testTestTest", METHOD_NAME_CONVENTION ) );
+
+        assertEquals( JavaIdentifier.valueOf( "testTestTest" ),
+                      JavaIdentifier.normalize( "Test TeSt Test", METHOD_NAME_CONVENTION ) );
 
         for ( final String keyword : JavaLanguage.KEYWORDS )
         {
@@ -408,10 +435,10 @@ public class JavaIdentifierTest
         assertEquals( JavaIdentifier.valueOf( "testTestTest" ),
                       JavaIdentifier.normalize( "test test test  ", VARIABLE_NAME_CONVENTION ) );
 
-        assertEquals( JavaIdentifier.valueOf( "test_test_test" ),
+        assertEquals( JavaIdentifier.valueOf( "testTestTest" ),
                       JavaIdentifier.normalize( "test_test_test", VARIABLE_NAME_CONVENTION ) );
 
-        assertEquals( JavaIdentifier.valueOf( "test_test_test" ),
+        assertEquals( JavaIdentifier.valueOf( "testTestTest" ),
                       JavaIdentifier.normalize( " test_test_test ", VARIABLE_NAME_CONVENTION ) );
 
         assertEquals( JavaIdentifier.valueOf( "testTestTest" ),
@@ -434,6 +461,15 @@ public class JavaIdentifierTest
 
         assertEquals( JavaIdentifier.valueOf( "test" ),
                       JavaIdentifier.normalize( "TEST", VARIABLE_NAME_CONVENTION ) );
+
+        assertEquals( JavaIdentifier.valueOf( "testTestTest" ),
+                      JavaIdentifier.normalize( "TestTestTest", VARIABLE_NAME_CONVENTION ) );
+
+        assertEquals( JavaIdentifier.valueOf( "testTestTest" ),
+                      JavaIdentifier.normalize( "testTestTest", VARIABLE_NAME_CONVENTION ) );
+
+        assertEquals( JavaIdentifier.valueOf( "testTestTest" ),
+                      JavaIdentifier.normalize( "test TeSt Test", VARIABLE_NAME_CONVENTION ) );
 
         for ( final String keyword : JavaLanguage.KEYWORDS )
         {
