@@ -43,7 +43,7 @@ import java.util.ResourceBundle;
 /**
  * Data type of a Java identifier.
  * <p>This class provides support for parsing and normalizing text to java identifiers as specified in the Java
- * Language Specifiction - Java SE 7 Edition - Chapter 3.8ff.</p>
+ * Language Specification - Java SE 7 Edition - Chapter 3.8ff.</p>
  *
  * @author <a href="mailto:cs@schulte.it">Christian Schulte</a>
  * @version $JOMC$

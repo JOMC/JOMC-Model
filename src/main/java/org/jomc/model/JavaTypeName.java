@@ -48,7 +48,7 @@ import java.util.ResourceBundle;
 /**
  * Data type of a Java type name.
  * <p>This class supports parsing of Java type names as specified in the
- * Java Language Specifiction - Java SE 7 Edition - Chapters 3.8ff, 6.5 and 18.</p>
+ * Java Language Specification - Java SE 7 Edition - Chapters 3.8ff, 6.5 and 18.</p>
  *
  * @author <a href="mailto:cs@schulte.it">Christian Schulte</a>
  * @version $JOMC$
