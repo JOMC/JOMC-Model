@@ -43,7 +43,7 @@ import java.util.ResourceBundle;
 /**
  * Data type of a Java identifier.
  * <p>This class provides support for parsing and normalizing text to java identifiers as specified in the Java
- * Language Specifiction - Java SE 7 Edition - Chapter 3.8ff.</p>
+ * Language Specification - Java SE 7 Edition - Chapter 3.8ff.</p>
  *
  * @author <a href="mailto:cs@schulte.it">Christian Schulte</a>
  * @version $JOMC$
@@ -117,6 +117,9 @@ public final class JavaIdentifier implements CharSequence, Serializable
 
     /** Serial version UID for backwards compatibility with 1.4.x object streams. */
     private static final long serialVersionUID = 7600377999055800720L;
+
+    /** Underscore character. */
+    private static final int UNDERSCORE_CODEPOINT = Character.codePointAt( "_", 0 );
 
     /** Creates a new {@code JavaIdentifier} instance. */
     private JavaIdentifier()
@@ -351,83 +354,71 @@ public final class JavaIdentifier implements CharSequence, Serializable
         }
 
         final StringBuilder identifierBuilder = new StringBuilder( text.length() );
-        int start_of_word = 0;
+        boolean start_of_word = true;
+        boolean retain_camel_case = true;
 
-        for ( int i = 0, s0 = text.length(); i < s0; i++ )
+        for ( int i = 0, s0 = text.length(), word = 0, last_codepoint = -1; i < s0; i++ )
         {
-            if ( identifierBuilder.length() <= 0
-                 ? Character.isJavaIdentifierStart( text.charAt( i ) )
-                 : Character.isJavaIdentifierPart( text.charAt( i ) ) )
+            if ( !isWordSeparator( text.codePointAt( i ), mode, identifierBuilder.length() <= 0 ) )
             {
                 if ( mode != null )
                 {
                     switch ( mode )
                     {
                         case CAMEL_CASE:
-                            if ( start_of_word >= 0 )
+                            if ( start_of_word )
                             {
                                 identifierBuilder.append( Character.toUpperCase( text.charAt( i ) ) );
                             }
+                            else if ( retain_camel_case && last_codepoint > -1 && i + 1 < s0
+                                      && isCamelCase( last_codepoint, text.codePointAt( i ),
+                                                      text.codePointAt( i + 1 ) ) )
+                            {
+                                identifierBuilder.append( text.charAt( i ) );
+                            }
                             else
                             {
                                 identifierBuilder.append( Character.toLowerCase( text.charAt( i ) ) );
                             }
-                            start_of_word = -1;
                             break;
 
                         case LOWER_CASE:
-                            if ( start_of_word >= 0
-                                 && identifierBuilder.length() > 0
-                                 && identifierBuilder.charAt( identifierBuilder.length() - 1 ) != '_' )
+                            if ( start_of_word && last_codepoint > -1 && last_codepoint != UNDERSCORE_CODEPOINT )
                             {
-                                identifierBuilder.append( '_' );
+                                identifierBuilder.append( Character.toChars( UNDERSCORE_CODEPOINT ) );
                             }
 
-                            if ( text.charAt( i ) != '_' )
-                            {
-                                identifierBuilder.append( Character.toLowerCase( text.charAt( i ) ) );
-                                start_of_word = -1;
-                            }
-                            else
-                            {
-                                start_of_word = i;
-                            }
+                            identifierBuilder.append( Character.toLowerCase( text.charAt( i ) ) );
                             break;
 
                         case UPPER_CASE:
                         case CONSTANT_NAME_CONVENTION:
-                            if ( start_of_word >= 0
-                                 && identifierBuilder.length() > 0
-                                 && identifierBuilder.charAt( identifierBuilder.length() - 1 ) != '_' )
+                            if ( start_of_word && last_codepoint > -1 && last_codepoint != UNDERSCORE_CODEPOINT )
                             {
-                                identifierBuilder.append( '_' );
+                                identifierBuilder.append( Character.toChars( UNDERSCORE_CODEPOINT ) );
                             }
 
-                            if ( text.charAt( i ) != '_' )
-                            {
-                                identifierBuilder.append( Character.toUpperCase( text.charAt( i ) ) );
-                                start_of_word = -1;
-                            }
-                            else
-                            {
-                                start_of_word = i;
-                            }
+                            identifierBuilder.append( Character.toUpperCase( text.charAt( i ) ) );
                             break;
 
                         case VARIABLE_NAME_CONVENTION:
                         case METHOD_NAME_CONVENTION:
-                            if ( start_of_word >= 0 )
+                            if ( start_of_word )
                             {
-                                identifierBuilder.append( identifierBuilder.length() == 0
-                                                          ? Character.toLowerCase( text.charAt( i ) )
+                                identifierBuilder.append( word == 0 ? Character.toLowerCase( text.charAt( i ) )
                                                           : Character.toUpperCase( text.charAt( i ) ) );
 
+                            }
+                            else if ( retain_camel_case && last_codepoint > -1 && i + 1 < s0
+                                      && isCamelCase( last_codepoint, text.codePointAt( i ),
+                                                      text.codePointAt( i + 1 ) ) )
+                            {
+                                identifierBuilder.append( text.charAt( i ) );
                             }
                             else
                             {
                                 identifierBuilder.append( Character.toLowerCase( text.charAt( i ) ) );
                             }
-                            start_of_word = -1;
                             break;
 
                         default:
@@ -438,14 +429,22 @@ public final class JavaIdentifier implements CharSequence, Serializable
                 else
                 {
                     identifierBuilder.append( text.charAt( i ) );
-                    start_of_word = -1;
                 }
+
+                last_codepoint = identifierBuilder.codePointAt( identifierBuilder.length() - 1 );
+                start_of_word = false;
             }
             else
             {
                 if ( mode != null )
                 {
-                    start_of_word = i;
+                    if ( !start_of_word )
+                    {
+                        start_of_word = true;
+                        word++;
+                    }
+
+                    retain_camel_case = false;
                 }
                 else if ( runtimeException )
                 {
@@ -493,6 +492,18 @@ public final class JavaIdentifier implements CharSequence, Serializable
 
             }
         }
+    }
+
+    private static boolean isWordSeparator( final int codePoint, final NormalizationMode mode, final boolean first )
+    {
+        return !( ( first ? Character.isJavaIdentifierStart( codePoint ) : Character.isJavaIdentifierPart( codePoint ) )
+                  && ( mode != null ? Character.isLetterOrDigit( codePoint ) : true ) );
+
+    }
+
+    private static boolean isCamelCase( final int left, final int middle, final int right )
+    {
+        return Character.isLowerCase( left ) && Character.isUpperCase( middle ) && Character.isLowerCase( right );
     }
 
     private static String getMessage( final String key, final Object... args )
