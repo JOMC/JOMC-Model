@@ -30,6 +30,12 @@
  */
 package org.jomc.model.test;
 
+import org.jomc.model.Text;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 /**
  * Test cases for class {@code org.jomc.model.Text}.
  *
@@ -44,6 +50,38 @@ public class TextTest
     public TextTest()
     {
         super();
+    }
+
+    @Test
+    public final void JavadocComment() throws Exception
+    {
+        final Text text = new Text();
+        text.setLanguage( "en" );
+        text.setValue( "<>\"*&" );
+
+        assertEquals( "&lt;&gt;&quot;&lowast;&amp;", text.getJavadocComment( "\n", "" ) );
+
+        try
+        {
+            text.getJavadocComment( null, "" );
+            fail( "Expected 'NullPointerException' not thrown." );
+        }
+        catch ( final NullPointerException e )
+        {
+            assertNotNull( e.getMessage() );
+            System.out.println( e );
+        }
+
+        try
+        {
+            text.getJavadocComment( "", null );
+            fail( "Expected 'NullPointerException' not thrown." );
+        }
+        catch ( final NullPointerException e )
+        {
+            assertNotNull( e.getMessage() );
+            System.out.println( e );
+        }
     }
 
 }
