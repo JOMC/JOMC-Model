@@ -209,7 +209,7 @@
                     if ( escapeHtml )
                     {
                         builder.append( lineSeparator ).append( indentation ).append( " * " ).
-                            append( line.replace( "<", "&lt;" ).replace( ">", "&gt;" ).replace( "&", "&amp;" ).
+                            append( line.replace( "&", "&amp;" ).replace( "<", "&lt;" ).replace( ">", "&gt;" ).
                             replace( "\"", "&quot;" ).replace( "*", "&lowast;" ) );
 
                     }
