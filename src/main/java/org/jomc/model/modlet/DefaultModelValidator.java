@@ -55,6 +55,7 @@ import org.jomc.model.ImplementationReference;
 import org.jomc.model.Implementations;
 import org.jomc.model.Inheritable;
 import org.jomc.model.InheritanceModel;
+import org.jomc.model.JavaIdentifier;
 import org.jomc.model.Message;
 import org.jomc.model.MessageReference;
 import org.jomc.model.ModelObject;
@@ -445,6 +446,9 @@ public class DefaultModelValidator implements ModelValidator
 
                     if ( msg.getArguments() != null )
                     {
+                        final Map<JavaIdentifier, Argument> javaVariableNames =
+                            new HashMap<JavaIdentifier, Argument>( msg.getArguments().getArgument().size() );
+
                         for ( int k = 0, s2 = msg.getArguments().getArgument().size(); k < s2; k++ )
                         {
                             final Argument a = msg.getArguments().getArgument( k );
@@ -475,7 +479,22 @@ public class DefaultModelValidator implements ModelValidator
 
                                 try
                                 {
-                                    a.getJavaVariableName();
+                                    final JavaIdentifier javaIdentifier = a.getJavaVariableName();
+
+                                    if ( javaVariableNames.containsKey( javaIdentifier ) )
+                                    {
+                                        addDetail( validationContext.getReport(),
+                                                   "MODULE_MESSAGE_ARGUMENT_JAVA_VARIABLE_NAME_UNIQUENESS_CONSTRAINT",
+                                                   Level.SEVERE, new ObjectFactory().createModule( m ),
+                                                   "moduleMessageArgumentJavaVariableNameUniquenessConstraint",
+                                                   m.getName(), msg.getName(), a.getName(),
+                                                   javaIdentifier, javaVariableNames.get( javaIdentifier ).getName() );
+
+                                    }
+                                    else
+                                    {
+                                        javaVariableNames.put( javaIdentifier, a );
+                                    }
                                 }
                                 catch ( final ModelObjectException e )
                                 {
@@ -858,8 +877,8 @@ public class DefaultModelValidator implements ModelValidator
 
                             if ( !( d.isOverride() || overriddenDependencies.isEmpty() ) )
                             {
-                                for ( final InheritanceModel.Node<Dependency> overriddenDependency
-                                      : overriddenDependencies )
+                                for ( final InheritanceModel.Node<Dependency> overriddenDependency :
+                                      overriddenDependencies )
                                 {
                                     Implementation overriddenImplementation = overriddenDependency.getImplementation();
                                     if ( overriddenDependency.getClassDeclaration() != null )
@@ -885,8 +904,7 @@ public class DefaultModelValidator implements ModelValidator
 
                             retainFinalNodes( overriddenDependencies );
 
-                            for ( final InheritanceModel.Node<Dependency> overriddenDependency
-                                  : overriddenDependencies )
+                            for ( final InheritanceModel.Node<Dependency> overriddenDependency : overriddenDependencies )
                             {
                                 Implementation overriddenImplementation = overriddenDependency.getImplementation();
                                 if ( overriddenDependency.getClassDeclaration() != null )
@@ -1066,8 +1084,8 @@ public class DefaultModelValidator implements ModelValidator
 
                             if ( !( r.isOverride() || overriddenReferences.isEmpty() ) )
                             {
-                                for ( final InheritanceModel.Node<ImplementationReference> overriddenReference
-                                      : overriddenReferences )
+                                for ( final InheritanceModel.Node<ImplementationReference> overriddenReference :
+                                      overriddenReferences )
                                 {
                                     Implementation overriddenImplementation = overriddenReference.getImplementation();
                                     if ( overriddenReference.getClassDeclaration() != null )
@@ -1093,8 +1111,8 @@ public class DefaultModelValidator implements ModelValidator
 
                             retainFinalNodes( overriddenReferences );
 
-                            for ( final InheritanceModel.Node<ImplementationReference> overriddenReference
-                                  : overriddenReferences )
+                            for ( final InheritanceModel.Node<ImplementationReference> overriddenReference :
+                                  overriddenReferences )
                             {
                                 Implementation overriddenImplementation = overriddenReference.getImplementation();
                                 if ( overriddenReference.getClassDeclaration() != null )
@@ -1347,6 +1365,9 @@ public class DefaultModelValidator implements ModelValidator
 
                         if ( m.getArguments() != null )
                         {
+                            final Map<JavaIdentifier, Argument> javaVariableNames =
+                                new HashMap<JavaIdentifier, Argument>( m.getArguments().getArgument().size() );
+
                             for ( int k = 0, s2 = m.getArguments().getArgument().size(); k < s2; k++ )
                             {
                                 final Argument a = m.getArguments().getArgument().get( k );
@@ -1378,7 +1399,23 @@ public class DefaultModelValidator implements ModelValidator
 
                                     try
                                     {
-                                        a.getJavaVariableName();
+                                        final JavaIdentifier javaIdentifier = a.getJavaVariableName();
+
+                                        if ( javaVariableNames.containsKey( javaIdentifier ) )
+                                        {
+                                            addDetail( validationContext.getReport(),
+                                                       "IMPLEMENTATION_MESSAGE_ARGUMENT_JAVA_VARIABLE_NAME_UNIQUENESS_CONSTRAINT",
+                                                       Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                                       "implementationMessageArgumentJavaVariableNameUniquenessConstraint",
+                                                       impl.getIdentifier(), moduleOfImpl.getName(), m.getName(),
+                                                       a.getName(), javaIdentifier,
+                                                       javaVariableNames.get( javaIdentifier ).getName() );
+
+                                        }
+                                        else
+                                        {
+                                            javaVariableNames.put( javaIdentifier, a );
+                                        }
                                     }
                                     catch ( final ModelObjectException e )
                                     {
@@ -1843,8 +1880,8 @@ public class DefaultModelValidator implements ModelValidator
 
                             if ( !( r.isOverride() || overriddenReferences.isEmpty() ) )
                             {
-                                for ( final InheritanceModel.Node<SpecificationReference> overriddenReference
-                                      : overriddenReferences )
+                                for ( final InheritanceModel.Node<SpecificationReference> overriddenReference :
+                                      overriddenReferences )
                                 {
                                     Implementation overriddenImplementation = overriddenReference.getImplementation();
                                     if ( overriddenReference.getClassDeclaration() != null )
@@ -1869,8 +1906,8 @@ public class DefaultModelValidator implements ModelValidator
 
                             retainFinalNodes( overriddenReferences );
 
-                            for ( final InheritanceModel.Node<SpecificationReference> overriddenReference
-                                  : overriddenReferences )
+                            for ( final InheritanceModel.Node<SpecificationReference> overriddenReference :
+                                  overriddenReferences )
                             {
                                 Implementation overriddenImplementation = overriddenReference.getImplementation();
                                 if ( overriddenReference.getClassDeclaration() != null )
@@ -1931,8 +1968,8 @@ public class DefaultModelValidator implements ModelValidator
 
                                 if ( !( overrideNode || overriddenElements.isEmpty() ) )
                                 {
-                                    for ( final InheritanceModel.Node<JAXBElement<?>> overriddenElement
-                                          : overriddenElements )
+                                    for ( final InheritanceModel.Node<JAXBElement<?>> overriddenElement :
+                                          overriddenElements )
                                     {
                                         Implementation overriddenImplementation = overriddenElement.getImplementation();
                                         if ( overriddenElement.getClassDeclaration() != null )
@@ -1957,8 +1994,7 @@ public class DefaultModelValidator implements ModelValidator
 
                                 retainFinalNodes( overriddenElements );
 
-                                for ( final InheritanceModel.Node<JAXBElement<?>> overriddenElement
-                                      : overriddenElements )
+                                for ( final InheritanceModel.Node<JAXBElement<?>> overriddenElement : overriddenElements )
                                 {
                                     Implementation overriddenImplementation = overriddenElement.getImplementation();
                                     if ( overriddenElement.getClassDeclaration() != null )
@@ -1986,6 +2022,18 @@ public class DefaultModelValidator implements ModelValidator
 
                 final Set<String> dependencyNames = imodel.getDependencyNames( impl.getIdentifier() );
 
+                final Map<JavaIdentifier, InheritanceModel.Node<Dependency>> dependencyJavaConstantNames =
+                    new HashMap<JavaIdentifier, InheritanceModel.Node<Dependency>>( dependencyNames.size() );
+
+                final Map<JavaIdentifier, InheritanceModel.Node<Dependency>> dependencyJavaGetterMethodNames =
+                    new HashMap<JavaIdentifier, InheritanceModel.Node<Dependency>>( dependencyNames.size() );
+
+                final Map<JavaIdentifier, InheritanceModel.Node<Dependency>> dependencyJavaSetterMethodNames =
+                    new HashMap<JavaIdentifier, InheritanceModel.Node<Dependency>>( dependencyNames.size() );
+
+                final Map<JavaIdentifier, InheritanceModel.Node<Dependency>> dependencyJavaVariableNames =
+                    new HashMap<JavaIdentifier, InheritanceModel.Node<Dependency>>( dependencyNames.size() );
+
                 for ( String dependencyName : dependencyNames )
                 {
                     final Set<InheritanceModel.Node<Dependency>> dependencyNodes =
@@ -2000,9 +2048,135 @@ public class DefaultModelValidator implements ModelValidator
                                    moduleOfImpl.getName(), dependencyName, getNodeListPathString( dependencyNodes ) );
 
                     }
+
+                    if ( validationContext.isValidateJava() )
+                    {
+                        for ( final InheritanceModel.Node<Dependency> node : dependencyNodes )
+                        {
+                            try
+                            {
+                                final JavaIdentifier javaIdentifier = node.getModelObject().getJavaConstantName();
+                                final InheritanceModel.Node<Dependency> existingNode =
+                                    dependencyJavaConstantNames.get( javaIdentifier );
+
+                                if ( existingNode != null )
+                                {
+                                    addDetail( validationContext.getReport(),
+                                               "IMPLEMENTATION_DEPENDENCY_JAVA_CONSTANT_NAME_UNIQUENESS_CONSTRAINT",
+                                               Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                               "implementationDependencyJavaConstantNameUniquenessConstraint",
+                                               impl.getIdentifier(), moduleOfImpl.getName(), dependencyName,
+                                               getNodePathString( node ), existingNode.getModelObject().getName(),
+                                               getNodePathString( existingNode ), javaIdentifier );
+
+                                }
+                                else
+                                {
+                                    dependencyJavaConstantNames.put( javaIdentifier, node );
+                                }
+                            }
+                            catch ( final ModelObjectException e )
+                            {
+                                // Validated above.
+                            }
+
+                            try
+                            {
+                                final JavaIdentifier javaIdentifier = node.getModelObject().getJavaGetterMethodName();
+                                final InheritanceModel.Node<Dependency> existingNode =
+                                    dependencyJavaGetterMethodNames.get( javaIdentifier );
+
+                                if ( existingNode != null )
+                                {
+                                    addDetail( validationContext.getReport(),
+                                               "IMPLEMENTATION_DEPENDENCY_JAVA_GETTER_METHOD_NAME_UNIQUENESS_CONSTRAINT",
+                                               Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                               "implementationDependencyJavaGetterMethodNameUniquenessConstraint",
+                                               impl.getIdentifier(), moduleOfImpl.getName(), dependencyName,
+                                               getNodePathString( node ), existingNode.getModelObject().getName(),
+                                               getNodePathString( existingNode ), javaIdentifier );
+
+                                }
+                                else
+                                {
+                                    dependencyJavaGetterMethodNames.put( javaIdentifier, node );
+                                }
+                            }
+                            catch ( final ModelObjectException e )
+                            {
+                                // Validated above.
+                            }
+
+                            try
+                            {
+                                final JavaIdentifier javaIdentifier = node.getModelObject().getJavaSetterMethodName();
+                                final InheritanceModel.Node<Dependency> existingNode =
+                                    dependencyJavaSetterMethodNames.get( javaIdentifier );
+
+                                if ( existingNode != null )
+                                {
+                                    addDetail( validationContext.getReport(),
+                                               "IMPLEMENTATION_DEPENDENCY_JAVA_SETTER_METHOD_NAME_UNIQUENESS_CONSTRAINT",
+                                               Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                               "implementationDependencyJavaSetterMethodNameUniquenessConstraint",
+                                               impl.getIdentifier(), moduleOfImpl.getName(), dependencyName,
+                                               getNodePathString( node ), existingNode.getModelObject().getName(),
+                                               getNodePathString( existingNode ), javaIdentifier );
+
+                                }
+                                else
+                                {
+                                    dependencyJavaSetterMethodNames.put( javaIdentifier, node );
+                                }
+                            }
+                            catch ( final ModelObjectException e )
+                            {
+                                // Validated above.
+                            }
+
+                            try
+                            {
+                                final JavaIdentifier javaIdentifier = node.getModelObject().getJavaSetterMethodName();
+                                final InheritanceModel.Node<Dependency> existingNode =
+                                    dependencyJavaVariableNames.get( javaIdentifier );
+
+                                if ( existingNode != null )
+                                {
+                                    addDetail( validationContext.getReport(),
+                                               "IMPLEMENTATION_DEPENDENCY_JAVA_VARIABLE_NAME_UNIQUENESS_CONSTRAINT",
+                                               Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                               "implementationDependencyJavaVariableNameUniquenessConstraint",
+                                               impl.getIdentifier(), moduleOfImpl.getName(), dependencyName,
+                                               getNodePathString( node ), existingNode.getModelObject().getName(),
+                                               getNodePathString( existingNode ), javaIdentifier );
+
+                                }
+                                else
+                                {
+                                    dependencyJavaVariableNames.put( javaIdentifier, node );
+                                }
+                            }
+                            catch ( final ModelObjectException e )
+                            {
+                                // Validated above.
+                            }
+                        }
+                    }
                 }
 
                 final Set<String> messageNames = imodel.getMessageNames( impl.getIdentifier() );
+
+                final Map<JavaIdentifier, InheritanceModel.Node<Message>> messageJavaConstantNames =
+                    new HashMap<JavaIdentifier, InheritanceModel.Node<Message>>( messageNames.size() );
+
+                final Map<JavaIdentifier, InheritanceModel.Node<Message>> messageJavaGetterMethodNames =
+                    new HashMap<JavaIdentifier, InheritanceModel.Node<Message>>( messageNames.size() );
+
+                final Map<JavaIdentifier, InheritanceModel.Node<Message>> messageJavaSetterMethodNames =
+                    new HashMap<JavaIdentifier, InheritanceModel.Node<Message>>( messageNames.size() );
+
+                final Map<JavaIdentifier, InheritanceModel.Node<Message>> messageJavaVariableNames =
+                    new HashMap<JavaIdentifier, InheritanceModel.Node<Message>>( messageNames.size() );
 
                 for ( String messageName : messageNames )
                 {
@@ -2018,9 +2192,135 @@ public class DefaultModelValidator implements ModelValidator
                                    moduleOfImpl.getName(), messageName, getNodeListPathString( messageNodes ) );
 
                     }
+
+                    if ( validationContext.isValidateJava() )
+                    {
+                        for ( final InheritanceModel.Node<Message> node : messageNodes )
+                        {
+                            try
+                            {
+                                final JavaIdentifier javaIdentifier = node.getModelObject().getJavaConstantName();
+                                final InheritanceModel.Node<Message> existingNode =
+                                    messageJavaConstantNames.get( javaIdentifier );
+
+                                if ( existingNode != null )
+                                {
+                                    addDetail( validationContext.getReport(),
+                                               "IMPLEMENTATION_MESSAGE_JAVA_CONSTANT_NAME_UNIQUENESS_CONSTRAINT",
+                                               Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                               "implementationMessageJavaConstantNameUniquenessConstraint",
+                                               impl.getIdentifier(), moduleOfImpl.getName(), messageName,
+                                               getNodePathString( node ), existingNode.getModelObject().getName(),
+                                               getNodePathString( existingNode ), javaIdentifier );
+
+                                }
+                                else
+                                {
+                                    messageJavaConstantNames.put( javaIdentifier, node );
+                                }
+                            }
+                            catch ( final ModelObjectException e )
+                            {
+                                // Validated above.
+                            }
+
+                            try
+                            {
+                                final JavaIdentifier javaIdentifier = node.getModelObject().getJavaGetterMethodName();
+                                final InheritanceModel.Node<Message> existingNode =
+                                    messageJavaGetterMethodNames.get( javaIdentifier );
+
+                                if ( existingNode != null )
+                                {
+                                    addDetail( validationContext.getReport(),
+                                               "IMPLEMENTATION_MESSAGE_JAVA_GETTER_METHOD_NAME_UNIQUENESS_CONSTRAINT",
+                                               Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                               "implementationMessageJavaGetterMethodNameUniquenessConstraint",
+                                               impl.getIdentifier(), moduleOfImpl.getName(), messageName,
+                                               getNodePathString( node ), existingNode.getModelObject().getName(),
+                                               getNodePathString( existingNode ), javaIdentifier );
+
+                                }
+                                else
+                                {
+                                    messageJavaGetterMethodNames.put( javaIdentifier, node );
+                                }
+                            }
+                            catch ( final ModelObjectException e )
+                            {
+                                // Validated above.
+                            }
+
+                            try
+                            {
+                                final JavaIdentifier javaIdentifier = node.getModelObject().getJavaSetterMethodName();
+                                final InheritanceModel.Node<Message> existingNode =
+                                    messageJavaSetterMethodNames.get( javaIdentifier );
+
+                                if ( existingNode != null )
+                                {
+                                    addDetail( validationContext.getReport(),
+                                               "IMPLEMENTATION_MESSAGE_JAVA_SETTER_METHOD_NAME_UNIQUENESS_CONSTRAINT",
+                                               Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                               "implementationMessageJavaSetterMethodNameUniquenessConstraint",
+                                               impl.getIdentifier(), moduleOfImpl.getName(), messageName,
+                                               getNodePathString( node ), existingNode.getModelObject().getName(),
+                                               getNodePathString( existingNode ), javaIdentifier );
+
+                                }
+                                else
+                                {
+                                    messageJavaSetterMethodNames.put( javaIdentifier, node );
+                                }
+                            }
+                            catch ( final ModelObjectException e )
+                            {
+                                // Validated above.
+                            }
+
+                            try
+                            {
+                                final JavaIdentifier javaIdentifier = node.getModelObject().getJavaSetterMethodName();
+                                final InheritanceModel.Node<Message> existingNode =
+                                    messageJavaVariableNames.get( javaIdentifier );
+
+                                if ( existingNode != null )
+                                {
+                                    addDetail( validationContext.getReport(),
+                                               "IMPLEMENTATION_MESSAGE_JAVA_VARIABLE_NAME_UNIQUENESS_CONSTRAINT",
+                                               Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                               "implementationMessageJavaVariableNameUniquenessConstraint",
+                                               impl.getIdentifier(), moduleOfImpl.getName(), messageName,
+                                               getNodePathString( node ), existingNode.getModelObject().getName(),
+                                               getNodePathString( existingNode ), javaIdentifier );
+
+                                }
+                                else
+                                {
+                                    messageJavaVariableNames.put( javaIdentifier, node );
+                                }
+                            }
+                            catch ( final ModelObjectException e )
+                            {
+                                // Validated above.
+                            }
+                        }
+                    }
                 }
 
                 final Set<String> propertyNames = imodel.getPropertyNames( impl.getIdentifier() );
+
+                final Map<JavaIdentifier, InheritanceModel.Node<Property>> propertyJavaConstantNames =
+                    new HashMap<JavaIdentifier, InheritanceModel.Node<Property>>( messageNames.size() );
+
+                final Map<JavaIdentifier, InheritanceModel.Node<Property>> propertyJavaGetterMethodNames =
+                    new HashMap<JavaIdentifier, InheritanceModel.Node<Property>>( messageNames.size() );
+
+                final Map<JavaIdentifier, InheritanceModel.Node<Property>> propertyJavaSetterMethodNames =
+                    new HashMap<JavaIdentifier, InheritanceModel.Node<Property>>( messageNames.size() );
+
+                final Map<JavaIdentifier, InheritanceModel.Node<Property>> propertyJavaVariableNames =
+                    new HashMap<JavaIdentifier, InheritanceModel.Node<Property>>( messageNames.size() );
 
                 for ( String propertyName : propertyNames )
                 {
@@ -2035,6 +2335,120 @@ public class DefaultModelValidator implements ModelValidator
                                    "implementationMultipleInheritancePropertyConstraint", impl.getIdentifier(),
                                    moduleOfImpl.getName(), propertyName, getNodeListPathString( propertyNodes ) );
 
+                    }
+
+                    if ( validationContext.isValidateJava() )
+                    {
+                        for ( final InheritanceModel.Node<Property> node : propertyNodes )
+                        {
+                            try
+                            {
+                                final JavaIdentifier javaIdentifier = node.getModelObject().getJavaConstantName();
+                                final InheritanceModel.Node<Property> existingNode =
+                                    propertyJavaConstantNames.get( javaIdentifier );
+
+                                if ( existingNode != null )
+                                {
+                                    addDetail( validationContext.getReport(),
+                                               "IMPLEMENTATION_PROPERTY_JAVA_CONSTANT_NAME_UNIQUENESS_CONSTRAINT",
+                                               Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                               "implementationPropertyJavaConstantNameUniquenessConstraint",
+                                               impl.getIdentifier(), moduleOfImpl.getName(), propertyName,
+                                               getNodePathString( node ), existingNode.getModelObject().getName(),
+                                               getNodePathString( existingNode ), javaIdentifier );
+
+                                }
+                                else
+                                {
+                                    propertyJavaConstantNames.put( javaIdentifier, node );
+                                }
+                            }
+                            catch ( final ModelObjectException e )
+                            {
+                                // Validated above.
+                            }
+
+                            try
+                            {
+                                final JavaIdentifier javaIdentifier = node.getModelObject().getJavaGetterMethodName();
+                                final InheritanceModel.Node<Property> existingNode =
+                                    propertyJavaGetterMethodNames.get( javaIdentifier );
+
+                                if ( existingNode != null )
+                                {
+                                    addDetail( validationContext.getReport(),
+                                               "IMPLEMENTATION_PROPERTY_JAVA_GETTER_METHOD_NAME_UNIQUENESS_CONSTRAINT",
+                                               Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                               "implementationPropertyJavaGetterMethodNameUniquenessConstraint",
+                                               impl.getIdentifier(), moduleOfImpl.getName(), propertyName,
+                                               getNodePathString( node ), existingNode.getModelObject().getName(),
+                                               getNodePathString( existingNode ), javaIdentifier );
+
+                                }
+                                else
+                                {
+                                    propertyJavaGetterMethodNames.put( javaIdentifier, node );
+                                }
+                            }
+                            catch ( final ModelObjectException e )
+                            {
+                                // Validated above.
+                            }
+
+                            try
+                            {
+                                final JavaIdentifier javaIdentifier = node.getModelObject().getJavaSetterMethodName();
+                                final InheritanceModel.Node<Property> existingNode =
+                                    propertyJavaSetterMethodNames.get( javaIdentifier );
+
+                                if ( existingNode != null )
+                                {
+                                    addDetail( validationContext.getReport(),
+                                               "IMPLEMENTATION_PROPERTY_JAVA_SETTER_METHOD_NAME_UNIQUENESS_CONSTRAINT",
+                                               Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                               "implementationPropertyJavaSetterMethodNameUniquenessConstraint",
+                                               impl.getIdentifier(), moduleOfImpl.getName(), propertyName,
+                                               getNodePathString( node ), existingNode.getModelObject().getName(),
+                                               getNodePathString( existingNode ), javaIdentifier );
+
+                                }
+                                else
+                                {
+                                    propertyJavaSetterMethodNames.put( javaIdentifier, node );
+                                }
+                            }
+                            catch ( final ModelObjectException e )
+                            {
+                                // Validated above.
+                            }
+
+                            try
+                            {
+                                final JavaIdentifier javaIdentifier = node.getModelObject().getJavaSetterMethodName();
+                                final InheritanceModel.Node<Property> existingNode =
+                                    propertyJavaVariableNames.get( javaIdentifier );
+
+                                if ( existingNode != null )
+                                {
+                                    addDetail( validationContext.getReport(),
+                                               "IMPLEMENTATION_PROPERTY_JAVA_VARIABLE_NAME_UNIQUENESS_CONSTRAINT",
+                                               Level.SEVERE, new ObjectFactory().createImplementation( impl ),
+                                               "implementationPropertyJavaVariableNameUniquenessConstraint",
+                                               impl.getIdentifier(), moduleOfImpl.getName(), propertyName,
+                                               getNodePathString( node ), existingNode.getModelObject().getName(),
+                                               getNodePathString( existingNode ), javaIdentifier );
+
+                                }
+                                else
+                                {
+                                    propertyJavaVariableNames.put( javaIdentifier, node );
+                                }
+                            }
+                            catch ( final ModelObjectException e )
+                            {
+                                // Validated above.
+                            }
+                        }
                     }
                 }
 
@@ -2833,6 +3247,9 @@ public class DefaultModelValidator implements ModelValidator
 
                 if ( m.getArguments() != null )
                 {
+                    final Map<JavaIdentifier, Argument> javaVariableNames =
+                        new HashMap<JavaIdentifier, Argument>( m.getArguments().getArgument().size() );
+
                     for ( int j = 0, s1 = m.getArguments().getArgument().size(); j < s1; j++ )
                     {
                         final Argument a = m.getArguments().getArgument().get( j );
@@ -2864,7 +3281,23 @@ public class DefaultModelValidator implements ModelValidator
 
                             try
                             {
-                                a.getJavaVariableName();
+                                final JavaIdentifier javaIdentifier = a.getJavaVariableName();
+
+                                if ( javaVariableNames.containsKey( javaIdentifier ) )
+                                {
+                                    addDetail( validationContext.getReport(),
+                                               "IMPLEMENTATION_DEPENDENCY_MESSAGE_ARGUMENT_JAVA_VARIABLE_NAME_UNIQUENESS_CONSTRAINT",
+                                               Level.SEVERE, new ObjectFactory().createImplementation( implementation ),
+                                               "implementationDependencyMessageArgumentJavaVariableNameUniquenessConstraint",
+                                               implementation.getIdentifier(), moduleOfImpl.getName(),
+                                               dependency.getName(), m.getName(), a.getName(), javaIdentifier,
+                                               javaVariableNames.get( javaIdentifier ).getName() );
+
+                                }
+                                else
+                                {
+                                    javaVariableNames.put( javaIdentifier, a );
+                                }
                             }
                             catch ( final ModelObjectException e )
                             {
@@ -3117,8 +3550,7 @@ public class DefaultModelValidator implements ModelValidator
 
                         if ( !( override.isOverride() || overriddenDependencies.isEmpty() ) )
                         {
-                            for ( final InheritanceModel.Node<Dependency> overriddenDependency
-                                  : overriddenDependencies )
+                            for ( final InheritanceModel.Node<Dependency> overriddenDependency : overriddenDependencies )
                             {
                                 addDetail( validationContext.getReport(),
                                            "IMPLEMENTATION_DEPENDENCY_OVERRIDE_DEPENDENCY_WARNING",
