@@ -179,6 +179,12 @@ public class JavaIdentifierTest
         assertEquals( JavaIdentifier.valueOf( "TestTestTest" ),
                       JavaIdentifier.normalize( "test TeSt Test", CAMEL_CASE ) );
 
+        assertEquals( JavaIdentifier.valueOf( "TesTtEsTtEst" ),
+                      JavaIdentifier.normalize( "tEsTtEsTtEsT", CAMEL_CASE ) );
+
+        assertEquals( JavaIdentifier.valueOf( "TesttesttestTesttesttest" ),
+                      JavaIdentifier.normalize( "tEsTtEsTtEsT tEsTtEsTtEsT", CAMEL_CASE ) );
+
         for ( final String keyword : JavaLanguage.KEYWORDS )
         {
             assertEquals( JavaIdentifier.valueOf( toUpperCase( keyword, 0, 1 ) ),
@@ -407,6 +413,12 @@ public class JavaIdentifierTest
         assertEquals( JavaIdentifier.valueOf( "testTestTest" ),
                       JavaIdentifier.normalize( "Test TeSt Test", METHOD_NAME_CONVENTION ) );
 
+        assertEquals( JavaIdentifier.valueOf( "teStTeStTeStx" ),
+                      JavaIdentifier.normalize( "TeStTeStTeStX", METHOD_NAME_CONVENTION ) );
+
+        assertEquals( JavaIdentifier.valueOf( "testtesttestTesttesttest" ),
+                      JavaIdentifier.normalize( "TeStTeStTeSt TeStTeStTeSt", METHOD_NAME_CONVENTION ) );
+
         for ( final String keyword : JavaLanguage.KEYWORDS )
         {
             assertEquals( JavaIdentifier.valueOf( "_" + keyword ),
@@ -470,6 +482,12 @@ public class JavaIdentifierTest
 
         assertEquals( JavaIdentifier.valueOf( "testTestTest" ),
                       JavaIdentifier.normalize( "test TeSt Test", VARIABLE_NAME_CONVENTION ) );
+
+        assertEquals( JavaIdentifier.valueOf( "teStTeStTeStx" ),
+                      JavaIdentifier.normalize( "TeStTeStTeStX", VARIABLE_NAME_CONVENTION ) );
+
+        assertEquals( JavaIdentifier.valueOf( "testtesttestTesttesttest" ),
+                      JavaIdentifier.normalize( "TeStTeStTeSt TeStTeStTeSt", VARIABLE_NAME_CONVENTION ) );
 
         for ( final String keyword : JavaLanguage.KEYWORDS )
         {
