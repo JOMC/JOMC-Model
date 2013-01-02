@@ -664,6 +664,10 @@
     <detail identifier="IMPLEMENTATION_MESSAGE_MULTIPLE_INHERITANCE_CONSTRAINT" count="5"/>
     <detail identifier="IMPLEMENTATION_MESSAGE_OVERRIDE_CONSTRAINT" count="20"/>
     <detail identifier="IMPLEMENTATION_MESSAGES_UNIQUENESS_CONSTRAINT" count="5"/>
+    <detail identifier="IMPLEMENTATION_MESSAGE_JAVA_CONSTANT_NAME_UNIQUENESS_CONSTRAINT" count="5"/>
+    <detail identifier="IMPLEMENTATION_MESSAGE_JAVA_GETTER_METHOD_NAME_UNIQUENESS_CONSTRAINT" count="5"/>
+    <detail identifier="IMPLEMENTATION_MESSAGE_JAVA_SETTER_METHOD_NAME_UNIQUENESS_CONSTRAINT" count="5"/>
+    <detail identifier="IMPLEMENTATION_MESSAGE_JAVA_VARIABLE_NAME_UNIQUENESS_CONSTRAINT" count="5"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
@@ -700,6 +704,10 @@
     <detail identifier="IMPLEMENTATION_PROPERTY_MULTIPLE_INHERITANCE_CONSTRAINT" count="5"/>
     <detail identifier="IMPLEMENTATION_PROPERTY_OVERRIDE_CONSTRAINT" count="20"/>
     <detail identifier="IMPLEMENTATION_PROPERTIES_UNIQUENESS_CONSTRAINT" count="5"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_JAVA_CONSTANT_NAME_UNIQUENESS_CONSTRAINT" count="5"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_JAVA_GETTER_METHOD_NAME_UNIQUENESS_CONSTRAINT" count="5"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_JAVA_SETTER_METHOD_NAME_UNIQUENESS_CONSTRAINT" count="5"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_JAVA_VARIABLE_NAME_UNIQUENESS_CONSTRAINT" count="5"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
@@ -2206,6 +2214,10 @@
       </modules>
     </modules>
     <detail identifier="IMPLEMENTATION_DEPENDENCY_MULTIPLE_INHERITANCE_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_JAVA_CONSTANT_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_JAVA_GETTER_METHOD_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_JAVA_SETTER_METHOD_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_JAVA_VARIABLE_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
@@ -2249,6 +2261,10 @@
     <detail identifier="IMPLEMENTATION_DEPENDENCY_OVERRIDE_WARNING" count="2"/>
     <detail identifier="IMPLEMENTATION_IMPLEMENTATION_REFERENCE_OVERRIDE_WARNING" count="1"/>
     <detail identifier="IMPLEMENTATION_DEPENDENCY_MULTIPLE_INHERITANCE_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_JAVA_CONSTANT_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_JAVA_GETTER_METHOD_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_JAVA_SETTER_METHOD_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_JAVA_VARIABLE_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
@@ -2326,6 +2342,10 @@
       </modules>
     </modules>
     <detail identifier="IMPLEMENTATION_MESSAGE_MULTIPLE_INHERITANCE_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_MESSAGE_JAVA_CONSTANT_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_MESSAGE_JAVA_GETTER_METHOD_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_MESSAGE_JAVA_SETTER_METHOD_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_MESSAGE_JAVA_VARIABLE_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
@@ -2378,6 +2398,10 @@
     <detail identifier="IMPLEMENTATION_MESSAGE_OVERRIDE_WARNING" count="2"/>
     <detail identifier="IMPLEMENTATION_IMPLEMENTATION_REFERENCE_OVERRIDE_WARNING" count="1"/>
     <detail identifier="IMPLEMENTATION_MESSAGE_MULTIPLE_INHERITANCE_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_MESSAGE_JAVA_CONSTANT_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_MESSAGE_JAVA_GETTER_METHOD_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_MESSAGE_JAVA_SETTER_METHOD_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_MESSAGE_JAVA_VARIABLE_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
@@ -2456,6 +2480,10 @@
       </modules>
     </modules>
     <detail identifier="IMPLEMENTATION_PROPERTY_MULTIPLE_INHERITANCE_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_JAVA_CONSTANT_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_JAVA_GETTER_METHOD_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_JAVA_SETTER_METHOD_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_JAVA_VARIABLE_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
@@ -2496,6 +2524,10 @@
     <detail identifier="IMPLEMENTATION_PROPERTY_OVERRIDE_WARNING" count="2"/>
     <detail identifier="IMPLEMENTATION_IMPLEMENTATION_REFERENCE_OVERRIDE_WARNING" count="1"/>
     <detail identifier="IMPLEMENTATION_PROPERTY_MULTIPLE_INHERITANCE_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_JAVA_CONSTANT_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_JAVA_GETTER_METHOD_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_JAVA_SETTER_METHOD_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_JAVA_VARIABLE_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
@@ -3989,6 +4021,10 @@
       </modules>
     </modules>
     <detail identifier="IMPLEMENTATION_PROPERTY_MULTIPLE_INHERITANCE_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_JAVA_CONSTANT_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_JAVA_GETTER_METHOD_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_JAVA_SETTER_METHOD_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_JAVA_VARIABLE_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
@@ -4374,6 +4410,10 @@
       </modules>
     </modules>
     <detail identifier="IMPLEMENTATION_PROPERTY_MULTIPLE_INHERITANCE_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_JAVA_CONSTANT_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_JAVA_GETTER_METHOD_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_JAVA_SETTER_METHOD_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_JAVA_VARIABLE_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
@@ -4433,6 +4473,10 @@
       </modules>
     </modules>
     <detail identifier="IMPLEMENTATION_PROPERTY_MULTIPLE_INHERITANCE_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_JAVA_CONSTANT_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_JAVA_GETTER_METHOD_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_JAVA_SETTER_METHOD_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_JAVA_VARIABLE_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
@@ -4879,6 +4923,10 @@
     </modules>
     <detail identifier="IMPLEMENTATION_PROPERTY_OVERRIDE_WARNING" count="2"/>
     <detail identifier="IMPLEMENTATION_PROPERTY_MULTIPLE_INHERITANCE_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_JAVA_CONSTANT_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_JAVA_GETTER_METHOD_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_JAVA_SETTER_METHOD_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_JAVA_VARIABLE_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
@@ -4915,6 +4963,10 @@
       </modules>
     </modules>
     <detail identifier="IMPLEMENTATION_PROPERTY_MULTIPLE_INHERITANCE_CONSTRAINT" count="2"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_JAVA_CONSTANT_NAME_UNIQUENESS_CONSTRAINT" count="2"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_JAVA_GETTER_METHOD_NAME_UNIQUENESS_CONSTRAINT" count="2"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_JAVA_SETTER_METHOD_NAME_UNIQUENESS_CONSTRAINT" count="2"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_JAVA_VARIABLE_NAME_UNIQUENESS_CONSTRAINT" count="2"/>
   </modules-constraints-test>
 
   <!-- ********************************************************************* -->
@@ -5251,6 +5303,150 @@
     </modules>
     <detail identifier="SPECIFICATION_JAVA_TYPE_NAME_CONSTRAINT" count="1"/>
     <detail identifier="IMPLEMENTATION_JAVA_TYPE_NAME_CONSTRAINT" count="1"/>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="MCT0125">
+    <modules valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <messages>
+            <message name="Message">
+              <template defaultLanguage="en">
+                <text language="en">Text</text>
+              </template>
+              <arguments>
+                <argument index="0" name="Argument Name"/>
+                <argument index="1" name="Argument::Name"/>
+              </arguments>
+            </message>
+          </messages>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="MODULE_MESSAGE_ARGUMENT_JAVA_VARIABLE_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="MCT0126">
+    <modules valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <implementations>
+            <implementation identifier="Implementation" name="Implementation Name">
+              <messages>
+                <message name="Message">
+                  <template defaultLanguage="en">
+                    <text language="en">Text</text>
+                  </template>
+                  <arguments>
+                    <argument index="0" name="Argument Name"/>
+                    <argument index="1" name="Argument::Name"/>
+                  </arguments>
+                </message>
+              </messages>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="IMPLEMENTATION_MESSAGE_ARGUMENT_JAVA_VARIABLE_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="MCT0127">
+    <modules valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <specifications>
+            <specification identifier="Specification" class="java.lang.Object"/>
+          </specifications>
+          <implementations>
+            <implementation identifier="Implementation" name="Implementation Name">
+              <dependencies>
+                <dependency name="Dependency" identifier="Specification" optional="true">
+                  <messages>
+                    <message name="Message">
+                      <template defaultLanguage="en">
+                        <text language="en">Text</text>
+                      </template>
+                      <arguments>
+                        <argument index="0" name="Argument Name"/>
+                        <argument index="1" name="Argument::Name"/>
+                      </arguments>
+                    </message>
+                  </messages>
+                </dependency>
+              </dependencies>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_MESSAGE_ARGUMENT_JAVA_VARIABLE_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="MCT0128">
+    <modules valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <specifications>
+            <specification identifier="Specification" class="java.lang.Object"/>
+          </specifications>
+          <implementations>
+            <implementation identifier="Implementation 1" name="Implementation 1">
+              <dependencies>
+                <dependency name="Dependency Name" identifier="Specification" optional="true"/>
+              </dependencies>
+              <properties>
+                <property name="Property Name" value="Value"/>
+              </properties>
+              <messages>
+                <message name="Message Name">
+                  <template defaultLanguage="en">
+                    <text language="en">Text</text>
+                  </template>
+                </message>
+              </messages>
+            </implementation>
+            <implementation identifier="Implementation 2" name="Implementation 2">
+              <dependencies>
+                <dependency name="Dependency::Name" identifier="Specification" optional="true"/>
+              </dependencies>
+              <properties>
+                <property name="Property::Name" value="Value"/>
+              </properties>
+              <messages>
+                <message name="Message::Name">
+                  <template defaultLanguage="en">
+                    <text language="en">Text</text>
+                  </template>
+                </message>
+              </messages>
+            </implementation>
+            <implementation identifier="Implementation 3" name="Implementation 3">
+              <implementations>
+                <reference identifier="Implementation 1"/>
+                <reference identifier="Implementation 2"/>
+              </implementations>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_JAVA_CONSTANT_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_JAVA_GETTER_METHOD_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_JAVA_SETTER_METHOD_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_DEPENDENCY_JAVA_VARIABLE_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_MESSAGE_JAVA_CONSTANT_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_MESSAGE_JAVA_GETTER_METHOD_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_MESSAGE_JAVA_SETTER_METHOD_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_MESSAGE_JAVA_VARIABLE_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_JAVA_CONSTANT_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_JAVA_GETTER_METHOD_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_JAVA_SETTER_METHOD_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
+    <detail identifier="IMPLEMENTATION_PROPERTY_JAVA_VARIABLE_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
   </modules-constraints-test>
 
 </testsuite>

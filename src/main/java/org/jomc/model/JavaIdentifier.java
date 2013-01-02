@@ -35,7 +35,9 @@ import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 import java.text.MessageFormat;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -354,10 +356,11 @@ public final class JavaIdentifier implements CharSequence, Serializable
         }
 
         final StringBuilder identifierBuilder = new StringBuilder( text.length() );
+        final List<Integer> retainedIndices = new ArrayList<Integer>( text.length() );
         boolean start_of_word = true;
-        boolean retain_camel_case = true;
+        int words = 0;
 
-        for ( int i = 0, s0 = text.length(), word = 0, last_codepoint = -1; i < s0; i++ )
+        for ( int i = 0, j = 1, s0 = text.length(), last_codepoint = -1; i < s0; i++, j++ )
         {
             if ( !isWordSeparator( text.codePointAt( i ), mode, identifierBuilder.length() <= 0 ) )
             {
@@ -370,11 +373,11 @@ public final class JavaIdentifier implements CharSequence, Serializable
                             {
                                 identifierBuilder.append( Character.toUpperCase( text.charAt( i ) ) );
                             }
-                            else if ( retain_camel_case && last_codepoint > -1 && i + 1 < s0
-                                      && isCamelCase( last_codepoint, text.codePointAt( i ),
-                                                      text.codePointAt( i + 1 ) ) )
-                            {
+                            else if ( last_codepoint > -1 && j < s0
+                                      && isCamelCase( last_codepoint, text.codePointAt( i ), text.codePointAt( j ) ) )
+                            { // Retain camel-case in words.
                                 identifierBuilder.append( text.charAt( i ) );
+                                retainedIndices.add( identifierBuilder.length() - 1 );
                             }
                             else
                             {
@@ -405,15 +408,15 @@ public final class JavaIdentifier implements CharSequence, Serializable
                         case METHOD_NAME_CONVENTION:
                             if ( start_of_word )
                             {
-                                identifierBuilder.append( word == 0 ? Character.toLowerCase( text.charAt( i ) )
+                                identifierBuilder.append( words == 0 ? Character.toLowerCase( text.charAt( i ) )
                                                           : Character.toUpperCase( text.charAt( i ) ) );
 
                             }
-                            else if ( retain_camel_case && last_codepoint > -1 && i + 1 < s0
-                                      && isCamelCase( last_codepoint, text.codePointAt( i ),
-                                                      text.codePointAt( i + 1 ) ) )
-                            {
+                            else if ( last_codepoint > -1 && j < s0
+                                      && isCamelCase( last_codepoint, text.codePointAt( i ), text.codePointAt( j ) ) )
+                            { // Retain camel-case in words.
                                 identifierBuilder.append( text.charAt( i ) );
+                                retainedIndices.add( identifierBuilder.length() - 1 );
                             }
                             else
                             {
@@ -441,10 +444,8 @@ public final class JavaIdentifier implements CharSequence, Serializable
                     if ( !start_of_word )
                     {
                         start_of_word = true;
-                        word++;
+                        words++;
                     }
-
-                    retain_camel_case = false;
                 }
                 else if ( runtimeException )
                 {
@@ -455,6 +456,12 @@ public final class JavaIdentifier implements CharSequence, Serializable
                     throw new ParseException( getMessage( "invalidCharacter", text, text.charAt( i ), i ), i );
                 }
             }
+        }
+
+        if ( words > 0 )
+        {
+            // Multiple words - no camel-case retained in any word.
+            toLowerCase( identifierBuilder, retainedIndices );
         }
 
         t.identifier = identifierBuilder.toString();
@@ -504,6 +511,16 @@ public final class JavaIdentifier implements CharSequence, Serializable
     private static boolean isCamelCase( final int left, final int middle, final int right )
     {
         return Character.isLowerCase( left ) && Character.isUpperCase( middle ) && Character.isLowerCase( right );
+    }
+
+    private static void toLowerCase( final StringBuilder stringBuilder, final List<Integer> indices )
+    {
+        for ( int i = 0, s0 = indices.size(); i < s0; i++ )
+        {
+            final int index = indices.get( i );
+            final int cp = Character.toLowerCase( stringBuilder.codePointAt( index ) );
+            stringBuilder.replace( index, index + 1, String.valueOf( Character.toChars( cp ) ) );
+        }
     }
 
     private static String getMessage( final String key, final Object... args )
