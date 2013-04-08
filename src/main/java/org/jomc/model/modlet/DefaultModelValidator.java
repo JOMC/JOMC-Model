@@ -877,8 +877,8 @@ public class DefaultModelValidator implements ModelValidator
 
                             if ( !( d.isOverride() || overriddenDependencies.isEmpty() ) )
                             {
-                                for ( final InheritanceModel.Node<Dependency> overriddenDependency :
-                                      overriddenDependencies )
+                                for ( final InheritanceModel.Node<Dependency> overriddenDependency
+                                      : overriddenDependencies )
                                 {
                                     Implementation overriddenImplementation = overriddenDependency.getImplementation();
                                     if ( overriddenDependency.getClassDeclaration() != null )
@@ -1084,8 +1084,8 @@ public class DefaultModelValidator implements ModelValidator
 
                             if ( !( r.isOverride() || overriddenReferences.isEmpty() ) )
                             {
-                                for ( final InheritanceModel.Node<ImplementationReference> overriddenReference :
-                                      overriddenReferences )
+                                for ( final InheritanceModel.Node<ImplementationReference> overriddenReference
+                                      : overriddenReferences )
                                 {
                                     Implementation overriddenImplementation = overriddenReference.getImplementation();
                                     if ( overriddenReference.getClassDeclaration() != null )
@@ -1111,8 +1111,8 @@ public class DefaultModelValidator implements ModelValidator
 
                             retainFinalNodes( overriddenReferences );
 
-                            for ( final InheritanceModel.Node<ImplementationReference> overriddenReference :
-                                  overriddenReferences )
+                            for ( final InheritanceModel.Node<ImplementationReference> overriddenReference
+                                  : overriddenReferences )
                             {
                                 Implementation overriddenImplementation = overriddenReference.getImplementation();
                                 if ( overriddenReference.getClassDeclaration() != null )
@@ -1880,8 +1880,8 @@ public class DefaultModelValidator implements ModelValidator
 
                             if ( !( r.isOverride() || overriddenReferences.isEmpty() ) )
                             {
-                                for ( final InheritanceModel.Node<SpecificationReference> overriddenReference :
-                                      overriddenReferences )
+                                for ( final InheritanceModel.Node<SpecificationReference> overriddenReference
+                                      : overriddenReferences )
                                 {
                                     Implementation overriddenImplementation = overriddenReference.getImplementation();
                                     if ( overriddenReference.getClassDeclaration() != null )
@@ -1906,8 +1906,8 @@ public class DefaultModelValidator implements ModelValidator
 
                             retainFinalNodes( overriddenReferences );
 
-                            for ( final InheritanceModel.Node<SpecificationReference> overriddenReference :
-                                  overriddenReferences )
+                            for ( final InheritanceModel.Node<SpecificationReference> overriddenReference
+                                  : overriddenReferences )
                             {
                                 Implementation overriddenImplementation = overriddenReference.getImplementation();
                                 if ( overriddenReference.getClassDeclaration() != null )
@@ -1968,8 +1968,8 @@ public class DefaultModelValidator implements ModelValidator
 
                                 if ( !( overrideNode || overriddenElements.isEmpty() ) )
                                 {
-                                    for ( final InheritanceModel.Node<JAXBElement<?>> overriddenElement :
-                                          overriddenElements )
+                                    for ( final InheritanceModel.Node<JAXBElement<?>> overriddenElement
+                                          : overriddenElements )
                                     {
                                         Implementation overriddenImplementation = overriddenElement.getImplementation();
                                         if ( overriddenElement.getClassDeclaration() != null )
@@ -4104,7 +4104,12 @@ public class DefaultModelValidator implements ModelValidator
 
     private static String getMessage( final Throwable t )
     {
-        return t != null ? t.getMessage() != null ? t.getMessage() : getMessage( t.getCause() ) : null;
+        return t != null
+               ? t.getMessage() != null && t.getMessage().trim().length() > 0
+                 ? t.getMessage()
+                 : getMessage( t.getCause() )
+               : null;
+
     }
 
     /** @since 1.2 */
