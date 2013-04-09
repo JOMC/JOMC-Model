@@ -2241,17 +2241,18 @@
      * <li>If property {@code any} is set, the Java value is computed based on the object returned by method
      * {@code getAny()} by possibly unwrapping any {@code JAXBElement} instances. If that object declares a
      * <blockquote><pre>public Object getJavaValue( ClassLoader )</pre></blockquote> method, the value returned by this
-     * method is the object returned by a call to that method using reflection. If that object does not declare such a
-     * method, the value returned by this method is that (possibly unwrapped) object.</li>
+     * method is the object returned by a call to that method. If that object does not declare such a method, the value
+     * returned by this method is that (possibly unwrapped) object.</li>
      * <li>If property {@code value} is set, the Java value is computed based on the values of properties {@code type}
      * and {@code value}. If property {@code type} is not set or equals {@code java.lang.String}, the value returned
      * by this method is the string value returned by method {@code getValue()}. If property {@code type} equals a name
      * of a Java primitive type, an instance of the wrapper class corresponding to that primitive type name is returned
-     * instantiated by passing the value of property {@code value} to the public constructor taking a single
-     * {@code java.lang.String} argument of that wrapper class. For all other values of property {@code type} an
-     * instance of a class with a name equal to the value of property {@code type} is returned instantiated by passing
-     * the value of property {@code value} to the public constructor taking a single {@code java.lang.String} argument
-     * of that class.</li>
+     * instantiated by passing the value of property {@code value} to the public constructor of that wrapper class
+     * taking a single {@code java.lang.String} argument. For all other values of property {@code type} an instance of
+     * a class with a name equal to the value of property {@code type} is returned, either instantiated by passing the
+     * value of property {@code value} to the public constructor of that class taking a single {@code java.lang.String}
+     * argument, or, failing that, by passing the value of property {@code value} to the static {@code valueOf} method
+     * of that class taking a single {@code java.lang.String} argument.</li>
      * <li>If properties {@code any} and {@code value} are both {@code null}, this method returns {@code null}.</li>
      * </ol></p>
      *
@@ -2514,12 +2515,12 @@
                     }
 
                     return type.getConstructor( new Class<?>[]
-                        {
-                            char.class
-                        } ).newInstance( new Object[]
-                        {
-                            value.charAt( 0 )
-                        } );
+                    {
+                        char.class
+                    } ).newInstance( new Object[]
+                    {
+                        value.charAt( 0 )
+                    } );
 
                 }
                 else if ( type == String.class )
@@ -2528,11 +2529,32 @@
                 }
                 else
                 {
-                    return type.getConstructor( new Class<?>[]
+                    try
+                    {
+                        return type.getConstructor( new Class<?>[]
                         {
                             String.class
                         } ).newInstance( value );
 
+                    }
+                    catch ( final NoSuchMethodException e )
+                    {
+                        // Sine 1.5: Try static 'valueOf' method.
+                        final java.lang.reflect.Method valueOf = type.getMethod( "valueOf", new Class<?>[]
+                        {
+                            String.class
+                        } );
+
+                        if ( !type.isAssignableFrom( valueOf.getReturnType() ) )
+                        {
+                            throw new PropertyException( getMessage( "notAssignable", valueOf.getReturnType().getName(),
+                                                                     valueOf.getName(), type.getName(),
+                                                                     type.getName(), this.getName() ) );
+
+                        }
+
+                        return valueOf.invoke( null, value );
+                    }
                 }
             }
             catch ( final InstantiationException e )
@@ -2541,7 +2563,7 @@
             }
             catch ( final IllegalAccessException e )
             {
-                throw new PropertyException( getMessage( "constructorAccessDenied", type.getName() ), e );
+                throw new PropertyException( getMessage( "accessDenied", type.getName() ), e );
             }
             catch ( final IllegalArgumentException e )
             {
@@ -2549,7 +2571,7 @@
             }
             catch ( final InvocationTargetException e )
             {
-                throw new PropertyException( getMessage( "constructorInvocationFailure", type.getName() ), e );
+                throw new PropertyException( getMessage( "invocationFailure", type.getName() ), e );
             }
             catch ( final NoSuchMethodException e )
             {
