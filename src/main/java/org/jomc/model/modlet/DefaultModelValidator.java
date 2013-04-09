@@ -772,7 +772,8 @@ public class DefaultModelValidator implements ModelValidator
                                    "IMPLEMENTATION_JAVA_TYPE_NAME_CONSTRAINT",
                                    Level.SEVERE, new ObjectFactory().createImplementation( impl ),
                                    "implementationJavaTypeNameConstraint", impl.getIdentifier(),
-                                   moduleOfImpl.getName(), impl.getClazz(), message );
+                                   moduleOfImpl.getName(), impl.getClazz(),
+                                   message != null && message.length() > 0 ? " " + message : "" );
 
                     }
                 }
@@ -2639,7 +2640,8 @@ public class DefaultModelValidator implements ModelValidator
                                    "SPECIFICATION_JAVA_TYPE_NAME_CONSTRAINT",
                                    Level.SEVERE, new ObjectFactory().createSpecification( s ),
                                    "specificationJavaTypeNameConstraint", s.getIdentifier(),
-                                   moduleOfS.getName(), s.getClazz(), message );
+                                   moduleOfS.getName(), s.getClazz(),
+                                   message != null && message.length() > 0 ? " " + message : "" );
 
                     }
                 }
