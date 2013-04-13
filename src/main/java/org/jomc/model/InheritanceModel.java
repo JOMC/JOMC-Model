@@ -278,6 +278,9 @@ public class InheritanceModel
     /** {@code ImplementationReference} nodes by context and implementation reference identifier. */
     private final Map<String, Map<String, Set<Node<ImplementationReference>>>> implReferences = newMap();
 
+    /** {@code ImplementationReference} nodes by context and implementation reference identifier. */
+    private final Map<String, Set<Node<ImplementationReference>>> cyclicImplReferences = newMap();
+
     /** {@code ImplementationReference} nodes by context and implementation identifier. */
     private final Map<String, Map<String, Map<String, Set<Node<ImplementationReference>>>>> effImplReferences =
         newMap();
@@ -323,6 +326,55 @@ public class InheritanceModel
         }
 
         this.modules = modules.clone();
+    }
+
+    /**
+     * Gets a set holding source nodes of an implementation.
+     *
+     * @param implementation The identifier of the implementation to get source nodes of.
+     *
+     * @return An unmodifiable set holding source nodes of the implementation identified by {@code implementation}.
+     *
+     * @throws NullPointerException if {@code implementation} is {@code null}.
+     *
+     * @see Node#getDescendant()
+     */
+    public Set<Node<Implementation>> getSourceNodes( final String implementation )
+    {
+        if ( implementation == null )
+        {
+            throw new NullPointerException( "implementation" );
+        }
+
+        this.prepareContext( implementation );
+        final Collection<Node<Implementation>> col = map( this.sourceNodes, implementation ).values();
+        return unmodifiableSet( newSet( col ) );
+    }
+
+    /**
+     * Gets a set holding implementation reference nodes of an implementation causing a cycle.
+     *
+     * @param implementation The identifier of the implementation to get implementation reference nodes causing a cycle
+     * of.
+     *
+     * @return An unmodifiable set holding implementation reference nodes of the implementation identified by
+     * {@code implementation} causing a cycle.
+     *
+     * @throws NullPointerException if {@code implementation} is {@code null}.
+     *
+     * @since 1.5
+     *
+     * @see Node#getPath()
+     */
+    public Set<Node<ImplementationReference>> getCycleNodes( final String implementation )
+    {
+        if ( implementation == null )
+        {
+            throw new NullPointerException( "implementation" );
+        }
+
+        this.prepareContext( implementation );
+        return unmodifiableSet( nodes( this.cyclicImplReferences, implementation ) );
     }
 
     /**
@@ -616,29 +668,6 @@ public class InheritanceModel
         }
 
         return unmodifiableSet( set );
-    }
-
-    /**
-     * Gets a set holding source nodes of an implementation.
-     *
-     * @param implementation The identifier of the implementation to get source nodes of.
-     *
-     * @return An unmodifiable set holding source nodes of the implementation identified by {@code implementation}.
-     *
-     * @throws NullPointerException if {@code implementation} is {@code null}.
-     *
-     * @see Node#getDescendant()
-     */
-    public Set<Node<Implementation>> getSourceNodes( final String implementation )
-    {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-
-        this.prepareContext( implementation );
-        final Collection<Node<Implementation>> col = map( this.sourceNodes, implementation ).values();
-        return unmodifiableSet( newSet( col ) );
     }
 
     /**
@@ -982,6 +1011,8 @@ public class InheritanceModel
             if ( declaration.getImplementations() != null
                  && !declaration.getImplementations().getReference().isEmpty() )
             {
+                boolean all_cyclic = true;
+
                 for ( int i = 0, s0 = declaration.getImplementations().getReference().size(); i < s0; i++ )
                 {
                     final ImplementationReference r = declaration.getImplementations().getReference().get( i );
@@ -990,10 +1021,41 @@ public class InheritanceModel
 
                     node.getModifiablePath().addAll( path );
 
-                    addNode( map( this.implReferences, context ), node, node.getModelObject().getIdentifier() );
-
                     final Implementation ancestor = this.modules.getImplementation( r.getIdentifier() );
-                    this.collectNodes( context, ancestor, declarationNode, path );
+
+                    boolean cycle = false;
+                    if ( ancestor != null && contextImplementations.containsKey( ancestor.getIdentifier() ) )
+                    {
+                        for ( int j = 0, s1 = path.size(); j < s1; j++ )
+                        {
+                            final Node<Implementation> n = path.get( j );
+
+                            if ( n.getModelObject().getIdentifier().equals( ancestor.getIdentifier() ) )
+                            {
+                                cycle = true;
+                                node.getModifiablePath().add( n );
+                                break;
+                            }
+                        }
+                    }
+
+                    if ( cycle )
+                    {
+                        addNode( this.cyclicImplReferences, node, context );
+                    }
+                    else
+                    {
+                        all_cyclic = false;
+                        addNode( map( this.implReferences, context ), node, node.getModelObject().getIdentifier() );
+                        this.collectNodes( context, ancestor, declarationNode, path );
+                    }
+                }
+
+                if ( all_cyclic )
+                {
+                    map( this.sourceNodes, context ).
+                        put( declarationNode.getModelObject().getIdentifier(), declarationNode );
+
                 }
             }
             else
@@ -1230,8 +1292,8 @@ public class InheritanceModel
 
                     if ( effectiveSpecificationReferences.containsKey( e.getKey() ) )
                     {
-                        for ( final Node<SpecificationReference> effNode :
-                              effectiveSpecificationReferences.get( e.getKey() ) )
+                        for ( final Node<SpecificationReference> effNode
+                              : effectiveSpecificationReferences.get( e.getKey() ) )
                         {
                             effNode.getModifiableOverriddenNodes().addAll( set );
                         }

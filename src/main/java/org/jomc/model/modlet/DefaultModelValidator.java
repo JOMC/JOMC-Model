@@ -36,8 +36,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -733,23 +731,18 @@ public class DefaultModelValidator implements ModelValidator
             {
                 final Implementation impl = implementations.getImplementation().get( i );
                 final InheritanceModel imodel = validationContext.getInheritanceModel();
-                final List<String> cyclePath = new LinkedList<String>();
                 final Module moduleOfImpl =
                     validationContext.getModules().getModuleOfImplementation( impl.getIdentifier() );
 
-                if ( isInheritanceCycle( validationContext, impl, null, cyclePath ) )
+                final Set<InheritanceModel.Node<ImplementationReference>> cyclicImplementationReferenceNodes =
+                    imodel.getCycleNodes( impl.getIdentifier() );
+
+                for ( final InheritanceModel.Node<ImplementationReference> node : cyclicImplementationReferenceNodes )
                 {
-                    final StringBuilder b = new StringBuilder( cyclePath.size() * 50 );
-
-                    for ( int j = 0, s1 = cyclePath.size(); j < s1; j++ )
-                    {
-                        b.append( " -> " ).append( "'" ).append( cyclePath.get( j ) ).append( "'" );
-                    }
-
                     addDetail( validationContext.getReport(), "IMPLEMENTATION_INHERITANCE_CYCLE_CONSTRAINT",
                                Level.SEVERE, new ObjectFactory().createImplementation( impl ),
                                "implementationInheritanceCycleConstraint", impl.getIdentifier(),
-                               moduleOfImpl.getName(), b.substring( " -> ".length() ) );
+                               moduleOfImpl.getName(), getNodePathString( node ) );
 
                 }
 
@@ -3966,43 +3959,6 @@ public class DefaultModelValidator implements ModelValidator
                 }
             }
         }
-    }
-
-    private static boolean isInheritanceCycle( final ValidationContext validationContext, final Implementation current,
-                                               Map<String, Implementation> implementations, final List<String> path )
-    {
-        if ( implementations == null )
-        {
-            implementations = new HashMap<String, Implementation>();
-        }
-
-        if ( current != null )
-        {
-            path.add( current.getIdentifier() );
-
-            if ( implementations.containsKey( current.getIdentifier() ) )
-            {
-                return true;
-            }
-
-            implementations.put( current.getIdentifier(), current );
-
-            if ( current.getImplementations() != null )
-            {
-                for ( int i = 0, s0 = current.getImplementations().getReference().size(); i < s0; i++ )
-                {
-                    final ImplementationReference r = current.getImplementations().getReference().get( i );
-                    return isInheritanceCycle(
-                        validationContext, validationContext.getModules().getImplementation( r.getIdentifier() ),
-                        implementations, path );
-
-                }
-            }
-
-            path.remove( current.getIdentifier() );
-        }
-
-        return false;
     }
 
     private static <T> String getNodePathString( final InheritanceModel.Node<T> node )
