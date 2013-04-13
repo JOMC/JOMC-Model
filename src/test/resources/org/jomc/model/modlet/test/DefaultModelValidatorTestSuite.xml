@@ -2589,18 +2589,26 @@
   <modules-constraints-test identifier="MCT0058">
     <modules valid="false">
       <modules xmlns="http://jomc.org/model">
-        <module name="Module">
+        <module name="Module 1">
           <implementations>
             <implementation identifier="Parent 1" name="Parent Name 1">
               <implementations>
                 <reference identifier="Cycle"/>
               </implementations>
             </implementation>
+          </implementations>
+        </module>
+        <module name="Module 2">
+          <implementations>
             <implementation identifier="Parent 2" name="Parent Name 2">
               <implementations>
                 <reference identifier="Parent 1"/>
               </implementations>
             </implementation>
+          </implementations>
+        </module>
+        <module name="Module 3">
+          <implementations>
             <implementation identifier="Cycle" name="Cycle Name">
               <implementations>
                 <reference identifier="Parent 1"/>
@@ -5447,6 +5455,70 @@
     <detail identifier="IMPLEMENTATION_PROPERTY_JAVA_GETTER_METHOD_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
     <detail identifier="IMPLEMENTATION_PROPERTY_JAVA_SETTER_METHOD_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
     <detail identifier="IMPLEMENTATION_PROPERTY_JAVA_VARIABLE_NAME_UNIQUENESS_CONSTRAINT" count="1"/>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="MCT0129">
+    <modules valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <implementations>
+            <implementation identifier="Parent" name="Parent Name"/>
+            <implementation identifier="Implementation" name="Implementation Name">
+              <implementations>
+                <reference identifier="Parent"/>
+                <reference identifier="Implementation"/>
+              </implementations>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="IMPLEMENTATION_INHERITANCE_CYCLE_CONSTRAINT" count="1"/>
+  </modules-constraints-test>
+
+  <!-- ********************************************************************* -->
+  <modules-constraints-test identifier="MCT0130">
+    <modules valid="false">
+      <modules xmlns="http://jomc.org/model">
+        <module name="Module">
+          <implementations>
+            <implementation identifier="Root" name="Root Name"/>
+          </implementations>
+        </module>
+        <module name="Module 1">
+          <implementations>
+            <implementation identifier="Parent 1" name="Parent Name 1">
+              <implementations>
+                <reference identifier="Root"/>
+                <reference identifier="Cycle"/>
+              </implementations>
+            </implementation>
+          </implementations>
+        </module>
+        <module name="Module 2">
+          <implementations>
+            <implementation identifier="Parent 2" name="Parent Name 2">
+              <implementations>
+                <reference identifier="Root"/>
+                <reference identifier="Parent 1"/>
+              </implementations>
+            </implementation>
+          </implementations>
+        </module>
+        <module name="Module 3">
+          <implementations>
+            <implementation identifier="Cycle" name="Cycle Name">
+              <implementations>
+                <reference identifier="Root"/>
+                <reference identifier="Parent 1"/>
+              </implementations>
+            </implementation>
+          </implementations>
+        </module>
+      </modules>
+    </modules>
+    <detail identifier="IMPLEMENTATION_INHERITANCE_CYCLE_CONSTRAINT" count="3"/>
   </modules-constraints-test>
 
 </testsuite>
