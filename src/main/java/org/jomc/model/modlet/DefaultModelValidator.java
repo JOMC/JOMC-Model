@@ -740,7 +740,7 @@ public class DefaultModelValidator implements ModelValidator
                 for ( final InheritanceModel.Node<ImplementationReference> node : cyclicImplementationReferenceNodes )
                 {
                     addDetail( validationContext.getReport(), "IMPLEMENTATION_INHERITANCE_CYCLE_CONSTRAINT",
-                               Level.SEVERE, new ObjectFactory().createImplementation( node.getImplementation() ),
+                               Level.SEVERE, new ObjectFactory().createImplementation( impl ),
                                "implementationInheritanceCycleConstraint", impl.getIdentifier(),
                                moduleOfImpl.getName(), getNodePathString( node ) );
 
