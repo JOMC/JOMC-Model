@@ -2539,7 +2539,7 @@
                     }
                     catch ( final NoSuchMethodException e )
                     {
-                        // Sine 1.5: Try static 'valueOf' method.
+                        // Since 1.5: Try static 'valueOf' method.
                         final java.lang.reflect.Method valueOf = type.getMethod( "valueOf", new Class<?>[]
                         {
                             String.class
