@@ -2203,14 +2203,7 @@
                         throw new PropertyException( getMessage( "illegalValue", value, Character.class.getName() ) );
                     }
 
-                    return type.getConstructor( new Class<?>[]
-                    {
-                        char.class
-                    } ).newInstance( new Object[]
-                    {
-                        value.charAt( 0 )
-                    } );
-
+                    return type.getConstructor( char.class ).newInstance( value.charAt( 0 ) );
                 }
                 else if ( type == String.class )
                 {
@@ -2220,19 +2213,12 @@
                 {
                     try
                     {
-                        return type.getConstructor( new Class<?>[]
-                        {
-                            String.class
-                        } ).newInstance( value );
-
+                        return type.getConstructor( String.class ).newInstance( value );
                     }
                     catch ( final NoSuchMethodException e )
                     {
                         // Since 1.5: Try static 'valueOf' method.
-                        final java.lang.reflect.Method valueOf = type.getMethod( "valueOf", new Class<?>[]
-                        {
-                            String.class
-                        } );
+                        final java.lang.reflect.Method valueOf = type.getMethod( "valueOf", String.class );
 
                         if ( !type.isAssignableFrom( valueOf.getReturnType() ) )
                         {
