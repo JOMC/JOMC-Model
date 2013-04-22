@@ -43,6 +43,12 @@ import java.util.Set;
 class JavaLanguage
 {
 
+    /** Creates a new {@cde JavaLanguage} instance. */
+    JavaLanguage()
+    {
+        super();
+    }
+
     /**
      * The Java Language Specification - Java SE 7 Edition - Chapter 18. Syntax
      * <pre>
