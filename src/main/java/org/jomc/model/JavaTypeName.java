@@ -66,7 +66,7 @@ public final class JavaTypeName implements Serializable
      * @version $JOMC$
      * @since 1.4
      */
-    public final static class Argument implements Serializable
+    public static final class Argument implements Serializable
     {
 
         /**
@@ -1419,7 +1419,7 @@ public final class JavaTypeName implements Serializable
 
     }
 
-    private static class Token
+    private static final class Token
     {
 
         private int kind;
@@ -1453,7 +1453,7 @@ public final class JavaTypeName implements Serializable
 
     }
 
-    private static class Tokenizer
+    private static final class Tokenizer
     {
 
         private static final int TK_BASIC_TYPE = 1;
