@@ -531,7 +531,7 @@ public final class JavaIdentifier implements CharSequence, Serializable
 
     }
 
-    private static class CacheKey
+    private static final class CacheKey
     {
 
         private final String text;
