@@ -139,7 +139,7 @@
         <!--                                                                 -->
         <!-- Artifact signing is backed by the 'maven-gpg-plugin'.           -->
         <!-- The following link redirects to the official documentation of   -->
-        <!-- that plugin. http://www.jomc.org/redirect/mgpg          -->
+        <!-- that plugin. http://www.jomc.org/redirect/mgpg                  -->
         <!--                                                                 -->
         <!--                                                                 -->
         <!-- The 'gpg.keyname' property may be set to the name of the GPG    -->
