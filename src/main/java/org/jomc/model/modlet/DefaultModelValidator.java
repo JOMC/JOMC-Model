@@ -719,7 +719,7 @@ public class DefaultModelValidator implements ModelValidator
 
     private static void assertImplementationsValid( final ValidationContext validationContext )
     {
-        final Implementations implementations = validationContext.getModules().getImplementations();
+        final Implementations implementations = validationContext.getAllImplementations();
 
         if ( implementations != null )
         {
@@ -731,9 +731,7 @@ public class DefaultModelValidator implements ModelValidator
             {
                 final Implementation impl = implementations.getImplementation().get( i );
                 final InheritanceModel imodel = validationContext.getInheritanceModel();
-                final Module moduleOfImpl =
-                    validationContext.getModules().getModuleOfImplementation( impl.getIdentifier() );
-
+                final Module moduleOfImpl = validationContext.getModuleOfImplementation( impl.getIdentifier() );
                 final Set<InheritanceModel.Node<ImplementationReference>> cyclicImplementationReferenceNodes =
                     imodel.getCycleNodes( impl.getIdentifier() );
 
@@ -787,7 +785,7 @@ public class DefaultModelValidator implements ModelValidator
                         if ( prev != null && !prev.getIdentifier().equals( impl.getIdentifier() ) )
                         {
                             final Module moduleOfPrev =
-                                validationContext.getModules().getModuleOfImplementation( prev.getIdentifier() );
+                                validationContext.getModuleOfImplementation( prev.getIdentifier() );
 
                             addDetail( validationContext.getReport(), "IMPLEMENTATION_CLASS_DECLARATION_CONSTRAINT",
                                        Level.SEVERE, new ObjectFactory().createImplementation( impl ),
@@ -810,8 +808,8 @@ public class DefaultModelValidator implements ModelValidator
 
                                 if ( java != null && !java.getIdentifier().equals( impl.getIdentifier() ) )
                                 {
-                                    final Module moduleOfJava = validationContext.getModules().
-                                        getModuleOfImplementation( java.getIdentifier() );
+                                    final Module moduleOfJava =
+                                        validationContext.getModuleOfImplementation( java.getIdentifier() );
 
                                     addDetail( validationContext.getReport(),
                                                "IMPLEMENTATION_JAVA_CLASS_DECLARATION_CONSTRAINT",
@@ -881,8 +879,8 @@ public class DefaultModelValidator implements ModelValidator
                                     }
 
                                     final Module moduleOfDependency =
-                                        validationContext.getModules().getModuleOfImplementation(
-                                        overriddenImplementation.getIdentifier() );
+                                        validationContext.getModuleOfImplementation(
+                                            overriddenImplementation.getIdentifier() );
 
                                     addDetail( validationContext.getReport(),
                                                "IMPLEMENTATION_DEPENDENCY_OVERRIDE_WARNING",
@@ -907,7 +905,7 @@ public class DefaultModelValidator implements ModelValidator
                                 }
 
                                 final Module moduleOfDependency =
-                                    validationContext.getModules().getModuleOfImplementation(
+                                    validationContext.getModuleOfImplementation(
                                     overriddenImplementation.getIdentifier() );
 
                                 addDetail( validationContext.getReport(),
@@ -1025,12 +1023,12 @@ public class DefaultModelValidator implements ModelValidator
                     for ( final String effImplementationReference : effImplementationReferences )
                     {
                         final Implementation ancestorImplementation =
-                            validationContext.getModules().getImplementation( effImplementationReference );
+                            validationContext.getImplementation( effImplementationReference );
 
                         if ( ancestorImplementation != null && ancestorImplementation.isFinal() )
                         {
-                            final Module moduleOfFinal = validationContext.getModules().getModuleOfImplementation(
-                                ancestorImplementation.getIdentifier() );
+                            final Module moduleOfFinal =
+                                validationContext.getModuleOfImplementation( ancestorImplementation.getIdentifier() );
 
                             addDetail( validationContext.getReport(),
                                        "IMPLEMENTATION_IMPLEMENTATION_INHERITANCE_CONSTRAINT", Level.SEVERE,
@@ -1088,7 +1086,7 @@ public class DefaultModelValidator implements ModelValidator
                                     }
 
                                     final Module moduleOfReference =
-                                        validationContext.getModules().getModuleOfImplementation(
+                                        validationContext.getModuleOfImplementation(
                                         overriddenImplementation.getIdentifier() );
 
                                     addDetail( validationContext.getReport(),
@@ -1115,7 +1113,7 @@ public class DefaultModelValidator implements ModelValidator
                                 }
 
                                 final Module moduleOfReference =
-                                    validationContext.getModules().getModuleOfImplementation(
+                                    validationContext.getModuleOfImplementation(
                                     overriddenImplementation.getIdentifier() );
 
                                 addDetail( validationContext.getReport(),
@@ -1320,7 +1318,7 @@ public class DefaultModelValidator implements ModelValidator
                                     }
 
                                     final Module moduleOfMessage =
-                                        validationContext.getModules().getModuleOfImplementation(
+                                        validationContext.getModuleOfImplementation(
                                         overriddenImplementation.getIdentifier() );
 
                                     addDetail( validationContext.getReport(), "IMPLEMENTATION_MESSAGE_OVERRIDE_WARNING",
@@ -1343,7 +1341,7 @@ public class DefaultModelValidator implements ModelValidator
                                     overriddenImplementation = overriddenMessage.getClassDeclaration();
                                 }
 
-                                final Module moduleOfMessage = validationContext.getModules().getModuleOfImplementation(
+                                final Module moduleOfMessage = validationContext.getModuleOfImplementation(
                                     overriddenImplementation.getIdentifier() );
 
                                 addDetail( validationContext.getReport(),
@@ -1466,7 +1464,7 @@ public class DefaultModelValidator implements ModelValidator
                                     }
 
                                     final Module moduleOfMessage =
-                                        validationContext.getModules().getModuleOfImplementation(
+                                        validationContext.getModuleOfImplementation(
                                         overriddenImplementation.getIdentifier() );
 
                                     addDetail( validationContext.getReport(), "IMPLEMENTATION_MESSAGE_OVERRIDE_WARNING",
@@ -1490,7 +1488,7 @@ public class DefaultModelValidator implements ModelValidator
                                 }
 
                                 final Module moduleOfMessage =
-                                    validationContext.getModules().getModuleOfImplementation(
+                                    validationContext.getModuleOfImplementation(
                                     overriddenImplementation.getIdentifier() );
 
                                 addDetail( validationContext.getReport(),
@@ -1698,7 +1696,7 @@ public class DefaultModelValidator implements ModelValidator
                                     if ( overriddenProperty.getSpecification() != null )
                                     {
                                         final Module moduleOfProperty =
-                                            validationContext.getModules().getModuleOfSpecification(
+                                            validationContext.getModuleOfSpecification(
                                             overriddenProperty.getSpecification().getIdentifier() );
 
                                         addDetail( validationContext.getReport(),
@@ -1722,7 +1720,7 @@ public class DefaultModelValidator implements ModelValidator
                                         }
 
                                         final Module moduleOfProperty =
-                                            validationContext.getModules().getModuleOfImplementation(
+                                            validationContext.getModuleOfImplementation(
                                             overriddenImplementation.getIdentifier() );
 
                                         addDetail( validationContext.getReport(),
@@ -1749,7 +1747,7 @@ public class DefaultModelValidator implements ModelValidator
                                 }
 
                                 final Module moduleOfProperty =
-                                    validationContext.getModules().getModuleOfImplementation(
+                                    validationContext.getModuleOfImplementation(
                                     overriddenImplementation.getIdentifier() );
 
                                 addDetail( validationContext.getReport(),
@@ -1796,7 +1794,7 @@ public class DefaultModelValidator implements ModelValidator
                                     }
 
                                     final Module moduleOfProperty =
-                                        validationContext.getModules().getModuleOfImplementation(
+                                        validationContext.getModuleOfImplementation(
                                         overriddenImplementation.getIdentifier() );
 
                                     addDetail( validationContext.getReport(),
@@ -1821,7 +1819,7 @@ public class DefaultModelValidator implements ModelValidator
                                 }
 
                                 final Module moduleOfProperty =
-                                    validationContext.getModules().getModuleOfImplementation(
+                                    validationContext.getModuleOfImplementation(
                                     overriddenImplementation.getIdentifier() );
 
                                 addDetail( validationContext.getReport(),
@@ -1884,7 +1882,7 @@ public class DefaultModelValidator implements ModelValidator
                                     }
 
                                     final Module moduleOfReference =
-                                        validationContext.getModules().getModuleOfImplementation(
+                                        validationContext.getModuleOfImplementation(
                                         overriddenImplementation.getIdentifier() );
 
                                     addDetail( validationContext.getReport(),
@@ -1910,7 +1908,7 @@ public class DefaultModelValidator implements ModelValidator
                                 }
 
                                 final Module moduleOfReference =
-                                    validationContext.getModules().getModuleOfImplementation(
+                                    validationContext.getModuleOfImplementation(
                                     overriddenImplementation.getIdentifier() );
 
                                 addDetail( validationContext.getReport(),
@@ -1972,7 +1970,7 @@ public class DefaultModelValidator implements ModelValidator
                                         }
 
                                         final Module moduleOfElement =
-                                            validationContext.getModules().getModuleOfImplementation(
+                                            validationContext.getModuleOfImplementation(
                                             overriddenElement.getImplementation().getIdentifier() );
 
                                         addDetail( validationContext.getReport(),
@@ -1997,7 +1995,7 @@ public class DefaultModelValidator implements ModelValidator
                                     }
 
                                     final Module moduleOfElement =
-                                        validationContext.getModules().getModuleOfImplementation(
+                                        validationContext.getModuleOfImplementation(
                                         overriddenImplementation.getIdentifier() );
 
                                     addDetail( validationContext.getReport(),
@@ -2518,10 +2516,10 @@ public class DefaultModelValidator implements ModelValidator
                         final ImplementationReference r = node.getModelObject();
 
                         final Implementation referenced =
-                            validationContext.getModules().getImplementation( r.getIdentifier() );
+                            validationContext.getImplementation( r.getIdentifier() );
 
                         final Module moduleOfReferenced =
-                            validationContext.getModules().getModuleOfImplementation( referenced.getIdentifier() );
+                            validationContext.getModuleOfImplementation( referenced.getIdentifier() );
 
                         if ( r.getVersion() != null && referenced != null )
                         {
@@ -2601,7 +2599,7 @@ public class DefaultModelValidator implements ModelValidator
 
     private static void assertSpecificationsValid( final ValidationContext validationContext )
     {
-        final Specifications specifications = validationContext.getModules().getSpecifications();
+        final Specifications specifications = validationContext.getAllSpecifications();
         final Map<String, Specification> specificationClassDeclarations = new HashMap<String, Specification>();
         final Map<String, Specification> specificationJavaClassDeclarations =
             new HashMap<String, Specification>();
@@ -2611,8 +2609,8 @@ public class DefaultModelValidator implements ModelValidator
             for ( int i = 0, s0 = specifications.getSpecification().size(); i < s0; i++ )
             {
                 final Specification s = specifications.getSpecification().get( i );
-                final Implementations impls = validationContext.getModules().getImplementations( s.getIdentifier() );
-                final Module moduleOfS = validationContext.getModules().getModuleOfSpecification( s.getIdentifier() );
+                final Implementations impls = validationContext.getImplementations( s.getIdentifier() );
+                final Module moduleOfS = validationContext.getModuleOfSpecification( s.getIdentifier() );
 
                 if ( validationContext.isValidateJava() )
                 {
@@ -2654,8 +2652,8 @@ public class DefaultModelValidator implements ModelValidator
 
                         if ( prev != null && !prev.getIdentifier().equals( s.getIdentifier() ) )
                         {
-                            final Module moduleOfPrev = validationContext.getModules().getModuleOfSpecification(
-                                prev.getIdentifier() );
+                            final Module moduleOfPrev =
+                                validationContext.getModuleOfSpecification( prev.getIdentifier() );
 
                             addDetail( validationContext.getReport(), "SPECIFICATION_CLASS_DECLARATION_CONSTRAINT",
                                        Level.SEVERE, new ObjectFactory().createSpecification( s ),
@@ -2678,8 +2676,8 @@ public class DefaultModelValidator implements ModelValidator
 
                                 if ( java != null && !java.getIdentifier().equals( s.getIdentifier() ) )
                                 {
-                                    final Module moduleOfJava = validationContext.getModules().
-                                        getModuleOfSpecification( java.getIdentifier() );
+                                    final Module moduleOfJava =
+                                        validationContext.getModuleOfSpecification( java.getIdentifier() );
 
                                     addDetail( validationContext.getReport(),
                                                "SPECIFICATION_JAVA_CLASS_DECLARATION_CONSTRAINT",
@@ -2727,8 +2725,8 @@ public class DefaultModelValidator implements ModelValidator
                             for ( int j = 0, s1 = e.getValue().getImplementation().size(); j < s1; j++ )
                             {
                                 final Implementation impl = e.getValue().getImplementation().get( j );
-                                final Module moduleOfImpl = validationContext.getModules().getModuleOfImplementation(
-                                    impl.getIdentifier() );
+                                final Module moduleOfImpl =
+                                    validationContext.getModuleOfImplementation( impl.getIdentifier() );
 
                                 addDetail( validationContext.getReport(),
                                            "SPECIFICATION_IMPLEMENTATION_NAME_UNIQUENESS_CONSTRAINT",
@@ -2746,8 +2744,8 @@ public class DefaultModelValidator implements ModelValidator
                         for ( int j = 0, s1 = impls.getImplementation().size(); j < s1; j++ )
                         {
                             final Implementation impl = impls.getImplementation().get( j );
-                            final Module moduleOfImpl = validationContext.getModules().getModuleOfImplementation(
-                                impl.getIdentifier() );
+                            final Module moduleOfImpl =
+                                validationContext.getModuleOfImplementation( impl.getIdentifier() );
 
                             addDetail( validationContext.getReport(),
                                        "SPECIFICATION_IMPLEMENTATION_MULTIPLICITY_CONSTRAINT", Level.SEVERE,
@@ -2939,12 +2937,10 @@ public class DefaultModelValidator implements ModelValidator
     private static void assertDependencyValid( final ValidationContext validationContext,
                                                final Implementation implementation, final Dependency dependency )
     {
-        final Specification s = validationContext.getModules().getSpecification( dependency.getIdentifier() );
-        final Implementations available =
-            validationContext.getModules().getImplementations( dependency.getIdentifier() );
-
+        final Specification s = validationContext.getSpecification( dependency.getIdentifier() );
+        final Implementations available = validationContext.getImplementations( dependency.getIdentifier() );
         final Module moduleOfImpl =
-            validationContext.getModules().getModuleOfImplementation( implementation.getIdentifier() );
+            validationContext.getModuleOfImplementation( implementation.getIdentifier() );
 
         if ( !dependency.isOptional()
              && ( available == null || available.getImplementation().isEmpty()
@@ -2960,7 +2956,7 @@ public class DefaultModelValidator implements ModelValidator
 
         if ( s != null )
         {
-            final Module moduleOfS = validationContext.getModules().getModuleOfSpecification( s.getIdentifier() );
+            final Module moduleOfS = validationContext.getModuleOfSpecification( s.getIdentifier() );
 
             if ( s.getClazz() == null )
             {
@@ -2986,7 +2982,6 @@ public class DefaultModelValidator implements ModelValidator
                 }
                 else
                 {
-
                     try
                     {
                         if ( VersionParser.compare( dependency.getVersion(), s.getVersion() ) > 0 )
@@ -3516,7 +3511,7 @@ public class DefaultModelValidator implements ModelValidator
                 }
 
                 final InheritanceModel imodel = validationContext.getInheritanceModel();
-                final Module moduleOfA = validationContext.getModules().getModuleOfImplementation( a.getIdentifier() );
+                final Module moduleOfA = validationContext.getModuleOfImplementation( a.getIdentifier() );
 
                 if ( dependency.getDependencies() != null )
                 {
@@ -3579,10 +3574,10 @@ public class DefaultModelValidator implements ModelValidator
                                 final Dependency overridden = node.getModelObject();
 
                                 final Specification overrideSpecification =
-                                    validationContext.getModules().getSpecification( override.getIdentifier() );
+                                    validationContext.getSpecification( override.getIdentifier() );
 
                                 final Specification overriddenSpecification =
-                                    validationContext.getModules().getSpecification( overridden.getIdentifier() );
+                                    validationContext.getSpecification( overridden.getIdentifier() );
 
                                 if ( overrideSpecification != null && overriddenSpecification != null )
                                 {
@@ -3879,9 +3874,9 @@ public class DefaultModelValidator implements ModelValidator
     private static void assertImplementationSpecificationCompatibility(
         final ValidationContext validationContext, final Implementation implementation )
     {
-        final Specifications specs = validationContext.getModules().getSpecifications( implementation.getIdentifier() );
+        final Specifications specs = validationContext.getSpecifications( implementation.getIdentifier() );
         final Module moduleOfImpl =
-            validationContext.getModules().getModuleOfImplementation( implementation.getIdentifier() );
+            validationContext.getModuleOfImplementation( implementation.getIdentifier() );
 
         if ( specs != null )
         {
@@ -3893,7 +3888,7 @@ public class DefaultModelValidator implements ModelValidator
                 if ( s != null && r.getVersion() != null )
                 {
                     final Module moduleOfS =
-                        validationContext.getModules().getModuleOfSpecification( s.getIdentifier() );
+                        validationContext.getModuleOfSpecification( s.getIdentifier() );
 
                     if ( s.getVersion() == null )
                     {
@@ -4084,6 +4079,24 @@ public class DefaultModelValidator implements ModelValidator
 
         private final boolean validateJava;
 
+        private final Specifications allSpecifications;
+
+        private final Implementations allImplementations;
+
+        private final Map<String, Specification> specifications = new HashMap<String, Specification>();
+
+        private final Map<String, Specifications> specificationsByImplementation =
+            new HashMap<String, Specifications>();
+
+        private final Map<String, Module> modulesOfSpecifications = new HashMap<String, Module>();
+
+        private final Map<String, Implementation> implementations = new HashMap<String, Implementation>();
+
+        private final Map<String, Implementations> implementationsBySpecification =
+            new HashMap<String, Implementations>();
+
+        private final Map<String, Module> modulesOfImplementations = new HashMap<String, Module>();
+
         private ValidationContext( final ModelContext modelContext, final Modules modules,
                                    final ModelValidationReport report, final boolean validateJava )
         {
@@ -4093,6 +4106,35 @@ public class DefaultModelValidator implements ModelValidator
             this.report = report;
             this.inheritanceModel = new InheritanceModel( modules );
             this.validateJava = validateJava;
+            this.allImplementations = modules.getImplementations();
+            this.allSpecifications = modules.getSpecifications();
+
+            if ( this.allSpecifications != null )
+            {
+                for ( final Specification s : this.allSpecifications.getSpecification() )
+                {
+                    this.specifications.put( s.getIdentifier(), s );
+                    this.implementationsBySpecification.put(
+                        s.getIdentifier(), modules.getImplementations( s.getIdentifier() ) );
+
+                    this.modulesOfSpecifications.put(
+                        s.getIdentifier(), modules.getModuleOfSpecification( s.getIdentifier() ) );
+
+                }
+            }
+
+            if ( this.allImplementations != null )
+            {
+                for ( final Implementation i : this.allImplementations.getImplementation() )
+                {
+                    this.implementations.put( i.getIdentifier(), i );
+                    this.specificationsByImplementation.put(
+                        i.getIdentifier(), modules.getSpecifications( i.getIdentifier() ) );
+
+                    this.modulesOfImplementations.put(
+                        i.getIdentifier(), modules.getModuleOfImplementation( i.getIdentifier() ) );
+                }
+            }
         }
 
         private ModelContext getModelContext()
@@ -4118,6 +4160,46 @@ public class DefaultModelValidator implements ModelValidator
         private boolean isValidateJava()
         {
             return this.validateJava;
+        }
+
+        private Specifications getAllSpecifications()
+        {
+            return this.allSpecifications;
+        }
+
+        private Implementations getAllImplementations()
+        {
+            return this.allImplementations;
+        }
+
+        private Specification getSpecification( final String identifier )
+        {
+            return this.specifications.get( identifier );
+        }
+
+        private Specifications getSpecifications( final String implementation )
+        {
+            return this.specificationsByImplementation.get( implementation );
+        }
+
+        private Implementation getImplementation( final String identifier )
+        {
+            return this.implementations.get( identifier );
+        }
+
+        private Implementations getImplementations( final String specification )
+        {
+            return this.implementationsBySpecification.get( specification );
+        }
+
+        private Module getModuleOfSpecification( final String identifier )
+        {
+            return this.modulesOfSpecifications.get( identifier );
+        }
+
+        private Module getModuleOfImplementation( final String identifier )
+        {
+            return this.modulesOfImplementations.get( identifier );
         }
 
     }
