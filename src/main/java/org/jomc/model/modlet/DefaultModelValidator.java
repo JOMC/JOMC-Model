@@ -30,6 +30,7 @@
  */
 package org.jomc.model.modlet;
 
+import java.beans.Beans;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Collections;
@@ -226,20 +227,30 @@ public class DefaultModelValidator implements ModelValidator
 
         try
         {
-            final Source source = new JAXBSource( context.createContext( model.getIdentifier() ),
-                                                  new org.jomc.modlet.ObjectFactory().createModel( model ) );
+            ModelValidationReport report = new ModelValidationReport();
 
-            final ModelValidationReport report = context.validateModel( model.getIdentifier(), source );
-            final Modules modules = ModelHelper.getModules( model );
-
-            if ( modules != null )
+            if ( !Beans.isDesignTime() )
             {
-                final ValidationContext validationContext =
-                    new ValidationContext( context, modules, report, contextValidateJava );
+                final Source source = new JAXBSource( context.createContext( model.getIdentifier() ),
+                                                      new org.jomc.modlet.ObjectFactory().createModel( model ) );
 
-                assertModulesValid( validationContext );
-                assertSpecificationsValid( validationContext );
-                assertImplementationsValid( validationContext );
+                report = context.validateModel( model.getIdentifier(), source );
+
+                final Modules modules = ModelHelper.getModules( model );
+
+                if ( modules != null )
+                {
+                    final ValidationContext validationContext =
+                        new ValidationContext( context, modules, report, contextValidateJava );
+
+                    assertModulesValid( validationContext );
+                    assertSpecificationsValid( validationContext );
+                    assertImplementationsValid( validationContext );
+                }
+            }
+            else if ( context.isLoggable( Level.WARNING ) )
+            {
+                context.log( Level.WARNING, getMessage( "designTimeWarning" ), null );
             }
 
             return report;

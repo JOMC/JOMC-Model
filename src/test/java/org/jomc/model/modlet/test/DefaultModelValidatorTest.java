@@ -30,6 +30,7 @@
  */
 package org.jomc.model.modlet.test;
 
+import java.beans.Beans;
 import java.util.List;
 import java.util.logging.Level;
 import javax.xml.bind.JAXBContext;
@@ -322,6 +323,27 @@ public class DefaultModelValidatorTest
                 fail( "[" + test.getIdentifier() + "] Unexpected " + d.getIdentifier() + " detail." );
             }
         }
+    }
+
+    @Test
+    public final void ValidReportDuringDesignTime() throws Exception
+    {
+        final Model model = new Model();
+        model.setIdentifier( "http://jomc.org" );
+
+        Beans.setDesignTime( false );
+
+        ModelValidationReport report = this.getModelValidator().validateModel( this.getModelContext(), model );
+        assertNotNull( report );
+        assertTrue( report.isModelValid() );
+
+        Beans.setDesignTime( true );
+
+        report = this.getModelValidator().validateModel( this.getModelContext(), model );
+        assertNotNull( report );
+        assertTrue( report.isModelValid() );
+
+        Beans.setDesignTime( false );
     }
 
     private static void log( final ModelValidationReport report )
