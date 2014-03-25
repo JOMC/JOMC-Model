@@ -481,7 +481,7 @@ public class DefaultModelProvider implements ModelProvider
             if ( context.isLoggable( Level.FINE ) )
             {
                 context.log( Level.FINE, getMessage( "contextReport", count, location,
-                                                     Long.valueOf( System.currentTimeMillis() - t0 ) ), null );
+                                                     System.currentTimeMillis() - t0 ), null );
 
             }
 
