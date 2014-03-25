@@ -30,7 +30,6 @@
  */
 package org.jomc.model.modlet.test;
 
-import java.beans.Beans;
 import java.util.List;
 import java.util.logging.Level;
 import javax.xml.bind.JAXBContext;
@@ -52,6 +51,7 @@ import org.jomc.modlet.ModelException;
 import org.jomc.modlet.ModelValidationReport;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -326,24 +326,38 @@ public class DefaultModelValidatorTest
     }
 
     @Test
-    public final void ValidReportDuringDesignTime() throws Exception
+    public final void testDefaultEnabled() throws Exception
+    {
+        System.clearProperty( "org.jomc.model.modlet.DefaultModelValidator.defaultEnabled" );
+        DefaultModelValidator.setDefaultEnabled( null );
+        assertTrue( DefaultModelValidator.isDefaultEnabled() );
+
+        System.setProperty( "org.jomc.model.modlet.DefaultModelValidator.defaultEnabled", Boolean.toString( false ) );
+        DefaultModelValidator.setDefaultEnabled( null );
+        assertFalse( DefaultModelValidator.isDefaultEnabled() );
+        System.clearProperty( "org.jomc.model.modlet.DefaultModelValidator.defaultEnabled" );
+        DefaultModelValidator.setDefaultEnabled( null );
+        assertTrue( DefaultModelValidator.isDefaultEnabled() );
+    }
+
+    @Test
+    public final void testEnabled() throws Exception
     {
         final Model model = new Model();
-        model.setIdentifier( "http://jomc.org" );
+        model.setIdentifier( ModelObject.MODEL_PUBLIC_ID );
 
-        Beans.setDesignTime( false );
+        DefaultModelValidator.setDefaultEnabled( null );
+        this.getModelValidator().setEnabled( null );
+        assertTrue( this.getModelValidator().isEnabled() );
 
-        ModelValidationReport report = this.getModelValidator().validateModel( this.getModelContext(), model );
-        assertNotNull( report );
-        assertTrue( report.isModelValid() );
+        this.getModelValidator().validateModel( this.getModelContext(), model );
+        DefaultModelValidator.setDefaultEnabled( false );
+        this.getModelValidator().setEnabled( null );
+        assertFalse( this.getModelValidator().isEnabled() );
 
-        Beans.setDesignTime( true );
-
-        report = this.getModelValidator().validateModel( this.getModelContext(), model );
-        assertNotNull( report );
-        assertTrue( report.isModelValid() );
-
-        Beans.setDesignTime( false );
+        this.getModelValidator().validateModel( this.getModelContext(), model );
+        DefaultModelValidator.setDefaultEnabled( null );
+        this.getModelValidator().setEnabled( null );
     }
 
     private static void log( final ModelValidationReport report )
