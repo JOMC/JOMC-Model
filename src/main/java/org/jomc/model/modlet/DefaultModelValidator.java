@@ -30,7 +30,6 @@
  */
 package org.jomc.model.modlet;
 
-import java.beans.Beans;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Collections;
@@ -90,6 +89,41 @@ public class DefaultModelValidator implements ModelValidator
 {
 
     /**
+     * Constant for the name of the model context attribute backing property {@code enabled}.
+     * @see #validateModel(org.jomc.modlet.ModelContext, org.jomc.modlet.Model)
+     * @see ModelContext#getAttribute(java.lang.String)
+     * @since 1.7
+     */
+    public static final String ENABLED_ATTRIBUTE_NAME = "org.jomc.model.modlet.DefaultModelValidator.enabledAttribute";
+
+    /**
+     * Constant for the name of the system property controlling property {@code defaultEnabled}.
+     * @see #isDefaultEnabled()
+     * @since 1.7
+     */
+    private static final String DEFAULT_ENABLED_PROPERTY_NAME =
+        "org.jomc.model.modlet.DefaultModelValidator.defaultEnabled";
+
+    /**
+     * Default value of the flag indicating the validator is enabled by default.
+     * @see #isDefaultEnabled()
+     * @since 1.7
+     */
+    private static final Boolean DEFAULT_ENABLED = Boolean.TRUE;
+
+    /**
+     * Flag indicating the validator is enabled by default.
+     * @since 1.7
+     */
+    private static volatile Boolean defaultEnabled;
+
+    /**
+     * Flag indicating the validator is enabled.
+     * @since 1.7
+     */
+    private Boolean enabled;
+
+    /**
      * Constant for the name of the model context attribute backing property {@code validateJava}.
      * @see ModelContext#getAttribute(java.lang.String)
      * @since 1.4
@@ -128,6 +162,76 @@ public class DefaultModelValidator implements ModelValidator
     public DefaultModelValidator()
     {
         super();
+    }
+
+    /**
+     * Gets a flag indicating the validator is enabled by default.
+     * <p>
+     * The default enabled flag is controlled by system property
+     * {@code org.jomc.model.modlet.DefaultModelValidator.defaultEnabled} holding a value indicating the validator is
+     * enabled by default. If that property is not set, the {@code true} default is returned.
+     *
+     * @return {@code true}, if the validator is enabled by default; {@code false}, if the validator is disabled by
+     * default.
+     *
+     * @see #setDefaultEnabled(java.lang.Boolean)
+     * @since 1.7
+     */
+    public static boolean isDefaultEnabled()
+    {
+        if ( defaultEnabled == null )
+        {
+            defaultEnabled = Boolean.valueOf( System.getProperty( DEFAULT_ENABLED_PROPERTY_NAME,
+                                                                  Boolean.toString( DEFAULT_ENABLED ) ) );
+
+        }
+
+        return defaultEnabled;
+    }
+
+    /**
+     * Sets the flag indicating the validator is enabled by default.
+     *
+     * @param value The new value of the flag indicating the validator is enabled by default or {@code null}.
+     *
+     * @see #isDefaultEnabled()
+     * @since 1.7
+     */
+    public static void setDefaultEnabled( final Boolean value )
+    {
+        defaultEnabled = value;
+    }
+
+    /**
+     * Gets a flag indicating the validator is enabled.
+     *
+     * @return {@code true}, if the validator is enabled; {@code false}, if the validator is disabled.
+     *
+     * @see #isDefaultEnabled()
+     * @see #setEnabled(java.lang.Boolean)
+     * @since 1.7
+     */
+    public final boolean isEnabled()
+    {
+        if ( this.enabled == null )
+        {
+            this.enabled = isDefaultEnabled();
+        }
+
+        return this.enabled;
+    }
+
+    /**
+     * Sets the flag indicating the validator is enabled.
+     *
+     * @param value The new value of the flag indicating the validator is enabled or {@code null}.
+     *
+     * @see #isEnabled()
+     * @since 1.7
+     */
+    public final void setEnabled( final Boolean value )
+    {
+        this.enabled = value;
     }
 
     /**
@@ -218,9 +322,16 @@ public class DefaultModelValidator implements ModelValidator
             throw new NullPointerException( "model" );
         }
 
+        boolean contextEnabled = this.isEnabled();
+        if ( DEFAULT_ENABLED == contextEnabled
+                 && context.getAttribute( ENABLED_ATTRIBUTE_NAME ) instanceof Boolean )
+        {
+            contextEnabled = (Boolean) context.getAttribute( ENABLED_ATTRIBUTE_NAME );
+        }
+
         boolean contextValidateJava = this.isValidateJava();
         if ( DEFAULT_VALIDATE_JAVA == contextValidateJava
-             && context.getAttribute( VALIDATE_JAVA_ATTRIBUTE_NAME ) instanceof Boolean )
+                 && context.getAttribute( VALIDATE_JAVA_ATTRIBUTE_NAME ) instanceof Boolean )
         {
             contextValidateJava = (Boolean) context.getAttribute( VALIDATE_JAVA_ATTRIBUTE_NAME );
         }
@@ -229,7 +340,7 @@ public class DefaultModelValidator implements ModelValidator
         {
             ModelValidationReport report = new ModelValidationReport();
 
-            if ( !Beans.isDesignTime() )
+            if ( contextEnabled )
             {
                 final Source source = new JAXBSource( context.createContext( model.getIdentifier() ),
                                                       new org.jomc.modlet.ObjectFactory().createModel( model ) );
@@ -248,9 +359,11 @@ public class DefaultModelValidator implements ModelValidator
                     assertImplementationsValid( validationContext );
                 }
             }
-            else if ( context.isLoggable( Level.WARNING ) )
+            else if ( context.isLoggable( Level.FINER ) )
             {
-                context.log( Level.WARNING, getMessage( "designTimeWarning" ), null );
+                context.log( Level.FINER, getMessage( "disabled", this.getClass().getSimpleName(),
+                                                      model.getIdentifier() ), null );
+
             }
 
             return report;

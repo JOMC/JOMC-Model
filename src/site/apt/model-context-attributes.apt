@@ -49,5 +49,7 @@ Model Context Attributes Reference
 *--------------------------------------------------------------------------------*-------------------------------------*
 | <<<org.jomc.model.modlet.DefaultModelProvider.validatingAttribute>>>           | <<<java.lang.Boolean>>>             |
 *--------------------------------------------------------------------------------*-------------------------------------*
+| <<<org.jomc.model.modlet.DefaultModelValidator.enabledAttribute>>>             | <<<java.lang.Boolean>>>             |
+*--------------------------------------------------------------------------------*-------------------------------------*
 | <<<org.jomc.model.modlet.DefaultModelValidator.validateJavaAttribute>>>        | <<<java.lang.Boolean>>>             |
 *--------------------------------------------------------------------------------*-------------------------------------*
