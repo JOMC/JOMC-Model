@@ -47,8 +47,13 @@ import java.util.ResourceBundle;
 
 /**
  * Data type of a Java type name.
- * <p>This class supports parsing of Java type names as specified in the
- * Java Language Specification - Java SE 7 Edition - Chapters 3.8ff, 6.5 and 18.</p>
+ * <p>
+ * This class supports parsing of Java type names as specified in the
+ * Java Language Specification - Java SE 7 Edition - Chapters 3.8ff, 6.5 and 18.
+ * </p>
+ * <p>
+ * Please note that this class will move to package {@code org.jomc.util} in JOMC 2.0.
+ * </p>
  *
  * @author <a href="mailto:cs@schulte.it">Christian Schulte</a>
  * @version $JOMC$
@@ -467,13 +472,13 @@ public final class JavaTypeName implements Serializable
     {
         // The Java Language Specification - Java SE 7 Edition - 5.1.8. Unboxing Conversion
         return BOOLEAN.equals( this )
-               || BYTE.equals( this )
-               || SHORT.equals( this )
-               || CHARACTER.equals( this )
-               || INTEGER.equals( this )
-               || LONG.equals( this )
-               || FLOAT.equals( this )
-               || DOUBLE.equals( this );
+                   || BYTE.equals( this )
+                   || SHORT.equals( this )
+                   || CHARACTER.equals( this )
+                   || INTEGER.equals( this )
+                   || LONG.equals( this )
+                   || FLOAT.equals( this )
+                   || DOUBLE.equals( this );
 
     }
 
@@ -487,10 +492,10 @@ public final class JavaTypeName implements Serializable
     public String getName( final boolean qualified )
     {
         return qualified
-               ? this.toString()
-               : this.getPackageName().length() > 0
-                 ? this.toString().substring( this.getPackageName().length() + 1 )
-                 : this.toString();
+                   ? this.toString()
+                   : this.getPackageName().length() > 0
+                         ? this.toString().substring( this.getPackageName().length() + 1 )
+                         : this.toString();
 
     }
 
@@ -762,8 +767,10 @@ public final class JavaTypeName implements Serializable
 
     /**
      * Parses text from the beginning of the given string to produce a {@code JavaTypeName} instance.
-     * <p>Unlike the {@link #parse(String)} method, this method throws an {@code IllegalArgumentException} if parsing
-     * fails.</p>
+     * <p>
+     * Unlike the {@link #parse(String)} method, this method throws an {@code IllegalArgumentException} if parsing
+     * fails.
+     * </p>
      *
      * @param text The text to parse.
      *
@@ -811,8 +818,8 @@ public final class JavaTypeName implements Serializable
                 parseType( javaType, text, runtimeException );
 
                 javaType.arguments = javaType.arguments != null
-                                     ? Collections.unmodifiableList( javaType.arguments )
-                                     : Collections.<Argument>emptyList();
+                                         ? Collections.unmodifiableList( javaType.arguments )
+                                         : Collections.<Argument>emptyList();
 
                 final String name = javaType.getName( true );
                 final JavaTypeName existingInstance = map.get( name );
@@ -1011,8 +1018,8 @@ public final class JavaTypeName implements Serializable
                     type_arguments_seen = false;
                     t.simpleName = token.getValue();
                     t.packageName = typeNameBuilder.length() > 0
-                                    ? typeNameBuilder.substring( 0, typeNameBuilder.length() - 1 )
-                                    : "";
+                                        ? typeNameBuilder.substring( 0, typeNameBuilder.length() - 1 )
+                                        : "";
 
                     classNameBuilder.append( token.getValue() );
                     typeNameBuilder.append( token.getValue() );
@@ -1312,7 +1319,7 @@ public final class JavaTypeName implements Serializable
 
                 case Tokenizer.TK_KEYWORD:
                     if ( !qm_seen || keyword_seen
-                         || !( "extends".equals( token.getValue() ) || "super".equals( token.getValue() ) ) )
+                             || !( "extends".equals( token.getValue() ) || "super".equals( token.getValue() ) ) )
                     {
                         if ( runtimeException )
                         {
@@ -1600,7 +1607,7 @@ public final class JavaTypeName implements Serializable
                             idx += basicType.length();
 
                             if ( idx >= str.length()
-                                 || !Character.isJavaIdentifierPart( str.charAt( idx ) ) )
+                                     || !Character.isJavaIdentifierPart( str.charAt( idx ) ) )
                             {
                                 token = new Token( TK_BASIC_TYPE, pos.getIndex(), basicType );
                                 pos.setIndex( idx );
@@ -1622,7 +1629,7 @@ public final class JavaTypeName implements Serializable
                             idx += keyword.length();
 
                             if ( idx >= str.length()
-                                 || !Character.isJavaIdentifierPart( str.charAt( idx ) ) )
+                                     || !Character.isJavaIdentifierPart( str.charAt( idx ) ) )
                             {
                                 token = new Token( TK_KEYWORD, pos.getIndex(), keyword );
                                 pos.setIndex( idx );
@@ -1644,7 +1651,7 @@ public final class JavaTypeName implements Serializable
                             idx += literal.length();
 
                             if ( idx >= str.length()
-                                 || !Character.isJavaIdentifierPart( str.charAt( idx ) ) )
+                                     || !Character.isJavaIdentifierPart( str.charAt( idx ) ) )
                             {
                                 token = new Token( TK_LITERAL, pos.getIndex(), literal );
                                 pos.setIndex( idx );
@@ -1664,7 +1671,7 @@ public final class JavaTypeName implements Serializable
                         idx += JavaLanguage.NULL_LITERAL.length();
 
                         if ( idx >= str.length()
-                             || !Character.isJavaIdentifierPart( str.charAt( idx ) ) )
+                                 || !Character.isJavaIdentifierPart( str.charAt( idx ) ) )
                         {
                             token = new Token( TK_LITERAL, pos.getIndex(), JavaLanguage.NULL_LITERAL );
                             pos.setIndex( idx );

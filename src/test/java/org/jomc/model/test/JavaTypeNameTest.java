@@ -265,16 +265,16 @@ public class JavaTypeNameTest
 
         javaTypeName = JavaTypeName.parse(
             "validpackagename.ReferenceType<validpackagename.ReferenceType<validpackagename.ReferenceType<"
-            + "validpackagename.ReferenceType>>,?   super validpackagename.ReferenceType<"
-            + "validpackagename.ReferenceType<validpackagename.ReferenceType>>>" );
+                + "validpackagename.ReferenceType>>,?   super validpackagename.ReferenceType<"
+                + "validpackagename.ReferenceType<validpackagename.ReferenceType>>>" );
 
         assertEquals( "validpackagename.ReferenceType", javaTypeName.getClassName() );
         assertEquals( "validpackagename", javaTypeName.getPackageName() );
         assertEquals( "validpackagename.ReferenceType", javaTypeName.getQualifiedName() );
         assertEquals( "ReferenceType", javaTypeName.getSimpleName() );
         assertEquals( "validpackagename.ReferenceType<validpackagename.ReferenceType<validpackagename.ReferenceType<"
-                      + "validpackagename.ReferenceType>>, ? super validpackagename.ReferenceType<"
-                      + "validpackagename.ReferenceType<validpackagename.ReferenceType>>>",
+                          + "validpackagename.ReferenceType>>, ? super validpackagename.ReferenceType<"
+                          + "validpackagename.ReferenceType<validpackagename.ReferenceType>>>",
                       javaTypeName.toString() );
 
         assertFalse( javaTypeName.isArray() );
