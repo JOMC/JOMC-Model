@@ -44,8 +44,13 @@ import java.util.ResourceBundle;
 
 /**
  * Data type of a Java identifier.
- * <p>This class provides support for parsing and normalizing text to java identifiers as specified in the Java
- * Language Specification - Java SE 7 Edition - Chapter 3.8ff.</p>
+ * <p>
+ * This class provides support for parsing and normalizing text to java identifiers as specified in the Java
+ * Language Specification - Java SE 7 Edition - Chapter 3.8ff.
+ * </p>
+ * <p>
+ * <i>Please note that this class will move to package {@code org.jomc.util} in JOMC 2.0.</i>
+ * </p>
  *
  * @author <a href="mailto:cs@schulte.it">Christian Schulte</a>
  * @version $JOMC$
@@ -262,8 +267,10 @@ public final class JavaIdentifier implements CharSequence, Serializable
 
     /**
      * Parses text from the beginning of a given string to produce a {@code JavaIdentifier} instance.
-     * <p>Unlike the {@link #parse(String)} method, this method throws an {@code IllegalArgumentException} if parsing
-     * fails.</p>
+     * <p>
+     * Unlike the {@link #parse(String)} method, this method throws an {@code IllegalArgumentException} if parsing
+     * fails.
+     * </p>
      *
      * @param text The text to parse.
      *
@@ -374,7 +381,8 @@ public final class JavaIdentifier implements CharSequence, Serializable
                                 identifierBuilder.append( Character.toUpperCase( text.charAt( i ) ) );
                             }
                             else if ( last_codepoint > -1 && j < s0
-                                      && isCamelCase( last_codepoint, text.codePointAt( i ), text.codePointAt( j ) ) )
+                                          && isCamelCase( last_codepoint, text.codePointAt( i ),
+                                                          text.codePointAt( j ) ) )
                             { // Retain camel-case in words.
                                 identifierBuilder.append( text.charAt( i ) );
                                 retainedIndices.add( identifierBuilder.length() - 1 );
@@ -408,12 +416,14 @@ public final class JavaIdentifier implements CharSequence, Serializable
                         case METHOD_NAME_CONVENTION:
                             if ( start_of_word )
                             {
-                                identifierBuilder.append( words == 0 ? Character.toLowerCase( text.charAt( i ) )
-                                                          : Character.toUpperCase( text.charAt( i ) ) );
+                                identifierBuilder.append( words == 0
+                                                              ? Character.toLowerCase( text.charAt( i ) )
+                                                              : Character.toUpperCase( text.charAt( i ) ) );
 
                             }
                             else if ( last_codepoint > -1 && j < s0
-                                      && isCamelCase( last_codepoint, text.codePointAt( i ), text.codePointAt( j ) ) )
+                                          && isCamelCase( last_codepoint, text.codePointAt( i ),
+                                                          text.codePointAt( j ) ) )
                             { // Retain camel-case in words.
                                 identifierBuilder.append( text.charAt( i ) );
                                 retainedIndices.add( identifierBuilder.length() - 1 );
@@ -479,8 +489,8 @@ public final class JavaIdentifier implements CharSequence, Serializable
         }
 
         if ( JavaLanguage.KEYWORDS.contains( t.identifier )
-             || JavaLanguage.BOOLEAN_LITERALS.contains( t.identifier )
-             || JavaLanguage.NULL_LITERAL.equals( t.identifier ) )
+                 || JavaLanguage.BOOLEAN_LITERALS.contains( t.identifier )
+                 || JavaLanguage.NULL_LITERAL.equals( t.identifier ) )
         {
             if ( mode != null )
             {
