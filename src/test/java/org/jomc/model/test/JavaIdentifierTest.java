@@ -30,7 +30,9 @@
  */
 package org.jomc.model.test;
 
+import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.text.ParseException;
 import org.jomc.model.JavaIdentifier;
 import org.junit.Test;
@@ -509,6 +511,27 @@ public class JavaIdentifierTest
         assertInvalidJavaIdentifier( "", VARIABLE_NAME_CONVENTION );
         assertInvalidJavaIdentifier( "@", VARIABLE_NAME_CONVENTION );
         assertInvalidJavaIdentifier( "   ", VARIABLE_NAME_CONVENTION );
+    }
+
+    @Test
+    public final void Serializable() throws Exception
+    {
+        ObjectOutputStream out = null;
+
+        try
+        {
+            out = new ObjectOutputStream( new ByteArrayOutputStream() );
+            out.writeObject( JavaIdentifier.valueOf( "Java" ) );
+            out.close();
+            out = null;
+        }
+        finally
+        {
+            if ( out != null )
+            {
+                out.close();
+            }
+        }
     }
 
     @Test

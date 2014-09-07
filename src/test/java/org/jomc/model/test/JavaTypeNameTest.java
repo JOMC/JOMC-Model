@@ -30,7 +30,9 @@
  */
 package org.jomc.model.test;
 
+import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.text.ParseException;
 import org.jomc.model.JavaTypeName;
 import org.junit.Test;
@@ -582,6 +584,27 @@ public class JavaTypeNameTest
         assertEquals( "[[[Lvalidpackagename.ReferenceType;",
                       JavaTypeName.parse( "validpackagename.ReferenceType[][][]" ).getClassName() );
 
+    }
+
+    @Test
+    public final void Serializable() throws Exception
+    {
+        ObjectOutputStream out = null;
+
+        try
+        {
+            out = new ObjectOutputStream( new ByteArrayOutputStream() );
+            out.writeObject( JavaTypeName.valueOf( "Java<Java>" ) );
+            out.close();
+            out = null;
+        }
+        finally
+        {
+            if ( out != null )
+            {
+                out.close();
+            }
+        }
     }
 
     @Test
