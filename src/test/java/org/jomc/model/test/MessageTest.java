@@ -30,9 +30,9 @@
  */
 package org.jomc.model.test;
 
-import org.jomc.model.JavaIdentifier;
 import org.jomc.model.Message;
 import org.jomc.model.ModelObjectException;
+import org.jomc.util.JavaIdentifier;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
