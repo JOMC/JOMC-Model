@@ -43,7 +43,9 @@ import java.util.Set;
 class JavaLanguage
 {
 
-    /** Creates a new {@code JavaLanguage} instance. */
+    /**
+     * Creates a new {@code JavaLanguage} instance.
+     */
     JavaLanguage()
     {
         super();

@@ -41,10 +41,14 @@ package org.jomc.model;
 public class PropertyException extends ModelObjectException
 {
 
-    /** Serial version UID for backwards compatibility with 1.0.x object streams. */
+    /**
+     * Serial version UID for backwards compatibility with 1.0.x object streams.
+     */
     private static final long serialVersionUID = 399942023584965406L;
 
-    /** Creates a new {@code PropertyException} instance. */
+    /**
+     * Creates a new {@code PropertyException} instance.
+     */
     public PropertyException()
     {
         super();

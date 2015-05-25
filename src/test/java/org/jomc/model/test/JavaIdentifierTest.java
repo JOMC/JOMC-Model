@@ -56,10 +56,14 @@ import static org.junit.Assert.fail;
 public class JavaIdentifierTest
 {
 
-    /** Constant to prefix relative resource names with. */
+    /**
+     * Constant to prefix relative resource names with.
+     */
     private static final String ABSOLUTE_RESOURCE_NAME_PREFIX = "/org/jomc/model/test/";
 
-    /** Creates a new {@code JavaIdentifierTest} instance. */
+    /**
+     * Creates a new {@code JavaIdentifierTest} instance.
+     */
     public JavaIdentifierTest()
     {
         super();

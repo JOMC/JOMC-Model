@@ -73,11 +73,17 @@ public final class JavaIdentifier implements CharSequence, Serializable
     public static enum NormalizationMode
     {
 
-        /** Mode to normalize by compacting words using camel-case. */
+        /**
+         * Mode to normalize by compacting words using camel-case.
+         */
         CAMEL_CASE,
-        /** Mode to normalize by separating words using '_' and by converting all characters to lower-case. */
+        /**
+         * Mode to normalize by separating words using '_' and by converting all characters to lower-case.
+         */
         LOWER_CASE,
-        /** Mode to normalize by separating words using '_' and by converting all characters to upper-case. */
+        /**
+         * Mode to normalize by separating words using '_' and by converting all characters to upper-case.
+         */
         UPPER_CASE,
         /**
          * Mode to normalize according to the
@@ -115,20 +121,29 @@ public final class JavaIdentifier implements CharSequence, Serializable
 
     /**
      * The value of the instance.
+     *
      * @serial
      */
     private String identifier;
 
-    /** Cached instances. */
+    /**
+     * Cached instances.
+     */
     private static volatile Reference<Map<CacheKey, JavaIdentifier>> cache;
 
-    /** Serial version UID for backwards compatibility with 1.4.x object streams. */
+    /**
+     * Serial version UID for backwards compatibility with 1.4.x object streams.
+     */
     private static final long serialVersionUID = 7600377999055800720L;
 
-    /** Underscore character. */
+    /**
+     * Underscore character.
+     */
     private static final int UNDERSCORE_CODEPOINT = Character.codePointAt( "_", 0 );
 
-    /** Creates a new {@code JavaIdentifier} instance. */
+    /**
+     * Creates a new {@code JavaIdentifier} instance.
+     */
     private JavaIdentifier()
     {
         super();

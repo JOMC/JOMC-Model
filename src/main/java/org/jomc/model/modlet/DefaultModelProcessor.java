@@ -68,6 +68,7 @@ public class DefaultModelProcessor implements ModelProcessor
 
     /**
      * Constant for the name of the model context attribute backing property {@code enabled}.
+     *
      * @see #processModel(org.jomc.modlet.ModelContext, org.jomc.modlet.Model)
      * @see ModelContext#getAttribute(java.lang.String)
      * @since 1.2
@@ -76,6 +77,7 @@ public class DefaultModelProcessor implements ModelProcessor
 
     /**
      * Constant for the name of the system property controlling property {@code defaultEnabled}.
+     *
      * @see #isDefaultEnabled()
      */
     private static final String DEFAULT_ENABLED_PROPERTY_NAME =
@@ -90,19 +92,25 @@ public class DefaultModelProcessor implements ModelProcessor
 
     /**
      * Default value of the flag indicating the processor is enabled by default.
+     *
      * @see #isDefaultEnabled()
      * @since 1.2
      */
     private static final Boolean DEFAULT_ENABLED = Boolean.TRUE;
 
-    /** Flag indicating the processor is enabled by default. */
+    /**
+     * Flag indicating the processor is enabled by default.
+     */
     private static volatile Boolean defaultEnabled;
 
-    /** Flag indicating the processor is enabled. */
+    /**
+     * Flag indicating the processor is enabled.
+     */
     private Boolean enabled;
 
     /**
      * Constant for the name of the model context attribute backing property {@code transformerLocation}.
+     *
      * @see #processModel(org.jomc.modlet.ModelContext, org.jomc.modlet.Model)
      * @see ModelContext#getAttribute(java.lang.String)
      * @since 1.2
@@ -112,6 +120,7 @@ public class DefaultModelProcessor implements ModelProcessor
 
     /**
      * Constant for the name of the system property controlling property {@code defaultTransformerLocation}.
+     *
      * @see #getDefaultTransformerLocation()
      */
     private static final String DEFAULT_TRANSFORMER_LOCATION_PROPERTY_NAME =
@@ -126,17 +135,24 @@ public class DefaultModelProcessor implements ModelProcessor
 
     /**
      * Class path location searched for transformers by default.
+     *
      * @see #getDefaultTransformerLocation()
      */
     private static final String DEFAULT_TRANSFORMER_LOCATION = "META-INF/jomc.xsl";
 
-    /** Default transformer location. */
+    /**
+     * Default transformer location.
+     */
     private static volatile String defaultTransformerLocation;
 
-    /** Transformer location of the instance. */
+    /**
+     * Transformer location of the instance.
+     */
     private String transformerLocation;
 
-    /** Creates a new {@code DefaultModelProcessor} instance. */
+    /**
+     * Creates a new {@code DefaultModelProcessor} instance.
+     */
     public DefaultModelProcessor()
     {
         super();
@@ -144,9 +160,11 @@ public class DefaultModelProcessor implements ModelProcessor
 
     /**
      * Gets a flag indicating the processor is enabled by default.
-     * <p>The default enabled flag is controlled by system property
+     * <p>
+     * The default enabled flag is controlled by system property
      * {@code org.jomc.model.modlet.DefaultModelProcessor.defaultEnabled} holding a value indicating the processor is
-     * enabled by default. If that property is not set, the {@code true} default is returned.</p>
+     * enabled by default. If that property is not set, the {@code true} default is returned.
+     * </p>
      *
      * @return {@code true}, if the processor is enabled by default; {@code false}, if the processor is disabled by
      * default.
@@ -211,10 +229,12 @@ public class DefaultModelProcessor implements ModelProcessor
 
     /**
      * Gets the default location searched for transformer resources.
-     * <p>The default transformer location is controlled by system property
+     * <p>
+     * The default transformer location is controlled by system property
      * {@code org.jomc.model.modlet.DefaultModelProcessor.defaultTransformerLocation} holding the location to search for
      * transformer resources by default. If that property is not set, the {@code META-INF/jomc.xsl} default is
-     * returned.</p>
+     * returned.
+     * </p>
      *
      * @return The location searched for transformer resources by default.
      *
@@ -356,7 +376,7 @@ public class DefaultModelProcessor implements ModelProcessor
 
                 transformer.setErrorListener( errorListener );
 
-                for ( Map.Entry<Object, Object> e : System.getProperties().entrySet() )
+                for ( final Map.Entry<Object, Object> e : System.getProperties().entrySet() )
                 {
                     transformer.setParameter( e.getKey().toString(), e.getValue() );
                 }
@@ -415,14 +435,14 @@ public class DefaultModelProcessor implements ModelProcessor
 
             boolean contextEnabled = this.isEnabled();
             if ( DEFAULT_ENABLED == contextEnabled
-                 && context.getAttribute( ENABLED_ATTRIBUTE_NAME ) instanceof Boolean )
+                     && context.getAttribute( ENABLED_ATTRIBUTE_NAME ) instanceof Boolean )
             {
                 contextEnabled = (Boolean) context.getAttribute( ENABLED_ATTRIBUTE_NAME );
             }
 
             String contextTransformerLocation = this.getTransformerLocation();
             if ( DEFAULT_TRANSFORMER_LOCATION.equals( contextTransformerLocation )
-                 && context.getAttribute( TRANSFORMER_LOCATION_ATTRIBUTE_NAME ) instanceof String )
+                     && context.getAttribute( TRANSFORMER_LOCATION_ATTRIBUTE_NAME ) instanceof String )
             {
                 contextTransformerLocation = (String) context.getAttribute( TRANSFORMER_LOCATION_ATTRIBUTE_NAME );
             }
@@ -444,7 +464,7 @@ public class DefaultModelProcessor implements ModelProcessor
                         transformers.get( i ).transform( source, result );
 
                         if ( result.getResult() instanceof JAXBElement<?>
-                             && ( (JAXBElement<?>) result.getResult() ).getValue() instanceof Model )
+                                 && ( (JAXBElement<?>) result.getResult() ).getValue() instanceof Model )
                         {
                             processed = (Model) ( (JAXBElement<?>) result.getResult() ).getValue();
                         }
@@ -498,10 +518,10 @@ public class DefaultModelProcessor implements ModelProcessor
     private static String getMessage( final Throwable t )
     {
         return t != null
-               ? t.getMessage() != null && t.getMessage().trim().length() > 0
-                 ? t.getMessage()
-                 : getMessage( t.getCause() )
-               : null;
+                   ? t.getMessage() != null && t.getMessage().trim().length() > 0
+                         ? t.getMessage()
+                         : getMessage( t.getCause() )
+                   : null;
 
     }
 

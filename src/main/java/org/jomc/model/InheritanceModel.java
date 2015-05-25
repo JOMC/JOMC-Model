@@ -65,31 +65,49 @@ public class InheritanceModel
     public static class Node<T>
     {
 
-        /** The implementation the node originates from. */
+        /**
+         * The implementation the node originates from.
+         */
         private final Implementation implementation;
 
-        /** The specification the node originates from. */
+        /**
+         * The specification the node originates from.
+         */
         private final Specification specification;
 
-        /** The class declaration the node originates from. */
+        /**
+         * The class declaration the node originates from.
+         */
         private final Implementation classDeclaration;
 
-        /** The direct descendant node. */
+        /**
+         * The direct descendant node.
+         */
         private final Node<Implementation> descendant;
 
-        /** The model object of the node. */
+        /**
+         * The model object of the node.
+         */
         private final T modelObject;
 
-        /** Flag indicating the node is the final node in an inheritance hierarchy. */
+        /**
+         * Flag indicating the node is the final node in an inheritance hierarchy.
+         */
         private final boolean _final;
 
-        /** Flag indicating the node is intended to override an ancestor node. */
+        /**
+         * Flag indicating the node is intended to override an ancestor node.
+         */
         private final boolean override;
 
-        /** The path to the node. */
+        /**
+         * The path to the node.
+         */
         private final LinkedList<Node<Implementation>> path = new LinkedList<Node<Implementation>>();
 
-        /** The nodes overridden by the node. */
+        /**
+         * The nodes overridden by the node.
+         */
         private final Set<Node<T>> overriddenNodes = new HashSet<Node<T>>();
 
         /**
@@ -238,7 +256,9 @@ public class InheritanceModel
 
     }
 
-    /** Enumeration of context states. */
+    /**
+     * Enumeration of context states.
+     */
     private enum ContextState
     {
 
@@ -247,64 +267,102 @@ public class InheritanceModel
 
     }
 
-    /** The modules backing the model. */
+    /**
+     * The modules backing the model.
+     */
     private final Modules modules;
 
-    /** {@code Dependency} nodes by context and dependency name. */
+    /**
+     * {@code Dependency} nodes by context and dependency name.
+     */
     private final Map<String, Map<String, Set<Node<Dependency>>>> dependencies = newMap();
 
-    /** {@code Dependency} nodes by context and implementation identifier. */
+    /**
+     * {@code Dependency} nodes by context and implementation identifier.
+     */
     private final Map<String, Map<String, Map<String, Set<Node<Dependency>>>>> effDependencies = newMap();
 
-    /** {@code Message} nodes by context and message name. */
+    /**
+     * {@code Message} nodes by context and message name.
+     */
     private final Map<String, Map<String, Set<Node<Message>>>> messages = newMap();
 
-    /** {@code Message} nodes by context and implementation identifier. */
+    /**
+     * {@code Message} nodes by context and implementation identifier.
+     */
     private final Map<String, Map<String, Map<String, Set<Node<Message>>>>> effMessages = newMap();
 
-    /** {@code Property} nodes by context and property name. */
+    /**
+     * {@code Property} nodes by context and property name.
+     */
     private final Map<String, Map<String, Set<Node<Property>>>> properties = newMap();
 
-    /** {@code Property} nodes by context and implementation identifier. */
+    /**
+     * {@code Property} nodes by context and implementation identifier.
+     */
     private final Map<String, Map<String, Map<String, Set<Node<Property>>>>> effProperties = newMap();
 
-    /** {@code SpecificationReference} nodes by context and specification identifier. */
+    /**
+     * {@code SpecificationReference} nodes by context and specification identifier.
+     */
     private final Map<String, Map<String, Set<Node<SpecificationReference>>>> specReferences = newMap();
 
-    /** {@code SpecificationReference} nodes by context and implementation identifier. */
+    /**
+     * {@code SpecificationReference} nodes by context and implementation identifier.
+     */
     private final Map<String, Map<String, Map<String, Set<Node<SpecificationReference>>>>> effSpecReferences =
         newMap();
 
-    /** {@code ImplementationReference} nodes by context and implementation reference identifier. */
+    /**
+     * {@code ImplementationReference} nodes by context and implementation reference identifier.
+     */
     private final Map<String, Map<String, Set<Node<ImplementationReference>>>> implReferences = newMap();
 
-    /** {@code ImplementationReference} nodes by context and implementation reference identifier. */
+    /**
+     * {@code ImplementationReference} nodes by context and implementation reference identifier.
+     */
     private final Map<String, Set<Node<ImplementationReference>>> cyclicImplReferences = newMap();
 
-    /** {@code ImplementationReference} nodes by context and implementation identifier. */
+    /**
+     * {@code ImplementationReference} nodes by context and implementation identifier.
+     */
     private final Map<String, Map<String, Map<String, Set<Node<ImplementationReference>>>>> effImplReferences =
         newMap();
 
-    /** {@code Element} nodes by context and qualified name. */
+    /**
+     * {@code Element} nodes by context and qualified name.
+     */
     private final Map<String, Map<QName, Set<Node<Element>>>> xmlElements = newMap();
 
-    /** {@code Element} nodes by context and implementation identifier. */
+    /**
+     * {@code Element} nodes by context and implementation identifier.
+     */
     private final Map<String, Map<String, Map<QName, Set<Node<Element>>>>> effXmlElements = newMap();
 
-    /** {@code JAXBElement} nodes by context and qualified name. */
+    /**
+     * {@code JAXBElement} nodes by context and qualified name.
+     */
     private final Map<String, Map<QName, Set<Node<JAXBElement<?>>>>> jaxbElements = newMap();
 
-    /** {@code JAXBElement} nodes by context and implementation identifier. */
+    /**
+     * {@code JAXBElement} nodes by context and implementation identifier.
+     */
     private final Map<String, Map<String, Map<QName, Set<Node<JAXBElement<?>>>>>> effJaxbElements =
         newMap();
 
-    /** {@code Implementation} nodes by context and implementation identifier. */
+    /**
+     * {@code Implementation} nodes by context and implementation identifier.
+     */
     private final Map<String, Map<String, Node<Implementation>>> implementations = newMap();
 
-    /** Source nodes of a hierarchy by context and implementation identifier. */
+    /**
+     * Source nodes of a hierarchy by context and implementation identifier.
+     */
     private final Map<String, Map<String, Node<Implementation>>> sourceNodes = newMap();
 
-    /** Context states by context identifier. */
+    /**
+     * Context states by context identifier.
+     */
     private final Map<String, ContextState> contextStates = newMap();
 
     /**
@@ -803,7 +861,7 @@ public class InheritanceModel
             {
                 this.collectNodes( context, i, null, null );
 
-                for ( Node<Implementation> source : map( this.sourceNodes, context ).values() )
+                for ( final Node<Implementation> source : map( this.sourceNodes, context ).values() )
                 {
                     this.collectEffectiveNodes( context, source );
                 }
@@ -1009,7 +1067,7 @@ public class InheritanceModel
             }
 
             if ( declaration.getImplementations() != null
-                 && !declaration.getImplementations().getReference().isEmpty() )
+                     && !declaration.getImplementations().getReference().isEmpty() )
             {
                 boolean all_cyclic = true;
 
@@ -1234,7 +1292,7 @@ public class InheritanceModel
 
                 }
 
-                for ( Map.Entry<String, Set<Node<Dependency>>> e : declDependencies.entrySet() )
+                for ( final Map.Entry<String, Set<Node<Dependency>>> e : declDependencies.entrySet() )
                 {
                     final Set<Node<Dependency>> set = newSet( e.getValue().size() );
 
@@ -1274,7 +1332,7 @@ public class InheritanceModel
 
                 }
 
-                for ( Map.Entry<String, Set<Node<SpecificationReference>>> e : declSpecReferences.entrySet() )
+                for ( final Map.Entry<String, Set<Node<SpecificationReference>>> e : declSpecReferences.entrySet() )
                 {
                     final Set<Node<SpecificationReference>> set = newSet( e.getValue().size() );
 
@@ -1293,7 +1351,7 @@ public class InheritanceModel
                     if ( effectiveSpecificationReferences.containsKey( e.getKey() ) )
                     {
                         for ( final Node<SpecificationReference> effNode
-                              : effectiveSpecificationReferences.get( e.getKey() ) )
+                                  : effectiveSpecificationReferences.get( e.getKey() ) )
                         {
                             effNode.getModifiableOverriddenNodes().addAll( set );
                         }
@@ -1315,7 +1373,7 @@ public class InheritanceModel
 
                 }
 
-                for ( Map.Entry<String, Set<Node<Message>>> e : declMessages.entrySet() )
+                for ( final Map.Entry<String, Set<Node<Message>>> e : declMessages.entrySet() )
                 {
                     final Set<Node<Message>> set = newSet( e.getValue().size() );
 
@@ -1355,7 +1413,7 @@ public class InheritanceModel
 
                 }
 
-                for ( Map.Entry<String, Set<Node<Property>>> e : declProperties.entrySet() )
+                for ( final Map.Entry<String, Set<Node<Property>>> e : declProperties.entrySet() )
                 {
                     final Set<Node<Property>> set = newSet( e.getValue().size() );
 
@@ -1395,7 +1453,7 @@ public class InheritanceModel
 
                 }
 
-                for ( Map.Entry<QName, Set<Node<Element>>> e : declXmlElements.entrySet() )
+                for ( final Map.Entry<QName, Set<Node<Element>>> e : declXmlElements.entrySet() )
                 {
                     final Set<Node<Element>> set = newSet( e.getValue().size() );
 
@@ -1435,7 +1493,7 @@ public class InheritanceModel
 
                 }
 
-                for ( Map.Entry<QName, Set<Node<JAXBElement<?>>>> e : declJaxbElements.entrySet() )
+                for ( final Map.Entry<QName, Set<Node<JAXBElement<?>>>> e : declJaxbElements.entrySet() )
                 {
                     final Set<Node<JAXBElement<?>>> set = newSet( e.getValue().size() );
 
@@ -1486,7 +1544,7 @@ public class InheritanceModel
                             candidateModule.getImplementations().getImplementation().get( j );
 
                         if ( candidate.isClassDeclaration()
-                             && candidate.getClazz().equals( implementation.getClazz() ) )
+                                 && candidate.getClazz().equals( implementation.getClazz() ) )
                         {
                             declaration = candidate;
                             break find;
@@ -1617,7 +1675,7 @@ public class InheritanceModel
     {
         final Map<K, Set<Node<T>>> declarationMap = newMap( map.size() );
 
-        for ( Map.Entry<K, Set<Node<T>>> e : map.entrySet() )
+        for ( final Map.Entry<K, Set<Node<T>>> e : map.entrySet() )
         {
             final Set<Node<T>> set = nodes( declarationMap, e.getKey() );
 
@@ -1670,14 +1728,14 @@ public class InheritanceModel
     private static boolean isDirectEffectiveNode( final Node<?> node, final String implementation )
     {
         return isDirectNode( node, implementation ) && node.getClassDeclaration() == null
-               && node.getSpecification() == null;
+                   && node.getSpecification() == null;
 
     }
 
     private static boolean isDirectSpecifiedNode( final Node<?> node, final String implementation )
     {
         return isDirectNode( node, implementation ) && node.getClassDeclaration() == null
-               && node.getSpecification() != null;
+                   && node.getSpecification() != null;
 
     }
 

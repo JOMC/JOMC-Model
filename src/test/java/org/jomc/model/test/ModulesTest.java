@@ -68,16 +68,24 @@ import org.junit.Assert;
 public class ModulesTest
 {
 
-    /** Constant to prefix relative resource names with. */
+    /**
+     * Constant to prefix relative resource names with.
+     */
     private static final String ABSOLUTE_RESOURCE_NAME_PREFIX = "/org/jomc/model/test/";
 
-    /** The {@code TestSuite} holding the module tests to run. */
+    /**
+     * The {@code TestSuite} holding the module tests to run.
+     */
     private TestSuite testSuite;
 
-    /** The {@code ModelContext} instance tests are performed with. */
+    /**
+     * The {@code ModelContext} instance tests are performed with.
+     */
     private ModelContext modelContext;
 
-    /** Creates a new {@code ModulesTest} instance. */
+    /**
+     * Creates a new {@code ModulesTest} instance.
+     */
     public ModulesTest()
     {
         super();
@@ -112,8 +120,8 @@ public class ModulesTest
         try
         {
             return ( (JAXBElement<TestSuite>) this.getModelContext().createUnmarshaller(
-                ModelObject.MODEL_PUBLIC_ID ).unmarshal( this.getClass().getResource(
-                ABSOLUTE_RESOURCE_NAME_PREFIX + "ModulesTestSuite.xml" ) ) ).getValue();
+                    ModelObject.MODEL_PUBLIC_ID ).unmarshal( this.getClass().getResource(
+                    ABSOLUTE_RESOURCE_NAME_PREFIX + "ModulesTestSuite.xml" ) ) ).getValue();
 
         }
         catch ( final JAXBException e )
@@ -183,7 +191,7 @@ public class ModulesTest
 
         ImplementationTestType test = null;
 
-        for ( ImplementationTestType candidate : this.getTestSuite().getImplementationTest() )
+        for ( final ImplementationTestType candidate : this.getTestSuite().getImplementationTest() )
         {
             if ( identifier.equals( candidate.getIdentifier() ) )
             {
@@ -258,7 +266,7 @@ public class ModulesTest
 
         InstanceTestType test = null;
 
-        for ( InstanceTestType candidate : this.getTestSuite().getInstanceTest() )
+        for ( final InstanceTestType candidate : this.getTestSuite().getInstanceTest() )
         {
             if ( identifier.equals( candidate.getIdentifier() ) )
             {
@@ -307,22 +315,22 @@ public class ModulesTest
                 modules.getValue().getDependencies( test.getImplementationIdentifier() );
 
             Assert.assertNotNull( "[" + test.getIdentifier() + "] No dependencies for implementation '"
-                                  + test.getImplementationIdentifier() + "' not found.", dependencies );
+                                      + test.getImplementationIdentifier() + "' not found.", dependencies );
 
             final Dependency d = dependencies.getDependency( test.getDependencyName() );
             Assert.assertNotNull( "[" + test.getIdentifier() + "] Dependency '" + test.getDependencyName()
-                                  + "' not found.", d );
+                                      + "' not found.", d );
 
             Assert.assertNotNull( "[" + test.getIdentifier() + "] Expected implementation name of dependency '"
-                                  + test.getDependencyName() + "' not set.", d.getImplementationName() );
+                                      + test.getDependencyName() + "' not set.", d.getImplementationName() );
 
             final Implementations implementations = modules.getValue().getImplementations( d.getIdentifier() );
             Assert.assertNotNull( "[" + test.getIdentifier() + "] Expected implementations of dependency '"
-                                  + test.getDependencyName() + "' not found.", implementations );
+                                      + test.getDependencyName() + "' not found.", implementations );
 
             final Implementation i = implementations.getImplementationByName( d.getImplementationName() );
             Assert.assertNotNull( "[" + test.getIdentifier() + "] Expected '" + d.getImplementationName()
-                                  + "' implementation not found.", i );
+                                      + "' implementation not found.", i );
 
             instance = modules.getValue().getInstance( i.getIdentifier(), d );
         }
@@ -377,7 +385,7 @@ public class ModulesTest
             Assert.assertNotNull( computed );
             assertEquals( (ModelObject) expected, (ModelObject) computed );
 
-            for ( Implementation i : expected.getImplementation() )
+            for ( final Implementation i : expected.getImplementation() )
             {
                 assertEquals( i, computed.getImplementation( i.getIdentifier() ) );
             }
@@ -417,12 +425,12 @@ public class ModulesTest
             Assert.assertNotNull( computed );
             assertEquals( (ModelObject) expected, (ModelObject) computed );
 
-            for ( Specification s : expected.getSpecification() )
+            for ( final Specification s : expected.getSpecification() )
             {
                 assertEquals( s, computed.getSpecification( s.getIdentifier() ) );
             }
 
-            for ( SpecificationReference r : expected.getReference() )
+            for ( final SpecificationReference r : expected.getReference() )
             {
                 assertEquals( r, computed.getReference( r.getIdentifier() ) );
             }
@@ -480,7 +488,7 @@ public class ModulesTest
         {
             Assert.assertNotNull( computed );
 
-            for ( Dependency d : expected.getDependency() )
+            for ( final Dependency d : expected.getDependency() )
             {
                 assertEquals( d, computed.getDependency( d.getName() ) );
             }
@@ -521,7 +529,7 @@ public class ModulesTest
         {
             Assert.assertNotNull( computed );
 
-            for ( Message m : expected.getMessage() )
+            for ( final Message m : expected.getMessage() )
             {
                 assertEquals( m, computed.getMessage( m.getName() ) );
             }
@@ -556,13 +564,13 @@ public class ModulesTest
             Assert.assertNotNull( computed );
             Assert.assertEquals( expected.getDefaultLanguage(), computed.getDefaultLanguage() );
 
-            for ( Text t : expected.getText() )
+            for ( final Text t : expected.getText() )
             {
                 Assert.assertNotNull( computed.getText( t.getLanguage() ) );
                 Assert.assertEquals( t.getValue(), computed.getText( t.getLanguage() ).getValue() );
             }
 
-            for ( Text t : computed.getText() )
+            for ( final Text t : computed.getText() )
             {
                 Assert.assertNotNull( expected.getText( t.getLanguage() ) );
             }
@@ -579,7 +587,7 @@ public class ModulesTest
         {
             Assert.assertNotNull( computed );
 
-            for ( Property p : expected.getProperty() )
+            for ( final Property p : expected.getProperty() )
             {
                 assertEquals( p, computed.getProperty( p.getName() ) );
             }
@@ -613,7 +621,7 @@ public class ModulesTest
 
     private static void log( final ModelValidationReport report )
     {
-        for ( ModelValidationReport.Detail d : report.getDetails() )
+        for ( final ModelValidationReport.Detail d : report.getDetails() )
         {
             System.out.println( "\t" + d.toString() );
         }

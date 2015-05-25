@@ -117,7 +117,9 @@ public class PropertyTest
 
     }
 
-    /** Creates a new {@code PropertyTest} instance. */
+    /**
+     * Creates a new {@code PropertyTest} instance.
+     */
     public PropertyTest()
     {
         super();

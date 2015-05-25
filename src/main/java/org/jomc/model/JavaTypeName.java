@@ -76,29 +76,38 @@ public final class JavaTypeName implements Serializable
 
         /**
          * Flag indicating the argument is a wildcard.
+         *
          * @serial
          */
         private boolean wildcard;
 
         /**
          * The wildcard bounds of the argument.
+         *
          * @serial
          */
         private String wildcardBounds;
 
         /**
          * The type name of the argument.
+         *
          * @serial
          */
         private JavaTypeName typeName;
 
-        /** Cached string representation. */
+        /**
+         * Cached string representation.
+         */
         private transient String cachedString;
 
-        /** Serial version UID for backwards compatibility with 1.4.x object streams. */
+        /**
+         * Serial version UID for backwards compatibility with 1.4.x object streams.
+         */
         private static final long serialVersionUID = -6515267147665760819L;
 
-        /** Create a new {@code Argument} instance. */
+        /**
+         * Create a new {@code Argument} instance.
+         */
         private Argument()
         {
             super();
@@ -172,152 +181,183 @@ public final class JavaTypeName implements Serializable
 
     /**
      * Java type name of class {@code Boolean}.
+     *
      * @see Boolean
      */
     public static final JavaTypeName BOOLEAN;
 
     /**
      * Java type name of basic type {@code boolean}.
+     *
      * @see Boolean#TYPE
      */
     public static final JavaTypeName BOOLEAN_TYPE;
 
     /**
      * Java type name of class {@code Byte}.
+     *
      * @see Byte
      */
     public static final JavaTypeName BYTE;
 
     /**
      * Java type name of basic type {@code byte}.
+     *
      * @see Byte#TYPE
      */
     public static final JavaTypeName BYTE_TYPE;
 
     /**
      * Java type name of class {@code Character}.
+     *
      * @see Character
      */
     public static final JavaTypeName CHARACTER;
 
     /**
      * Java type name of basic type {@code char}.
+     *
      * @see Character#TYPE
      */
     public static final JavaTypeName CHARACTER_TYPE;
 
     /**
      * Java type name of class {@code Double}.
+     *
      * @see Double
      */
     public static final JavaTypeName DOUBLE;
 
     /**
      * Java type name of basic type {@code double}.
+     *
      * @see Double#TYPE
      */
     public static final JavaTypeName DOUBLE_TYPE;
 
     /**
      * Java type name of class {@code Float}.
+     *
      * @see Float
      */
     public static final JavaTypeName FLOAT;
 
     /**
      * Java type name of basic type {@code float}.
+     *
      * @see Float#TYPE
      */
     public static final JavaTypeName FLOAT_TYPE;
 
     /**
      * Java type name of class {@code Integer}.
+     *
      * @see Integer
      */
     public static final JavaTypeName INTEGER;
 
     /**
      * Java type name of basic type {@code int}.
+     *
      * @see Integer#TYPE
      */
     public static final JavaTypeName INTEGER_TYPE;
 
     /**
      * Java type name of class {@code Long}.
+     *
      * @see Long
      */
     public static final JavaTypeName LONG;
 
     /**
      * Java type name of basic type {@code long}.
+     *
      * @see Long#TYPE
      */
     public static final JavaTypeName LONG_TYPE;
 
     /**
      * Java type name of class {@code Short}.
+     *
      * @see Short
      */
     public static final JavaTypeName SHORT;
 
     /**
      * Java type name of basic type {@code short}.
+     *
      * @see Short#TYPE
      */
     public static final JavaTypeName SHORT_TYPE;
 
     /**
      * The array dimension of the type name.
+     *
      * @serial
      */
     private int dimension;
 
     /**
      * The flag indicating the type name denotes a primitive type.
+     *
      * @serial
      */
     private boolean primitive;
 
     /**
      * The class name of the type name.
+     *
      * @serial
      */
     private String className;
 
     /**
      * The qualified package name of the type name.
+     *
      * @serial
      */
     private String packageName;
 
     /**
      * The qualified name of the type name.
+     *
      * @serial
      */
     private String qualifiedName;
 
     /**
      * The simple name of the type name.
+     *
      * @serial
      */
     private String simpleName;
 
     /**
      * The arguments of the type name.
+     *
      * @serial
      */
     private volatile List<Argument> arguments;
 
-    /** Cached string representation. */
+    /**
+     * Cached string representation.
+     */
     private transient String cachedString;
 
-    /** Cached instances. */
+    /**
+     * Cached instances.
+     */
     private static volatile Reference<Map<String, JavaTypeName>> cache;
 
-    /** Mappings of basic type name to class name encoding. */
+    /**
+     * Mappings of basic type name to class name encoding.
+     */
     private static final Map<String, String> CLASSNAME_ENCODINGS = new HashMap<String, String>( 8 );
 
-    /** Serial version UID for backwards compatibility with 1.4.x object streams. */
+    /**
+     * Serial version UID for backwards compatibility with 1.4.x object streams.
+     */
     private static final long serialVersionUID = -4258949347035910249L;
 
     static
@@ -349,7 +389,9 @@ public final class JavaTypeName implements Serializable
         SHORT_TYPE = JavaTypeName.valueOf( Short.TYPE.getName() );
     }
 
-    /** Creates a new {@code JavaTypeName} instance. */
+    /**
+     * Creates a new {@code JavaTypeName} instance.
+     */
     private JavaTypeName()
     {
         super();

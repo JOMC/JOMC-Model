@@ -54,10 +54,14 @@ import static org.junit.Assert.fail;
 public class DefaultModelProcessorTest
 {
 
-    /** The {@code DefaultModelProcessor} instance tests are performed with. */
+    /**
+     * The {@code DefaultModelProcessor} instance tests are performed with.
+     */
     private DefaultModelProcessor defaultModelProcessor;
 
-    /** Creates a new {@code DefaultModelProcessorTest} instance. */
+    /**
+     * Creates a new {@code DefaultModelProcessorTest} instance.
+     */
     public DefaultModelProcessorTest()
     {
         super();
@@ -122,7 +126,7 @@ public class DefaultModelProcessorTest
         DefaultModelProcessor.setDefaultTransformerLocation( null );
         this.getModelProcessor().setTransformerLocation( null );
         assertEquals( 1, this.getModelProcessor().findTransformers(
-            context, DefaultModelProcessor.getDefaultTransformerLocation() ).size() );
+                      context, DefaultModelProcessor.getDefaultTransformerLocation() ).size() );
 
         DefaultModelProcessor.setDefaultTransformerLocation( "DOES_NOT_EXIST" );
         this.getModelProcessor().setTransformerLocation( "DOES_NOT_EXIST" );

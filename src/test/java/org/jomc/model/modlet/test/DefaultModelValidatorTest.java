@@ -65,19 +65,29 @@ import static org.junit.Assert.fail;
 public class DefaultModelValidatorTest
 {
 
-    /** Constant to prefix relative resource names with. */
+    /**
+     * Constant to prefix relative resource names with.
+     */
     private static final String ABSOLUTE_RESOURCE_NAME_PREFIX = "/org/jomc/model/modlet/test/";
 
-    /** The {@code DefaultModelValidator} instance tests are performed with. */
+    /**
+     * The {@code DefaultModelValidator} instance tests are performed with.
+     */
     private DefaultModelValidator defaultModelValidator;
 
-    /** The {@code TestSuite} holding module tests to run. */
+    /**
+     * The {@code TestSuite} holding module tests to run.
+     */
     private TestSuite testSuite;
 
-    /** The {@code ModelContext} tests are performed with. */
+    /**
+     * The {@code ModelContext} tests are performed with.
+     */
     private ModelContext modelContext;
 
-    /** Creates a new {@code DefaultModelValidatorTest} instance. */
+    /**
+     * Creates a new {@code DefaultModelValidatorTest} instance.
+     */
     public DefaultModelValidatorTest()
     {
         super();
@@ -181,8 +191,8 @@ public class DefaultModelValidatorTest
         try
         {
             return ( (JAXBElement<TestSuite>) this.getModelContext().createUnmarshaller(
-                ModelObject.MODEL_PUBLIC_ID ).unmarshal( this.getClass().getResource(
-                ABSOLUTE_RESOURCE_NAME_PREFIX + "DefaultModelValidatorTestSuite.xml" ) ) ).getValue();
+                    ModelObject.MODEL_PUBLIC_ID ).unmarshal( this.getClass().getResource(
+                    ABSOLUTE_RESOURCE_NAME_PREFIX + "DefaultModelValidatorTestSuite.xml" ) ) ).getValue();
 
         }
         catch ( final JAXBException e )
@@ -240,7 +250,7 @@ public class DefaultModelValidatorTest
     {
         SchemaConstraintsTestType test = null;
 
-        for ( SchemaConstraintsTestType candidate : this.getTestSuite().getSchemaConstraintsTest() )
+        for ( final SchemaConstraintsTestType candidate : this.getTestSuite().getSchemaConstraintsTest() )
         {
             if ( identifier.equals( candidate.getIdentifier() ) )
             {
@@ -278,7 +288,7 @@ public class DefaultModelValidatorTest
     {
         ModulesConstraintsTestType test = null;
 
-        for ( ModulesConstraintsTestType candidate : this.getTestSuite().getModulesConstraintsTest() )
+        for ( final ModulesConstraintsTestType candidate : this.getTestSuite().getModulesConstraintsTest() )
         {
             if ( identifier.equals( candidate.getIdentifier() ) )
             {
@@ -304,21 +314,21 @@ public class DefaultModelValidatorTest
         assertEquals( "[" + test.getIdentifier() + "] Unexpected model validity.",
                       test.getModules().isValid(), report.isModelValid() );
 
-        for ( ModelValidationReportDetail expectedDetail : test.getDetail() )
+        for ( final ModelValidationReportDetail expectedDetail : test.getDetail() )
         {
             final List<ModelValidationReport.Detail> reportedDetails =
                 report.getDetails( expectedDetail.getIdentifier() );
 
             assertTrue( "[" + test.getIdentifier() + "] Expected " + expectedDetail.getCount() + " "
-                        + expectedDetail.getIdentifier() + " details but got " + reportedDetails.size()
-                        + ".", expectedDetail.getCount() == reportedDetails.size() );
+                            + expectedDetail.getIdentifier() + " details but got " + reportedDetails.size()
+                            + ".", expectedDetail.getCount() == reportedDetails.size() );
 
             report.getDetails().removeAll( reportedDetails );
         }
 
         if ( !report.getDetails().isEmpty() )
         {
-            for ( ModelValidationReport.Detail d : report.getDetails() )
+            for ( final ModelValidationReport.Detail d : report.getDetails() )
             {
                 fail( "[" + test.getIdentifier() + "] Unexpected " + d.getIdentifier() + " detail." );
             }
@@ -362,7 +372,7 @@ public class DefaultModelValidatorTest
 
     private static void log( final ModelValidationReport report )
     {
-        for ( ModelValidationReport.Detail d : report.getDetails() )
+        for ( final ModelValidationReport.Detail d : report.getDetails() )
         {
             System.out.println( "\t" + d.toString() );
         }
