@@ -90,6 +90,7 @@ public class DefaultModelValidator implements ModelValidator
 
     /**
      * Constant for the name of the model context attribute backing property {@code enabled}.
+     *
      * @see #validateModel(org.jomc.modlet.ModelContext, org.jomc.modlet.Model)
      * @see ModelContext#getAttribute(java.lang.String)
      * @since 1.7
@@ -98,6 +99,7 @@ public class DefaultModelValidator implements ModelValidator
 
     /**
      * Constant for the name of the system property controlling property {@code defaultEnabled}.
+     *
      * @see #isDefaultEnabled()
      * @since 1.7
      */
@@ -106,6 +108,7 @@ public class DefaultModelValidator implements ModelValidator
 
     /**
      * Default value of the flag indicating the validator is enabled by default.
+     *
      * @see #isDefaultEnabled()
      * @since 1.7
      */
@@ -113,18 +116,21 @@ public class DefaultModelValidator implements ModelValidator
 
     /**
      * Flag indicating the validator is enabled by default.
+     *
      * @since 1.7
      */
     private static volatile Boolean defaultEnabled;
 
     /**
      * Flag indicating the validator is enabled.
+     *
      * @since 1.7
      */
     private Boolean enabled;
 
     /**
      * Constant for the name of the model context attribute backing property {@code validateJava}.
+     *
      * @see ModelContext#getAttribute(java.lang.String)
      * @since 1.4
      */
@@ -133,6 +139,7 @@ public class DefaultModelValidator implements ModelValidator
 
     /**
      * Constant for the name of the system property controlling property {@code defaultValidateJava}.
+     *
      * @see #isDefaultValidateJava()
      * @since 1.4
      */
@@ -141,6 +148,7 @@ public class DefaultModelValidator implements ModelValidator
 
     /**
      * Default value of the flag indicating the validator is performing Java related validation by default.
+     *
      * @see #isDefaultValidateJava()
      * @since 1.4
      */
@@ -148,17 +156,21 @@ public class DefaultModelValidator implements ModelValidator
 
     /**
      * Flag indicating the validator is performing Java related validation by default.
+     *
      * @since 1.4
      */
     private static volatile Boolean defaultValidateJava;
 
     /**
      * Flag indicating the validator is performing Java related validation.
+     *
      * @since 1.4
      */
     private Boolean validateJava;
 
-    /** Creates a new {@code DefaultModelValidator} instance. */
+    /**
+     * Creates a new {@code DefaultModelValidator} instance.
+     */
     public DefaultModelValidator()
     {
         super();
@@ -170,6 +182,7 @@ public class DefaultModelValidator implements ModelValidator
      * The default enabled flag is controlled by system property
      * {@code org.jomc.model.modlet.DefaultModelValidator.defaultEnabled} holding a value indicating the validator is
      * enabled by default. If that property is not set, the {@code true} default is returned.
+     * </p>
      *
      * @return {@code true}, if the validator is enabled by default; {@code false}, if the validator is disabled by
      * default.
@@ -236,10 +249,12 @@ public class DefaultModelValidator implements ModelValidator
 
     /**
      * Gets a flag indicating the validator is performing Java related validation by default.
-     * <p>The default validate Java flag is controlled by system property
+     * <p>
+     * The default validate Java flag is controlled by system property
      * {@code org.jomc.model.modlet.DefaultModelValidator.defaultValidateJava} holding a value indicating the validator
      * is performing Java related validation by default. If that property is not set, the {@code true} default is
-     * returned.</p>
+     * returned.
+     * </p>
      *
      * @return {@code true}, if the validator is performing Java related validation by default; {@code false}, if the
      * validator is not performing Java related validation by default.
@@ -994,7 +1009,7 @@ public class DefaultModelValidator implements ModelValidator
                             if ( !( d.isOverride() || overriddenDependencies.isEmpty() ) )
                             {
                                 for ( final InheritanceModel.Node<Dependency> overriddenDependency
-                                      : overriddenDependencies )
+                                          : overriddenDependencies )
                                 {
                                     Implementation overriddenImplementation = overriddenDependency.getImplementation();
                                     if ( overriddenDependency.getClassDeclaration() != null )
@@ -1030,7 +1045,7 @@ public class DefaultModelValidator implements ModelValidator
 
                                 final Module moduleOfDependency =
                                     validationContext.getModuleOfImplementation(
-                                    overriddenImplementation.getIdentifier() );
+                                        overriddenImplementation.getIdentifier() );
 
                                 addDetail( validationContext.getReport(),
                                            "IMPLEMENTATION_DEPENDENCY_INHERITANCE_CONSTRAINT", Level.SEVERE,
@@ -1201,7 +1216,7 @@ public class DefaultModelValidator implements ModelValidator
                             if ( !( r.isOverride() || overriddenReferences.isEmpty() ) )
                             {
                                 for ( final InheritanceModel.Node<ImplementationReference> overriddenReference
-                                      : overriddenReferences )
+                                          : overriddenReferences )
                                 {
                                     Implementation overriddenImplementation = overriddenReference.getImplementation();
                                     if ( overriddenReference.getClassDeclaration() != null )
@@ -1211,7 +1226,7 @@ public class DefaultModelValidator implements ModelValidator
 
                                     final Module moduleOfReference =
                                         validationContext.getModuleOfImplementation(
-                                        overriddenImplementation.getIdentifier() );
+                                            overriddenImplementation.getIdentifier() );
 
                                     addDetail( validationContext.getReport(),
                                                "IMPLEMENTATION_IMPLEMENTATION_REFERENCE_OVERRIDE_WARNING",
@@ -1228,7 +1243,7 @@ public class DefaultModelValidator implements ModelValidator
                             retainFinalNodes( overriddenReferences );
 
                             for ( final InheritanceModel.Node<ImplementationReference> overriddenReference
-                                  : overriddenReferences )
+                                      : overriddenReferences )
                             {
                                 Implementation overriddenImplementation = overriddenReference.getImplementation();
                                 if ( overriddenReference.getClassDeclaration() != null )
@@ -1238,7 +1253,7 @@ public class DefaultModelValidator implements ModelValidator
 
                                 final Module moduleOfReference =
                                     validationContext.getModuleOfImplementation(
-                                    overriddenImplementation.getIdentifier() );
+                                        overriddenImplementation.getIdentifier() );
 
                                 addDetail( validationContext.getReport(),
                                            "IMPLEMENTATION_IMPLEMENTATION_REFERENCE_INHERITANCE_CONSTRAINT",
@@ -1443,7 +1458,7 @@ public class DefaultModelValidator implements ModelValidator
 
                                     final Module moduleOfMessage =
                                         validationContext.getModuleOfImplementation(
-                                        overriddenImplementation.getIdentifier() );
+                                            overriddenImplementation.getIdentifier() );
 
                                     addDetail( validationContext.getReport(), "IMPLEMENTATION_MESSAGE_OVERRIDE_WARNING",
                                                Level.WARNING, new ObjectFactory().createImplementation( impl ),
@@ -1589,7 +1604,7 @@ public class DefaultModelValidator implements ModelValidator
 
                                     final Module moduleOfMessage =
                                         validationContext.getModuleOfImplementation(
-                                        overriddenImplementation.getIdentifier() );
+                                            overriddenImplementation.getIdentifier() );
 
                                     addDetail( validationContext.getReport(), "IMPLEMENTATION_MESSAGE_OVERRIDE_WARNING",
                                                Level.WARNING, new ObjectFactory().createImplementation( impl ),
@@ -1613,7 +1628,7 @@ public class DefaultModelValidator implements ModelValidator
 
                                 final Module moduleOfMessage =
                                     validationContext.getModuleOfImplementation(
-                                    overriddenImplementation.getIdentifier() );
+                                        overriddenImplementation.getIdentifier() );
 
                                 addDetail( validationContext.getReport(),
                                            "IMPLEMENTATION_MESSAGE_INHERITANCE_CONSTRAINT",
@@ -1821,7 +1836,7 @@ public class DefaultModelValidator implements ModelValidator
                                     {
                                         final Module moduleOfProperty =
                                             validationContext.getModuleOfSpecification(
-                                            overriddenProperty.getSpecification().getIdentifier() );
+                                                overriddenProperty.getSpecification().getIdentifier() );
 
                                         addDetail( validationContext.getReport(),
                                                    "IMPLEMENTATION_PROPERTY_OVERRIDE_WARNING", Level.WARNING,
@@ -1845,7 +1860,7 @@ public class DefaultModelValidator implements ModelValidator
 
                                         final Module moduleOfProperty =
                                             validationContext.getModuleOfImplementation(
-                                            overriddenImplementation.getIdentifier() );
+                                                overriddenImplementation.getIdentifier() );
 
                                         addDetail( validationContext.getReport(),
                                                    "IMPLEMENTATION_PROPERTY_OVERRIDE_WARNING", Level.WARNING,
@@ -1872,7 +1887,7 @@ public class DefaultModelValidator implements ModelValidator
 
                                 final Module moduleOfProperty =
                                     validationContext.getModuleOfImplementation(
-                                    overriddenImplementation.getIdentifier() );
+                                        overriddenImplementation.getIdentifier() );
 
                                 addDetail( validationContext.getReport(),
                                            "IMPLEMENTATION_PROPERTY_INHERITANCE_CONSTRAINT",
@@ -1919,7 +1934,7 @@ public class DefaultModelValidator implements ModelValidator
 
                                     final Module moduleOfProperty =
                                         validationContext.getModuleOfImplementation(
-                                        overriddenImplementation.getIdentifier() );
+                                            overriddenImplementation.getIdentifier() );
 
                                     addDetail( validationContext.getReport(),
                                                "IMPLEMENTATION_PROPERTY_OVERRIDE_WARNING", Level.WARNING,
@@ -1944,7 +1959,7 @@ public class DefaultModelValidator implements ModelValidator
 
                                 final Module moduleOfProperty =
                                     validationContext.getModuleOfImplementation(
-                                    overriddenImplementation.getIdentifier() );
+                                        overriddenImplementation.getIdentifier() );
 
                                 addDetail( validationContext.getReport(),
                                            "IMPLEMENTATION_PROPERTY_INHERITANCE_CONSTRAINT",
@@ -1997,7 +2012,7 @@ public class DefaultModelValidator implements ModelValidator
                             if ( !( r.isOverride() || overriddenReferences.isEmpty() ) )
                             {
                                 for ( final InheritanceModel.Node<SpecificationReference> overriddenReference
-                                      : overriddenReferences )
+                                          : overriddenReferences )
                                 {
                                     Implementation overriddenImplementation = overriddenReference.getImplementation();
                                     if ( overriddenReference.getClassDeclaration() != null )
@@ -2007,7 +2022,7 @@ public class DefaultModelValidator implements ModelValidator
 
                                     final Module moduleOfReference =
                                         validationContext.getModuleOfImplementation(
-                                        overriddenImplementation.getIdentifier() );
+                                            overriddenImplementation.getIdentifier() );
 
                                     addDetail( validationContext.getReport(),
                                                "IMPLEMENTATION_SPECIFICATION_REFERENCE_OVERRIDE_WARNING",
@@ -2023,7 +2038,7 @@ public class DefaultModelValidator implements ModelValidator
                             retainFinalNodes( overriddenReferences );
 
                             for ( final InheritanceModel.Node<SpecificationReference> overriddenReference
-                                  : overriddenReferences )
+                                      : overriddenReferences )
                             {
                                 Implementation overriddenImplementation = overriddenReference.getImplementation();
                                 if ( overriddenReference.getClassDeclaration() != null )
@@ -2033,7 +2048,7 @@ public class DefaultModelValidator implements ModelValidator
 
                                 final Module moduleOfReference =
                                     validationContext.getModuleOfImplementation(
-                                    overriddenImplementation.getIdentifier() );
+                                        overriddenImplementation.getIdentifier() );
 
                                 addDetail( validationContext.getReport(),
                                            "IMPLEMENTATION_SPECIFICATION_INHERITANCE_CONSTRAINT", Level.SEVERE,
@@ -2085,7 +2100,7 @@ public class DefaultModelValidator implements ModelValidator
                                 if ( !( overrideNode || overriddenElements.isEmpty() ) )
                                 {
                                     for ( final InheritanceModel.Node<JAXBElement<?>> overriddenElement
-                                          : overriddenElements )
+                                              : overriddenElements )
                                     {
                                         Implementation overriddenImplementation = overriddenElement.getImplementation();
                                         if ( overriddenElement.getClassDeclaration() != null )
@@ -2095,7 +2110,7 @@ public class DefaultModelValidator implements ModelValidator
 
                                         final Module moduleOfElement =
                                             validationContext.getModuleOfImplementation(
-                                            overriddenElement.getImplementation().getIdentifier() );
+                                                overriddenElement.getImplementation().getIdentifier() );
 
                                         addDetail( validationContext.getReport(),
                                                    "IMPLEMENTATION_JAXB_ELEMENT_OVERRIDE_WARNING",
@@ -2120,7 +2135,7 @@ public class DefaultModelValidator implements ModelValidator
 
                                     final Module moduleOfElement =
                                         validationContext.getModuleOfImplementation(
-                                        overriddenImplementation.getIdentifier() );
+                                            overriddenImplementation.getIdentifier() );
 
                                     addDetail( validationContext.getReport(),
                                                "IMPLEMENTATION_JAXB_ELEMENT_INHERITANCE_CONSTRAINT",
@@ -2150,7 +2165,7 @@ public class DefaultModelValidator implements ModelValidator
                 final Map<JavaIdentifier, InheritanceModel.Node<Dependency>> dependencyJavaVariableNames =
                     new HashMap<JavaIdentifier, InheritanceModel.Node<Dependency>>( dependencyNames.size() );
 
-                for ( String dependencyName : dependencyNames )
+                for ( final String dependencyName : dependencyNames )
                 {
                     final Set<InheritanceModel.Node<Dependency>> dependencyNodes =
                         imodel.getDependencyNodes( impl.getIdentifier(), dependencyName );
@@ -2294,7 +2309,7 @@ public class DefaultModelValidator implements ModelValidator
                 final Map<JavaIdentifier, InheritanceModel.Node<Message>> messageJavaVariableNames =
                     new HashMap<JavaIdentifier, InheritanceModel.Node<Message>>( messageNames.size() );
 
-                for ( String messageName : messageNames )
+                for ( final String messageName : messageNames )
                 {
                     final Set<InheritanceModel.Node<Message>> messageNodes =
                         imodel.getMessageNodes( impl.getIdentifier(), messageName );
@@ -2438,7 +2453,7 @@ public class DefaultModelValidator implements ModelValidator
                 final Map<JavaIdentifier, InheritanceModel.Node<Property>> propertyJavaVariableNames =
                     new HashMap<JavaIdentifier, InheritanceModel.Node<Property>>( messageNames.size() );
 
-                for ( String propertyName : propertyNames )
+                for ( final String propertyName : propertyNames )
                 {
                     final Set<InheritanceModel.Node<Property>> propertyNodes =
                         imodel.getPropertyNodes( impl.getIdentifier(), propertyName );
@@ -2571,7 +2586,7 @@ public class DefaultModelValidator implements ModelValidator
                 final Set<String> specificationReferenceIdentifiers =
                     imodel.getSpecificationReferenceIdentifiers( impl.getIdentifier() );
 
-                for ( String specificationRefereneIdentifier : specificationReferenceIdentifiers )
+                for ( final String specificationRefereneIdentifier : specificationReferenceIdentifiers )
                 {
                     final Set<InheritanceModel.Node<SpecificationReference>> specificationReferenceNodes =
                         imodel.getSpecificationReferenceNodes( impl.getIdentifier(), specificationRefereneIdentifier );
@@ -2590,7 +2605,7 @@ public class DefaultModelValidator implements ModelValidator
 
                 final Set<QName> xmlElementNames = imodel.getXmlElementNames( impl.getIdentifier() );
 
-                for ( QName xmlElementName : xmlElementNames )
+                for ( final QName xmlElementName : xmlElementNames )
                 {
                     final Set<InheritanceModel.Node<Element>> xmlElementNodes =
                         imodel.getXmlElementNodes( impl.getIdentifier(), xmlElementName );
@@ -2609,7 +2624,7 @@ public class DefaultModelValidator implements ModelValidator
 
                 final Set<QName> jaxbElementNames = imodel.getJaxbElementNames( impl.getIdentifier() );
 
-                for ( QName jaxbElementName : jaxbElementNames )
+                for ( final QName jaxbElementName : jaxbElementNames )
                 {
                     final Set<InheritanceModel.Node<JAXBElement<?>>> jaxbElementNodes =
                         imodel.getJaxbElementNodes( impl.getIdentifier(), jaxbElementName );
@@ -2629,7 +2644,7 @@ public class DefaultModelValidator implements ModelValidator
                 final Set<String> implementationReferenceIdentifiers =
                     imodel.getImplementationReferenceIdentifiers( impl.getIdentifier() );
 
-                for ( String implementationReferenceIdentifier : implementationReferenceIdentifiers )
+                for ( final String implementationReferenceIdentifier : implementationReferenceIdentifiers )
                 {
                     final Set<InheritanceModel.Node<ImplementationReference>> implementationReferenceNodes =
                         imodel.getImplementationReferenceNodes( impl.getIdentifier(),
@@ -2842,7 +2857,7 @@ public class DefaultModelValidator implements ModelValidator
                         implementations.getImplementation().add( impl );
                     }
 
-                    for ( Map.Entry<String, Implementations> e : map.entrySet() )
+                    for ( final Map.Entry<String, Implementations> e : map.entrySet() )
                     {
                         if ( e.getValue().getImplementation().size() > 1 )
                         {
@@ -3067,9 +3082,9 @@ public class DefaultModelValidator implements ModelValidator
             validationContext.getModuleOfImplementation( implementation.getIdentifier() );
 
         if ( !dependency.isOptional()
-             && ( available == null || available.getImplementation().isEmpty()
-                  || ( dependency.getImplementationName() != null
-                       && available.getImplementationByName( dependency.getImplementationName() ) == null ) ) )
+                 && ( available == null || available.getImplementation().isEmpty()
+                      || ( dependency.getImplementationName() != null
+                           && available.getImplementationByName( dependency.getImplementationName() ) == null ) ) )
         {
             addDetail( validationContext.getReport(), "IMPLEMENTATION_MANDATORY_DEPENDENCY_CONSTRAINT", Level.SEVERE,
                        new ObjectFactory().createImplementation( implementation ),
@@ -3629,7 +3644,7 @@ public class DefaultModelValidator implements ModelValidator
                 final Implementation a = available.getImplementation().get( i );
 
                 if ( dependency.getImplementationName() != null
-                     && !dependency.getImplementationName().equals( a.getName() ) )
+                         && !dependency.getImplementationName().equals( a.getName() ) )
                 {
                     continue;
                 }
@@ -3693,7 +3708,7 @@ public class DefaultModelValidator implements ModelValidator
 
                         if ( effectiveDependencyOverridden )
                         {
-                            for ( InheritanceModel.Node<Dependency> node : effDependencies )
+                            for ( final InheritanceModel.Node<Dependency> node : effDependencies )
                             {
                                 final Dependency overridden = node.getModelObject();
 
@@ -3706,7 +3721,7 @@ public class DefaultModelValidator implements ModelValidator
                                 if ( overrideSpecification != null && overriddenSpecification != null )
                                 {
                                     if ( overrideSpecification.getMultiplicity()
-                                         != overriddenSpecification.getMultiplicity() )
+                                             != overriddenSpecification.getMultiplicity() )
                                     {
                                         addDetail( validationContext.getReport(),
                                                    "IMPLEMENTATION_DEPENDENCY_MULTIPLICITY_CONSTRAINT",
@@ -3722,9 +3737,9 @@ public class DefaultModelValidator implements ModelValidator
                                     }
 
                                     if ( overrideSpecification.getScope() != null
-                                         ? !overrideSpecification.getScope().equals(
-                                        overriddenSpecification.getScope() )
-                                         : overriddenSpecification.getScope() != null )
+                                             ? !overrideSpecification.getScope().equals(
+                                            overriddenSpecification.getScope() )
+                                             : overriddenSpecification.getScope() != null )
                                     {
                                         addDetail( validationContext.getReport(),
                                                    "IMPLEMENTATION_DEPENDENCY_SCOPE_CONSTRAINT", Level.SEVERE,
@@ -3734,16 +3749,16 @@ public class DefaultModelValidator implements ModelValidator
                                                    dependency.getName(), override.getName(),
                                                    a.getIdentifier(), moduleOfA.getName(),
                                                    overrideSpecification.getScope() == null
-                                                   ? "Multiton" : overrideSpecification.getScope(),
+                                                       ? "Multiton" : overrideSpecification.getScope(),
                                                    overriddenSpecification.getScope() == null
-                                                   ? "Multiton" : overriddenSpecification.getScope() );
+                                                       ? "Multiton" : overriddenSpecification.getScope() );
 
                                     }
 
                                     if ( overriddenSpecification.getMultiplicity() == Multiplicity.MANY )
                                     {
                                         if ( override.getImplementationName() == null
-                                             && overridden.getImplementationName() != null )
+                                                 && overridden.getImplementationName() != null )
                                         {
                                             addDetail( validationContext.getReport(),
                                                        "IMPLEMENTATION_DEPENDENCY_NO_IMPLEMENTATION_NAME_CONSTRAINT",
@@ -3757,7 +3772,7 @@ public class DefaultModelValidator implements ModelValidator
                                         }
 
                                         if ( override.getImplementationName() != null
-                                             && overridden.getImplementationName() == null )
+                                                 && overridden.getImplementationName() == null )
                                         {
                                             addDetail( validationContext.getReport(),
                                                        "IMPLEMENTATION_DEPENDENCY_IMPLEMENTATION_NAME_CONSTRAINT",
@@ -4182,14 +4197,16 @@ public class DefaultModelValidator implements ModelValidator
     private static String getMessage( final Throwable t )
     {
         return t != null
-               ? t.getMessage() != null && t.getMessage().trim().length() > 0
-                 ? t.getMessage()
-                 : getMessage( t.getCause() )
-               : null;
+                   ? t.getMessage() != null && t.getMessage().trim().length() > 0
+                         ? t.getMessage()
+                         : getMessage( t.getCause() )
+                   : null;
 
     }
 
-    /** @since 1.2 */
+    /**
+     * @since 1.2
+     */
     private static final class ValidationContext
     {
 

@@ -52,10 +52,14 @@ import static org.junit.Assert.fail;
 public class DefaultModelProviderTest
 {
 
-    /** The {@code DefaultModelProvider} instance tests are performed with. */
+    /**
+     * The {@code DefaultModelProvider} instance tests are performed with.
+     */
     private DefaultModelProvider defaultModelProvider;
 
-    /** Creates a new {@code DefaultModelProviderTest} instance. */
+    /**
+     * Creates a new {@code DefaultModelProviderTest} instance.
+     */
     public DefaultModelProviderTest()
     {
         super();
@@ -131,10 +135,12 @@ public class DefaultModelProviderTest
         DefaultModelProvider.setDefaultModuleLocation( null );
         this.getModelProvider().setModuleLocation( null );
         assertEquals( 1, this.getModelProvider().findModules(
-            context, ModelObject.MODEL_PUBLIC_ID, DefaultModelProvider.getDefaultModuleLocation() ).getModule().size() );
+                      context, ModelObject.MODEL_PUBLIC_ID, DefaultModelProvider.getDefaultModuleLocation() ).
+                      getModule().size() );
 
         assertEquals( 1, this.getModelProvider().findModules(
-            context, ModelObject.MODEL_PUBLIC_ID, this.getModelProvider().getModuleLocation() ).getModule().size() );
+                      context, ModelObject.MODEL_PUBLIC_ID, this.getModelProvider().getModuleLocation() ).getModule().
+                      size() );
 
         DefaultModelProvider.setDefaultModuleLocation( "DOES_NOT_EXIST" );
         this.getModelProvider().setModuleLocation( "DOES_NOT_EXIST" );

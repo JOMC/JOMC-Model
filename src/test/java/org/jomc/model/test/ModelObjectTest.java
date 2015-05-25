@@ -48,13 +48,17 @@ import static org.junit.Assert.fail;
 public class ModelObjectTest
 {
 
-    /** Creates a new {@code ModelObjectTest} instance. */
+    /**
+     * Creates a new {@code ModelObjectTest} instance.
+     */
     public ModelObjectTest()
     {
         super();
     }
 
-    /** Test {@code ModelObject}. */
+    /**
+     * Test {@code ModelObject}.
+     */
     public static class TestModelObject extends ModelObject
     {
 

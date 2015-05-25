@@ -42,10 +42,14 @@ import org.jomc.modlet.ModelException;
 public class ModelObjectException extends ModelException
 {
 
-    /** Serial version UID for backwards compatibility with 1.4 object streams. */
+    /**
+     * Serial version UID for backwards compatibility with 1.4 object streams.
+     */
     private static final long serialVersionUID = -8515159053275601138L;
 
-    /** Creates a new {@code ModelObjectException} instance. */
+    /**
+     * Creates a new {@code ModelObjectException} instance.
+     */
     public ModelObjectException()
     {
         super();

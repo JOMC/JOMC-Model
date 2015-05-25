@@ -61,6 +61,7 @@ public class DefaultModelProvider implements ModelProvider
 
     /**
      * Constant for the name of the model context attribute backing property {@code enabled}.
+     *
      * @see #findModel(org.jomc.modlet.ModelContext, org.jomc.modlet.Model)
      * @see ModelContext#getAttribute(java.lang.String)
      * @since 1.2
@@ -69,6 +70,7 @@ public class DefaultModelProvider implements ModelProvider
 
     /**
      * Constant for the name of the system property controlling property {@code defaultEnabled}.
+     *
      * @see #isDefaultEnabled()
      */
     private static final String DEFAULT_ENABLED_PROPERTY_NAME =
@@ -76,19 +78,25 @@ public class DefaultModelProvider implements ModelProvider
 
     /**
      * Default value of the flag indicating the provider is enabled by default.
+     *
      * @see #isDefaultEnabled()
      * @since 1.2
      */
     private static final Boolean DEFAULT_ENABLED = Boolean.TRUE;
 
-    /** Flag indicating the provider is enabled by default. */
+    /**
+     * Flag indicating the provider is enabled by default.
+     */
     private static volatile Boolean defaultEnabled;
 
-    /** Flag indicating the provider is enabled. */
+    /**
+     * Flag indicating the provider is enabled.
+     */
     private Boolean enabled;
 
     /**
      * Constant for the name of the model context attribute backing property {@code moduleLocation}.
+     *
      * @see #findModel(org.jomc.modlet.ModelContext, org.jomc.modlet.Model)
      * @see ModelContext#getAttribute(java.lang.String)
      * @since 1.2
@@ -98,6 +106,7 @@ public class DefaultModelProvider implements ModelProvider
 
     /**
      * Constant for the name of the system property controlling property {@code defaultModuleLocation}.
+     *
      * @see #getDefaultModuleLocation()
      */
     private static final String DEFAULT_MODULE_LOCATION_PROPERTY_NAME =
@@ -105,18 +114,24 @@ public class DefaultModelProvider implements ModelProvider
 
     /**
      * Class path location searched for modules by default.
+     *
      * @see #getDefaultModuleLocation()
      */
     private static final String DEFAULT_MODULE_LOCATION = "META-INF/jomc.xml";
 
-    /** Default module location. */
+    /**
+     * Default module location.
+     */
     private static volatile String defaultModuleLocation;
 
-    /** Module location of the instance. */
+    /**
+     * Module location of the instance.
+     */
     private String moduleLocation;
 
     /**
      * Constant for the name of the model context attribute backing property {@code validating}.
+     *
      * @see #findModules(org.jomc.modlet.ModelContext, java.lang.String, java.lang.String)
      * @see ModelContext#getAttribute(java.lang.String)
      * @since 1.2
@@ -126,6 +141,7 @@ public class DefaultModelProvider implements ModelProvider
 
     /**
      * Constant for the name of the system property controlling property {@code defaultValidating}.
+     *
      * @see #isDefaultValidating()
      * @since 1.2
      */
@@ -134,6 +150,7 @@ public class DefaultModelProvider implements ModelProvider
 
     /**
      * Default value of the flag indicating the provider is validating resources by default.
+     *
      * @see #isDefaultValidating()
      * @since 1.2
      */
@@ -141,17 +158,21 @@ public class DefaultModelProvider implements ModelProvider
 
     /**
      * Flag indicating the provider is validating resources by default.
+     *
      * @since 1.2
      */
     private static volatile Boolean defaultValidating;
 
     /**
      * Flag indicating the provider is validating resources.
+     *
      * @since 1.2
      */
     private Boolean validating;
 
-    /** Creates a new {@code DefaultModelProvider} instance. */
+    /**
+     * Creates a new {@code DefaultModelProvider} instance.
+     */
     public DefaultModelProvider()
     {
         super();
@@ -159,9 +180,11 @@ public class DefaultModelProvider implements ModelProvider
 
     /**
      * Gets a flag indicating the provider is enabled by default.
-     * <p>The default enabled flag is controlled by system property
+     * <p>
+     * The default enabled flag is controlled by system property
      * {@code org.jomc.model.modlet.DefaultModelProvider.defaultEnabled} holding a value indicating the provider is
-     * enabled by default. If that property is not set, the {@code true} default is returned.</p>
+     * enabled by default. If that property is not set, the {@code true} default is returned.
+     * </p>
      *
      * @return {@code true}, if the provider is enabled by default; {@code false}, if the provider is disabled by
      * default.
@@ -224,9 +247,11 @@ public class DefaultModelProvider implements ModelProvider
 
     /**
      * Gets the default location searched for module resources.
-     * <p>The default module location is controlled by system property
+     * <p>
+     * The default module location is controlled by system property
      * {@code org.jomc.model.modlet.DefaultModelProvider.defaultModuleLocation} holding the location to search for
-     * module resources by default. If that property is not set, the {@code META-INF/jomc.xml} default is returned.</p>
+     * module resources by default. If that property is not set, the {@code META-INF/jomc.xml} default is returned.
+     * </p>
      *
      * @return The location searched for module resources by default.
      *
@@ -288,9 +313,11 @@ public class DefaultModelProvider implements ModelProvider
 
     /**
      * Gets a flag indicating the provider is validating resources by default.
-     * <p>The default validating flag is controlled by system property
+     * <p>
+     * The default validating flag is controlled by system property
      * {@code org.jomc.model.modlet.DefaultModelProvider.defaultValidating} holding a value indicating the provider is
-     * validating resources by default. If that property is not set, the {@code true} default is returned.</p>
+     * validating resources by default. If that property is not set, the {@code true} default is returned.
+     * </p>
      *
      * @return {@code true}, if the provider is validating resources by default; {@code false}, if the provider is not
      * validating resources by default.
@@ -399,7 +426,7 @@ public class DefaultModelProvider implements ModelProvider
         {
             boolean contextValidating = this.isValidating();
             if ( DEFAULT_VALIDATING == contextValidating
-                 && context.getAttribute( VALIDATING_ATTRIBUTE_NAME ) instanceof Boolean )
+                     && context.getAttribute( VALIDATING_ATTRIBUTE_NAME ) instanceof Boolean )
             {
                 contextValidating = (Boolean) context.getAttribute( VALIDATING_ATTRIBUTE_NAME );
             }
@@ -445,7 +472,7 @@ public class DefaultModelProvider implements ModelProvider
                     if ( context.isLoggable( Level.FINEST ) )
                     {
                         context.log( Level.FINEST, getMessage(
-                            "foundModule", m.getName(), m.getVersion() == null ? "" : m.getVersion() ), null );
+                                     "foundModule", m.getName(), m.getVersion() == null ? "" : m.getVersion() ), null );
 
                     }
 
@@ -531,7 +558,7 @@ public class DefaultModelProvider implements ModelProvider
 
         String contextModuleLocation = this.getModuleLocation();
         if ( DEFAULT_MODULE_LOCATION.equals( contextModuleLocation )
-             && context.getAttribute( MODULE_LOCATION_ATTRIBUTE_NAME ) instanceof String )
+                 && context.getAttribute( MODULE_LOCATION_ATTRIBUTE_NAME ) instanceof String )
         {
             contextModuleLocation = (String) context.getAttribute( MODULE_LOCATION_ATTRIBUTE_NAME );
         }
@@ -566,10 +593,10 @@ public class DefaultModelProvider implements ModelProvider
     private static String getMessage( final Throwable t )
     {
         return t != null
-               ? t.getMessage() != null && t.getMessage().trim().length() > 0
-                 ? t.getMessage()
-                 : getMessage( t.getCause() )
-               : null;
+                   ? t.getMessage() != null && t.getMessage().trim().length() > 0
+                         ? t.getMessage()
+                         : getMessage( t.getCause() )
+                   : null;
 
     }
 

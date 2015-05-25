@@ -48,7 +48,9 @@ import static org.junit.Assert.fail;
 public class InstanceTest
 {
 
-    /** Creates a new {@code InstanceTest} instance. */
+    /**
+     * Creates a new {@code InstanceTest} instance.
+     */
     public InstanceTest()
     {
         super();

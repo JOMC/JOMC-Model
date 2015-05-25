@@ -51,7 +51,9 @@ import static org.junit.Assert.fail;
 public class ModelHelperTest
 {
 
-    /** Creates a new {@code ModelHelperTest} instance. */
+    /**
+     * Creates a new {@code ModelHelperTest} instance.
+     */
     public ModelHelperTest()
     {
         super();

@@ -48,7 +48,9 @@ import org.jomc.modlet.Model;
 public abstract class ModelHelper
 {
 
-    /** Creates a new {@code ModelHelper} instance. */
+    /**
+     * Creates a new {@code ModelHelper} instance.
+     */
     public ModelHelper()
     {
         super();
