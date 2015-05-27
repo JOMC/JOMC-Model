@@ -1,5 +1,5 @@
 /*
- *   Copyright (C) Christian Schulte, 2011-325
+ *   Copyright (C) Christian Schulte <cs@schulte.it>, 2011-325
  *   All rights reserved.
  *
  *   Redistribution and use in source and binary forms, with or without

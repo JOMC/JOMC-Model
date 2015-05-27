@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-  Copyright (C) Christian Schulte, 2011-332
+  Copyright (C) Christian Schulte <cs@schulte.it>, 2011-332
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -38,7 +38,7 @@
   <xsl:output method="text" encoding="UTF-8"/>
 
   <xsl:template match="/">/*
- *  Copyright (C) Christian Schulte, 2011-332
+ *  Copyright (C) Christian Schulte &lt;cs@schulte.it&gt;, 2011-332
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
