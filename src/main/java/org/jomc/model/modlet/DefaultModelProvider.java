@@ -449,7 +449,7 @@ public class DefaultModelProvider implements ModelProvider
                 contextValidating = (Boolean) context.getAttribute( VALIDATING_ATTRIBUTE_NAME );
             }
 
-            final long t0 = System.currentTimeMillis();
+            final long t0 = System.nanoTime();
             final Text text = new Text();
             text.setLanguage( "en" );
             text.setValue( getMessage( "contextModulesInfo", location ) );
@@ -507,9 +507,7 @@ public class DefaultModelProvider implements ModelProvider
 
             if ( context.isLoggable( Level.FINE ) )
             {
-                context.log( Level.FINE, getMessage( "contextReport", count, location,
-                                                     System.currentTimeMillis() - t0 ), null );
-
+                context.log( Level.FINE, getMessage( "contextReport", count, location, System.nanoTime() - t0 ), null );
             }
 
             return modules.getModule().isEmpty() ? null : modules;
