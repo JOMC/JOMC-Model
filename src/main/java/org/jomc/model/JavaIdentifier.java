@@ -49,7 +49,7 @@ import java.util.ResourceBundle;
  * Language Specification - Java SE 7 Edition - Chapter 3.8ff.
  * </p>
  * <p>
- * <i>Please note that this class will move to package {@code org.jomc.util} in JOMC 2.0.</i>
+ * <i>Please note that this class will move to package {@code org.jomc.jsl} in JOMC 2.0.</i>
  * </p>
  *
  * @author <a href="mailto:cs@schulte.it">Christian Schulte</a>
