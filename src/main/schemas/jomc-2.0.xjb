@@ -852,7 +852,7 @@
         throws ClassNotFoundException, ModelObjectException
     {
         Class<?> javaClass = null;
-        final org.jomc.util.JavaTypeName javaTypeName = this.getJavaTypeName();
+        final org.jomc.jls.JavaTypeName javaTypeName = this.getJavaTypeName();
 
         if ( javaTypeName != null )
         {
@@ -874,15 +874,15 @@
      *
      * @since 1.4
      */
-    public org.jomc.util.JavaTypeName getJavaTypeName() throws ModelObjectException
+    public org.jomc.jls.JavaTypeName getJavaTypeName() throws ModelObjectException
     {
         try
         {
-            org.jomc.util.JavaTypeName javaTypeName = null;
+            org.jomc.jls.JavaTypeName javaTypeName = null;
 
             if ( this.getClazz() != null )
             {
-                javaTypeName = org.jomc.util.JavaTypeName.parse( this.getClazz() );
+                javaTypeName = org.jomc.jls.JavaTypeName.parse( this.getClazz() );
             }
 
             return javaTypeName;
@@ -1262,7 +1262,7 @@
         throws ClassNotFoundException, ModelObjectException
     {
         Class<?> javaClass = null;
-        final org.jomc.util.JavaTypeName javaTypeName = this.getJavaTypeName();
+        final org.jomc.jls.JavaTypeName javaTypeName = this.getJavaTypeName();
 
         if ( javaTypeName != null )
         {
@@ -1284,15 +1284,15 @@
      *
      * @since 1.4
      */
-    public org.jomc.util.JavaTypeName getJavaTypeName() throws ModelObjectException
+    public org.jomc.jls.JavaTypeName getJavaTypeName() throws ModelObjectException
     {
         try
         {
-            org.jomc.util.JavaTypeName javaTypeName = null;
+            org.jomc.jls.JavaTypeName javaTypeName = null;
 
             if ( this.getClazz() != null )
             {
-                javaTypeName = org.jomc.util.JavaTypeName.parse( this.getClazz() );
+                javaTypeName = org.jomc.jls.JavaTypeName.parse( this.getClazz() );
             }
 
             return javaTypeName;
@@ -1587,13 +1587,13 @@
      *
      * @see #getName()
      */
-    public org.jomc.util.JavaIdentifier getJavaGetterMethodName() throws ModelObjectException
+    public org.jomc.jls.JavaIdentifier getJavaGetterMethodName() throws ModelObjectException
     {
         try
         {
-            return org.jomc.util.JavaIdentifier.parse( "get" + org.jomc.util.JavaIdentifier.normalize(
+            return org.jomc.jls.JavaIdentifier.parse( "get" + org.jomc.jls.JavaIdentifier.normalize(
                 this.getName() != null ? this.getName() : "",
-                org.jomc.util.JavaIdentifier.NormalizationMode.CAMEL_CASE ) );
+                org.jomc.jls.JavaIdentifier.NormalizationMode.CAMEL_CASE ) );
 
         }
         catch ( final java.text.ParseException e )
@@ -1615,13 +1615,13 @@
      *
      * @see #getName()
      */
-    public org.jomc.util.JavaIdentifier getJavaSetterMethodName() throws ModelObjectException
+    public org.jomc.jls.JavaIdentifier getJavaSetterMethodName() throws ModelObjectException
     {
         try
         {
-            return org.jomc.util.JavaIdentifier.parse( "set" + org.jomc.util.JavaIdentifier.normalize(
+            return org.jomc.jls.JavaIdentifier.parse( "set" + org.jomc.jls.JavaIdentifier.normalize(
                 this.getName() != null ? this.getName() : "",
-                org.jomc.util.JavaIdentifier.NormalizationMode.CAMEL_CASE ) );
+                org.jomc.jls.JavaIdentifier.NormalizationMode.CAMEL_CASE ) );
 
         }
         catch ( final java.text.ParseException e )
@@ -1643,13 +1643,13 @@
      *
      * @see #getName()
      */
-    public org.jomc.util.JavaIdentifier getJavaVariableName() throws ModelObjectException
+    public org.jomc.jls.JavaIdentifier getJavaVariableName() throws ModelObjectException
     {
         try
         {
-            return org.jomc.util.JavaIdentifier.normalize(
+            return org.jomc.jls.JavaIdentifier.normalize(
                 this.getName() != null ? this.getName() : "",
-                org.jomc.util.JavaIdentifier.NormalizationMode.VARIABLE_NAME_CONVENTION );
+                org.jomc.jls.JavaIdentifier.NormalizationMode.VARIABLE_NAME_CONVENTION );
 
         }
         catch ( final java.text.ParseException e )
@@ -1671,13 +1671,13 @@
      *
      * @see #getName()
      */
-    public org.jomc.util.JavaIdentifier getJavaConstantName() throws ModelObjectException
+    public org.jomc.jls.JavaIdentifier getJavaConstantName() throws ModelObjectException
     {
         try
         {
-            return org.jomc.util.JavaIdentifier.normalize(
+            return org.jomc.jls.JavaIdentifier.normalize(
                 this.getName() != null ? this.getName() : "",
-                org.jomc.util.JavaIdentifier.NormalizationMode.CONSTANT_NAME_CONVENTION );
+                org.jomc.jls.JavaIdentifier.NormalizationMode.CONSTANT_NAME_CONVENTION );
 
         }
         catch ( final java.text.ParseException e )
@@ -2010,7 +2010,7 @@
      *
      * @since 1.4
      */
-    public org.jomc.util.JavaTypeName getJavaTypeName() throws ModelObjectException
+    public org.jomc.jls.JavaTypeName getJavaTypeName() throws ModelObjectException
     {
         final String typeName = this.getType() == null
                                 ? this.getAny() == null
@@ -2020,7 +2020,7 @@
 
         try
         {
-            return org.jomc.util.JavaTypeName.parse( typeName );
+            return org.jomc.jls.JavaTypeName.parse( typeName );
         }
         catch ( final java.text.ParseException e )
         {
@@ -2040,17 +2040,17 @@
      *
      * @see #getName()
      */
-    public org.jomc.util.JavaIdentifier getJavaGetterMethodName() throws ModelObjectException
+    public org.jomc.jls.JavaIdentifier getJavaGetterMethodName() throws ModelObjectException
     {
         try
         {
-            final org.jomc.util.JavaTypeName javaType = this.getJavaTypeName();
-            final String prefix = javaType.runtimeEquals( org.jomc.util.JavaTypeName.BOOLEAN )
-                                  || javaType.runtimeEquals( org.jomc.util.JavaTypeName.BOOLEAN_TYPE ) ? "is" : "get";
+            final org.jomc.jls.JavaTypeName javaType = this.getJavaTypeName();
+            final String prefix = javaType.runtimeEquals( org.jomc.jls.JavaTypeName.BOOLEAN )
+                                  || javaType.runtimeEquals( org.jomc.jls.JavaTypeName.BOOLEAN_TYPE ) ? "is" : "get";
 
-            return org.jomc.util.JavaIdentifier.parse( prefix + org.jomc.util.JavaIdentifier.normalize(
+            return org.jomc.jls.JavaIdentifier.parse( prefix + org.jomc.jls.JavaIdentifier.normalize(
                 this.getName() != null ? this.getName() : "",
-                org.jomc.util.JavaIdentifier.NormalizationMode.CAMEL_CASE ) );
+                org.jomc.jls.JavaIdentifier.NormalizationMode.CAMEL_CASE ) );
 
         }
         catch ( final java.text.ParseException e )
@@ -2072,13 +2072,13 @@
      *
      * @see #getName()
      */
-    public org.jomc.util.JavaIdentifier getJavaSetterMethodName() throws ModelObjectException
+    public org.jomc.jls.JavaIdentifier getJavaSetterMethodName() throws ModelObjectException
     {
         try
         {
-            return org.jomc.util.JavaIdentifier.parse( "set" + org.jomc.util.JavaIdentifier.normalize(
+            return org.jomc.jls.JavaIdentifier.parse( "set" + org.jomc.jls.JavaIdentifier.normalize(
                 this.getName() != null ? this.getName() : "",
-                org.jomc.util.JavaIdentifier.NormalizationMode.CAMEL_CASE ) );
+                org.jomc.jls.JavaIdentifier.NormalizationMode.CAMEL_CASE ) );
 
         }
         catch ( final java.text.ParseException e )
@@ -2100,13 +2100,13 @@
      *
      * @see #getName()
      */
-    public org.jomc.util.JavaIdentifier getJavaVariableName() throws ModelObjectException
+    public org.jomc.jls.JavaIdentifier getJavaVariableName() throws ModelObjectException
     {
         try
         {
-            return org.jomc.util.JavaIdentifier.normalize(
+            return org.jomc.jls.JavaIdentifier.normalize(
                 this.getName() != null ? this.getName() : "",
-                org.jomc.util.JavaIdentifier.NormalizationMode.VARIABLE_NAME_CONVENTION );
+                org.jomc.jls.JavaIdentifier.NormalizationMode.VARIABLE_NAME_CONVENTION );
 
         }
         catch ( final java.text.ParseException e )
@@ -2128,13 +2128,13 @@
      *
      * @see #getName()
      */
-    public org.jomc.util.JavaIdentifier getJavaConstantName() throws ModelObjectException
+    public org.jomc.jls.JavaIdentifier getJavaConstantName() throws ModelObjectException
     {
         try
         {
-            return org.jomc.util.JavaIdentifier.normalize(
+            return org.jomc.jls.JavaIdentifier.normalize(
                 this.getName() != null ? this.getName() : "",
-                org.jomc.util.JavaIdentifier.NormalizationMode.CONSTANT_NAME_CONVENTION );
+                org.jomc.jls.JavaIdentifier.NormalizationMode.CONSTANT_NAME_CONVENTION );
 
         }
         catch ( final java.text.ParseException e )
@@ -2557,13 +2557,13 @@
      *
      * @see #getName()
      */
-    public org.jomc.util.JavaIdentifier getJavaGetterMethodName() throws ModelObjectException
+    public org.jomc.jls.JavaIdentifier getJavaGetterMethodName() throws ModelObjectException
     {
         try
         {
-            return org.jomc.util.JavaIdentifier.parse( "get" + org.jomc.util.JavaIdentifier.normalize(
+            return org.jomc.jls.JavaIdentifier.parse( "get" + org.jomc.jls.JavaIdentifier.normalize(
                 this.getName() != null ? this.getName() : "",
-                org.jomc.util.JavaIdentifier.NormalizationMode.CAMEL_CASE ) );
+                org.jomc.jls.JavaIdentifier.NormalizationMode.CAMEL_CASE ) );
 
         }
         catch ( final java.text.ParseException e )
@@ -2585,13 +2585,13 @@
      *
      * @see #getName()
      */
-    public org.jomc.util.JavaIdentifier getJavaSetterMethodName() throws ModelObjectException
+    public org.jomc.jls.JavaIdentifier getJavaSetterMethodName() throws ModelObjectException
     {
         try
         {
-            return org.jomc.util.JavaIdentifier.parse( "set" + org.jomc.util.JavaIdentifier.normalize(
+            return org.jomc.jls.JavaIdentifier.parse( "set" + org.jomc.jls.JavaIdentifier.normalize(
                 this.getName() != null ? this.getName() : "",
-                org.jomc.util.JavaIdentifier.NormalizationMode.CAMEL_CASE ) );
+                org.jomc.jls.JavaIdentifier.NormalizationMode.CAMEL_CASE ) );
 
         }
         catch ( final java.text.ParseException e )
@@ -2613,13 +2613,13 @@
      *
      * @see #getName()
      */
-    public org.jomc.util.JavaIdentifier getJavaVariableName() throws ModelObjectException
+    public org.jomc.jls.JavaIdentifier getJavaVariableName() throws ModelObjectException
     {
         try
         {
-            return org.jomc.util.JavaIdentifier.normalize(
+            return org.jomc.jls.JavaIdentifier.normalize(
                 this.getName() != null ? this.getName() : "",
-                org.jomc.util.JavaIdentifier.NormalizationMode.VARIABLE_NAME_CONVENTION );
+                org.jomc.jls.JavaIdentifier.NormalizationMode.VARIABLE_NAME_CONVENTION );
 
         }
         catch ( final java.text.ParseException e )
@@ -2641,13 +2641,13 @@
      *
      * @see #getName()
      */
-    public org.jomc.util.JavaIdentifier getJavaConstantName() throws ModelObjectException
+    public org.jomc.jls.JavaIdentifier getJavaConstantName() throws ModelObjectException
     {
         try
         {
-            return org.jomc.util.JavaIdentifier.normalize(
+            return org.jomc.jls.JavaIdentifier.normalize(
                 this.getName() != null ? this.getName() : "",
-                org.jomc.util.JavaIdentifier.NormalizationMode.CONSTANT_NAME_CONVENTION );
+                org.jomc.jls.JavaIdentifier.NormalizationMode.CONSTANT_NAME_CONVENTION );
 
         }
         catch ( final java.text.ParseException e )
@@ -2795,7 +2795,7 @@
      *
      * @see #getType()
      */
-    public org.jomc.util.JavaTypeName getJavaTypeName() throws ModelObjectException
+    public org.jomc.jls.JavaTypeName getJavaTypeName() throws ModelObjectException
     {
         try
         {
@@ -2810,7 +2810,7 @@
                 typeName = "java.lang.Number";
             }
 
-            return org.jomc.util.JavaTypeName.parse( typeName );
+            return org.jomc.jls.JavaTypeName.parse( typeName );
         }
         catch ( final java.text.ParseException e )
         {
@@ -2831,13 +2831,13 @@
      *
      * @see #getName()
      */
-    public org.jomc.util.JavaIdentifier getJavaVariableName() throws ModelObjectException
+    public org.jomc.jls.JavaIdentifier getJavaVariableName() throws ModelObjectException
     {
         try
         {
-            return org.jomc.util.JavaIdentifier.normalize(
+            return org.jomc.jls.JavaIdentifier.normalize(
                 this.getName() != null ? this.getName() : "",
-                org.jomc.util.JavaIdentifier.NormalizationMode.VARIABLE_NAME_CONVENTION );
+                org.jomc.jls.JavaIdentifier.NormalizationMode.VARIABLE_NAME_CONVENTION );
 
         }
         catch ( final java.text.ParseException e )
@@ -3130,7 +3130,7 @@
         throws ClassNotFoundException, ModelObjectException
     {
         Class<?> javaClass = null;
-        final org.jomc.util.JavaTypeName javaTypeName = this.getJavaTypeName();
+        final org.jomc.jls.JavaTypeName javaTypeName = this.getJavaTypeName();
 
         if ( javaTypeName != null )
         {
@@ -3167,7 +3167,7 @@
             for ( int i = 0, s0 = this.getSpecifications().getSpecification().size(); i < s0; i++ )
             {
                 final Specification s = this.getSpecifications().getSpecification().get( i );
-                final org.jomc.util.JavaTypeName javaTypeName = s.getJavaTypeName();
+                final org.jomc.jls.JavaTypeName javaTypeName = s.getJavaTypeName();
 
                 if ( javaTypeName != null )
                 {
@@ -3200,7 +3200,7 @@
         throws ClassNotFoundException, ModelObjectException
     {
         java.lang.reflect.Constructor<?> javaConstructor = null;
-        final org.jomc.util.JavaTypeName javaTypeName = this.getJavaTypeName();
+        final org.jomc.jls.JavaTypeName javaTypeName = this.getJavaTypeName();
 
         if ( javaTypeName != null )
         {
@@ -3244,8 +3244,8 @@
             if ( this.getName() != null )
             {
                 javaFactoryMethodName =
-                    org.jomc.util.JavaIdentifier.parse( "get" + org.jomc.util.JavaIdentifier.normalize(
-                        this.getName(), org.jomc.util.JavaIdentifier.NormalizationMode.CAMEL_CASE ) ).toString();
+                    org.jomc.jls.JavaIdentifier.parse( "get" + org.jomc.jls.JavaIdentifier.normalize(
+                        this.getName(), org.jomc.jls.JavaIdentifier.NormalizationMode.CAMEL_CASE ) ).toString();
 
             }
 
@@ -3280,7 +3280,7 @@
     public java.lang.reflect.Method getJavaFactoryMethod( final ClassLoader classLoader )
         throws ClassNotFoundException, ModelObjectException
     {
-        final org.jomc.util.JavaTypeName javaTypeName = this.getJavaTypeName();
+        final org.jomc.jls.JavaTypeName javaTypeName = this.getJavaTypeName();
         java.lang.reflect.Method factoryMethod = null;
 
         if ( javaTypeName != null )
@@ -3339,7 +3339,7 @@
     public boolean isJavaClassAssignable( final ClassLoader classLoader )
         throws ClassNotFoundException, ModelObjectException
     {
-        final org.jomc.util.JavaTypeName javaTypeName = this.getJavaTypeName();
+        final org.jomc.jls.JavaTypeName javaTypeName = this.getJavaTypeName();
         boolean assignable = javaTypeName != null;
 
         if ( assignable )
@@ -3410,15 +3410,15 @@
      *
      * @since 1.4
      */
-    public org.jomc.util.JavaTypeName getJavaTypeName() throws ModelObjectException
+    public org.jomc.jls.JavaTypeName getJavaTypeName() throws ModelObjectException
     {
         try
         {
-            org.jomc.util.JavaTypeName javaTypeName = null;
+            org.jomc.jls.JavaTypeName javaTypeName = null;
 
             if ( this.getClazz() != null )
             {
-                javaTypeName = org.jomc.util.JavaTypeName.parse( this.getClazz() );
+                javaTypeName = org.jomc.jls.JavaTypeName.parse( this.getClazz() );
             }
 
             return javaTypeName;
@@ -3781,11 +3781,11 @@
      * @since 1.4
      */
     @javax.xml.bind.annotation.XmlTransient
-    private static final java.util.Comparator<org.jomc.util.JavaTypeName> JAVA_TYPE_NAME_COMPARATOR =
-        new java.util.Comparator<org.jomc.util.JavaTypeName>()
+    private static final java.util.Comparator<org.jomc.jls.JavaTypeName> JAVA_TYPE_NAME_COMPARATOR =
+        new java.util.Comparator<org.jomc.jls.JavaTypeName>()
     {
 
-        public int compare( final org.jomc.util.JavaTypeName o1, final org.jomc.util.JavaTypeName o2 )
+        public int compare( final org.jomc.jls.JavaTypeName o1, final org.jomc.jls.JavaTypeName o2 )
         {
             return o1.getName( true ).compareTo( o2.getName( true ) );
         }
@@ -4180,7 +4180,7 @@
      *
      * @since 1.4
      */
-    public List<org.jomc.util.JavaTypeName> getImplementedJavaTypeNames( final String implementation ) throws ModelObjectException
+    public List<org.jomc.jls.JavaTypeName> getImplementedJavaTypeNames( final String implementation ) throws ModelObjectException
     {
         if ( implementation == null )
         {
@@ -4188,17 +4188,17 @@
         }
 
         final Specifications implemented = this.getSpecifications( implementation );
-        java.util.List<org.jomc.util.JavaTypeName> javaTypeNames = null;
+        java.util.List<org.jomc.jls.JavaTypeName> javaTypeNames = null;
 
         if ( implemented != null )
         {
             javaTypeNames =
-                new java.util.ArrayList<org.jomc.util.JavaTypeName>( implemented.getSpecification().size() );
+                new java.util.ArrayList<org.jomc.jls.JavaTypeName>( implemented.getSpecification().size() );
 
             for ( int i = 0, s0 = implemented.getSpecification().size(); i < s0; i++ )
             {
                 final Specification s = implemented.getSpecification().get( i );
-                final org.jomc.util.JavaTypeName javaTypeName = s.getJavaTypeName();
+                final org.jomc.jls.JavaTypeName javaTypeName = s.getJavaTypeName();
 
                 if ( javaTypeName != null && !javaTypeNames.contains( javaTypeName ) )
                 {
@@ -4394,7 +4394,7 @@
      * @see #getSpecification(java.lang.String)
      * @see Specification#getJavaTypeName()
      */
-    public org.jomc.util.JavaTypeName getDependencyJavaTypeName( final String implementation, final String dependency )
+    public org.jomc.jls.JavaTypeName getDependencyJavaTypeName( final String implementation, final String dependency )
         throws ModelObjectException
     {
         if ( implementation == null )
@@ -4410,7 +4410,7 @@
 
         try
         {
-            org.jomc.util.JavaTypeName javaTypeName = null;
+            org.jomc.jls.JavaTypeName javaTypeName = null;
             final Dependencies dependencies = this.getDependencies( implementation );
 
             if ( dependencies != null )
@@ -4431,7 +4431,7 @@
                             typeName += "[]";
                         }
 
-                        javaTypeName = org.jomc.util.JavaTypeName.parse( typeName );
+                        javaTypeName = org.jomc.jls.JavaTypeName.parse( typeName );
                     }
                 }
             }
@@ -5650,7 +5650,7 @@
         {
             try
             {
-                final org.jomc.util.JavaTypeName javaTypeName = org.jomc.util.JavaTypeName.parse( identifier );
+                final org.jomc.jls.JavaTypeName javaTypeName = org.jomc.jls.JavaTypeName.parse( identifier );
                 final Class<?> classpathSpec = javaTypeName.getClass( classLoader, false );
 
                 if ( java.lang.reflect.Modifier.isPublic( classpathSpec.getModifiers() ) )
@@ -5714,8 +5714,8 @@
 
             try
             {
-                final org.jomc.util.JavaTypeName javaTypeName =
-                    org.jomc.util.JavaTypeName.parse( specification.getClazz() );
+                final org.jomc.jls.JavaTypeName javaTypeName =
+                    org.jomc.jls.JavaTypeName.parse( specification.getClazz() );
 
                 final Class<?> classpathImpl = javaTypeName.getClass( classLoader, false );
 

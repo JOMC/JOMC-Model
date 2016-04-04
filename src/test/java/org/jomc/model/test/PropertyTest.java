@@ -34,7 +34,7 @@ import java.lang.reflect.InvocationTargetException;
 import org.jomc.model.ModelObjectException;
 import org.jomc.model.Property;
 import org.jomc.model.PropertyException;
-import org.jomc.util.JavaIdentifier;
+import org.jomc.jls.JavaIdentifier;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

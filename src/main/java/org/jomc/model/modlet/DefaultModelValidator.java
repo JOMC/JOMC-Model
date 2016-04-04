@@ -72,7 +72,7 @@ import org.jomc.modlet.ModelContext;
 import org.jomc.modlet.ModelException;
 import org.jomc.modlet.ModelValidationReport;
 import org.jomc.modlet.ModelValidator;
-import org.jomc.util.JavaIdentifier;
+import org.jomc.jls.JavaIdentifier;
 import org.jomc.util.ParseException;
 import org.jomc.util.TokenMgrError;
 import org.jomc.util.VersionParser;

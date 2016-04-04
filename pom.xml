@@ -40,7 +40,7 @@
   <artifactId>jomc-model</artifactId>
   <name>JOMC ⁑ Model</name>
   <description>Object management and configuration model.</description>
-  <url>${jomc.artifacts.url}/${project.artifactId}-${project.version}</url>
+  <url>${jomc.base.url}/${jomc.site.location}/${project.artifactId}-${project.version}</url>
   <build>
     <resources>
       <resource>
@@ -235,7 +235,7 @@
                 <includes>*.xsd</includes>
                 <serverId>${jomc.xml.distribution.id}</serverId>
                 <toDir>model</toDir>
-                <url>${jomc.xml.distribution.url}</url>
+                <url>${jomc.xml.distribution.base.url}</url>
               </configuration>
             </execution>
           </executions>
@@ -305,6 +305,11 @@
   <dependencies>
     <dependency>
       <groupId>org.jomc</groupId>
+      <artifactId>jomc-jls</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jomc</groupId>
       <artifactId>jomc-util</artifactId>
       <scope>compile</scope>
     </dependency>
@@ -321,9 +326,9 @@
   </dependencies>
   <distributionManagement>
     <site>
-      <id>${jomc.artifacts.distribution.id}</id>
-      <name>${jomc.artifacts.distribution.name}</name>
-      <url>${jomc.artifacts.distribution.url}/${project.artifactId}-${project.version}</url>
+      <id>${jomc.site.distribution.id}</id>
+      <name>${jomc.site.distribution.name}</name>
+      <url>${jomc.site.distribution.base.url}/${jomc.site.location}/${project.artifactId}-${project.version}</url>
     </site>
   </distributionManagement>
   <profiles>
