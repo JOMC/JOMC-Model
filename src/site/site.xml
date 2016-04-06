@@ -34,6 +34,11 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/DECORATION/1.3.0 http://maven.apache.org/xsd/decoration-1.3.0.xsd">
   <body>
+    <menu name="Model" inherit="top">
+      <item name="Home" href="${project.url}/index.html"/>
+      <item name="Download" href="http://repo.maven.apache.org/maven2/org/jomc/jomc-model/"/>
+      <item name="Issues" href="http://www.jomc.org/project/issues"/>
+    </menu>
     <menu name="Reference">
       <item name="System Properties" href="system-properties.html"/>
       <item name="Model Context Attributes" href="model-context-attributes.html"/>
