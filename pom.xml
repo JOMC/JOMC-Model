@@ -312,13 +312,13 @@
     <dependency>
       <groupId>org.jomc</groupId>
       <artifactId>jomc-jls</artifactId>
-      <version>1.7.1-SNAPSHOT</version>
+      <version>1.7.0</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.jomc</groupId>
       <artifactId>jomc-util</artifactId>
-      <version>1.10-SNAPSHOT</version>
+      <version>1.9</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
