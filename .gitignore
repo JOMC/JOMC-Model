@@ -7,3 +7,4 @@
 /catalog.xml
 /maven-eclipse.xml
 /.settings
+/.travis.yml
