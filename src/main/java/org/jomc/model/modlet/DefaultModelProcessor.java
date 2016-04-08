@@ -84,13 +84,6 @@ public class DefaultModelProcessor implements ModelProcessor
         "org.jomc.model.modlet.DefaultModelProcessor.defaultEnabled";
 
     /**
-     * Constant for the name of the deprecated system property controlling property {@code defaultEnabled}.
-     * @see #isDefaultEnabled()
-     */
-    private static final String DEPRECATED_DEFAULT_ENABLED_PROPERTY_NAME =
-        "org.jomc.model.DefaultModelProcessor.defaultEnabled";
-
-    /**
      * Default value of the flag indicating the processor is enabled by default.
      *
      * @see #isDefaultEnabled()
@@ -125,13 +118,6 @@ public class DefaultModelProcessor implements ModelProcessor
      */
     private static final String DEFAULT_TRANSFORMER_LOCATION_PROPERTY_NAME =
         "org.jomc.model.modlet.DefaultModelProcessor.defaultTransformerLocation";
-
-    /**
-     * Constant for the name of the deprecated system property controlling property {@code defaultTransformerLocation}.
-     * @see #getDefaultTransformerLocation()
-     */
-    private static final String DEPRECATED_DEFAULT_TRANSFORMER_LOCATION_PROPERTY_NAME =
-        "org.jomc.model.DefaultModelProcessor.defaultTransformerLocation";
 
     /**
      * Class path location searched for transformers by default.
@@ -175,10 +161,8 @@ public class DefaultModelProcessor implements ModelProcessor
     {
         if ( defaultEnabled == null )
         {
-            defaultEnabled =
-                Boolean.valueOf( System.getProperty( DEFAULT_ENABLED_PROPERTY_NAME,
-                                                     System.getProperty( DEPRECATED_DEFAULT_ENABLED_PROPERTY_NAME,
-                                                                         Boolean.toString( DEFAULT_ENABLED ) ) ) );
+            defaultEnabled = Boolean.valueOf( System.getProperty( DEFAULT_ENABLED_PROPERTY_NAME,
+                                                                  Boolean.toString( DEFAULT_ENABLED ) ) );
 
         }
 
@@ -245,9 +229,7 @@ public class DefaultModelProcessor implements ModelProcessor
         if ( defaultTransformerLocation == null )
         {
             defaultTransformerLocation =
-                System.getProperty( DEFAULT_TRANSFORMER_LOCATION_PROPERTY_NAME,
-                                    System.getProperty( DEPRECATED_DEFAULT_TRANSFORMER_LOCATION_PROPERTY_NAME,
-                                                        DEFAULT_TRANSFORMER_LOCATION ) );
+                System.getProperty( DEFAULT_TRANSFORMER_LOCATION_PROPERTY_NAME, DEFAULT_TRANSFORMER_LOCATION );
 
         }
 

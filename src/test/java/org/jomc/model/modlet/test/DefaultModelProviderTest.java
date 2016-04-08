@@ -190,15 +190,7 @@ public class DefaultModelProviderTest
     @Test
     public final void testDefaultEnabled() throws Exception
     {
-        System.clearProperty( "org.jomc.model.DefaultModelProvider.defaultEnabled" );
         System.clearProperty( "org.jomc.model.modlet.DefaultModelProvider.defaultEnabled" );
-        DefaultModelProvider.setDefaultEnabled( null );
-        assertTrue( DefaultModelProvider.isDefaultEnabled() );
-
-        System.setProperty( "org.jomc.model.DefaultModelProvider.defaultEnabled", Boolean.toString( false ) );
-        DefaultModelProvider.setDefaultEnabled( null );
-        assertFalse( DefaultModelProvider.isDefaultEnabled() );
-        System.clearProperty( "org.jomc.model.DefaultModelProvider.defaultEnabled" );
         DefaultModelProvider.setDefaultEnabled( null );
         assertTrue( DefaultModelProvider.isDefaultEnabled() );
 
@@ -206,17 +198,6 @@ public class DefaultModelProviderTest
         DefaultModelProvider.setDefaultEnabled( null );
         assertFalse( DefaultModelProvider.isDefaultEnabled() );
         System.clearProperty( "org.jomc.model.modlet.DefaultModelProvider.defaultEnabled" );
-        DefaultModelProvider.setDefaultEnabled( null );
-        assertTrue( DefaultModelProvider.isDefaultEnabled() );
-
-        System.setProperty( "org.jomc.model.DefaultModelProvider.defaultEnabled", Boolean.toString( true ) );
-        System.setProperty( "org.jomc.model.modlet.DefaultModelProvider.defaultEnabled", Boolean.toString( false ) );
-        DefaultModelProvider.setDefaultEnabled( null );
-        assertFalse( DefaultModelProvider.isDefaultEnabled() );
-        System.clearProperty( "org.jomc.model.modlet.DefaultModelProvider.defaultEnabled" );
-        DefaultModelProvider.setDefaultEnabled( null );
-        assertTrue( DefaultModelProvider.isDefaultEnabled() );
-        System.clearProperty( "org.jomc.model.DefaultModelProvider.defaultEnabled" );
         DefaultModelProvider.setDefaultEnabled( null );
         assertTrue( DefaultModelProvider.isDefaultEnabled() );
     }
@@ -244,15 +225,7 @@ public class DefaultModelProviderTest
     @Test
     public final void testDefaultModuleLocation() throws Exception
     {
-        System.clearProperty( "org.jomc.model.DefaultModelProvider.defaultModuleLocation" );
         System.clearProperty( "org.jomc.model.modlet.DefaultModelProvider.defaultModuleLocation" );
-        DefaultModelProvider.setDefaultModuleLocation( null );
-        assertEquals( "META-INF/jomc.xml", DefaultModelProvider.getDefaultModuleLocation() );
-
-        System.setProperty( "org.jomc.model.DefaultModelProvider.defaultModuleLocation", "TEST" );
-        DefaultModelProvider.setDefaultModuleLocation( null );
-        assertEquals( "TEST", DefaultModelProvider.getDefaultModuleLocation() );
-        System.clearProperty( "org.jomc.model.DefaultModelProvider.defaultModuleLocation" );
         DefaultModelProvider.setDefaultModuleLocation( null );
         assertEquals( "META-INF/jomc.xml", DefaultModelProvider.getDefaultModuleLocation() );
 
@@ -260,17 +233,6 @@ public class DefaultModelProviderTest
         DefaultModelProvider.setDefaultModuleLocation( null );
         assertEquals( "TEST", DefaultModelProvider.getDefaultModuleLocation() );
         System.clearProperty( "org.jomc.model.modlet.DefaultModelProvider.defaultModuleLocation" );
-        DefaultModelProvider.setDefaultModuleLocation( null );
-        assertEquals( "META-INF/jomc.xml", DefaultModelProvider.getDefaultModuleLocation() );
-
-        System.setProperty( "org.jomc.model.DefaultModelProvider.defaultModuleLocation", "DEPRECATED" );
-        System.setProperty( "org.jomc.model.modlet.DefaultModelProvider.defaultModuleLocation", "TEST" );
-        DefaultModelProvider.setDefaultModuleLocation( null );
-        assertEquals( "TEST", DefaultModelProvider.getDefaultModuleLocation() );
-        System.clearProperty( "org.jomc.model.modlet.DefaultModelProvider.defaultModuleLocation" );
-        DefaultModelProvider.setDefaultModuleLocation( null );
-        assertEquals( "DEPRECATED", DefaultModelProvider.getDefaultModuleLocation() );
-        System.clearProperty( "org.jomc.model.DefaultModelProvider.defaultModuleLocation" );
         DefaultModelProvider.setDefaultModuleLocation( null );
         assertEquals( "META-INF/jomc.xml", DefaultModelProvider.getDefaultModuleLocation() );
     }
