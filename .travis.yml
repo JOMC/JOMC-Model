@@ -1,7 +1,6 @@
 language: java
 branches:
   only:
-  - master
   - jomc-model-1.x
 jdk:
   - openjdk7
