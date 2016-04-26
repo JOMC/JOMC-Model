@@ -203,14 +203,13 @@
                 final StringBuilder builder = new StringBuilder( this.getValue().length() );
                 final boolean escapeHtml = !this.getMimeType().match( "text/html" );
 
-                String line;
-                while ( ( line = reader.readLine() ) != null )
+                for ( String line = reader.readLine(); line != null; line = reader.readLine() )
                 {
                     if ( escapeHtml )
                     {
                         builder.append( lineSeparator ).append( indentation ).append( " * " ).
                             append( line.replace( "&", "&amp;" ).replace( "<", "&lt;" ).replace( ">", "&gt;" ).
-                            replace( "\"", "&quot;" ).replace( "*", "&lowast;" ) );
+                                replace( "\"", "&quot;" ).replace( "*", "&lowast;" ) );
 
                     }
                     else
@@ -2520,21 +2519,22 @@
         final Text text = this.getTemplate().getText( locale.getLanguage().toLowerCase( Locale.ENGLISH ) );
         final StringBuilder builder = new StringBuilder( text.getValue().length() );
         String pattern = null;
+        java.io.BufferedReader reader = null;
 
         try
         {
-            final java.io.BufferedReader reader =
-                new java.io.BufferedReader( new java.io.StringReader( text.getValue() ) );
+            reader = new java.io.BufferedReader( new java.io.StringReader( text.getValue() ) );
 
-            String line;
-            while ( ( line = reader.readLine() ) != null )
+            for ( String line = reader.readLine(); line != null; line = reader.readLine() )
             {
                 builder.append( LINE_SEPARATOR ).append( line );
             }
 
+            reader.close();
+            reader = null;
+
             pattern = builder.length() > 0 ? builder.substring( LINE_SEPARATOR.length() ) : builder.toString();
             return new java.text.MessageFormat( pattern, locale );
-
         }
         catch ( final IllegalArgumentException e )
         {
@@ -2543,6 +2543,20 @@
         catch ( final java.io.IOException e )
         {
             throw new AssertionError( e );
+        }
+        finally
+        {
+            try
+            {
+                if ( reader != null )
+                {
+                    reader.close();
+                }
+            }
+            catch ( final java.io.IOException e )
+            {
+                throw new AssertionError( e );
+            }
         }
     }
 
