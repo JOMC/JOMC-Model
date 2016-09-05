@@ -30,6 +30,8 @@
  */
 package org.jomc.model.modlet.test;
 
+import java.util.concurrent.ExecutorService;
+import java.util.logging.Level;
 import org.jomc.model.ModelObject;
 import org.jomc.model.Modules;
 import org.jomc.model.modlet.DefaultModelProcessor;
@@ -37,6 +39,8 @@ import org.jomc.model.modlet.ModelHelper;
 import org.jomc.modlet.Model;
 import org.jomc.modlet.ModelContext;
 import org.jomc.modlet.ModelContextFactory;
+import org.jomc.modlet.ModelException;
+import org.junit.After;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -57,7 +61,21 @@ public class DefaultModelProcessorTest
     /**
      * The {@code DefaultModelProcessor} instance tests are performed with.
      */
-    private DefaultModelProcessor defaultModelProcessor;
+    private volatile DefaultModelProcessor defaultModelProcessor;
+
+    /**
+     * The {@code ModelContext} instance tests are performed with.
+     *
+     * @since 1.10
+     */
+    private volatile ModelContext modelContext;
+
+    /**
+     * The {@code ExecutorService} backing the tests.
+     *
+     * @since 1.10
+     */
+    private volatile ExecutorService executorService;
 
     /**
      * Creates a new {@code DefaultModelProcessorTest} instance.
@@ -65,6 +83,96 @@ public class DefaultModelProcessorTest
     public DefaultModelProcessorTest()
     {
         super();
+    }
+
+    /**
+     * Gets the {@code ModelContext} instance tests are performed with.
+     *
+     * @return The {@code ModelContext} instance tests are performed with.
+     *
+     * @throws ModelException if creating a new instance fails.
+     *
+     * @see #newModelContext()
+     * @since 1.10
+     */
+    public ModelContext getModelContext() throws ModelException
+    {
+        if ( this.modelContext == null )
+        {
+            this.modelContext = this.newModelContext();
+            this.modelContext.setExecutorService( this.getExecutorService() );
+            this.modelContext.getListeners().add( new ModelContext.Listener()
+            {
+
+                @Override
+                public void onLog( final Level level, final String message, final Throwable t )
+                {
+                    super.onLog( level, message, t );
+                    System.out.println( "[" + level.getLocalizedName() + "] " + message );
+                }
+
+            } );
+
+        }
+
+        return this.modelContext;
+    }
+
+    /**
+     * Creates a new {@code ModelContext} instance to test.
+     *
+     * @return A new {@code ModelContext} instance to test.
+     *
+     * @see #getModelContext()
+     * @since 1.10
+     */
+    protected ModelContext newModelContext()
+    {
+        return ModelContextFactory.newInstance().newModelContext();
+    }
+
+    /**
+     * Gets the {@code ExecutorService} backing the tests.
+     *
+     * @return The {@code ExecutorService} backing the tests.
+     *
+     * @see #newExecutorService()
+     * @since 1.10
+     */
+    public final ExecutorService getExecutorService()
+    {
+        if ( this.executorService == null )
+        {
+            this.executorService = this.newExecutorService();
+        }
+
+        return this.executorService;
+    }
+
+    /**
+     * Creates a new {@code ExecutorService} backing the tests.
+     *
+     * @return A new {@code ExecutorService} backing the tests, or {@code null}.
+     *
+     * @see #getExecutorService()
+     * @since 1.10
+     */
+    protected ExecutorService newExecutorService()
+    {
+        return null;
+    }
+
+    /**
+     * Shuts down the {@code ExecutorService} backing the tests, if not {@code null}.
+     */
+    @After
+    public final void shutdown()
+    {
+        if ( this.executorService != null )
+        {
+            this.executorService.shutdown();
+            this.executorService = null;
+        }
     }
 
     /**
@@ -99,11 +207,9 @@ public class DefaultModelProcessorTest
     @Test
     public final void testFindTransformers() throws Exception
     {
-        final ModelContext context = ModelContextFactory.newInstance().newModelContext();
-
         try
         {
-            this.getModelProcessor().findTransformers( context, null );
+            this.getModelProcessor().findTransformers( this.getModelContext(), null );
             fail( "Expected NullPointerException not thrown." );
         }
         catch ( final NullPointerException e )
@@ -126,16 +232,16 @@ public class DefaultModelProcessorTest
         DefaultModelProcessor.setDefaultTransformerLocation( null );
         this.getModelProcessor().setTransformerLocation( null );
         assertEquals( 1, this.getModelProcessor().findTransformers(
-                      context, DefaultModelProcessor.getDefaultTransformerLocation() ).size() );
+                      this.getModelContext(), DefaultModelProcessor.getDefaultTransformerLocation() ).size() );
 
         DefaultModelProcessor.setDefaultTransformerLocation( "DOES_NOT_EXIST" );
         this.getModelProcessor().setTransformerLocation( "DOES_NOT_EXIST" );
 
         assertNull( this.getModelProcessor().findTransformers(
-            context, DefaultModelProcessor.getDefaultTransformerLocation() ) );
+            this.getModelContext(), DefaultModelProcessor.getDefaultTransformerLocation() ) );
 
         assertNull( this.getModelProcessor().findTransformers(
-            context, this.getModelProcessor().getTransformerLocation() ) );
+            this.getModelContext(), this.getModelProcessor().getTransformerLocation() ) );
 
         DefaultModelProcessor.setDefaultTransformerLocation( null );
         this.getModelProcessor().setTransformerLocation( null );
@@ -144,7 +250,6 @@ public class DefaultModelProcessorTest
     @Test
     public final void testProcessModel() throws Exception
     {
-        final ModelContext context = ModelContextFactory.newInstance().newModelContext();
         final Model model = new Model();
         model.setIdentifier( ModelObject.MODEL_PUBLIC_ID );
 
@@ -161,7 +266,7 @@ public class DefaultModelProcessorTest
 
         try
         {
-            this.getModelProcessor().processModel( context, null );
+            this.getModelProcessor().processModel( this.getModelContext(), null );
             fail( "Expected NullPointerException not thrown." );
         }
         catch ( final NullPointerException e )
@@ -170,12 +275,12 @@ public class DefaultModelProcessorTest
             System.out.println( e.toString() );
         }
 
-        assertNotNull( this.getModelProcessor().processModel( context, model ) );
+        assertNotNull( this.getModelProcessor().processModel( this.getModelContext(), model ) );
 
         this.getModelProcessor().setTransformerLocation(
             this.getClass().getPackage().getName().replace( '.', '/' ) + "/system-property-test.xsl" );
 
-        final Model processedSystemProperty = this.getModelProcessor().processModel( context, model );
+        final Model processedSystemProperty = this.getModelProcessor().processModel( this.getModelContext(), model );
         assertNotNull( processedSystemProperty );
 
         final Modules processedSystemPropertyModules = ModelHelper.getModules( processedSystemProperty );
@@ -185,7 +290,7 @@ public class DefaultModelProcessorTest
         this.getModelProcessor().setTransformerLocation(
             this.getClass().getPackage().getName().replace( '.', '/' ) + "/relative-uri-test.xsl" );
 
-        final Model processedRelativeUri = this.getModelProcessor().processModel( context, model );
+        final Model processedRelativeUri = this.getModelProcessor().processModel( this.getModelContext(), model );
         assertNotNull( processedRelativeUri );
 
         final Modules processedRelativeUriModules = ModelHelper.getModules( processedRelativeUri );

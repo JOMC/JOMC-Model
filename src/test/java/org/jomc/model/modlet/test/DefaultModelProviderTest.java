@@ -30,11 +30,15 @@
  */
 package org.jomc.model.modlet.test;
 
+import java.util.concurrent.ExecutorService;
+import java.util.logging.Level;
 import org.jomc.model.ModelObject;
 import org.jomc.model.modlet.DefaultModelProvider;
 import org.jomc.modlet.Model;
 import org.jomc.modlet.ModelContext;
 import org.jomc.modlet.ModelContextFactory;
+import org.jomc.modlet.ModelException;
+import org.junit.After;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -55,7 +59,21 @@ public class DefaultModelProviderTest
     /**
      * The {@code DefaultModelProvider} instance tests are performed with.
      */
-    private DefaultModelProvider defaultModelProvider;
+    private volatile DefaultModelProvider defaultModelProvider;
+
+    /**
+     * The {@code ModelContext} instance tests are performed with.
+     *
+     * @since 1.10
+     */
+    private volatile ModelContext modelContext;
+
+    /**
+     * The {@code ExecutorService} backing the tests.
+     *
+     * @since 1.10
+     */
+    private volatile ExecutorService executorService;
 
     /**
      * Creates a new {@code DefaultModelProviderTest} instance.
@@ -63,6 +81,96 @@ public class DefaultModelProviderTest
     public DefaultModelProviderTest()
     {
         super();
+    }
+
+    /**
+     * Gets the {@code ModelContext} instance tests are performed with.
+     *
+     * @return The {@code ModelContext} instance tests are performed with.
+     *
+     * @throws ModelException if creating a new instance fails.
+     *
+     * @see #newModelContext()
+     * @since 1.10
+     */
+    public ModelContext getModelContext() throws ModelException
+    {
+        if ( this.modelContext == null )
+        {
+            this.modelContext = this.newModelContext();
+            this.modelContext.setExecutorService( this.getExecutorService() );
+            this.modelContext.getListeners().add( new ModelContext.Listener()
+            {
+
+                @Override
+                public void onLog( final Level level, final String message, final Throwable t )
+                {
+                    super.onLog( level, message, t );
+                    System.out.println( "[" + level.getLocalizedName() + "] " + message );
+                }
+
+            } );
+
+        }
+
+        return this.modelContext;
+    }
+
+    /**
+     * Creates a new {@code ModelContext} instance to test.
+     *
+     * @return A new {@code ModelContext} instance to test.
+     *
+     * @see #getModelContext()
+     * @since 1.10
+     */
+    protected ModelContext newModelContext()
+    {
+        return ModelContextFactory.newInstance().newModelContext();
+    }
+
+    /**
+     * Gets the {@code ExecutorService} backing the tests.
+     *
+     * @return The {@code ExecutorService} backing the tests.
+     *
+     * @see #newExecutorService()
+     * @since 1.10
+     */
+    public final ExecutorService getExecutorService()
+    {
+        if ( this.executorService == null )
+        {
+            this.executorService = this.newExecutorService();
+        }
+
+        return this.executorService;
+    }
+
+    /**
+     * Creates a new {@code ExecutorService} backing the tests.
+     *
+     * @return A new {@code ExecutorService} backing the tests, or {@code null}.
+     *
+     * @see #getExecutorService()
+     * @since 1.10
+     */
+    protected ExecutorService newExecutorService()
+    {
+        return null;
+    }
+
+    /**
+     * Shuts down the {@code ExecutorService} backing the tests, if not {@code null}.
+     */
+    @After
+    public final void shutdown()
+    {
+        if ( this.executorService != null )
+        {
+            this.executorService.shutdown();
+            this.executorService = null;
+        }
     }
 
     /**
@@ -97,8 +205,6 @@ public class DefaultModelProviderTest
     @Test
     public final void testFindModules() throws Exception
     {
-        final ModelContext context = ModelContextFactory.newInstance().newModelContext();
-
         try
         {
             this.getModelProvider().findModules( null, null, null );
@@ -112,7 +218,7 @@ public class DefaultModelProviderTest
 
         try
         {
-            this.getModelProvider().findModules( context, null, null );
+            this.getModelProvider().findModules( this.getModelContext(), null, null );
             fail( "Expected NullPointerException not thrown." );
         }
         catch ( final NullPointerException e )
@@ -123,7 +229,7 @@ public class DefaultModelProviderTest
 
         try
         {
-            this.getModelProvider().findModules( context, "TEST", null );
+            this.getModelProvider().findModules( this.getModelContext(), "TEST", null );
             fail( "Expected NullPointerException not thrown." );
         }
         catch ( final NullPointerException e )
@@ -135,21 +241,21 @@ public class DefaultModelProviderTest
         DefaultModelProvider.setDefaultModuleLocation( null );
         this.getModelProvider().setModuleLocation( null );
         assertEquals( 1, this.getModelProvider().findModules(
-                      context, ModelObject.MODEL_PUBLIC_ID, DefaultModelProvider.getDefaultModuleLocation() ).
-                      getModule().size() );
+                      this.getModelContext(), ModelObject.MODEL_PUBLIC_ID,
+                      DefaultModelProvider.getDefaultModuleLocation() ).getModule().size() );
 
         assertEquals( 1, this.getModelProvider().findModules(
-                      context, ModelObject.MODEL_PUBLIC_ID, this.getModelProvider().getModuleLocation() ).getModule().
-                      size() );
+                      this.getModelContext(), ModelObject.MODEL_PUBLIC_ID, this.getModelProvider().
+                      getModuleLocation() ).getModule().size() );
 
         DefaultModelProvider.setDefaultModuleLocation( "DOES_NOT_EXIST" );
         this.getModelProvider().setModuleLocation( "DOES_NOT_EXIST" );
 
         assertNull( this.getModelProvider().findModules(
-            context, ModelObject.MODEL_PUBLIC_ID, DefaultModelProvider.getDefaultModuleLocation() ) );
+            this.getModelContext(), ModelObject.MODEL_PUBLIC_ID, DefaultModelProvider.getDefaultModuleLocation() ) );
 
         assertNull( this.getModelProvider().findModules(
-            context, ModelObject.MODEL_PUBLIC_ID, this.getModelProvider().getModuleLocation() ) );
+            this.getModelContext(), ModelObject.MODEL_PUBLIC_ID, this.getModelProvider().getModuleLocation() ) );
 
         DefaultModelProvider.setDefaultModuleLocation( null );
         this.getModelProvider().setModuleLocation( null );
@@ -158,7 +264,6 @@ public class DefaultModelProviderTest
     @Test
     public final void testFindModel() throws Exception
     {
-        final ModelContext context = ModelContextFactory.newInstance().newModelContext();
         final Model model = new Model();
         model.setIdentifier( ModelObject.MODEL_PUBLIC_ID );
 
@@ -175,7 +280,7 @@ public class DefaultModelProviderTest
 
         try
         {
-            this.getModelProvider().findModel( context, null );
+            this.getModelProvider().findModel( this.getModelContext(), null );
             fail( "Expected NullPointerException not thrown." );
         }
         catch ( final NullPointerException e )
@@ -184,7 +289,7 @@ public class DefaultModelProviderTest
             System.out.println( e.toString() );
         }
 
-        assertNotNull( this.getModelProvider().findModel( context, model ) );
+        assertNotNull( this.getModelProvider().findModel( this.getModelContext(), model ) );
     }
 
     @Test
