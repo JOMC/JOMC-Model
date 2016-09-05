@@ -497,6 +497,7 @@ public class DefaultModelProvider implements ModelProvider
                         {
                             u = context.createUnmarshaller( model );
                             u.setSchema( schema );
+                            threadLocalUnmarshaller.set( u );
                         }
 
                         Object content = u.unmarshal( this.resource );
