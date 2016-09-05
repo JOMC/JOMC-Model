@@ -30,16 +30,24 @@
  */
 package org.jomc.model.modlet;
 
+import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.Enumeration;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.logging.Level;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.UnmarshalException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.validation.Schema;
 import org.jomc.model.Module;
 import org.jomc.model.Modules;
 import org.jomc.model.Text;
@@ -438,8 +446,6 @@ public class DefaultModelProvider implements ModelProvider
             throw new NullPointerException( "location" );
         }
 
-        URL url = null;
-
         try
         {
             boolean contextValidating = this.isValidating();
@@ -459,49 +465,129 @@ public class DefaultModelProvider implements ModelProvider
             modules.getDocumentation().setDefaultLanguage( "en" );
             modules.getDocumentation().getText().add( text );
 
-            final Unmarshaller u = context.createUnmarshaller( model );
+            final ThreadLocal<Unmarshaller> threadLocalUnmarshaller = new ThreadLocal<Unmarshaller>();
+            final Schema schema = contextValidating ? context.createSchema( model ) : null;
+
+            class UnmarshallTask implements Callable<Module>
+            {
+
+                private final URL resource;
+
+                UnmarshallTask( final URL resource )
+                {
+                    super();
+                    this.resource = resource;
+                }
+
+                public Module call() throws ModelException
+                {
+                    try
+                    {
+                        Module module = null;
+
+                        if ( context.isLoggable( Level.FINEST ) )
+                        {
+                            context.log( Level.FINEST, getMessage( "processing", this.resource.toExternalForm() ),
+                                         null );
+
+                        }
+
+                        Unmarshaller u = threadLocalUnmarshaller.get();
+                        if ( u == null )
+                        {
+                            u = context.createUnmarshaller( model );
+                            u.setSchema( schema );
+                        }
+
+                        Object content = u.unmarshal( this.resource );
+                        if ( content instanceof JAXBElement<?> )
+                        {
+                            content = ( (JAXBElement<?>) content ).getValue();
+                        }
+
+                        if ( content instanceof Module )
+                        {
+                            final Module m = (Module) content;
+
+                            if ( context.isLoggable( Level.FINEST ) )
+                            {
+                                context.log( Level.FINEST, getMessage(
+                                             "foundModule", m.getName(), m.getVersion() == null ? "" : m.getVersion() ),
+                                             null );
+
+                            }
+
+                            module = m;
+                        }
+                        else if ( context.isLoggable( Level.WARNING ) )
+                        {
+                            context.log( Level.WARNING, getMessage( "ignoringDocument",
+                                                                    content == null ? "<>" : content.toString(),
+                                                                    this.resource.toExternalForm() ), null );
+
+                        }
+
+                        return module;
+                    }
+                    catch ( final UnmarshalException e )
+                    {
+                        String message = getMessage( e );
+                        if ( message == null && e.getLinkedException() != null )
+                        {
+                            message = getMessage( e.getLinkedException() );
+                        }
+
+                        message = getMessage( "unmarshalException", this.resource.toExternalForm(),
+                                              message != null ? " " + message : "" );
+
+                        throw new ModelException( message, e );
+                    }
+                    catch ( final JAXBException e )
+                    {
+                        String message = getMessage( e );
+                        if ( message == null && e.getLinkedException() != null )
+                        {
+                            message = getMessage( e.getLinkedException() );
+                        }
+
+                        throw new ModelException( message, e );
+                    }
+                }
+
+            }
+
+            final List<UnmarshallTask> tasks = new LinkedList<UnmarshallTask>();
             final Enumeration<URL> resources = context.findResources( location );
 
-            if ( contextValidating )
+            while ( resources.hasMoreElements() )
             {
-                u.setSchema( context.createSchema( model ) );
+                tasks.add( new UnmarshallTask( resources.nextElement() ) );
             }
 
             int count = 0;
-            while ( resources.hasMoreElements() )
+            if ( context.getExecutorService() != null && tasks.size() > 1 )
             {
-                count++;
-                url = resources.nextElement();
-
-                if ( context.isLoggable( Level.FINEST ) )
+                for ( final Future<Module> task : context.getExecutorService().invokeAll( tasks ) )
                 {
-                    context.log( Level.FINEST, getMessage( "processing", url.toExternalForm() ), null );
-                }
+                    final Module m = task.get();
 
-                Object content = u.unmarshal( url );
-                if ( content instanceof JAXBElement<?> )
-                {
-                    content = ( (JAXBElement<?>) content ).getValue();
-                }
-
-                if ( content instanceof Module )
-                {
-                    final Module m = (Module) content;
-                    if ( context.isLoggable( Level.FINEST ) )
+                    if ( m != null )
                     {
-                        context.log( Level.FINEST, getMessage(
-                                     "foundModule", m.getName(), m.getVersion() == null ? "" : m.getVersion() ), null );
-
+                        modules.getModule().add( m );
+                        count++;
                     }
-
-                    modules.getModule().add( m );
                 }
-                else if ( context.isLoggable( Level.WARNING ) )
+            }
+            else
+            {
+                for ( final UnmarshallTask task : tasks )
                 {
-                    context.log( Level.WARNING, getMessage( "ignoringDocument",
-                                                            content == null ? "<>" : content.toString(),
-                                                            url.toExternalForm() ), null );
-
+                    final Module m = task.call();
+                    if ( m != null )
+                    {
+                        modules.getModule().add( m );
+                        count++;
+                    }
                 }
             }
 
@@ -512,32 +598,55 @@ public class DefaultModelProvider implements ModelProvider
 
             return modules.getModule().isEmpty() ? null : modules;
         }
-        catch ( final UnmarshalException e )
+        catch ( final CancellationException e )
         {
-            String message = getMessage( e );
-            if ( message == null && e.getLinkedException() != null )
-            {
-                message = getMessage( e.getLinkedException() );
-            }
-
-            if ( url != null )
-            {
-                message = getMessage( "unmarshalException", url.toExternalForm(),
-                                      message != null ? " " + message : "" );
-
-            }
-
-            throw new ModelException( message, e );
+            throw new ModelException( getMessage( e ), e );
         }
-        catch ( final JAXBException e )
+        catch ( final InterruptedException e )
         {
-            String message = getMessage( e );
-            if ( message == null && e.getLinkedException() != null )
+            throw new ModelException( getMessage( e ), e );
+        }
+        catch ( final ExecutionException e )
+        {
+            if ( e.getCause() instanceof ModelException )
             {
-                message = getMessage( e.getLinkedException() );
+                throw (ModelException) e.getCause();
             }
-
-            throw new ModelException( message, e );
+            else if ( e.getCause() instanceof RuntimeException )
+            {
+                // The fork-join framework breaks the exception handling contract of Callable by re-throwing any
+                // exception caught using a runtime exception.
+                if ( e.getCause().getCause() instanceof ModelException )
+                {
+                    throw (ModelException) e.getCause().getCause();
+                }
+                else if ( e.getCause().getCause() instanceof RuntimeException )
+                {
+                    throw (RuntimeException) e.getCause().getCause();
+                }
+                else if ( e.getCause().getCause() instanceof Error )
+                {
+                    throw (Error) e.getCause().getCause();
+                }
+                else if ( e.getCause().getCause() instanceof Exception )
+                {
+                    // Checked exception not declared to be thrown by the Callable's 'call' method.
+                    throw new UndeclaredThrowableException( e.getCause().getCause() );
+                }
+                else
+                {
+                    throw (RuntimeException) e.getCause();
+                }
+            }
+            else if ( e.getCause() instanceof Error )
+            {
+                throw (Error) e.getCause();
+            }
+            else
+            {
+                // Checked exception not declared to be thrown by the Callable's 'call' method.
+                throw new UndeclaredThrowableException( e.getCause() );
+            }
         }
     }
 
