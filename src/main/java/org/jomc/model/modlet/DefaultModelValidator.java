@@ -1509,7 +1509,7 @@ public class DefaultModelValidator implements ModelValidator
                     catch ( final Exception e )
                     {
                         // None of the callables has declared to throw an exception.
-                        throw new AssertionError( e );
+                        throw new UndeclaredThrowableException( e );
                     }
                 }
             }
@@ -4543,9 +4543,7 @@ public class DefaultModelValidator implements ModelValidator
     private static String getMessage( final String key, final Object... messageArguments )
     {
         return MessageFormat.format( ResourceBundle.getBundle(
-            DefaultModelValidator.class
-            .getName().replace( '.', '/' ),
-            Locale.getDefault() ).getString( key ), messageArguments );
+            DefaultModelValidator.class.getName(), Locale.getDefault() ).getString( key ), messageArguments );
 
     }
 
