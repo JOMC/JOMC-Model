@@ -318,7 +318,7 @@
     <dependency>
       <groupId>org.jomc</groupId>
       <artifactId>jomc-modlet</artifactId>
-      <version>1.9</version>
+      <version>1.10</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
