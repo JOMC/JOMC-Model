@@ -38,14 +38,14 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>jomc-model</artifactId>
-  <version>1.11-SNAPSHOT</version>
+  <version>1.10.1</version>
   <name>JOMC ⁑ Model</name>
   <description>Object management and configuration model.</description>
   <url>${jomc.base.url}/${jomc.site.location}</url>
   <scm>
-    <connection>${jomc.scm.connection}/trunk</connection>
-    <developerConnection>${jomc.scm.developerConnection}/trunk</developerConnection>
-    <url>${jomc.scm.url}/trunk</url>
+    <connection>${jomc.scm.connection}/tags/jomc-model-1.10.1</connection>
+    <developerConnection>${jomc.scm.developerConnection}/tags/jomc-model-1.10.1</developerConnection>
+    <url>${jomc.scm.url}/tags/jomc-model-1.10.1</url>
   </scm>
   <build>
     <resources>
