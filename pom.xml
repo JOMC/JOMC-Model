@@ -34,7 +34,7 @@
   <parent>
     <groupId>org.jomc</groupId>
     <artifactId>jomc-pom</artifactId>
-    <version>1.6</version>
+    <version>2.0.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>jomc-model</artifactId>
@@ -248,7 +248,7 @@
         </plugin>
         <plugin>
           <groupId>org.jvnet.jaxb2.maven2</groupId>
-          <artifactId>maven-jaxb21-plugin</artifactId>
+          <artifactId>maven-jaxb23-plugin</artifactId>
           <executions>
             <execution>
               <id>default-test-generate</id>
@@ -296,7 +296,7 @@
       </plugin>
       <plugin>
         <groupId>org.jvnet.jaxb2.maven2</groupId>
-        <artifactId>maven-jaxb21-plugin</artifactId>
+        <artifactId>maven-jaxb23-plugin</artifactId>
       </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
@@ -312,13 +312,13 @@
     <dependency>
       <groupId>org.jomc</groupId>
       <artifactId>jomc-jls</artifactId>
-      <version>1.7.0</version>
+      <version>11.7.0-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.jomc</groupId>
       <artifactId>jomc-util</artifactId>
-      <version>1.10</version>
+      <version>2.0.0-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -341,6 +341,9 @@
       <url>${jomc.site.distribution.base.url}/${jomc.site.location}</url>
     </site>
   </distributionManagement>
+  <properties>
+    <jomc.module.name>org.jomc.model</jomc.module.name>
+  </properties>
   <profiles>
     <profile>
       <id>jdk15</id>
@@ -371,6 +374,39 @@
           <groupId>com.sun.xml.bind</groupId>
           <artifactId>jaxb-impl</artifactId>
           <version>2.2.4-1</version>
+          <scope>runtime</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>jdk11</id>
+      <activation>
+        <jdk>11</jdk>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>jakarta.annotation</groupId>
+          <artifactId>jakarta.annotation-api</artifactId>
+          <version>1.3.5</version>
+          <scope>compile</scope>
+          <optional>true</optional>
+        </dependency>
+        <!-- dependency>
+          <groupId>jakarta.activation</groupId>
+          <artifactId>jakarta.activation-api</artifactId>
+          <version>1.2.2</version>
+          <scope>compile</scope>
+        </dependency -->
+        <dependency>
+          <groupId>jakarta.xml.bind</groupId>
+          <artifactId>jakarta.xml.bind-api</artifactId>
+          <version>2.3.3</version>
+          <scope>compile</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.glassfish.jaxb</groupId>
+          <artifactId>jaxb-runtime</artifactId>
+          <version>2.3.2</version>
           <scope>runtime</scope>
         </dependency>
       </dependencies>

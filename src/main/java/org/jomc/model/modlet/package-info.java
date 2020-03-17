@@ -1,5 +1,5 @@
 /*
- *   Copyright (C) Christian Schulte <cs@schulte.it>, 2005-206
+ *   Copyright (C) 2020 Christian Schulte <cs@schulte.it>
  *   All rights reserved.
  *
  *   Redistribution and use in source and binary forms, with or without
@@ -29,21 +29,23 @@
  *
  */
 /**
- * Object management and configuration model classes.
+ * Object management and configuration modlet classes.
  * <p>
- * This package contains reference model classes defined in the {@code http://jomc.org/model} XML namespace prepared
- * for use with JAXB 2.3.
+ * The object management and configuration model is identified by the {@code http://jomc.org/model} public id in
+ * a {@code ModelContext}. The {@code any} property of a {@code Model} instance searched using that public id will
+ * hold a {@code JAXBElement<Modules>} instance to access using the {@code getAnyElement} method of class {@code Model}.
+ * <blockquote><pre>
+ * final ModelContext modelContext = ModelContextFactory.newInstance().newModelContext( a class loader );
+ * final Model model = modelContext.findModel( ModelObject.MODEL_PUBLIC_ID );
+ * final Model processed = modelContext.processModel( model );
+ * final ModelValidationReport validationReport = modelContext.validateModel( processed );
+ * final Modules modules = ModelHelper.getModules( model );
+ *
+ * final Model model = new Model();
+ * model.setIdentifier( ModelObject.MODEL_PUBLIC_ID );
+ * ModelHelper.setModules( model, new Modules() );
+ * </pre></blockquote>
  * </p>
- * @see org.jomc.model.Modules
- * @see <a href="http://xml.jomc.org/model/jomc-1.2.xsd">jomc-1.2.xsd</a>
+ * @see org.jomc.model.modlet.ModelHelper
  */
-@XmlSchema( namespace = "http://jomc.org/model", elementFormDefault = XmlNsForm.QUALIFIED,
-            location = "http://xml.jomc.org/model/jomc-1.2.xsd", xmlns =
-            {
-                @XmlNs( prefix = "model", namespaceURI = "http://jomc.org/model" )
-    } )
-package org.jomc.model;
-
-import javax.xml.bind.annotation.XmlNs;
-import javax.xml.bind.annotation.XmlNsForm;
-import javax.xml.bind.annotation.XmlSchema;
+package org.jomc.model.modlet;
