@@ -32,13 +32,18 @@ package org.jomc.model;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.stream.Collector;
+import java.util.stream.Stream;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import org.w3c.dom.Element;
@@ -103,12 +108,12 @@ public class InheritanceModel
         /**
          * The path to the node.
          */
-        private final LinkedList<Node<Implementation>> path = new LinkedList<Node<Implementation>>();
+        private final List<Node<Implementation>> path = new CopyOnWriteArrayList<>();
 
         /**
          * The nodes overridden by the node.
          */
-        private final Set<Node<T>> overriddenNodes = new HashSet<Node<T>>();
+        private final Set<Node<T>> overriddenNodes = newSet();
 
         /**
          * Creates a new {@code Node} instance.
@@ -249,7 +254,7 @@ public class InheritanceModel
          *
          * @see #getPath()
          */
-        private LinkedList<Node<Implementation>> getModifiablePath()
+        private List<Node<Implementation>> getModifiablePath()
         {
             return this.path;
         }
@@ -377,13 +382,7 @@ public class InheritanceModel
     public InheritanceModel( final Modules modules )
     {
         super();
-
-        if ( modules == null )
-        {
-            throw new NullPointerException( "modules" );
-        }
-
-        this.modules = modules.clone();
+        this.modules = Objects.requireNonNull( modules, "modules" ).clone();
     }
 
     /**
@@ -399,12 +398,7 @@ public class InheritanceModel
      */
     public Set<Node<Implementation>> getSourceNodes( final String implementation )
     {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-
-        this.prepareContext( implementation );
+        this.prepareContext( Objects.requireNonNull( implementation, "implementation" ) );
         final Collection<Node<Implementation>> col = map( this.sourceNodes, implementation ).values();
         return unmodifiableSet( newSet( col ) );
     }
@@ -426,12 +420,7 @@ public class InheritanceModel
      */
     public Set<Node<ImplementationReference>> getCycleNodes( final String implementation )
     {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-
-        this.prepareContext( implementation );
+        this.prepareContext( Objects.requireNonNull( implementation, "implementation" ) );
         return unmodifiableSet( nodes( this.cyclicImplReferences, implementation ) );
     }
 
@@ -447,12 +436,7 @@ public class InheritanceModel
      */
     public Set<String> getDependencyNames( final String implementation )
     {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-
-        this.prepareContext( implementation );
+        this.prepareContext( Objects.requireNonNull( implementation, "implementation" ) );
         return Collections.unmodifiableSet( map( this.dependencies, implementation ).keySet() );
     }
 
@@ -471,20 +455,12 @@ public class InheritanceModel
      */
     public Set<Node<Dependency>> getDependencyNodes( final String implementation, final String name )
     {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-        if ( name == null )
-        {
-            throw new NullPointerException( "name" );
-        }
-
-        this.prepareContext( implementation );
+        Objects.requireNonNull( name, "name" );
+        this.prepareContext( Objects.requireNonNull( implementation, "implementation" ) );
         Set<Node<Dependency>> set = null;
 
         final Map<String, Set<Node<Dependency>>> map =
-            getEffectiveNodes( this.effDependencies, implementation, implementation );
+            effectiveNodes( this.effDependencies, implementation, implementation );
 
         if ( map != null )
         {
@@ -507,12 +483,7 @@ public class InheritanceModel
      */
     public Set<String> getImplementationReferenceIdentifiers( final String implementation )
     {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-
-        this.prepareContext( implementation );
+        this.prepareContext( Objects.requireNonNull( implementation, "implementation" ) );
         return Collections.unmodifiableSet( map( this.implReferences, implementation ).keySet() );
     }
 
@@ -532,19 +503,11 @@ public class InheritanceModel
     public Set<Node<ImplementationReference>> getImplementationReferenceNodes( final String implementation,
                                                                                final String identifier )
     {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-        if ( identifier == null )
-        {
-            throw new NullPointerException( "identifier" );
-        }
-
-        this.prepareContext( implementation );
+        Objects.requireNonNull( identifier, "identifier" );
+        this.prepareContext( Objects.requireNonNull( implementation, "implementation" ) );
         Set<Node<ImplementationReference>> set = null;
         final Map<String, Set<Node<ImplementationReference>>> map =
-            getEffectiveNodes( this.effImplReferences, implementation, implementation );
+            effectiveNodes( this.effImplReferences, implementation, implementation );
 
         if ( map != null )
         {
@@ -566,12 +529,7 @@ public class InheritanceModel
      */
     public Set<QName> getJaxbElementNames( final String implementation )
     {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-
-        this.prepareContext( implementation );
+        this.prepareContext( Objects.requireNonNull( implementation, "implementation" ) );
         return Collections.unmodifiableSet( map( this.jaxbElements, implementation ).keySet() );
     }
 
@@ -590,19 +548,11 @@ public class InheritanceModel
      */
     public Set<Node<JAXBElement<?>>> getJaxbElementNodes( final String implementation, final QName name )
     {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-        if ( name == null )
-        {
-            throw new NullPointerException( "name" );
-        }
-
-        this.prepareContext( implementation );
+        Objects.requireNonNull( name, "name" );
+        this.prepareContext( Objects.requireNonNull( implementation, "implementation" ) );
         Set<Node<JAXBElement<?>>> set = null;
         final Map<QName, Set<Node<JAXBElement<?>>>> map =
-            getEffectiveNodes( this.effJaxbElements, implementation, implementation );
+            effectiveNodes( this.effJaxbElements, implementation, implementation );
 
         if ( map != null )
         {
@@ -624,12 +574,7 @@ public class InheritanceModel
      */
     public Set<String> getMessageNames( final String implementation )
     {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-
-        this.prepareContext( implementation );
+        this.prepareContext( Objects.requireNonNull( implementation, "implementation" ) );
         return Collections.unmodifiableSet( map( this.messages, implementation ).keySet() );
     }
 
@@ -648,19 +593,10 @@ public class InheritanceModel
      */
     public Set<Node<Message>> getMessageNodes( final String implementation, final String name )
     {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-        if ( name == null )
-        {
-            throw new NullPointerException( "name" );
-        }
-
-        this.prepareContext( implementation );
+        Objects.requireNonNull( name, "name" );
+        this.prepareContext( Objects.requireNonNull( implementation, "implementation" ) );
         Set<Node<Message>> set = null;
-        final Map<String, Set<Node<Message>>> map =
-            getEffectiveNodes( this.effMessages, implementation, implementation );
+        final Map<String, Set<Node<Message>>> map = effectiveNodes( this.effMessages, implementation, implementation );
 
         if ( map != null )
         {
@@ -682,12 +618,7 @@ public class InheritanceModel
      */
     public Set<String> getPropertyNames( final String implementation )
     {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-
-        this.prepareContext( implementation );
+        this.prepareContext( Objects.requireNonNull( implementation, "implementation" ) );
         return Collections.unmodifiableSet( map( this.properties, implementation ).keySet() );
     }
 
@@ -706,19 +637,11 @@ public class InheritanceModel
      */
     public Set<Node<Property>> getPropertyNodes( final String implementation, final String name )
     {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-        if ( name == null )
-        {
-            throw new NullPointerException( "name" );
-        }
-
-        this.prepareContext( implementation );
+        Objects.requireNonNull( name, "name" );
+        this.prepareContext( Objects.requireNonNull( implementation, "implementation" ) );
         Set<Node<Property>> set = null;
         final Map<String, Set<Node<Property>>> map =
-            getEffectiveNodes( this.effProperties, implementation, implementation );
+            effectiveNodes( this.effProperties, implementation, implementation );
 
         if ( map != null )
         {
@@ -741,12 +664,7 @@ public class InheritanceModel
      */
     public Set<String> getSpecificationReferenceIdentifiers( final String implementation )
     {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-
-        this.prepareContext( implementation );
+        this.prepareContext( Objects.requireNonNull( implementation, "implementation" ) );
         return Collections.unmodifiableSet( map( this.specReferences, implementation ).keySet() );
     }
 
@@ -766,19 +684,11 @@ public class InheritanceModel
     public Set<Node<SpecificationReference>> getSpecificationReferenceNodes( final String implementation,
                                                                              final String identifier )
     {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-        if ( identifier == null )
-        {
-            throw new NullPointerException( "identifier" );
-        }
-
-        this.prepareContext( implementation );
+        Objects.requireNonNull( identifier, "identifier" );
+        this.prepareContext( Objects.requireNonNull( implementation, "implementation" ) );
         Set<Node<SpecificationReference>> set = null;
         final Map<String, Set<Node<SpecificationReference>>> map =
-            getEffectiveNodes( this.effSpecReferences, implementation, implementation );
+            effectiveNodes( this.effSpecReferences, implementation, implementation );
 
         if ( map != null )
         {
@@ -800,12 +710,7 @@ public class InheritanceModel
      */
     public Set<QName> getXmlElementNames( final String implementation )
     {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-
-        this.prepareContext( implementation );
+        this.prepareContext( Objects.requireNonNull( implementation, "implementation" ) );
         return Collections.unmodifiableSet( map( this.xmlElements, implementation ).keySet() );
     }
 
@@ -824,19 +729,11 @@ public class InheritanceModel
      */
     public Set<Node<Element>> getXmlElementNodes( final String implementation, final QName name )
     {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-        if ( name == null )
-        {
-            throw new NullPointerException( "name" );
-        }
-
-        this.prepareContext( implementation );
+        Objects.requireNonNull( name, "name" );
+        this.prepareContext( Objects.requireNonNull( implementation, "implementation" ) );
         Set<Node<Element>> set = null;
         final Map<QName, Set<Node<Element>>> map =
-            getEffectiveNodes( this.effXmlElements, implementation, implementation );
+            effectiveNodes( this.effXmlElements, implementation, implementation );
 
         if ( map != null )
         {
@@ -860,11 +757,7 @@ public class InheritanceModel
             if ( i != null )
             {
                 this.collectNodes( context, i, null, null );
-
-                for ( final Node<Implementation> source : map( this.sourceNodes, context ).values() )
-                {
-                    this.collectEffectiveNodes( context, source );
-                }
+                map( this.sourceNodes, context ).values().forEach( n  -> this.collectEffectiveNodes( context, n ) );
             }
 
             state = ContextState.PREPARED;
@@ -877,193 +770,133 @@ public class InheritanceModel
     }
 
     private void collectNodes( final String context, final Implementation declaration,
-                               final Node<Implementation> descendant, LinkedList<Node<Implementation>> path )
+                               final Node<Implementation> descendant, final LinkedList<Node<Implementation>> path )
     {
-        if ( path == null )
-        {
-            path = new LinkedList<Node<Implementation>>();
-        }
-
+        final LinkedList<Node<Implementation>> currentPath = path == null ? new LinkedList<>() : path;
         final Map<String, Node<Implementation>> contextImplementations = map( this.implementations, context );
 
         if ( declaration != null && !contextImplementations.containsKey( declaration.getIdentifier() ) )
         {
-            final Node<Implementation> declarationNode = new Node<Implementation>(
-                declaration, null, null, descendant, declaration, declaration.isFinal(), false );
+            final Module moduleOfDeclaration = this.modules.getModuleOfImplementation( declaration.getIdentifier() );
 
-            declarationNode.getModifiablePath().addAll( path );
+            final Node<Implementation> declarationNode =
+                new Node<>( declaration, null, null, descendant, declaration, declaration.isFinal(), false );
+
+            declarationNode.getModifiablePath().addAll( currentPath );
 
             contextImplementations.put( declaration.getIdentifier(), declarationNode );
 
-            path.addLast( declarationNode );
+            currentPath.addLast( declarationNode );
 
             if ( declaration.getDependencies() != null )
             {
-                for ( int i = 0, s0 = declaration.getDependencies().getDependency().size(); i < s0; i++ )
-                {
-                    final Dependency d = declaration.getDependencies().getDependency().get( i );
-                    final Node<Dependency> node =
-                        new Node<Dependency>( declaration, null, null, descendant, d, d.isFinal(), d.isOverride() );
+                collectNodes( map( this.dependencies, context ), declaration.getDependencies().getDependency(),
+                              currentPath, null, declaration, descendant, d  -> d.getName() );
 
-                    node.getModifiablePath().addAll( path );
-
-                    addNode( map( this.dependencies, context ), node, node.getModelObject().getName() );
-                }
             }
 
             if ( declaration.getMessages() != null )
             {
-                for ( int i = 0, s0 = declaration.getMessages().getMessage().size(); i < s0; i++ )
+                collectNodes( map( this.messages, context ), declaration.getMessages().getMessage(),
+                              currentPath, null, declaration, descendant, m  -> m.getName() );
+
+                if ( !declaration.getMessages().getReference().isEmpty() && moduleOfDeclaration != null
+                         && moduleOfDeclaration.getMessages() != null )
                 {
-                    final Message m = declaration.getMessages().getMessage().get( i );
-                    final Node<Message> node =
-                        new Node<Message>( declaration, null, null, descendant, m, m.isFinal(), m.isOverride() );
+                    collectNodes( map( this.messages, context ), declaration.getMessages().getReference(), currentPath,
+                                  declaration, descendant,
+                                  r  -> moduleOfDeclaration.getMessages().getMessage( r.getName() ),
+                                  ( o, r )  ->
+                              {
+                                  final Message msg = o.clone();
+                                  msg.setFinal( r.isFinal() );
+                                  msg.setOverride( r.isOverride() );
+                                  return msg;
+                              }, m  -> m.getName() );
 
-                    node.getModifiablePath().addAll( path );
-
-                    addNode( map( this.messages, context ), node, node.getModelObject().getName() );
-                }
-
-                if ( !declaration.getMessages().getReference().isEmpty() )
-                {
-                    final Module m = this.modules.getModuleOfImplementation( declaration.getIdentifier() );
-
-                    if ( m != null && m.getMessages() != null )
-                    {
-                        for ( int i = 0, s0 = declaration.getMessages().getReference().size(); i < s0; i++ )
-                        {
-                            final MessageReference r = declaration.getMessages().getReference().get( i );
-                            Message msg = m.getMessages().getMessage( r.getName() );
-
-                            if ( msg != null )
-                            {
-                                msg = msg.clone();
-                                msg.setFinal( r.isFinal() );
-                                msg.setOverride( r.isOverride() );
-
-                                final Node<Message> node = new Node<Message>(
-                                    declaration, null, null, descendant, msg, msg.isFinal(), msg.isOverride() );
-
-                                node.getModifiablePath().addAll( path );
-
-                                addNode( map( this.messages, context ), node, node.getModelObject().getName() );
-                            }
-                        }
-                    }
                 }
             }
 
             if ( declaration.getProperties() != null )
             {
-                for ( int i = 0, s0 = declaration.getProperties().getProperty().size(); i < s0; i++ )
+                collectNodes( map( this.properties, context ), declaration.getProperties().getProperty(),
+                              currentPath, null, declaration, descendant, p  -> p.getName() );
+
+                if ( !declaration.getProperties().getReference().isEmpty() && moduleOfDeclaration != null
+                         && moduleOfDeclaration.getProperties() != null )
                 {
-                    final Property p = declaration.getProperties().getProperty().get( i );
-                    final Node<Property> node =
-                        new Node<Property>( declaration, null, null, descendant, p, p.isFinal(), p.isOverride() );
+                    collectNodes( map( this.properties, context ), declaration.getProperties().getReference(),
+                                  currentPath, declaration, descendant,
+                                  r  -> moduleOfDeclaration.getProperties().getProperty( r.getName() ),
+                                  ( o, r )  ->
+                              {
+                                  final Property p = o.clone();
+                                  p.setFinal( r.isFinal() );
+                                  p.setOverride( r.isOverride() );
+                                  return p;
+                              }, p  -> p.getName() );
 
-                    node.getModifiablePath().addAll( path );
-
-                    addNode( map( this.properties, context ), node, node.getModelObject().getName() );
-                }
-
-                if ( !declaration.getProperties().getReference().isEmpty() )
-                {
-                    final Module m = this.modules.getModuleOfImplementation( declaration.getIdentifier() );
-
-                    if ( m != null && m.getProperties() != null )
-                    {
-                        for ( int i = 0, s0 = declaration.getProperties().getReference().size(); i < s0; i++ )
-                        {
-                            final PropertyReference r = declaration.getProperties().getReference().get( i );
-                            Property p = m.getProperties().getProperty( r.getName() );
-
-                            if ( p != null )
-                            {
-                                p = p.clone();
-                                p.setFinal( r.isFinal() );
-                                p.setOverride( r.isOverride() );
-
-                                final Node<Property> node = new Node<Property>(
-                                    declaration, null, null, descendant, p, p.isFinal(), p.isOverride() );
-
-                                node.getModifiablePath().addAll( path );
-
-                                addNode( map( this.properties, context ), node, node.getModelObject().getName() );
-                            }
-                        }
-                    }
                 }
             }
 
             if ( declaration.getSpecifications() != null )
             {
-                for ( int i = 0, s0 = declaration.getSpecifications().getReference().size(); i < s0; i++ )
+                collectNodes( map( this.specReferences, context ), declaration.getSpecifications().getReference(),
+                              currentPath, null, declaration, descendant, r  -> r.getIdentifier() );
+
+                declaration.getSpecifications().getReference().forEach( ref  ->
                 {
-                    final SpecificationReference r = declaration.getSpecifications().getReference().get( i );
-                    final Node<SpecificationReference> node = new Node<SpecificationReference>(
-                        declaration, null, null, descendant, r, r.isFinal(), r.isOverride() );
-
-                    node.getModifiablePath().addAll( path );
-
-                    addNode( map( this.specReferences, context ), node, node.getModelObject().getIdentifier() );
-
-                    final Specification s = this.modules.getSpecification( r.getIdentifier() );
+                    final Specification s = this.modules.getSpecification( ref.getIdentifier() );
 
                     if ( s != null && s.getProperties() != null )
                     {
-                        for ( int j = 0, s1 = s.getProperties().getProperty().size(); j < s1; j++ )
-                        {
-                            final Property p = s.getProperties().getProperty().get( j );
-                            final Node<Property> n =
-                                new Node<Property>( declaration, s, null, descendant, p, p.isFinal(), p.isOverride() );
+                        collectNodes( map( this.properties, context ), s.getProperties().getProperty(),
+                                      currentPath, s, declaration, descendant, p  -> p.getName() );
 
-                            n.getModifiablePath().addAll( path );
-
-                            addNode( map( this.properties, context ), n, n.getModelObject().getName() );
-                        }
                     }
-                }
+                } );
             }
 
             if ( !declaration.getAny().isEmpty() )
             {
-                for ( int i = 0, s0 = declaration.getAny().size(); i < s0; i++ )
-                {
-                    final Object any = declaration.getAny().get( i );
+                collectNodes( map( this.xmlElements, context ), declaration.getAny(),
+                              any  ->
+                          {
+                              Node<Element> node = null;
 
-                    if ( any instanceof Element )
-                    {
-                        final Element e = (Element) any;
-                        final Node<Element> node =
-                            new Node<Element>( declaration, null, null, descendant, e, false, false );
+                              if ( any instanceof Element )
+                              {
+                                  node = new Node<>( declaration, null, null, descendant, (Element) any, false, false );
+                                  node.getModifiablePath().addAll( currentPath );
+                              }
 
-                        node.getModifiablePath().addAll( path );
+                              return node;
+                          }, o  -> getXmlElementName( o ) );
 
-                        addNode( map( this.xmlElements, context ), node, getXmlElementName( e ) );
-                        continue;
-                    }
+                collectNodes( map( this.jaxbElements, context ), declaration.getAny(),
+                              any  ->
+                          {
+                              Node<JAXBElement<?>> node = null;
 
-                    if ( any instanceof JAXBElement<?> )
-                    {
-                        final JAXBElement<?> e = (JAXBElement<?>) any;
-                        boolean _final = false;
-                        boolean override = false;
+                              if ( any instanceof JAXBElement<?> )
+                              {
+                                  final JAXBElement<?> e = (JAXBElement<?>) any;
+                                  boolean _final = false;
+                                  boolean override = false;
 
-                        if ( e.getValue() instanceof Inheritable )
-                        {
-                            _final = ( (Inheritable) e.getValue() ).isFinal();
-                            override = ( (Inheritable) e.getValue() ).isOverride();
-                        }
+                                  if ( e.getValue() instanceof Inheritable )
+                                  {
+                                      _final = ( (Inheritable) e.getValue() ).isFinal();
+                                      override = ( (Inheritable) e.getValue() ).isOverride();
+                                  }
 
-                        final Node<JAXBElement<?>> node =
-                            new Node<JAXBElement<?>>( declaration, null, null, descendant, e, _final, override );
+                                  node = new Node<>( declaration, null, null, descendant, e, _final, override );
+                                  node.getModifiablePath().addAll( currentPath );
+                              }
 
-                        node.getModifiablePath().addAll( path );
+                              return node;
+                          }, o  -> o.getName() );
 
-                        addNode( map( this.jaxbElements, context ), node, e.getName() );
-                        continue;
-                    }
-                }
             }
 
             if ( declaration.getImplementations() != null
@@ -1074,19 +907,19 @@ public class InheritanceModel
                 for ( int i = 0, s0 = declaration.getImplementations().getReference().size(); i < s0; i++ )
                 {
                     final ImplementationReference r = declaration.getImplementations().getReference().get( i );
-                    final Node<ImplementationReference> node = new Node<ImplementationReference>(
-                        declaration, null, null, descendant, r, r.isFinal(), r.isOverride() );
+                    final Node<ImplementationReference> node =
+                        new Node<>( declaration, null, null, descendant, r, r.isFinal(), r.isOverride() );
 
-                    node.getModifiablePath().addAll( path );
+                    node.getModifiablePath().addAll( currentPath );
 
                     final Implementation ancestor = this.modules.getImplementation( r.getIdentifier() );
 
                     boolean cycle = false;
                     if ( ancestor != null && contextImplementations.containsKey( ancestor.getIdentifier() ) )
                     {
-                        for ( int j = 0, s1 = path.size(); j < s1; j++ )
+                        for ( int j = 0, s1 = currentPath.size(); j < s1; j++ )
                         {
-                            final Node<Implementation> n = path.get( j );
+                            final Node<Implementation> n = currentPath.get( j );
 
                             if ( n.getModelObject().getIdentifier().equals( ancestor.getIdentifier() ) )
                             {
@@ -1104,51 +937,122 @@ public class InheritanceModel
                     else
                     {
                         all_cyclic = false;
-                        addNode( map( this.implReferences, context ), node, node.getModelObject().getIdentifier() );
-                        this.collectNodes( context, ancestor, declarationNode, path );
+                        final Map<String, Set<Node<ImplementationReference>>> implementationReferenceNodes =
+                            map( this.implReferences, context );
+
+                        addNode( implementationReferenceNodes, node, node.getModelObject().getIdentifier() );
+                        this.collectNodes( context, ancestor, declarationNode, currentPath );
                     }
                 }
 
                 if ( all_cyclic )
                 {
-                    map( this.sourceNodes, context ).
-                        put( declarationNode.getModelObject().getIdentifier(), declarationNode );
-
+                    final Map<String, Node<Implementation>> srcNodes = map( this.sourceNodes, context );
+                    srcNodes.put( declarationNode.getModelObject().getIdentifier(), declarationNode );
                 }
             }
             else
             {
-                map( this.sourceNodes, context ).
-                    put( declarationNode.getModelObject().getIdentifier(), declarationNode );
-
+                final Map<String, Node<Implementation>> srcNodes = map( this.sourceNodes, context );
+                srcNodes.put( declarationNode.getModelObject().getIdentifier(), declarationNode );
             }
 
-            path.removeLast();
+            currentPath.removeLast();
+        }
+    }
+
+    private static <T extends Inheritable, K> void collectNodes( final Map<K, Set<Node<T>>> collectedNodes,
+                                                                 final Collection<T> declaredModelObjects,
+                                                                 final Collection<Node<Implementation>> path,
+                                                                 final Specification specification,
+                                                                 final Implementation declaration,
+                                                                 final Node<Implementation> descendant,
+                                                                 final Function<T, K> modelObjectKeyFunction )
+    {
+        try ( final Stream<T> st0 = declaredModelObjects.parallelStream().unordered() )
+        {
+            st0.map( o  ->
+            {
+                final Node<T> node = new Node<>( declaration, specification, null, descendant, o, o.isFinal(),
+                                                 o.isOverride() );
+
+                node.getModifiablePath().addAll( path );
+                return node;
+            } ).forEach( n  ->
+            {
+                final K modelObjectKey = modelObjectKeyFunction.apply( n.getModelObject() );
+                addNode( collectedNodes, n, modelObjectKey );
+            } );
+        }
+    }
+
+    private static <R extends Inheritable, T, K> void collectNodes(
+        final Map<K, Set<Node<T>>> collectedNodes, final Collection<R> declaredReferenceModelObjects,
+        final Collection<Node<Implementation>> path, final Implementation declaration,
+        final Node<Implementation> descendant, final Function<R, T> findModelObjectFunction,
+        final BiFunction<T, R, T> inheritanceAttributesFunction, final Function<T, K> modelObjectKeyFunction )
+    {
+        try ( final Stream<R> st0 = declaredReferenceModelObjects.parallelStream().unordered() )
+        {
+            st0.map( r  ->
+            {
+                Node<T> node = null;
+                final T modelObject = findModelObjectFunction.apply( r );
+
+                if ( modelObject != null )
+                {
+                    node = new Node<>( declaration, null, null, descendant,
+                                       inheritanceAttributesFunction.apply( modelObject, r ),
+                                       r.isFinal(), r.isOverride() );
+
+                    node.getModifiablePath().addAll( path );
+                }
+
+                return node;
+            } ).filter( n  -> n != null ).forEach( n  ->
+            {
+                final K modelObjectKey = modelObjectKeyFunction.apply( n.getModelObject() );
+                addNode( collectedNodes, n, modelObjectKey );
+            } );
+        }
+    }
+
+    private static <T, K, D> void collectNodes(
+        final Map<K, Set<Node<T>>> collectedNodes, final Collection<D> declaredModelObjects,
+        final Function<D, Node<T>> mapFunction, final Function<T, K> modelObjectKeyFunction )
+    {
+        try ( final Stream<D> st0 = declaredModelObjects.parallelStream().unordered() )
+        {
+            st0.map( mapFunction ).filter( n  -> n != null ).forEach( n  ->
+            {
+                final K modelObjectKey = modelObjectKeyFunction.apply( n.getModelObject() );
+                addNode( collectedNodes, n, modelObjectKey );
+            } );
         }
     }
 
     private void collectEffectiveNodes( final String context, final Node<Implementation> node )
     {
         final Map<String, Set<Node<SpecificationReference>>> directSpecificationReferences =
-            getDirectEffectiveNodes( map( this.specReferences, context ), node.getModelObject().getIdentifier() );
+            directEffectiveNodes( map( this.specReferences, context ), node.getModelObject().getIdentifier() );
 
         final Map<String, Set<Node<Dependency>>> directDependencies =
-            getDirectEffectiveNodes( map( this.dependencies, context ), node.getModelObject().getIdentifier() );
+            directEffectiveNodes( map( this.dependencies, context ), node.getModelObject().getIdentifier() );
 
         final Map<String, Set<Node<Message>>> directMessages =
-            getDirectEffectiveNodes( map( this.messages, context ), node.getModelObject().getIdentifier() );
+            directEffectiveNodes( map( this.messages, context ), node.getModelObject().getIdentifier() );
 
         final Map<String, Set<Node<Property>>> directProperties =
-            getDirectEffectiveNodes( map( this.properties, context ), node.getModelObject().getIdentifier() );
+            directEffectiveNodes( map( this.properties, context ), node.getModelObject().getIdentifier() );
 
         final Map<String, Set<Node<ImplementationReference>>> directImplementationReferences =
-            getDirectEffectiveNodes( map( this.implReferences, context ), node.getModelObject().getIdentifier() );
+            directEffectiveNodes( map( this.implReferences, context ), node.getModelObject().getIdentifier() );
 
         final Map<QName, Set<Node<Element>>> directXmlElements =
-            getDirectEffectiveNodes( map( this.xmlElements, context ), node.getModelObject().getIdentifier() );
+            directEffectiveNodes( map( this.xmlElements, context ), node.getModelObject().getIdentifier() );
 
         final Map<QName, Set<Node<JAXBElement<?>>>> directJaxbElements =
-            getDirectEffectiveNodes( map( this.jaxbElements, context ), node.getModelObject().getIdentifier() );
+            directEffectiveNodes( map( this.jaxbElements, context ), node.getModelObject().getIdentifier() );
 
         overrideNodes( map( this.effSpecReferences, context ), node, directSpecificationReferences );
         overrideNodes( map( this.effImplReferences, context ), node, directImplementationReferences );
@@ -1161,25 +1065,25 @@ public class InheritanceModel
         this.addClassDeclarationNodes( context, node );
 
         final Map<String, Set<Node<SpecificationReference>>> ancestorSpecificationReferences =
-            getEffectiveNodes( this.effSpecReferences, context, node.getModelObject().getIdentifier() );
+            effectiveNodes( this.effSpecReferences, context, node.getModelObject().getIdentifier() );
 
         final Map<String, Set<Node<Dependency>>> ancestorDependencies =
-            getEffectiveNodes( this.effDependencies, context, node.getModelObject().getIdentifier() );
+            effectiveNodes( this.effDependencies, context, node.getModelObject().getIdentifier() );
 
         final Map<String, Set<Node<Message>>> ancestorMessages =
-            getEffectiveNodes( this.effMessages, context, node.getModelObject().getIdentifier() );
+            effectiveNodes( this.effMessages, context, node.getModelObject().getIdentifier() );
 
         final Map<String, Set<Node<Property>>> ancestorProperties =
-            getEffectiveNodes( this.effProperties, context, node.getModelObject().getIdentifier() );
+            effectiveNodes( this.effProperties, context, node.getModelObject().getIdentifier() );
 
         final Map<String, Set<Node<ImplementationReference>>> ancestorImplementationReferences =
-            getEffectiveNodes( this.effImplReferences, context, node.getModelObject().getIdentifier() );
+            effectiveNodes( this.effImplReferences, context, node.getModelObject().getIdentifier() );
 
         final Map<QName, Set<Node<Element>>> ancestorXmlElements =
-            getEffectiveNodes( this.effXmlElements, context, node.getModelObject().getIdentifier() );
+            effectiveNodes( this.effXmlElements, context, node.getModelObject().getIdentifier() );
 
         final Map<QName, Set<Node<JAXBElement<?>>>> ancestorJaxbElements =
-            getEffectiveNodes( this.effJaxbElements, context, node.getModelObject().getIdentifier() );
+            effectiveNodes( this.effJaxbElements, context, node.getModelObject().getIdentifier() );
 
         if ( node.getDescendant() != null )
         {
@@ -1240,288 +1144,83 @@ public class InheritanceModel
         {
             this.prepareContext( classDeclaration.getIdentifier() );
 
-            Map<String, Set<Node<Dependency>>> effectiveDependencies =
-                getEffectiveNodes( this.effDependencies, context, node.getModelObject().getIdentifier() );
+            addClassDeclarationNodes( context, node.getModelObject(), classDeclaration, this.dependencies,
+                                      this.effDependencies );
 
-            Map<String, Set<Node<Message>>> effectiveMessages =
-                getEffectiveNodes( this.effMessages, context, node.getModelObject().getIdentifier() );
+            addClassDeclarationNodes( context, node.getModelObject(), classDeclaration, this.specReferences,
+                                      this.effSpecReferences );
 
-            Map<String, Set<Node<Property>>> effectiveProperties =
-                getEffectiveNodes( this.effProperties, context, node.getModelObject().getIdentifier() );
+            addClassDeclarationNodes( context, node.getModelObject(), classDeclaration, this.messages,
+                                      this.effMessages );
 
-            Map<String, Set<Node<SpecificationReference>>> effectiveSpecificationReferences =
-                getEffectiveNodes( this.effSpecReferences, context, node.getModelObject().getIdentifier() );
+            addClassDeclarationNodes( context, node.getModelObject(), classDeclaration, this.properties,
+                                      this.effProperties );
 
-            Map<QName, Set<Node<Element>>> effectiveXmlElements =
-                getEffectiveNodes( this.effXmlElements, context, node.getModelObject().getIdentifier() );
+            addClassDeclarationNodes( context, node.getModelObject(), classDeclaration, this.xmlElements,
+                                      this.effXmlElements );
 
-            Map<QName, Set<Node<JAXBElement<?>>>> effectiveJaxbElements =
-                getEffectiveNodes( this.effJaxbElements, context, node.getModelObject().getIdentifier() );
+            addClassDeclarationNodes( context, node.getModelObject(), classDeclaration, this.jaxbElements,
+                                      this.effJaxbElements );
 
-            final Map<String, Set<Node<Dependency>>> declDependencies =
-                getEffectiveNodes( this.effDependencies, classDeclaration.getIdentifier(),
-                                   classDeclaration.getIdentifier() );
+        }
+    }
 
-            final Map<String, Set<Node<Message>>> declMessages =
-                getEffectiveNodes( this.effMessages, classDeclaration.getIdentifier(),
-                                   classDeclaration.getIdentifier() );
+    private static <T, K> void addClassDeclarationNodes(
+        final String context, final Implementation implementation, final Implementation classDeclaration,
+        final Map<String, Map<K, Set<Node<T>>>> collectedNodes,
+        final Map<String, Map<String, Map<K, Set<Node<T>>>>> effectiveNodes )
+    {
+        final Map<K, Set<Node<T>>> declNodes =
+            effectiveNodes( effectiveNodes, classDeclaration.getIdentifier(), classDeclaration.getIdentifier() );
 
-            final Map<String, Set<Node<Property>>> declProperties =
-                getEffectiveNodes( this.effProperties, classDeclaration.getIdentifier(),
-                                   classDeclaration.getIdentifier() );
+        final Map<K, Set<Node<T>>> effNodes =
+            effectiveNodes( effectiveNodes, context, implementation.getIdentifier() );
 
-            final Map<String, Set<Node<SpecificationReference>>> declSpecReferences =
-                getEffectiveNodes( this.effSpecReferences, classDeclaration.getIdentifier(),
-                                   classDeclaration.getIdentifier() );
+        addClassDeclarationNodes( map( collectedNodes, context ), effNodes, declNodes, implementation,
+                                  classDeclaration );
 
-            final Map<QName, Set<Node<Element>>> declXmlElements =
-                getEffectiveNodes( this.effXmlElements, classDeclaration.getIdentifier(),
-                                   classDeclaration.getIdentifier() );
+    }
 
-            final Map<QName, Set<Node<JAXBElement<?>>>> declJaxbElements =
-                getEffectiveNodes( this.effJaxbElements, classDeclaration.getIdentifier(),
-                                   classDeclaration.getIdentifier() );
-
-            if ( declDependencies != null )
+    private static <T, K> void addClassDeclarationNodes( final Map<K, Set<Node<T>>> collectedNodes,
+                                                         final Map<K, Set<Node<T>>> effectiveNodes,
+                                                         final Map<K, Set<Node<T>>> declaredNodes,
+                                                         final Implementation implementation,
+                                                         final Implementation classDeclaration )
+    {
+        try ( final Stream<Map.Entry<K, Set<Node<T>>>> st0 = declaredNodes.entrySet().parallelStream().unordered() )
+        {
+            st0.forEach( e  ->
             {
-                if ( effectiveDependencies == null )
+                try ( final Stream<Node<T>> st1 = e.getValue().parallelStream().unordered() )
                 {
-                    effectiveDependencies = newMap();
-                    map( this.effDependencies, context ).
-                        put( node.getModelObject().getIdentifier(), effectiveDependencies );
-
-                }
-
-                for ( final Map.Entry<String, Set<Node<Dependency>>> e : declDependencies.entrySet() )
-                {
-                    final Set<Node<Dependency>> set = newSet( e.getValue().size() );
-
-                    for ( final Node<Dependency> n : e.getValue() )
+                    final Set<Node<T>> nodes = st1.map( n  ->
                     {
-                        final Node<Dependency> effNode = new Node<Dependency>(
-                            node.getModelObject(), n.getSpecification(), classDeclaration, null, n.getModelObject(),
-                            n.isFinal(), n.isOverride() );
+                        final Node<T> effNode =
+                            new Node<>( implementation, n.getSpecification(), classDeclaration,
+                                        null, n.getModelObject(), n.isFinal(), n.isOverride() );
 
                         effNode.getModifiablePath().addAll( n.getPath() );
-                        set.add( effNode );
+                        return effNode;
+                    } ).collect( Collector.of( CopyOnWriteArraySet::new, Set::add, ( s1, s2 )  ->
+                                           {
+                                               s1.addAll( s2 );
+                                               return s1;
+                                           }, Collector.Characteristics.CONCURRENT,
+                                               Collector.Characteristics.UNORDERED ) );
 
-                        addNode( map( this.dependencies, context ), effNode, e.getKey() );
-                    }
+                    nodes.forEach( n  -> addNode( collectedNodes, n, e.getKey() ) );
 
-                    if ( effectiveDependencies.containsKey( e.getKey() ) )
+                    final Set<Node<T>> effNodes = effectiveNodes.putIfAbsent( e.getKey(), nodes );
+
+                    if ( effNodes != null )
                     {
-                        for ( final Node<Dependency> effNode : effectiveDependencies.get( e.getKey() ) )
+                        effNodes.forEach( n  ->
                         {
-                            effNode.getModifiableOverriddenNodes().addAll( set );
-                        }
-                    }
-                    else
-                    {
-                        effectiveDependencies.put( e.getKey(), set );
+                            n.getModifiableOverriddenNodes().addAll( nodes );
+                        } );
                     }
                 }
-            }
-
-            if ( declSpecReferences != null )
-            {
-                if ( effectiveSpecificationReferences == null )
-                {
-                    effectiveSpecificationReferences = newMap();
-                    map( this.effSpecReferences, context ).
-                        put( node.getModelObject().getIdentifier(), effectiveSpecificationReferences );
-
-                }
-
-                for ( final Map.Entry<String, Set<Node<SpecificationReference>>> e : declSpecReferences.entrySet() )
-                {
-                    final Set<Node<SpecificationReference>> set = newSet( e.getValue().size() );
-
-                    for ( final Node<SpecificationReference> n : e.getValue() )
-                    {
-                        final Node<SpecificationReference> effNode = new Node<SpecificationReference>(
-                            node.getModelObject(), n.getSpecification(), classDeclaration, null, n.getModelObject(),
-                            n.isFinal(), n.isOverride() );
-
-                        effNode.getModifiablePath().addAll( n.getPath() );
-                        set.add( effNode );
-
-                        addNode( map( this.specReferences, context ), effNode, e.getKey() );
-                    }
-
-                    if ( effectiveSpecificationReferences.containsKey( e.getKey() ) )
-                    {
-                        for ( final Node<SpecificationReference> effNode
-                                  : effectiveSpecificationReferences.get( e.getKey() ) )
-                        {
-                            effNode.getModifiableOverriddenNodes().addAll( set );
-                        }
-                    }
-                    else
-                    {
-                        effectiveSpecificationReferences.put( e.getKey(), set );
-                    }
-                }
-            }
-
-            if ( declMessages != null )
-            {
-                if ( effectiveMessages == null )
-                {
-                    effectiveMessages = newMap();
-                    map( this.effMessages, context ).
-                        put( node.getModelObject().getIdentifier(), effectiveMessages );
-
-                }
-
-                for ( final Map.Entry<String, Set<Node<Message>>> e : declMessages.entrySet() )
-                {
-                    final Set<Node<Message>> set = newSet( e.getValue().size() );
-
-                    for ( final Node<Message> n : e.getValue() )
-                    {
-                        final Node<Message> effNode = new Node<Message>(
-                            node.getModelObject(), n.getSpecification(), classDeclaration, null, n.getModelObject(),
-                            n.isFinal(), n.isOverride() );
-
-                        effNode.getModifiablePath().addAll( n.getPath() );
-                        set.add( effNode );
-
-                        addNode( map( this.messages, context ), effNode, e.getKey() );
-                    }
-
-                    if ( effectiveMessages.containsKey( e.getKey() ) )
-                    {
-                        for ( final Node<Message> effNode : effectiveMessages.get( e.getKey() ) )
-                        {
-                            effNode.getModifiableOverriddenNodes().addAll( set );
-                        }
-                    }
-                    else
-                    {
-                        effectiveMessages.put( e.getKey(), set );
-                    }
-                }
-            }
-
-            if ( declProperties != null )
-            {
-                if ( effectiveProperties == null )
-                {
-                    effectiveProperties = newMap();
-                    map( this.effProperties, context ).
-                        put( node.getModelObject().getIdentifier(), effectiveProperties );
-
-                }
-
-                for ( final Map.Entry<String, Set<Node<Property>>> e : declProperties.entrySet() )
-                {
-                    final Set<Node<Property>> set = newSet( e.getValue().size() );
-
-                    for ( final Node<Property> n : e.getValue() )
-                    {
-                        final Node<Property> effNode = new Node<Property>(
-                            node.getModelObject(), n.getSpecification(), classDeclaration, null, n.getModelObject(),
-                            n.isFinal(), n.isOverride() );
-
-                        effNode.getModifiablePath().addAll( n.getPath() );
-                        set.add( effNode );
-
-                        addNode( map( this.properties, context ), effNode, e.getKey() );
-                    }
-
-                    if ( effectiveProperties.containsKey( e.getKey() ) )
-                    {
-                        for ( final Node<Property> effNode : effectiveProperties.get( e.getKey() ) )
-                        {
-                            effNode.getModifiableOverriddenNodes().addAll( set );
-                        }
-                    }
-                    else
-                    {
-                        effectiveProperties.put( e.getKey(), set );
-                    }
-                }
-            }
-
-            if ( declXmlElements != null )
-            {
-                if ( effectiveXmlElements == null )
-                {
-                    effectiveXmlElements = newMap();
-                    map( this.effXmlElements, context ).
-                        put( node.getModelObject().getIdentifier(), effectiveXmlElements );
-
-                }
-
-                for ( final Map.Entry<QName, Set<Node<Element>>> e : declXmlElements.entrySet() )
-                {
-                    final Set<Node<Element>> set = newSet( e.getValue().size() );
-
-                    for ( final Node<Element> n : e.getValue() )
-                    {
-                        final Node<Element> effNode = new Node<Element>(
-                            node.getModelObject(), n.getSpecification(), classDeclaration, null, n.getModelObject(),
-                            n.isFinal(), n.isOverride() );
-
-                        effNode.getModifiablePath().addAll( n.getPath() );
-                        set.add( effNode );
-
-                        addNode( map( this.xmlElements, context ), effNode, e.getKey() );
-                    }
-
-                    if ( effectiveXmlElements.containsKey( e.getKey() ) )
-                    {
-                        for ( final Node<Element> effNode : effectiveXmlElements.get( e.getKey() ) )
-                        {
-                            effNode.getModifiableOverriddenNodes().addAll( set );
-                        }
-                    }
-                    else
-                    {
-                        effectiveXmlElements.put( e.getKey(), set );
-                    }
-                }
-            }
-
-            if ( declJaxbElements != null )
-            {
-                if ( effectiveJaxbElements == null )
-                {
-                    effectiveJaxbElements = newMap();
-                    map( this.effJaxbElements, context ).
-                        put( node.getModelObject().getIdentifier(), effectiveJaxbElements );
-
-                }
-
-                for ( final Map.Entry<QName, Set<Node<JAXBElement<?>>>> e : declJaxbElements.entrySet() )
-                {
-                    final Set<Node<JAXBElement<?>>> set = newSet( e.getValue().size() );
-
-                    for ( final Node<JAXBElement<?>> n : e.getValue() )
-                    {
-                        final Node<JAXBElement<?>> effNode = new Node<JAXBElement<?>>(
-                            node.getModelObject(), n.getSpecification(), classDeclaration, null, n.getModelObject(),
-                            n.isFinal(), n.isOverride() );
-
-                        effNode.getModifiablePath().addAll( n.getPath() );
-                        set.add( effNode );
-
-                        addNode( map( this.jaxbElements, context ), effNode, e.getKey() );
-                    }
-
-                    if ( effectiveJaxbElements.containsKey( e.getKey() ) )
-                    {
-                        for ( final Node<JAXBElement<?>> effNode : effectiveJaxbElements.get( e.getKey() ) )
-                        {
-                            effNode.getModifiableOverriddenNodes().addAll( set );
-                        }
-                    }
-                    else
-                    {
-                        effectiveJaxbElements.put( e.getKey(), set );
-                    }
-                }
-            }
+            } );
         }
     }
 
@@ -1559,93 +1258,74 @@ public class InheritanceModel
 
     private static <T, K> void addNode( final Map<K, Set<Node<T>>> map, final Node<T> node, final K key )
     {
-        Set<Node<T>> set = map.get( key );
-
-        if ( set == null )
-        {
-            set = newSet();
-            map.put( key, set );
-        }
-
-        set.add( node );
+        map.computeIfAbsent( key, k  -> newSet() ).add( node );
     }
 
     private static <T, K> void overrideNodes( final Map<String, Map<K, Set<Node<T>>>> effective,
                                               final Node<Implementation> implementation,
                                               final Map<K, Set<Node<T>>> directNodes )
     {
-        for ( final Map.Entry<K, Set<Node<T>>> e : directNodes.entrySet() )
+        directNodes.entrySet().forEach( e  ->
         {
             final Set<Node<T>> effectiveNodes =
                 effectiveNodes( effective, implementation.getModelObject().getIdentifier(), e.getKey() );
 
             final Set<Node<T>> overridingNodes = newSet();
 
-            for ( final Node<T> directNode : e.getValue() )
+            try ( final Stream<Node<T>> st0 = e.getValue().parallelStream().unordered() )
             {
-                for ( final Iterator<Node<T>> it = effectiveNodes.iterator(); it.hasNext(); )
+                st0.forEach( directNode  ->
                 {
-                    final Node<T> effectiveNode = it.next();
+                    final Collection<Node<T>> overriddenNodes = newSet();
 
-                    if ( isOverriding( effectiveNode, directNode ) )
+                    try ( final Stream<Node<T>> st1 = effectiveNodes.parallelStream().unordered() )
                     {
-                        it.remove();
+                        st1.filter( n  -> isOverriding( n, directNode ) ).
+                            map( n  ->
+                            {
+                                overriddenNodes.add( n );
+                                return n;
+                            } ).
+                            filter( n  -> n != directNode ).
+                            forEach( n  -> directNode.getModifiableOverriddenNodes().add( n ) );
 
-                        if ( directNode != effectiveNode )
+                    }
+
+                    effectiveNodes.removeAll( overriddenNodes );
+
+                    boolean overriddenByAncestor = false;
+
+                    if ( directNode.getSpecification() != null )
+                    {
+                        for ( final Node<T> effectiveNode : effectiveNodes )
                         {
-                            directNode.getModifiableOverriddenNodes().add( effectiveNode );
+                            if ( effectiveNode.getSpecification() == null )
+                            {
+                                overriddenByAncestor = true;
+                                effectiveNode.getModifiableOverriddenNodes().add( directNode );
+                            }
                         }
                     }
-                }
 
-                boolean overriddenByAncestor = false;
-
-                if ( directNode.getSpecification() != null )
-                {
-                    for ( final Node<T> effectiveNode : effectiveNodes )
+                    if ( !overriddenByAncestor )
                     {
-                        if ( effectiveNode.getSpecification() == null )
-                        {
-                            overriddenByAncestor = true;
-                            effectiveNode.getModifiableOverriddenNodes().add( directNode );
-                        }
+                        overridingNodes.add( directNode );
                     }
-                }
-
-                if ( !overriddenByAncestor )
-                {
-                    overridingNodes.add( directNode );
-                }
+                } );
             }
 
             effectiveNodes.addAll( overridingNodes );
-        }
+        } );
     }
 
     private static <K, V, T> Map<K, V> map( final Map<T, Map<K, V>> map, final T context )
     {
-        Map<K, V> contextMap = map.get( context );
-
-        if ( contextMap == null )
-        {
-            contextMap = newMap();
-            map.put( context, contextMap );
-        }
-
-        return contextMap;
+        return map.computeIfAbsent( context, k  -> newMap() );
     }
 
     private static <K, V> Set<Node<V>> nodes( final Map<K, Set<Node<V>>> map, final K key )
     {
-        Set<Node<V>> nodes = map.get( key );
-
-        if ( nodes == null )
-        {
-            nodes = newSet();
-            map.put( key, nodes );
-        }
-
-        return nodes;
+        return map.computeIfAbsent( key, k  -> newSet() );
     }
 
     private static <K, V> Set<Node<V>> effectiveNodes( final Map<String, Map<K, Set<Node<V>>>> map,
@@ -1658,66 +1338,85 @@ public class InheritanceModel
         final Map<String, Map<K, Set<Node<T>>>> effective, final Map<K, Set<Node<T>>> ancestor,
         final Node<Implementation> descendant )
     {
-        for ( Map.Entry<K, Set<Node<T>>> e : ancestor.entrySet() )
+        try ( final Stream<Map.Entry<K, Set<Node<T>>>> st0 = ancestor.entrySet().parallelStream().unordered() )
         {
-            for ( final Node<T> inherit : e.getValue() )
+            st0.forEach( e  ->
             {
-                if ( isInheritableNode( inherit ) )
+                try ( final Stream<Node<T>> st1 = e.getValue().parallelStream().unordered() )
                 {
-                    effectiveNodes( effective, descendant.getModelObject().getIdentifier(), e.getKey() ).add( inherit );
+                    final Set<Node<T>> nodes = effectiveNodes( effective, descendant.getModelObject().getIdentifier(),
+                                                               e.getKey() );
+
+                    nodes.addAll( st1.filter( n  -> isInheritableNode( n ) ).collect( Collector.of(
+                        CopyOnWriteArrayList::new, List::add, ( l1, l2 )  ->
+                    {
+                        l1.addAll( l2 );
+                        return l1;
+                    }, Collector.Characteristics.CONCURRENT, Collector.Characteristics.UNORDERED ) ) );
                 }
-            }
+            } );
         }
     }
 
-    private static <T, K> Map<K, Set<Node<T>>> getDirectEffectiveNodes( final Map<K, Set<Node<T>>> map,
-                                                                        final String origin )
+    private static <T, K> Map<K, Set<Node<T>>> directEffectiveNodes( final Map<K, Set<Node<T>>> map,
+                                                                     final String origin )
     {
         final Map<K, Set<Node<T>>> declarationMap = newMap( map.size() );
 
-        for ( final Map.Entry<K, Set<Node<T>>> e : map.entrySet() )
+        try ( final Stream<Map.Entry<K, Set<Node<T>>>> st0 = map.entrySet().parallelStream().unordered() )
         {
-            final Set<Node<T>> set = nodes( declarationMap, e.getKey() );
-
-            for ( final Node<T> n : e.getValue() )
+            st0.forEach( e  ->
             {
-                if ( isDirectEffectiveNode( n, origin ) )
+                final Set<Node<T>> set = nodes( declarationMap, e.getKey() );
+
+                try ( final Stream<Node<T>> st1 = e.getValue().parallelStream().unordered() )
                 {
-                    set.add( n );
+                    set.addAll( st1.filter( n  -> isDirectEffectiveNode( n, origin ) ).
+                        collect( Collector.of( CopyOnWriteArrayList::new, List::add, ( l1, l2 )  ->
+                                           {
+                                               l1.addAll( l2 );
+                                               return l1;
+                                           }, Collector.Characteristics.CONCURRENT,
+                                               Collector.Characteristics.UNORDERED ) ) );
+
                 }
-            }
 
-            for ( final Node<T> n : e.getValue() )
-            {
-                if ( isDirectSpecifiedNode( n, origin ) )
+                try ( final Stream<Node<T>> st1 = e.getValue().parallelStream().unordered() )
                 {
-                    boolean add = true;
-
-                    for ( final Node<T> override : set )
-                    {
-                        if ( override.getSpecification() == null )
+                    set.addAll( st1.filter( n  -> isDirectSpecifiedNode( n, origin ) ).
+                        filter( n  ->
                         {
-                            override.getModifiableOverriddenNodes().add( n );
-                            add = false;
-                        }
-                    }
+                            boolean add = true;
 
-                    if ( add )
-                    {
-                        set.add( n );
-                    }
+                            for ( final Node<T> override : set )
+                            {
+                                if ( override.getSpecification() == null )
+                                {
+                                    override.getModifiableOverriddenNodes().add( n );
+                                    add = false;
+                                }
+                            }
+
+                            return add;
+                        } ).collect( Collector.of( CopyOnWriteArrayList::new, List::add, ( l1, l2 )  ->
+                                               {
+                                                   l1.addAll( l2 );
+                                                   return l1;
+                                               }, Collector.Characteristics.CONCURRENT,
+                                                   Collector.Characteristics.UNORDERED ) ) );
+
                 }
-            }
+            } );
         }
 
         return declarationMap;
     }
 
-    private static <T, K> Map<K, Set<Node<T>>> getEffectiveNodes(
+    private static <T, K> Map<K, Set<Node<T>>> effectiveNodes(
         final Map<String, Map<String, Map<K, Set<Node<T>>>>> effective, final String context,
         final String implementation )
     {
-        return map( effective, context ).get( implementation );
+        return map( effective, context ).computeIfAbsent( implementation, k  -> newMap() );
     }
 
     private static boolean isDirectNode( final Node<?> node, final String implementation )
@@ -1763,27 +1462,24 @@ public class InheritanceModel
 
     private static <K, V> Map<K, V> newMap()
     {
-        return new HashMap<K, V>();
+        return new ConcurrentHashMap<>( 1024 );
     }
 
     private static <K, V> Map<K, V> newMap( final int initialCapacity )
     {
-        return new HashMap<K, V>( initialCapacity );
+        return new ConcurrentHashMap<>( initialCapacity );
     }
 
     private static <T> Set<T> newSet()
     {
-        return new HashSet<T>();
-    }
-
-    private static <T> Set<T> newSet( final int initialCapacity )
-    {
-        return new HashSet<T>( initialCapacity );
+        return new CopyOnWriteArraySet<>();
     }
 
     private static <T> Set<T> newSet( final Collection<? extends T> col )
     {
-        return new HashSet<T>( col );
+        final Set<T> set = new CopyOnWriteArraySet<>();
+        set.addAll( col );
+        return set;
     }
 
     private static <T> Set<T> unmodifiableSet( final Set<T> set )

@@ -30,19 +30,18 @@
  */
 package org.jomc.model.modlet;
 
-import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URL;
 import java.text.MessageFormat;
+import java.util.Collections;
 import java.util.Enumeration;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.ResourceBundle;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
+import java.util.stream.Collector;
+import java.util.stream.Stream;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.UnmarshalException;
@@ -415,53 +414,86 @@ public class DefaultModelProvider implements ModelProvider
     public Modules findModules( final ModelContext context, final String model, final String location )
         throws ModelException
     {
-        if ( context == null )
+        Objects.requireNonNull( context, "context" );
+        Objects.requireNonNull( model, "model" );
+        Objects.requireNonNull( location, "location" );
+
+        boolean contextValidating = this.isValidating();
+        if ( DEFAULT_VALIDATING == contextValidating
+                 && context.getAttribute( VALIDATING_ATTRIBUTE_NAME ) instanceof Boolean )
         {
-            throw new NullPointerException( "context" );
-        }
-        if ( model == null )
-        {
-            throw new NullPointerException( "model" );
-        }
-        if ( location == null )
-        {
-            throw new NullPointerException( "location" );
+            contextValidating = (Boolean) context.getAttribute( VALIDATING_ATTRIBUTE_NAME );
         }
 
-        try
+        final long t0 = System.nanoTime();
+        final Text text = new Text();
+        text.setLanguage( "en" );
+        text.setValue( getMessage( "contextModulesInfo", location ) );
+
+        final Modules modules = new Modules();
+        modules.setDocumentation( new Texts() );
+        modules.getDocumentation().setDefaultLanguage( "en" );
+        modules.getDocumentation().getText().add( text );
+
+        final ThreadLocal<Unmarshaller> threadLocalUnmarshaller = new ThreadLocal<>();
+        final Schema schema = contextValidating ? context.createSchema( model ) : null;
+        final Enumeration<URL> resources = context.findResources( location );
+
+        try ( final Stream<URL> st0 = Collections.list( resources ).parallelStream().unordered() )
         {
-            boolean contextValidating = this.isValidating();
-            if ( DEFAULT_VALIDATING == contextValidating
-                     && context.getAttribute( VALIDATING_ATTRIBUTE_NAME ) instanceof Boolean )
-            {
-                contextValidating = (Boolean) context.getAttribute( VALIDATING_ATTRIBUTE_NAME );
-            }
-
-            final long t0 = System.nanoTime();
-            final Text text = new Text();
-            text.setLanguage( "en" );
-            text.setValue( getMessage( "contextModulesInfo", location ) );
-
-            final Modules modules = new Modules();
-            modules.setDocumentation( new Texts() );
-            modules.getDocumentation().setDefaultLanguage( "en" );
-            modules.getDocumentation().getText().add( text );
-
-            final ThreadLocal<Unmarshaller> threadLocalUnmarshaller = new ThreadLocal<Unmarshaller>();
-            final Schema schema = contextValidating ? context.createSchema( model ) : null;
-
-            class UnmarshallTask implements Callable<Module>
+            final class UnmarshalFailure extends RuntimeException
             {
 
                 private final URL resource;
 
-                UnmarshallTask( final URL resource )
+                public UnmarshalFailure( final URL resource, final Throwable cause )
                 {
-                    super();
+                    super( cause );
                     this.resource = resource;
                 }
 
-                public Module call() throws ModelException
+                void propagate() throws ModelException
+                {
+                    if ( this.getCause() instanceof ModelException )
+                    {
+                        throw new ModelException( DefaultModelProvider.getMessage( this.getCause() ), this.getCause() );
+                    }
+                    else if ( this.getCause() instanceof UnmarshalException )
+                    {
+                        String message = DefaultModelProvider.getMessage( this.getCause() );
+                        if ( message == null && ( (UnmarshalException) this.getCause() ).getLinkedException() != null )
+                        {
+                            message = DefaultModelProvider.getMessage(
+                                ( (UnmarshalException) this.getCause() ).getLinkedException() );
+
+                        }
+
+                        message = DefaultModelProvider.getMessage( "unmarshalException", this.resource.toExternalForm(),
+                                                                   message != null ? " " + message : "" );
+
+                        throw new ModelException( message, this.getCause() );
+                    }
+                    else if ( this.getCause() instanceof JAXBException )
+                    {
+                        String message = DefaultModelProvider.getMessage( this.getCause() );
+                        if ( message == null && ( (JAXBException) this.getCause() ).getLinkedException() != null )
+                        {
+                            message = DefaultModelProvider.getMessage(
+                                ( (JAXBException) this.getCause() ).getLinkedException() );
+
+                        }
+
+                        throw new ModelException( message, this.getCause() );
+                    }
+
+                    throw new AssertionError( this );
+                }
+
+            }
+
+            try
+            {
+                modules.getModule().addAll( st0.map( url  ->
                 {
                     try
                     {
@@ -469,9 +501,7 @@ public class DefaultModelProvider implements ModelProvider
 
                         if ( context.isLoggable( Level.FINEST ) )
                         {
-                            context.log( Level.FINEST, getMessage( "processing", this.resource.toExternalForm() ),
-                                         null );
-
+                            context.log( Level.FINEST, getMessage( "processing", url.toExternalForm() ), null );
                         }
 
                         Unmarshaller u = threadLocalUnmarshaller.get();
@@ -482,7 +512,7 @@ public class DefaultModelProvider implements ModelProvider
                             threadLocalUnmarshaller.set( u );
                         }
 
-                        Object content = u.unmarshal( this.resource );
+                        Object content = u.unmarshal( url );
                         if ( content instanceof JAXBElement<?> )
                         {
                             content = ( (JAXBElement<?>) content ).getValue();
@@ -490,147 +520,54 @@ public class DefaultModelProvider implements ModelProvider
 
                         if ( content instanceof Module )
                         {
-                            final Module m = (Module) content;
+                            module = (Module) content;
 
                             if ( context.isLoggable( Level.FINEST ) )
                             {
-                                context.log( Level.FINEST, getMessage(
-                                             "foundModule", m.getName(), m.getVersion() == null ? "" : m.getVersion() ),
+                                context.log( Level.FINEST, getMessage( "foundModule", module.getName(),
+                                                                       module.getVersion() == null
+                                                                           ? ""
+                                                                           : module.getVersion() ),
                                              null );
 
                             }
-
-                            module = m;
                         }
                         else if ( context.isLoggable( Level.WARNING ) )
                         {
                             context.log( Level.WARNING, getMessage( "ignoringDocument",
                                                                     content == null ? "<>" : content.toString(),
-                                                                    this.resource.toExternalForm() ), null );
+                                                                    url.toExternalForm() ), null );
 
                         }
 
                         return module;
                     }
-                    catch ( final UnmarshalException e )
+                    catch ( final ModelException | JAXBException e )
                     {
-                        String message = getMessage( e );
-                        if ( message == null && e.getLinkedException() != null )
-                        {
-                            message = getMessage( e.getLinkedException() );
-                        }
-
-                        message = getMessage( "unmarshalException", this.resource.toExternalForm(),
-                                              message != null ? " " + message : "" );
-
-                        throw new ModelException( message, e );
+                        throw new UnmarshalFailure( url, e );
                     }
-                    catch ( final JAXBException e )
-                    {
-                        String message = getMessage( e );
-                        if ( message == null && e.getLinkedException() != null )
-                        {
-                            message = getMessage( e.getLinkedException() );
-                        }
-
-                        throw new ModelException( message, e );
-                    }
-                }
-
+                } ).filter( m  -> m != null ).
+                    collect( Collector.of( CopyOnWriteArrayList::new, List::add, ( l1, l2 )  ->
+                                       {
+                                           l1.addAll( l2 );
+                                           return l1;
+                                       }, Collector.Characteristics.CONCURRENT,
+                                           Collector.Characteristics.UNORDERED ) ) );
             }
-
-            final List<UnmarshallTask> tasks = new LinkedList<UnmarshallTask>();
-            final Enumeration<URL> resources = context.findResources( location );
-
-            while ( resources.hasMoreElements() )
+            catch ( final UnmarshalFailure e )
             {
-                tasks.add( new UnmarshallTask( resources.nextElement() ) );
+                e.propagate();
             }
-
-            int count = 0;
-            if ( context.getExecutorService() != null && tasks.size() > 1 )
-            {
-                for ( final Future<Module> task : context.getExecutorService().invokeAll( tasks ) )
-                {
-                    final Module m = task.get();
-
-                    if ( m != null )
-                    {
-                        modules.getModule().add( m );
-                        count++;
-                    }
-                }
-            }
-            else
-            {
-                for ( final UnmarshallTask task : tasks )
-                {
-                    final Module m = task.call();
-                    if ( m != null )
-                    {
-                        modules.getModule().add( m );
-                        count++;
-                    }
-                }
-            }
-
-            if ( context.isLoggable( Level.FINE ) )
-            {
-                context.log( Level.FINE, getMessage( "contextReport", count, location, System.nanoTime() - t0 ), null );
-            }
-
-            return modules.getModule().isEmpty() ? null : modules;
         }
-        catch ( final CancellationException e )
+
+        if ( context.isLoggable( Level.FINE ) )
         {
-            throw new ModelException( getMessage( e ), e );
+            context.log( Level.FINE, getMessage( "contextReport", modules.getModule().size(), location,
+                                                 System.nanoTime() - t0 ), null );
+
         }
-        catch ( final InterruptedException e )
-        {
-            throw new ModelException( getMessage( e ), e );
-        }
-        catch ( final ExecutionException e )
-        {
-            if ( e.getCause() instanceof ModelException )
-            {
-                throw (ModelException) e.getCause();
-            }
-            else if ( e.getCause() instanceof RuntimeException )
-            {
-                // The fork-join framework breaks the exception handling contract of Callable by re-throwing any
-                // exception caught using a runtime exception.
-                if ( e.getCause().getCause() instanceof ModelException )
-                {
-                    throw (ModelException) e.getCause().getCause();
-                }
-                else if ( e.getCause().getCause() instanceof RuntimeException )
-                {
-                    throw (RuntimeException) e.getCause().getCause();
-                }
-                else if ( e.getCause().getCause() instanceof Error )
-                {
-                    throw (Error) e.getCause().getCause();
-                }
-                else if ( e.getCause().getCause() instanceof Exception )
-                {
-                    // Checked exception not declared to be thrown by the Callable's 'call' method.
-                    throw new UndeclaredThrowableException( e.getCause().getCause() );
-                }
-                else
-                {
-                    throw (RuntimeException) e.getCause();
-                }
-            }
-            else if ( e.getCause() instanceof Error )
-            {
-                throw (Error) e.getCause();
-            }
-            else
-            {
-                // Checked exception not declared to be thrown by the Callable's 'call' method.
-                throw new UndeclaredThrowableException( e.getCause() );
-            }
-        }
+
+        return modules.getModule().isEmpty() ? null : modules;
     }
 
     /**
@@ -645,16 +582,11 @@ public class DefaultModelProvider implements ModelProvider
      * @see #ENABLED_ATTRIBUTE_NAME
      * @see #MODULE_LOCATION_ATTRIBUTE_NAME
      */
+    @Override
     public Model findModel( final ModelContext context, final Model model ) throws ModelException
     {
-        if ( context == null )
-        {
-            throw new NullPointerException( "context" );
-        }
-        if ( model == null )
-        {
-            throw new NullPointerException( "model" );
-        }
+        Objects.requireNonNull( context, "context" );
+        Objects.requireNonNull( model, "model" );
 
         Model found = null;
 

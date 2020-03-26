@@ -68,28 +68,25 @@
      */
     public Text getText( final String language )
     {
-        if ( language == null )
+        java.util.Objects.requireNonNull( language, "language" );
+
+        try ( final java.util.stream.Stream<Text> st0 = this.getText().parallelStream() )
         {
-            throw new NullPointerException( "language" );
-        }
+            final java.util.concurrent.atomic.AtomicReference<Text> defaultText =
+                new java.util.concurrent.atomic.AtomicReference<>();
 
-        Text defaultText = null;
-
-        for ( int i = 0, s0 = this.getText().size(); i < s0; i++ )
-        {
-            final Text t = this.getText().get( i );
-
-            if ( t.getLanguage().equalsIgnoreCase( this.getDefaultLanguage() ) )
+            final java.util.Optional<Text> candidate = st0.filter( t  ->
             {
-                defaultText = t;
-            }
-            if ( t.getLanguage().equalsIgnoreCase( language ) )
-            {
-                return t;
-            }
-        }
+                if ( t.getLanguage().equalsIgnoreCase( getDefaultLanguage() ) )
+                {
+                    defaultText.compareAndSet( null, t );
+                }
 
-        return defaultText;
+                return t.getLanguage().equalsIgnoreCase( language );
+            } ).findFirst();
+
+            return candidate.orElse( null );
+        }
     }
 
     /**
@@ -109,28 +106,7 @@
      */
     public Text getText( final java.util.Locale locale )
     {
-        if ( locale == null )
-        {
-            throw new NullPointerException( "locale" );
-        }
-
-        Text defaultText = null;
-
-        for ( int i = 0, s0 = this.getText().size(); i < s0; i++ )
-        {
-            final Text t = this.getText().get( i );
-
-            if ( t.getLanguage().equalsIgnoreCase( this.getDefaultLanguage() ) )
-            {
-                defaultText = t;
-            }
-            if ( t.getLanguage().equalsIgnoreCase( locale.getLanguage() ) )
-            {
-                return t;
-            }
-        }
-
-        return defaultText;
+        return this.getText( java.util.Objects.requireNonNull( locale, "locale" ).getLanguage() );
     }]]>
       </ci:code>
     </jaxb:bindings>
@@ -182,40 +158,35 @@
      */
     public String getJavadocComment( final String lineSeparator, final String indentation ) throws ModelObjectException
     {
-        if ( lineSeparator == null )
-        {
-            throw new NullPointerException( "lineSeparator" );
-        }
-        if ( indentation == null )
-        {
-            throw new NullPointerException( "indentation" );
-        }
+        java.util.Objects.requireNonNull( lineSeparator, "lineSeparator" );
+        java.util.Objects.requireNonNull( indentation, "indentation" );
 
-        java.io.BufferedReader reader = null;
+        String javadocComment = null;
 
-        try
+        if ( this.getValue() != null )
         {
-            String javadocComment = null;
-
-            if ( this.getValue() != null )
+            try ( final java.io.BufferedReader reader =
+                new java.io.BufferedReader( new java.io.StringReader( this.getValue() ) ) )
             {
-                reader = new java.io.BufferedReader( new java.io.StringReader( this.getValue() ) );
                 final StringBuilder builder = new StringBuilder( this.getValue().length() );
                 final boolean escapeHtml = !this.getMimeType().match( "text/html" );
 
-                for ( String line = reader.readLine(); line != null; line = reader.readLine() )
+                try ( final java.util.stream.Stream<String> st0 = reader.lines() )
                 {
-                    if ( escapeHtml )
+                    st0.forEach( l  ->
                     {
-                        builder.append( lineSeparator ).append( indentation ).append( " * " ).
-                            append( line.replace( "&", "&amp;" ).replace( "<", "&lt;" ).replace( ">", "&gt;" ).
-                                replace( "\"", "&quot;" ).replace( "*", "&lowast;" ) );
+                        if ( escapeHtml )
+                        {
+                            builder.append( lineSeparator ).append( indentation ).append( " * " ).
+                                append( l.replace( "&", "&amp;" ).replace( "<", "&lt;" ).replace( ">", "&gt;" ).
+                                    replace( "\"", "&quot;" ).replace( "*", "&lowast;" ) );
 
-                    }
-                    else
-                    {
-                        builder.append( lineSeparator ).append( indentation ).append( " * " ).append( line );
-                    }
+                        }
+                        else
+                        {
+                            builder.append( lineSeparator ).append( indentation ).append( " * " ).append( l );
+                        }
+                    } );
                 }
 
                 if ( builder.length() > 0 )
@@ -224,44 +195,23 @@
                         builder.substring( lineSeparator.length() + indentation.length() + " * ".length() );
 
                 }
-
-                reader.close();
-                reader = null;
             }
-
-            return javadocComment;
-        }
-        catch ( final javax.activation.MimeTypeParseException e )
-        {
-            throw new AssertionError( e );
-        }
-        catch ( final java.io.IOException e )
-        {
-            throw new AssertionError( e );
-        }
-        finally
-        {
-            try
-            {
-                if ( reader != null )
-                {
-                    reader.close();
-                }
-            }
-            catch ( final java.io.IOException e )
+            catch ( final javax.activation.MimeTypeParseException | java.io.IOException e )
             {
                 throw new AssertionError( e );
             }
         }
+
+        return javadocComment;
     }
 
     private static String getMessage( final Throwable t )
     {
         return t != null
-               ? t.getMessage() != null && t.getMessage().trim().length() > 0
-                 ? t.getMessage()
-                 : getMessage( t.getCause() )
-               : null;
+                   ? t.getMessage() != null && t.getMessage().trim().length() > 0
+                         ? t.getMessage()
+                         : getMessage( t.getCause() )
+                   : null;
 
     }
 
@@ -302,7 +252,9 @@
     </jaxb:bindings>
     <jaxb:bindings node="xs:complexType[@name='ModelObject']">
       <ci:code><![CDATA[
-    /** Public identifier of the object management and configuration model. */
+    /**
+     * Public identifier of the object management and configuration model.
+     */
     public static final String MODEL_PUBLIC_ID = "http://jomc.org/model";
 
     /**
@@ -328,47 +280,39 @@
                                                                final String localPart,
                                                                final Class<T> type )
     {
-        if ( any == null )
-        {
-            throw new NullPointerException( "any" );
-        }
-        if ( namespaceURI == null )
-        {
-            throw new NullPointerException( "namespaceURI" );
-        }
-        if ( localPart == null )
-        {
-            throw new NullPointerException( "localPart" );
-        }
-        if ( type == null )
-        {
-            throw new NullPointerException( "type" );
-        }
+        java.util.Objects.requireNonNull( any, "any" );
+        java.util.Objects.requireNonNull( namespaceURI, "namespaceURI" );
+        java.util.Objects.requireNonNull( localPart, "localPart" );
+        java.util.Objects.requireNonNull( type, "type" );
 
         javax.xml.bind.JAXBElement<?> anyElement = null;
 
-        for ( int i = 0, s0 = any.size(); i < s0; i++ )
+        try ( final java.util.stream.Stream<?> st0 = any.parallelStream().unordered() )
         {
-            final Object o = any.get( i );
+            final java.util.List<javax.xml.bind.JAXBElement<?>> candidates =
+                st0.filter( o  -> o instanceof javax.xml.bind.JAXBElement<?> ).
+                    map( o  -> (javax.xml.bind.JAXBElement<?>) o ).
+                    filter( e  -> namespaceURI.equals( e.getName().getNamespaceURI() )
+                                       && localPart.equals( e.getName().getLocalPart() ) ).
+                    collect( java.util.stream.Collector.of(
+                        java.util.concurrent.CopyOnWriteArrayList::new,
+                        java.util.List::add, ( l1, l2 )  ->
+                    {
+                        l1.addAll( l2 );
+                        return l1;
+                    }, java.util.stream.Collector.Characteristics.CONCURRENT,
+                        java.util.stream.Collector.Characteristics.UNORDERED ) );
 
-            if ( o instanceof javax.xml.bind.JAXBElement<?> )
+            if ( candidates.size() > 1 )
             {
-                final javax.xml.bind.JAXBElement<?> e = (javax.xml.bind.JAXBElement<?>) o;
+                throw new IllegalStateException( getMessage( "nonUniqueElement", this.getClass().getName(),
+                                                             namespaceURI, localPart ) );
 
-                if ( namespaceURI.equals( e.getName().getNamespaceURI() )
-                     && localPart.equals( e.getName().getLocalPart() ) )
-                {
-                    if ( anyElement == null )
-                    {
-                        anyElement = e;
-                    }
-                    else
-                    {
-                        throw new IllegalStateException( getMessage( "nonUniqueElement", this.getClass().getName(),
-                                                                     namespaceURI, localPart ) );
+            }
 
-                    }
-                }
+            if ( !candidates.isEmpty() )
+            {
+                anyElement = candidates.get( 0 );
             }
         }
 
@@ -406,44 +350,33 @@
                                                                                 final String localPart,
                                                                                 final Class<T> type )
     {
-        if ( any == null )
-        {
-            throw new NullPointerException( "any" );
-        }
-        if ( namespaceURI == null )
-        {
-            throw new NullPointerException( "namespaceURI" );
-        }
-        if ( localPart == null )
-        {
-            throw new NullPointerException( "localPart" );
-        }
-        if ( type == null )
-        {
-            throw new NullPointerException( "type" );
-        }
+        java.util.Objects.requireNonNull( any, "any" );
+        java.util.Objects.requireNonNull( namespaceURI, "namespaceURI" );
+        java.util.Objects.requireNonNull( localPart, "localPart" );
+        java.util.Objects.requireNonNull( type, "type" );
 
-        final java.util.List<javax.xml.bind.JAXBElement<T>> anyElements =
-            new java.util.ArrayList<javax.xml.bind.JAXBElement<T>>( any.size() );
+        final java.util.List<javax.xml.bind.JAXBElement<T>> anyElements = new java.util.ArrayList<>( any.size() );
 
-        for ( int i = 0, s0 = any.size(); i < s0; i++ )
+        try ( final java.util.stream.Stream<?> st0 = any.parallelStream().unordered() )
         {
-            final Object o = any.get( i );
-
-            if ( o instanceof javax.xml.bind.JAXBElement<?> )
-            {
-                final javax.xml.bind.JAXBElement<?> e = (javax.xml.bind.JAXBElement<?>) o;
-
-                if ( namespaceURI.equals( e.getName().getNamespaceURI() )
-                     && localPart.equals( e.getName().getLocalPart() )
-                     && e.getValue() != null && e.getValue().getClass().equals( type ) )
+            anyElements.addAll( st0.filter( o  -> o instanceof javax.xml.bind.JAXBElement<?> ).
+                map( o  -> (javax.xml.bind.JAXBElement<?>) o ).
+                filter( e  -> namespaceURI.equals( e.getName().getNamespaceURI() )
+                                   && localPart.equals( e.getName().getLocalPart() )
+                                   && e.getValue() != null && e.getValue().getClass().equals( type ) ).
+                map( e  ->
                 {
-                    @SuppressWarnings( "unchecked" ) final javax.xml.bind.JAXBElement<T> anyElement =
-                        (javax.xml.bind.JAXBElement<T>) e;
+                    @SuppressWarnings( "unchecked" )
+                    final javax.xml.bind.JAXBElement<T> g = (javax.xml.bind.JAXBElement<T>) e;
+                    return g;
+                } ).collect( java.util.stream.Collector.of( java.util.concurrent.CopyOnWriteArrayList::new,
+                                                            java.util.List::add, ( l1, l2 )  ->
+                                                        {
+                                                            l1.addAll( l2 );
+                                                            return l1;
+                                                        }, java.util.stream.Collector.Characteristics.CONCURRENT,
+                                                            java.util.stream.Collector.Characteristics.UNORDERED ) ) );
 
-                    anyElements.add( anyElement );
-                }
-            }
         }
 
         return java.util.Collections.unmodifiableList( anyElements );
@@ -463,39 +396,42 @@
      */
     protected <T> T getAnyObject( final java.util.List<Object> any, final Class<T> clazz )
     {
-        if ( any == null )
-        {
-            throw new NullPointerException( "any" );
-        }
-        if ( clazz == null )
-        {
-            throw new NullPointerException( "clazz" );
-        }
+        java.util.Objects.requireNonNull( any, "any" );
+        java.util.Objects.requireNonNull( clazz, "clazz" );
 
         T anyObject = null;
 
-        for ( int i = 0, s0 = any.size(); i < s0; i++ )
+        try ( final java.util.stream.Stream<?> st0 = any.parallelStream().unordered() )
         {
-            Object o = any.get( i );
-
-            if ( o instanceof javax.xml.bind.JAXBElement<?> )
+            final java.util.List<?> candidates = st0.map( o  ->
             {
-                o = ( (javax.xml.bind.JAXBElement<?>) o ).getValue();
+                Object mapped = o;
+
+                if ( o instanceof javax.xml.bind.JAXBElement<?> )
+                {
+                    mapped = ( (javax.xml.bind.JAXBElement<?>) o ).getValue();
+                }
+
+                return mapped;
+            } ).filter( o  -> clazz.equals( o.getClass() ) ).
+                collect( java.util.stream.Collector.of( java.util.concurrent.CopyOnWriteArrayList::new,
+                                                        java.util.List::add, ( l1, l2 )  ->
+                                                    {
+                                                        l1.addAll( l2 );
+                                                        return l1;
+                                                    }, java.util.stream.Collector.Characteristics.CONCURRENT,
+                                                        java.util.stream.Collector.Characteristics.UNORDERED ) );
+
+            if ( candidates.size() > 1 )
+            {
+                throw new IllegalStateException( getMessage( "nonUniqueObject", this.getClass().getName(),
+                                                             clazz.getName() ) );
+
             }
-
-            if ( clazz.equals( o.getClass() ) )
+            if ( !candidates.isEmpty() )
             {
-                if ( anyObject == null )
-                {
-                    @SuppressWarnings( "unchecked" ) final T object = (T) o;
-                    anyObject = object;
-                }
-                else
-                {
-                    throw new IllegalStateException( getMessage( "nonUniqueObject", this.getClass().getName(),
-                                                                 clazz.getName() ) );
-
-                }
+                @SuppressWarnings( "unchecked" ) final T object = (T) candidates.get( 0 );
+                anyObject = object;
             }
         }
 
@@ -516,31 +452,37 @@
      */
     protected <T> java.util.List<T> getAnyObjects( final java.util.List<Object> any, final Class<T> clazz )
     {
-        if ( any == null )
-        {
-            throw new NullPointerException( "any" );
-        }
-        if ( clazz == null )
-        {
-            throw new NullPointerException( "namespaceURI" );
-        }
+        java.util.Objects.requireNonNull( any, "any" );
+        java.util.Objects.requireNonNull( clazz, "clazz" );
 
-        final java.util.List<T> anyElements = new java.util.ArrayList<T>( any.size() );
+        final java.util.List<T> anyElements = new java.util.ArrayList<>( any.size() );
 
-        for ( int i = 0, s0 = any.size(); i < s0; i++ )
+        try ( final java.util.stream.Stream<?> st0 = any.parallelStream() )
         {
-            Object o = any.get( i );
-
-            if ( o instanceof javax.xml.bind.JAXBElement<?> )
+            anyElements.addAll( st0.map( o  ->
             {
-                o = ( (javax.xml.bind.JAXBElement<?>) o ).getValue();
-            }
+                Object mapped = o;
 
-            if ( clazz.equals( o.getClass() ) )
-            {
-                @SuppressWarnings( "unchecked" ) final T object = (T) o;
-                anyElements.add( object );
-            }
+                if ( o instanceof javax.xml.bind.JAXBElement<?> )
+                {
+                    mapped = ( (javax.xml.bind.JAXBElement<?>) o ).getValue();
+                }
+
+                return mapped;
+            } ).filter( o  -> clazz.equals( o.getClass() ) ).
+                map( o  ->
+                {
+                    @SuppressWarnings( "unchecked" ) final T object = (T) o;
+                    return object;
+                } ).
+                collect( java.util.stream.Collector.of( java.util.concurrent.CopyOnWriteArrayList::new,
+                                                        java.util.List::add, ( l1, l2 )  ->
+                                                    {
+                                                        l1.addAll( l2 );
+                                                        return l1;
+                                                    }, java.util.stream.Collector.Characteristics.CONCURRENT,
+                                                        java.util.stream.Collector.Characteristics.UNORDERED ) ) );
+
         }
 
         return java.util.Collections.unmodifiableList( anyElements );
@@ -698,22 +640,15 @@
      */
     public Specification getSpecification( final String specification )
     {
-        if ( specification == null )
+        java.util.Objects.requireNonNull( specification, "specification" );
+
+        try ( final java.util.stream.Stream<Specification> st0 = this.getSpecification().parallelStream() )
         {
-            throw new NullPointerException( "specification" );
+            final java.util.Optional<Specification> candidate =
+                st0.filter( s  -> specification.equals( s.getIdentifier() ) ).findFirst();
+
+            return candidate.orElse( null );
         }
-
-        for ( int i = 0, s0 = this.getSpecification().size(); i < s0; i++ )
-        {
-            final Specification s = this.getSpecification().get( i );
-
-            if ( specification.equals( s.getIdentifier() ) )
-            {
-                return s;
-            }
-        }
-
-        return null;
     }
 
     /**
@@ -733,25 +668,54 @@
      */
     public Specification getSpecification( final Class<?> specification ) throws ModelObjectException
     {
-        if ( specification == null )
-        {
-            throw new NullPointerException( "specification" );
-        }
+        java.util.Objects.requireNonNull( specification, "specification" );
 
-        for ( int i = 0, s0 = this.getSpecification().size(); i < s0; i++ )
+        try ( final java.util.stream.Stream<Specification> st0 = this.getSpecification().parallelStream() )
         {
-            final Specification s = this.getSpecification().get( i );
-
-            if ( s.isClassDeclaration() && s.getClazz() != null )
+            final class FindSpecificationFailure extends RuntimeException
             {
-                if ( specification.getName().equals( s.getJavaTypeName().getClassName() ) )
+
+                public FindSpecificationFailure( final Throwable cause )
                 {
-                    return s;
+                    super( cause );
                 }
+
+                void propagate() throws ModelObjectException
+                {
+                    if ( this.getCause() instanceof ModelObjectException )
+                    {
+                        throw new ModelObjectException( this.getCause().getMessage(), this.getCause() );
+                    }
+
+                    throw new AssertionError( this );
+                }
+
+            }
+
+            try
+            {
+                final java.util.Optional<Specification> candidate =
+                    st0.filter( s  -> s.isClassDeclaration() && s.getClazz() != null ).
+                        filter( s  ->
+                        {
+                            try
+                            {
+                                return specification.getName().equals( s.getJavaTypeName().getClassName() );
+                            }
+                            catch ( final ModelObjectException e )
+                            {
+                                throw new FindSpecificationFailure( e );
+                            }
+                        } ).findFirst();
+
+                return candidate.orElse( null );
+            }
+            catch ( final FindSpecificationFailure e )
+            {
+                e.propagate();
+                throw new AssertionError( e );
             }
         }
-
-        return null;
     }
 
     /**
@@ -768,22 +732,15 @@
      */
     public SpecificationReference getReference( final String specification )
     {
-        if ( specification == null )
+        java.util.Objects.requireNonNull( specification, "specification" );
+
+        try ( final java.util.stream.Stream<SpecificationReference> st0 = this.getReference().parallelStream() )
         {
-            throw new NullPointerException( "specification" );
+            final java.util.Optional<SpecificationReference> candidate =
+                st0.filter( s  -> specification.equals( s.getIdentifier() ) ).findFirst();
+
+            return candidate.orElse( null );
         }
-
-        for ( int i = 0, s0 = this.getReference().size(); i < s0; i++ )
-        {
-            final SpecificationReference r = this.getReference().get( i );
-
-            if ( specification.equals( r.getIdentifier() ) )
-            {
-                return r;
-            }
-        }
-
-        return null;
     }]]>
       </ci:code>
     </jaxb:bindings>
@@ -1041,22 +998,15 @@
      */
     public Implementation getImplementation( final String implementation )
     {
-        if ( implementation == null )
+        java.util.Objects.requireNonNull( implementation, "implementation" );
+
+        try ( final java.util.stream.Stream<Implementation> st0 = this.getImplementation().parallelStream() )
         {
-            throw new NullPointerException( "implementation" );
+            final java.util.Optional<Implementation> candidate =
+                st0.filter( i  -> implementation.equals( i.getIdentifier() ) ).findFirst();
+
+            return candidate.orElse( null );
         }
-
-        for ( int i = 0, s0 = this.getImplementation().size(); i < s0; i++ )
-        {
-            final Implementation current = this.getImplementation().get( i );
-
-            if ( implementation.equals( current.getIdentifier() ) )
-            {
-                return current;
-            }
-        }
-
-        return null;
     }
 
     /**
@@ -1076,25 +1026,54 @@
      */
     public Implementation getImplementation( final Class<?> implementation ) throws ModelObjectException
     {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
+        java.util.Objects.requireNonNull( implementation, "implementation" );
 
-        for ( int i = 0, s0 = this.getImplementation().size(); i < s0; i++ )
+        try ( final java.util.stream.Stream<Implementation> st0 = this.getImplementation().parallelStream() )
         {
-            final Implementation current = this.getImplementation().get( i );
-
-            if ( current.isClassDeclaration() && current.getClazz() != null )
+            final class FindImplementationFailure extends RuntimeException
             {
-                if ( implementation.getName().equals( current.getJavaTypeName().getClassName() ) )
+
+                public FindImplementationFailure( final Throwable cause )
                 {
-                    return current;
+                    super( cause );
                 }
+
+                void propagate() throws ModelObjectException
+                {
+                    if ( this.getCause() instanceof ModelObjectException )
+                    {
+                        throw new ModelObjectException( this.getCause().getMessage(), this.getCause() );
+                    }
+
+                    throw new AssertionError( this );
+                }
+
+            }
+
+            try
+            {
+                final java.util.Optional<Implementation> candidate =
+                    st0.filter( i  -> i.isClassDeclaration() && i.getClazz() != null ).
+                        filter( i  ->
+                        {
+                            try
+                            {
+                                return implementation.getName().equals( i.getJavaTypeName().getClassName() );
+                            }
+                            catch ( final ModelObjectException e )
+                            {
+                                throw new FindImplementationFailure( e );
+                            }
+                        } ).findFirst();
+
+                return candidate.orElse( null );
+            }
+            catch ( final FindImplementationFailure e )
+            {
+                e.propagate();
+                throw new AssertionError( e );
             }
         }
-
-        return null;
     }
 
     /**
@@ -1111,22 +1090,15 @@
      */
     public Implementation getImplementationByName( final String name )
     {
-        if ( name == null )
+        java.util.Objects.requireNonNull( name, "name" );
+
+        try ( final java.util.stream.Stream<Implementation> st0 = this.getImplementation().parallelStream() )
         {
-            throw new NullPointerException( "name" );
+            final java.util.Optional<Implementation> candidate =
+                st0.filter( i  -> name.equals( i.getName() ) ).findFirst();
+
+            return candidate.orElse( null );
         }
-
-        for ( int i = 0, s0 = this.getImplementation().size(); i < s0; i++ )
-        {
-            final Implementation current = this.getImplementation().get( i );
-
-            if ( name.equals( current.getName() ) )
-            {
-                return current;
-            }
-        }
-
-        return null;
     }
 
     /**
@@ -1143,22 +1115,15 @@
      */
     public ImplementationReference getReference( final String implementation )
     {
-        if ( implementation == null )
+        java.util.Objects.requireNonNull( implementation, "implementation" );
+
+        try ( final java.util.stream.Stream<ImplementationReference> s1 = this.getReference().parallelStream() )
         {
-            throw new NullPointerException( "implementation" );
+            final java.util.Optional<ImplementationReference> candidate =
+                s1.filter( r  -> implementation.equals( r.getIdentifier() ) ).findFirst();
+
+            return candidate.orElse( null );
         }
-
-        for ( int i = 0, s0 = this.getReference().size(); i < s0; i++ )
-        {
-            final ImplementationReference r = this.getReference().get( i );
-
-            if ( implementation.equals( r.getIdentifier() ) )
-            {
-                return r;
-            }
-        }
-
-        return null;
     }]]>
       </ci:code>
     </jaxb:bindings>
@@ -1482,22 +1447,15 @@
      */
     public Dependency getDependency( final String name )
     {
-        if ( name == null )
+        java.util.Objects.requireNonNull( name, "name" );
+
+        try ( final java.util.stream.Stream<Dependency> s1 = this.getDependency().parallelStream() )
         {
-            throw new NullPointerException( "identifier" );
+            final java.util.Optional<Dependency> candidate =
+                s1.filter( d  -> name.equals( d.getName() ) ).findFirst();
+
+            return candidate.isPresent() ? candidate.get() : null;
         }
-
-        for ( int i = 0, s0 = this.getDependency().size(); i < s0; i++ )
-        {
-            final Dependency d = this.getDependency().get( i );
-
-            if ( name.equals( d.getName() ) )
-            {
-                return d;
-            }
-        }
-
-        return null;
     }
 
     /**
@@ -1516,24 +1474,22 @@
      */
     public List<Dependency> getDependenciesBySpecification( final String specification )
     {
-        if ( specification == null )
+        java.util.Objects.requireNonNull( specification, "specification" );
+
+        try ( final java.util.stream.Stream<Dependency> st0 = this.getDependency().parallelStream() )
         {
-            throw new NullPointerException( "specification" );
+            return java.util.Collections.unmodifiableList(
+                st0.filter( d  -> specification.equals( d.getIdentifier() ) ).
+                    collect( java.util.stream.Collector.of( java.util.concurrent.CopyOnWriteArrayList::new,
+                                                            java.util.List::add, ( l1, l2 )  ->
+                                                        {
+                                                            l1.addAll( l2 );
+                                                            return l1;
+                                                        },
+                                                            java.util.stream.Collector.Characteristics.CONCURRENT,
+                                                            java.util.stream.Collector.Characteristics.UNORDERED ) ) );
+
         }
-
-        final List<Dependency> list = new ArrayList<Dependency>( this.getDependency().size() );
-
-        for ( int i = 0, s0 = this.getDependency().size(); i < s0; i++ )
-        {
-            final Dependency d = this.getDependency().get( i );
-
-            if ( specification.equals( d.getIdentifier() ) )
-            {
-                list.add( d );
-            }
-        }
-
-        return java.util.Collections.unmodifiableList( list );
     }]]>
       </ci:code>
     </jaxb:bindings>
@@ -1810,22 +1766,15 @@
      */
     public Property getProperty( final String name )
     {
-        if ( name == null )
+        java.util.Objects.requireNonNull( name, "name" );
+
+        try ( final java.util.stream.Stream<Property> s1 = this.getProperty().parallelStream() )
         {
-            throw new NullPointerException( "name" );
+            final java.util.Optional<Property> candidate =
+                s1.filter( p  -> name.equals( p.getName() ) ).findFirst();
+
+            return candidate.orElse( null );
         }
-
-        for ( int i = 0, s0 = this.getProperty().size(); i < s0; i++ )
-        {
-            final Property p = this.getProperty().get( i );
-
-            if ( name.equals( p.getName() ) )
-            {
-                return p;
-            }
-        }
-
-        return null;
     }
 
     /**
@@ -1842,22 +1791,15 @@
      */
     public PropertyReference getReference( final String name )
     {
-        if ( name == null )
+        java.util.Objects.requireNonNull( name, "name" );
+
+        try ( final java.util.stream.Stream<PropertyReference> st0 = this.getReference().parallelStream() )
         {
-            throw new NullPointerException( "name" );
+            final java.util.Optional<PropertyReference> candidate =
+                st0.filter( r  -> name.equals( r.getName() ) ).findFirst();
+
+            return candidate.orElse( null );
         }
-
-        for ( int i = 0, s0 = this.getReference().size(); i < s0; i++ )
-        {
-            final PropertyReference r = this.getReference().get( i );
-
-            if ( name.equals( r.getName() ) )
-            {
-                return r;
-            }
-        }
-
-        return null;
     }
 
     /**
@@ -1874,19 +1816,22 @@
      */
     public List<Property> getPropertiesByType( final String type )
     {
-        final List<Property> list = new ArrayList<Property>( this.getProperty().size() );
+        java.util.Objects.requireNonNull( type, "type" );
 
-        for ( int i = 0, s0 = this.getProperty().size(); i < s0; i++ )
+        try ( final java.util.stream.Stream<Property> st0 = this.getProperty().parallelStream() )
         {
-            final Property p = this.getProperty().get( i );
+            return java.util.Collections.unmodifiableList( st0.filter( p  -> type == null
+                                                                                  ? p.getType() == null
+                                                                                  : type.equals( p.getType() ) ).
+                collect( java.util.stream.Collector.of( java.util.concurrent.CopyOnWriteArrayList::new,
+                                                        java.util.List::add, ( l1, l2 )  ->
+                                                    {
+                                                        l1.addAll( l2 );
+                                                        return l1;
+                                                    }, java.util.stream.Collector.Characteristics.CONCURRENT,
+                                                        java.util.stream.Collector.Characteristics.UNORDERED ) ) );
 
-            if ( type == null ? p.getType() == null : type.equals( p.getType() ) )
-            {
-                list.add( p );
-            }
         }
-
-        return java.util.Collections.unmodifiableList( list );
     }]]>
       </ci:code>
     </jaxb:bindings>
@@ -1928,7 +1873,8 @@
       <ci:code><![CDATA[
     /**
      * Gets the Java value of the property.
-     * <p>The Java value of the property is computed based on the following rules:
+     * <p>
+     * The Java value of the property is computed based on the following rules:
      * <ol>
      * <li>If property {@code any} is set, the Java value is computed based on the object returned by method
      * {@code getAny()} by possibly unwrapping any {@code JAXBElement} instances. If that object declares a
@@ -1970,7 +1916,7 @@
                 }
 
                 final Object anyObject = this.getAny() instanceof JAXBElement
-                                         ? ( (JAXBElement) this.getAny() ).getValue() : this.getAny();
+                                             ? ( (JAXBElement) this.getAny() ).getValue() : this.getAny();
 
                 return this.getJavaValue( classLoader, anyObject,
                                           this.getJavaTypeName().getClass( classLoader, false ) );
@@ -1986,8 +1932,8 @@
                 }
 
                 return this.getJavaValue( this.getJavaTypeName().isPrimitive()
-                                          ? this.getJavaTypeName().getBoxedName().getClass( classLoader, false )
-                                          : this.getJavaTypeName().getClass( classLoader, false ),
+                                              ? this.getJavaTypeName().getBoxedName().getClass( classLoader, false )
+                                              : this.getJavaTypeName().getClass( classLoader, false ),
                                           this.getValue() );
 
             }
@@ -2012,10 +1958,10 @@
     public org.jomc.jls.JavaTypeName getJavaTypeName() throws ModelObjectException
     {
         final String typeName = this.getType() == null
-                                ? this.getAny() == null
-                                  ? String.class.getName()
-                                  : Object.class.getName()
-                                : this.getType();
+                                    ? this.getAny() == null
+                                          ? String.class.getName()
+                                          : Object.class.getName()
+                                    : this.getType();
 
         try
         {
@@ -2045,7 +1991,7 @@
         {
             final org.jomc.jls.JavaTypeName javaType = this.getJavaTypeName();
             final String prefix = javaType.runtimeEquals( org.jomc.jls.JavaTypeName.BOOLEAN )
-                                  || javaType.runtimeEquals( org.jomc.jls.JavaTypeName.BOOLEAN_TYPE ) ? "is" : "get";
+                                      || javaType.runtimeEquals( org.jomc.jls.JavaTypeName.BOOLEAN_TYPE ) ? "is" : "get";
 
             return org.jomc.jls.JavaIdentifier.parse( prefix + org.jomc.jls.JavaIdentifier.normalize(
                 this.getName() != null ? this.getName() : "",
@@ -2166,7 +2112,7 @@
 
                 return result;
             }
-            catch ( final IllegalAccessException e )
+            catch ( final IllegalAccessException | SecurityException e )
             {
                 throw new PropertyException( getMessage( "methodAccessDenied", methodName,
                                                          any.getClass().getName() ), e );
@@ -2179,12 +2125,6 @@
             catch ( final InvocationTargetException e )
             {
                 throw new PropertyException( getMessage( "methodInvocationFailure", methodName,
-                                                         any.getClass().getName() ), e );
-
-            }
-            catch ( final SecurityException e )
-            {
-                throw new PropertyException( getMessage( "methodAccessDenied", methodName,
                                                          any.getClass().getName() ), e );
 
             }
@@ -2267,10 +2207,10 @@
     private static String getMessage( final Throwable t )
     {
         return t != null
-               ? t.getMessage() != null && t.getMessage().trim().length() > 0
-                 ? t.getMessage()
-                 : getMessage( t.getCause() )
-               : null;
+                   ? t.getMessage() != null && t.getMessage().trim().length() > 0
+                         ? t.getMessage()
+                         : getMessage( t.getCause() )
+                   : null;
 
     }
 
@@ -2318,22 +2258,13 @@
      */
     public Message getMessage( final String name )
     {
-        if ( name == null )
+        java.util.Objects.requireNonNull( name, "name" );
+
+        try ( final java.util.stream.Stream<Message> st0 = this.getMessage().parallelStream() )
         {
-            throw new NullPointerException( "name" );
+            final java.util.Optional<Message> candidate = st0.filter( m  -> name.equals( m.getName() ) ).findFirst();
+            return candidate.orElse( null );
         }
-
-        for ( int i = 0, s0 = this.getMessage().size(); i < s0; i++ )
-        {
-            final Message m = this.getMessage().get( i );
-
-            if ( name.equals( m.getName() ) )
-            {
-                return m;
-            }
-        }
-
-        return null;
     }
 
     /**
@@ -2350,22 +2281,15 @@
      */
     public MessageReference getReference( final String name )
     {
-        if ( name == null )
+        java.util.Objects.requireNonNull( name, "name" );
+
+        try ( final java.util.stream.Stream<MessageReference> st0 = this.getReference().parallelStream() )
         {
-            throw new NullPointerException( "name" );
+            final java.util.Optional<MessageReference> candidate =
+                st0.filter( r  -> name.equals( r.getName() ) ).findFirst();
+
+            return candidate.orElse( null );
         }
-
-        for ( int i = 0, s0 = this.getReference().size(); i < s0; i++ )
-        {
-            final MessageReference r = this.getReference().get( i );
-
-            if ( name.equals( r.getName() ) )
-            {
-                return r;
-            }
-        }
-
-        return null;
     }]]>
       </ci:code>
     </jaxb:bindings>
@@ -2511,52 +2435,28 @@
      */
     public java.text.MessageFormat getJavaMessage( final Locale locale ) throws ModelObjectException
     {
-        if ( locale == null )
-        {
-            throw new NullPointerException( "locale" );
-        }
-
+        java.util.Objects.requireNonNull( locale, "locale" );
         final Text text = this.getTemplate().getText( locale.getLanguage().toLowerCase( Locale.ENGLISH ) );
         final StringBuilder builder = new StringBuilder( text.getValue().length() );
-        String pattern = null;
-        java.io.BufferedReader reader = null;
 
-        try
+        try ( final java.io.BufferedReader reader = new java.io.BufferedReader(
+            new java.io.StringReader( text.getValue() ) );
+              final java.util.stream.Stream<String> st0 = reader.lines() )
         {
-            reader = new java.io.BufferedReader( new java.io.StringReader( text.getValue() ) );
+            st0.forEach( line  -> builder.append( LINE_SEPARATOR ).append( line ) );
+            return new java.text.MessageFormat( builder.length() > 0
+                                                    ? builder.substring( LINE_SEPARATOR.length() )
+                                                    : builder.toString(),
+                                                locale );
 
-            for ( String line = reader.readLine(); line != null; line = reader.readLine() )
-            {
-                builder.append( LINE_SEPARATOR ).append( line );
-            }
-
-            reader.close();
-            reader = null;
-
-            pattern = builder.length() > 0 ? builder.substring( LINE_SEPARATOR.length() ) : builder.toString();
-            return new java.text.MessageFormat( pattern, locale );
         }
         catch ( final IllegalArgumentException e )
         {
-            throw new ModelObjectException( getMessage( "javaMessageParseException", pattern, getMessage( e ) ), e );
+            throw new ModelObjectException( getMessage( "javaMessageParseException", builder, getMessage( e ) ), e );
         }
         catch ( final java.io.IOException e )
         {
             throw new AssertionError( e );
-        }
-        finally
-        {
-            try
-            {
-                if ( reader != null )
-                {
-                    reader.close();
-                }
-            }
-            catch ( final java.io.IOException e )
-            {
-                throw new AssertionError( e );
-            }
         }
     }
 
@@ -2675,10 +2575,10 @@
     private static String getMessage( final Throwable t )
     {
         return t != null
-               ? t.getMessage() != null && t.getMessage().trim().length() > 0
-                 ? t.getMessage()
-                 : getMessage( t.getCause() )
-               : null;
+                   ? t.getMessage() != null && t.getMessage().trim().length() > 0
+                         ? t.getMessage()
+                         : getMessage( t.getCause() )
+                   : null;
 
     }
 
@@ -2727,22 +2627,13 @@
      */
     public Argument getArgument( final String name )
     {
-        if ( name == null )
+        java.util.Objects.requireNonNull( name, "name" );
+
+        try ( final java.util.stream.Stream<Argument> st0 = this.getArgument().parallelStream() )
         {
-            throw new NullPointerException( "name" );
+            final java.util.Optional<Argument> candidate = st0.filter( a  -> name.equals( a.getName() ) ).findFirst();
+            return candidate.orElse( null );
         }
-
-        for ( int i = 0, s0 = this.getArgument().size(); i < s0; i++ )
-        {
-            final Argument a = this.getArgument().get( i );
-
-            if ( name.equals( a.getName() ) )
-            {
-                return a;
-            }
-        }
-
-        return null;
     }
 
     /**
@@ -2765,17 +2656,11 @@
             throw new IndexOutOfBoundsException( Integer.toString( index ) );
         }
 
-        for ( int i = 0, s0 = this.getArgument().size(); i < s0; i++ )
+        try ( final java.util.stream.Stream<Argument> st0 = this.getArgument().parallelStream() )
         {
-            final Argument a = this.getArgument().get( i );
-
-            if ( index == a.getIndex() )
-            {
-                return a;
-            }
+            final java.util.Optional<Argument> candidate = st0.filter( a  -> index == a.getIndex() ).findFirst();
+            return candidate.orElse( null );
         }
-
-        return null;
     }]]>
       </ci:code>
     </jaxb:bindings>
@@ -2985,22 +2870,15 @@
      */
     public Instance getInstance( final String identifier )
     {
-        if ( identifier == null )
+        java.util.Objects.requireNonNull( identifier, "identifier" );
+
+        try ( final java.util.stream.Stream<Instance> st0 = this.getInstance().parallelStream() )
         {
-            throw new NullPointerException( "identifier" );
+            final java.util.Optional<Instance> candidate =
+                st0.filter( i  -> identifier.equals( i.getIdentifier() ) ).findFirst();
+
+            return candidate.orElse( null );
         }
-
-        for ( int i = 0, s0 = this.getInstance().size(); i < s0; i++ )
-        {
-            final Instance current = this.getInstance().get( i );
-
-            if ( identifier.equals( current.getIdentifier() ) )
-            {
-                return current;
-            }
-        }
-
-        return null;
     }]]>
       </ci:code>
     </jaxb:bindings>
@@ -3056,7 +2934,9 @@
     {
     };
 
-    /** Maps dependency names to dependency objects. */
+    /**
+     * Maps dependency names to dependency objects.
+     */
     @javax.xml.bind.annotation.XmlTransient private java.util.Map<String, Object> dependencyObjects;
 
     /**
@@ -3065,12 +2945,15 @@
      */
     @javax.xml.bind.annotation.XmlTransient private java.util.Map<String, java.util.Map<java.util.Locale, java.text.MessageFormat>> messageObjects;
 
-    /** Maps property names to property objects. */
+    /**
+     * Maps property names to property objects.
+     */
     @javax.xml.bind.annotation.XmlTransient private java.util.Map<String, Object> propertyObjects;
 
     /**
      * Gets a mapping of dependency names to objects bound to the instance.
-     * <p>This method returns a reference to the live map, not a snapshot. Any modification you make to the returned map
+     * <p>
+     * This method returns a reference to the live map, not a snapshot. Any modification you make to the returned map
      * will be present inside the object.</p>
      *
      * @return A mapping of dependency names to objects bound to the instance.
@@ -3079,7 +2962,7 @@
     {
         if ( this.dependencyObjects == null )
         {
-            this.dependencyObjects = new java.util.HashMap<String, Object>();
+            this.dependencyObjects = new java.util.HashMap<>();
         }
 
         return this.dependencyObjects;
@@ -3087,7 +2970,8 @@
 
     /**
      * Gets a mapping of message names to a mapping of locales to message format objects bound to the instance.
-     * <p>This method returns a reference to the live map, not a snapshot. Any modification you make to the returned map
+     * <p>
+     * This method returns a reference to the live map, not a snapshot. Any modification you make to the returned map
      * will be present inside the object.</p>
      *
      * @return A mapping of message names to a mapping of locales to message format objects bound to the instance.
@@ -3098,9 +2982,7 @@
     {
         if ( this.messageObjects == null )
         {
-            this.messageObjects =
-                new java.util.HashMap<String, java.util.Map<java.util.Locale, java.text.MessageFormat>>();
-
+            this.messageObjects = new java.util.HashMap<>();
         }
 
         return this.messageObjects;
@@ -3108,7 +2990,8 @@
 
     /**
      * Gets a mapping of property names to objects bound to the instance.
-     * <p>This method returns a reference to the live map, not a snapshot. Any modification you make to the returned map
+     * <p>
+     * This method returns a reference to the live map, not a snapshot. Any modification you make to the returned map
      * will be present inside the object.</p>
      *
      * @return A mapping of property names to objects bound to the instance.
@@ -3117,7 +3000,7 @@
     {
         if ( this.propertyObjects == null )
         {
-            this.propertyObjects = new java.util.HashMap<String, Object>();
+            this.propertyObjects = new java.util.HashMap<>();
         }
 
         return this.propertyObjects;
@@ -3174,18 +3057,71 @@
     public Class<?>[] getJavaClasses( final ClassLoader classLoader )
         throws ClassNotFoundException, ModelObjectException
     {
-        final java.util.Set<Class<?>> classes = new java.util.HashSet<Class<?>>();
+        java.util.List<Class<?>> classes = java.util.Collections.emptyList();
 
         if ( this.getSpecifications() != null )
         {
-            for ( int i = 0, s0 = this.getSpecifications().getSpecification().size(); i < s0; i++ )
+            try ( final java.util.stream.Stream<Specification> st0 =
+                this.getSpecifications().getSpecification().parallelStream().unordered() )
             {
-                final Specification s = this.getSpecifications().getSpecification().get( i );
-                final org.jomc.jls.JavaTypeName javaTypeName = s.getJavaTypeName();
-
-                if ( javaTypeName != null )
+                final class FindClassesFailure extends RuntimeException
                 {
-                    classes.add( javaTypeName.getClass( classLoader, false ) );
+
+                    public FindClassesFailure( final Throwable cause )
+                    {
+                        super( cause );
+                    }
+
+                    void propagate() throws ClassNotFoundException, ModelObjectException
+                    {
+                        if ( this.getCause() instanceof ClassNotFoundException )
+                        {
+                            throw (ClassNotFoundException) this.getCause();
+                        }
+                        else if ( this.getCause() instanceof ModelObjectException )
+                        {
+                            throw (ModelObjectException) this.getCause();
+                        }
+
+                        throw new AssertionError( this );
+                    }
+
+                }
+
+                try
+                {
+                    classes = st0.filter( s  ->
+                    {
+                        try
+                        {
+                            return s.getJavaTypeName() != null;
+                        }
+                        catch ( final ModelObjectException e )
+                        {
+                            throw new FindClassesFailure( e );
+                        }
+                    } ).map( s  ->
+                    {
+                        try
+                        {
+                            return s.getJavaTypeName().getClass( classLoader, false );
+                        }
+                        catch ( final ClassNotFoundException | ModelObjectException e )
+                        {
+                            throw new FindClassesFailure( e );
+                        }
+                    } ).collect( java.util.stream.Collector.of( java.util.concurrent.CopyOnWriteArrayList::new,
+                                                                java.util.List::add, ( l1, l2 )  ->
+                                                            {
+                                                                l1.addAll( l2 );
+                                                                return l1;
+                                                            }, java.util.stream.Collector.Characteristics.CONCURRENT,
+                                                                java.util.stream.Collector.Characteristics.UNORDERED ) );
+                }
+                catch ( final FindClassesFailure e )
+                {
+                    e.propagate();
+                    throw new AssertionError( e );
                 }
             }
         }
@@ -3221,7 +3157,7 @@
             final Class<?> javaClass = javaTypeName.getClass( classLoader, false );
 
             if ( java.lang.reflect.Modifier.isPublic( javaClass.getModifiers() )
-                 && !java.lang.reflect.Modifier.isAbstract( javaClass.getModifiers() ) )
+                     && !java.lang.reflect.Modifier.isAbstract( javaClass.getModifiers() ) )
             {
                 try
                 {
@@ -3399,13 +3335,10 @@
 
         if ( canProxy )
         {
-            for ( int i = javaClasses.length - 1; i >= 0; i-- )
+            try ( final java.util.stream.Stream<Class<?>> st0 =
+                java.util.Arrays.asList( javaClasses ).parallelStream().unordered() )
             {
-                if ( !javaClasses[i].isInterface() )
-                {
-                    canProxy = false;
-                    break;
-                }
+                canProxy = st0.noneMatch( c  -> !c.isInterface() );
             }
         }
 
@@ -3535,10 +3468,10 @@
     private static String getMessage( final Throwable t )
     {
         return t != null
-               ? t.getMessage() != null && t.getMessage().trim().length() > 0
-                 ? t.getMessage()
-                 : getMessage( t.getCause() )
-               : null;
+                   ? t.getMessage() != null && t.getMessage().trim().length() > 0
+                         ? t.getMessage()
+                         : getMessage( t.getCause() )
+                   : null;
 
     }
 
@@ -3700,11 +3633,15 @@
     @javax.xml.bind.annotation.XmlTransient
     private static final String DEFAULT_CLASSPATH_MODULE_NAME = "Java Classpath";
 
-    /** Default classpath module name. */
+    /**
+     * Default classpath module name.
+     */
     @javax.xml.bind.annotation.XmlTransient
     private static volatile String defaultClasspathModuleName;
 
-    /** Empty {@code Class} array. */
+    /**
+     * Empty {@code Class} array.
+     */
     @javax.xml.bind.annotation.XmlTransient
     private static final Class<?>[] NO_CLASSES =
     {
@@ -3716,15 +3653,7 @@
      */
     @javax.xml.bind.annotation.XmlTransient
     private static final java.util.Comparator<Dependency> DEPENDENCY_NAME_COMPARATOR =
-        new java.util.Comparator<Dependency>()
-    {
-
-        public int compare( final Dependency o1, final Dependency o2 )
-        {
-            return o1.getName().compareTo( o2.getName() );
-        }
-
-    };
+        ( o1, o2 )  -> o1.getName().compareTo( o2.getName() );
 
     /**
      * Comparator comparing message names lexicographically.
@@ -3732,15 +3661,7 @@
      */
     @javax.xml.bind.annotation.XmlTransient
     private static final java.util.Comparator<Message> MESSAGE_NAME_COMPARATOR =
-        new java.util.Comparator<Message>()
-    {
-
-        public int compare( final Message o1, final Message o2 )
-        {
-            return o1.getName().compareTo( o2.getName() );
-        }
-
-    };
+        ( o1, o2 )  -> o1.getName().compareTo( o2.getName() );
 
     /**
      * Comparator comparing property names lexicographically.
@@ -3748,15 +3669,7 @@
      */
     @javax.xml.bind.annotation.XmlTransient
     private static final java.util.Comparator<Property> PROPERTY_NAME_COMPARATOR =
-        new java.util.Comparator<Property>()
-    {
-
-        public int compare( final Property o1, final Property o2 )
-        {
-            return o1.getName().compareTo( o2.getName() );
-        }
-
-    };
+        ( o1, o2 )  -> o1.getName().compareTo( o2.getName() );
 
     /**
      * Comparator comparing specification identifiers lexicographically.
@@ -3764,15 +3677,7 @@
      */
     @javax.xml.bind.annotation.XmlTransient
     private static final java.util.Comparator<Specification> SPECIFICATION_IDENTIFIER_COMPARATOR =
-        new java.util.Comparator<Specification>()
-    {
-
-        public int compare( final Specification o1, final Specification o2 )
-        {
-            return o1.getIdentifier().compareTo( o2.getIdentifier() );
-        }
-
-    };
+        ( o1, o2 )  -> o1.getIdentifier().compareTo( o2.getIdentifier() );
 
     /**
      * Comparator comparing specification reference identifiers lexicographically.
@@ -3780,15 +3685,7 @@
      */
     @javax.xml.bind.annotation.XmlTransient
     private static final java.util.Comparator<SpecificationReference> SPECIFICATION_REFERENCE_IDENTIFIER_COMPARATOR =
-        new java.util.Comparator<SpecificationReference>()
-    {
-
-        public int compare( final SpecificationReference o1, final SpecificationReference o2 )
-        {
-            return o1.getIdentifier().compareTo( o2.getIdentifier() );
-        }
-
-    };
+        ( o1, o2 )  -> o1.getIdentifier().compareTo( o2.getIdentifier() );
 
     /**
      * Comparator comparing {@code JavaTypeName} names lexicographically.
@@ -3796,17 +3693,11 @@
      */
     @javax.xml.bind.annotation.XmlTransient
     private static final java.util.Comparator<org.jomc.jls.JavaTypeName> JAVA_TYPE_NAME_COMPARATOR =
-        new java.util.Comparator<org.jomc.jls.JavaTypeName>()
-    {
+        ( o1, o2 )  -> o1.getName( true ).compareTo( o2.getName( true ) );
 
-        public int compare( final org.jomc.jls.JavaTypeName o1, final org.jomc.jls.JavaTypeName o2 )
-        {
-            return o1.getName( true ).compareTo( o2.getName( true ) );
-        }
-
-    };
-
-    /** Maps objects to {@code Instance}s. */
+    /**
+     * Maps objects to {@code Instance}s.
+     */
     @javax.xml.bind.annotation.XmlTransient private java.util.Map<Object, Instance> objects =
         new org.jomc.util.WeakIdentityHashMap<Object, Instance>();
 
@@ -3818,13 +3709,7 @@
     public Modules( final java.util.Map<Object, Instance> objects )
     {
         super();
-
-        if ( objects == null )
-        {
-            throw new NullPointerException( "objects" );
-        }
-
-        this.objects = objects;
+        this.objects = java.util.Objects.requireNonNull( objects, "objects" );
     }
 
     /**
@@ -3839,22 +3724,14 @@
     public Modules( final Modules o, final java.util.Map<Object, Instance> objects )
     {
         super( o );
-        if ( o == null )
-        {
-            throw new NullPointerException( "Cannot create a copy of 'Modules' from 'null'." );
-        }
-        if ( objects == null )
-        {
-            throw new NullPointerException( "objects" );
-        }
-
-        copyModule( o.getModule(), getModule() );
-        this.objects = objects;
+        copyModule( java.util.Objects.requireNonNull( o, "o" ).getModule(), getModule() );
+        this.objects = java.util.Objects.requireNonNull( objects, "objects" );
     }
 
     /**
      * Gets the default classpath module name.
-     * <p>The default classpath module name is controlled by system property
+     * <p>
+     * The default classpath module name is controlled by system property
      * {@code org.jomc.model.Modules.defaultClasspathModuleName} holding the default classpath module name. If that
      * property is not set, the {@code Java Classpath} default is returned.</p>
      *
@@ -3886,7 +3763,8 @@
 
     /**
      * Gets a module holding model objects resolved by inspecting a given class loader.
-     * <p>This method searches this list of modules for unresolved references and tries to resolve each unresolved
+     * <p>
+     * This method searches this list of modules for unresolved references and tries to resolve each unresolved
      * reference by inspecting the given class loader.</p>
      *
      * @param moduleName The name of the module to return.
@@ -3903,21 +3781,16 @@
      */
     public Module getClasspathModule( final String moduleName, final ClassLoader classLoader )
     {
-        if ( moduleName == null )
-        {
-            throw new NullPointerException( "moduleName" );
-        }
-
         final Module classpathModule = new Module();
+        classpathModule.setName( java.util.Objects.requireNonNull( moduleName, "moduleName" ) );
         classpathModule.setVersion( System.getProperty( "java.specification.version" ) );
-        classpathModule.setName( moduleName );
 
         this.resolveClasspath( classpathModule, classLoader );
 
         final boolean resolved = ( classpathModule.getSpecifications() != null
                                    && !classpathModule.getSpecifications().getSpecification().isEmpty() )
-                                 || ( classpathModule.getImplementations() != null
-                                      && !classpathModule.getImplementations().getImplementation().isEmpty() );
+                                     || ( classpathModule.getImplementations() != null
+                                          && !classpathModule.getImplementations().getImplementation().isEmpty() );
 
         return resolved ? classpathModule : null;
     }
@@ -3936,22 +3809,15 @@
      */
     public Module getModule( final String name )
     {
-        if ( name == null )
+        java.util.Objects.requireNonNull( name, "name" );
+
+        try ( final java.util.stream.Stream<Module> s0 = this.getModule().parallelStream() )
         {
-            throw new NullPointerException( "name" );
+            final java.util.Optional<Module> candidate =
+                s0.filter( m  -> name.equals( m.getName() ) ).findFirst();
+
+            return candidate.isPresent() ? candidate.get() : null;
         }
-
-        for ( int i = 0, s0 = this.getModule().size(); i < s0; i++ )
-        {
-            final Module m = this.getModule().get( i );
-
-            if ( m.getName().equals( name ) )
-            {
-                return m;
-            }
-        }
-
-        return null;
     }
 
     /**
@@ -3965,14 +3831,20 @@
     {
         final Specifications specifications = new Specifications();
 
-        for ( int i = 0, s0 = this.getModule().size(); i < s0; i++ )
+        try ( final java.util.stream.Stream<Module> st0 = this.getModule().parallelStream().unordered() )
         {
-            final Module m = this.getModule().get( i );
+            specifications.getSpecification().addAll(
+                st0.flatMap( m  -> m.getSpecifications() != null
+                                        ? m.getSpecifications().getSpecification().parallelStream().unordered()
+                                        : java.util.stream.Stream.empty() ).
+                    collect( java.util.stream.Collector.of( java.util.concurrent.CopyOnWriteArrayList::new,
+                                                            java.util.List::add, ( l1, l2 )  ->
+                                                        {
+                                                            l1.addAll( l2 );
+                                                            return l1;
+                                                        }, java.util.stream.Collector.Characteristics.CONCURRENT,
+                                                            java.util.stream.Collector.Characteristics.UNORDERED ) ) );
 
-            if ( m.getSpecifications() != null )
-            {
-                specifications.getSpecification().addAll( m.getSpecifications().getSpecification() );
-            }
         }
 
         return specifications.getSpecification().isEmpty() ? null : specifications;
@@ -3989,14 +3861,20 @@
     {
         final Implementations implementations = new Implementations();
 
-        for ( int i = 0, s0 = this.getModule().size(); i < s0; i++ )
+        try ( final java.util.stream.Stream<Module> st0 = this.getModule().parallelStream().unordered() )
         {
-            final Module m = this.getModule().get( i );
+            implementations.getImplementation().addAll(
+                st0.flatMap( m  -> m.getImplementations() != null
+                                        ? m.getImplementations().getImplementation().parallelStream().unordered()
+                                        : java.util.stream.Stream.empty() ).
+                    collect( java.util.stream.Collector.of( java.util.concurrent.CopyOnWriteArrayList::new,
+                                                            java.util.List::add, ( l1, l2 )  ->
+                                                        {
+                                                            l1.addAll( l2 );
+                                                            return l1;
+                                                        }, java.util.stream.Collector.Characteristics.CONCURRENT,
+                                                            java.util.stream.Collector.Characteristics.UNORDERED ) ) );
 
-            if ( m.getImplementations() != null )
-            {
-                implementations.getImplementation().addAll( m.getImplementations().getImplementation() );
-            }
         }
 
         return implementations.getImplementation().isEmpty() ? null : implementations;
@@ -4017,22 +3895,16 @@
      */
     public Module getModuleOfSpecification( final String specification )
     {
-        if ( specification == null )
+        java.util.Objects.requireNonNull( specification, "specification" );
+
+        try ( final java.util.stream.Stream<Module> st0 = this.getModule().parallelStream() )
         {
-            throw new NullPointerException( "specification" );
+            final java.util.Optional<Module> candidate =
+                st0.filter( m  -> m.getSpecifications() != null
+                                       && m.getSpecifications().getSpecification( specification ) != null ).findFirst();
+
+            return candidate.orElse( null );
         }
-
-        for ( int i = 0, s0 = this.getModule().size(); i < s0; i++ )
-        {
-            final Module m = this.getModule().get( i );
-
-            if ( m.getSpecifications() != null && m.getSpecifications().getSpecification( specification ) != null )
-            {
-                return m;
-            }
-        }
-
-        return null;
     }
 
     /**
@@ -4050,22 +3922,17 @@
      */
     public Module getModuleOfImplementation( final String implementation )
     {
-        if ( implementation == null )
+        java.util.Objects.requireNonNull( implementation, "implementation" );
+
+        try ( final java.util.stream.Stream<Module> st0 = this.getModule().parallelStream() )
         {
-            throw new NullPointerException( "implementation" );
+            final java.util.Optional<Module> candidate =
+                st0.filter( m  -> m.getImplementations() != null
+                                       && m.getImplementations().getImplementation( implementation ) != null ).
+                    findFirst();
+
+            return candidate.orElse( null );
         }
-
-        for ( int i = 0, s0 = this.getModule().size(); i < s0; i++ )
-        {
-            final Module m = this.getModule().get( i );
-
-            if ( m.getImplementations() != null && m.getImplementations().getImplementation( implementation ) != null )
-            {
-                return m;
-            }
-        }
-
-        return null;
     }
 
     /**
@@ -4083,27 +3950,18 @@
      */
     public Specification getSpecification( final String specification )
     {
-        if ( specification == null )
+        java.util.Objects.requireNonNull( specification, "specification" );
+
+        try ( final java.util.stream.Stream<Module> st0 = this.getModule().parallelStream() )
         {
-            throw new NullPointerException( "specification" );
+            final java.util.Optional<Specification> candidate =
+                st0.filter( m  -> m.getSpecifications() != null ).
+                    flatMap( m  -> m.getSpecifications().getSpecification().parallelStream() ).
+                    filter( s  -> specification.equals( s.getIdentifier() ) ).
+                    findFirst();
+
+            return candidate.orElse( null );
         }
-
-        for ( int i = 0, s0 = this.getModule().size(); i < s0; i++ )
-        {
-            final Module m = this.getModule().get( i );
-
-            if ( m.getSpecifications() != null )
-            {
-                final Specification s = m.getSpecifications().getSpecification( specification );
-
-                if ( s != null )
-                {
-                    return s;
-                }
-            }
-        }
-
-        return null;
     }
 
     /**
@@ -4123,27 +3981,56 @@
      */
     public Specification getSpecification( final Class<?> specification ) throws ModelObjectException
     {
-        if ( specification == null )
-        {
-            throw new NullPointerException( "specification" );
-        }
+        java.util.Objects.requireNonNull( specification, "specification" );
 
-        for ( int i = 0, s0 = this.getModule().size(); i < s0; i++ )
+        try ( final java.util.stream.Stream<Module> st0 = this.getModule().parallelStream() )
         {
-            final Module m = this.getModule().get( i );
-
-            if ( m.getSpecifications() != null )
+            final class FindSpecificationFailure extends RuntimeException
             {
-                final Specification s = m.getSpecifications().getSpecification( specification );
 
-                if ( s != null )
+                public FindSpecificationFailure( final Throwable cause )
                 {
-                    return s;
+                    super( cause );
                 }
+
+                void propagate() throws ModelObjectException
+                {
+                    if ( this.getCause() instanceof ModelObjectException )
+                    {
+                        throw new ModelObjectException( this.getCause().getMessage(), this.getCause() );
+                    }
+
+                    throw new AssertionError( this );
+                }
+
+            }
+
+            try
+            {
+                final java.util.Optional<Specification> candidate =
+                    st0.filter( m  -> m.getSpecifications() != null ).
+                        flatMap( m  -> m.getSpecifications().getSpecification().parallelStream() ).
+                        filter( s  -> s.isClassDeclaration() && s.getClazz() != null ).
+                        filter( s  ->
+                        {
+                            try
+                            {
+                                return specification.getName().equals( s.getJavaTypeName().getClassName() );
+                            }
+                            catch ( final ModelObjectException e )
+                            {
+                                throw new FindSpecificationFailure( e );
+                            }
+                        } ).findFirst();
+
+                return candidate.orElse( null );
+            }
+            catch ( final FindSpecificationFailure e )
+            {
+                e.propagate();
+                throw new AssertionError( this );
             }
         }
-
-        return null;
     }
 
     /**
@@ -4164,14 +4051,10 @@
      */
     public Specifications getSpecifications( final String implementation )
     {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-
+        java.util.Objects.requireNonNull( implementation, "implementation" );
         final Specifications specs = new Specifications();
         final Implementation impl = this.getImplementation( implementation );
-        this.collectModelObjects( impl, null, null, null, specs, null, new java.util.HashSet<String>(), true );
+        this.collectModelObjects( impl, null, null, null, specs, null, new java.util.HashSet<>(), true );
         this.collectClassDeclarationModelObjects( impl, null, null, null, specs, null );
         java.util.Collections.sort( specs.getSpecification(), SPECIFICATION_IDENTIFIER_COMPARATOR );
         java.util.Collections.sort( specs.getReference(), SPECIFICATION_REFERENCE_IDENTIFIER_COMPARATOR );
@@ -4194,29 +4077,22 @@
      *
      * @since 1.4
      */
-    public List<org.jomc.jls.JavaTypeName> getImplementedJavaTypeNames( final String implementation ) throws ModelObjectException
+    public List<org.jomc.jls.JavaTypeName> getImplementedJavaTypeNames( final String implementation )
+        throws ModelObjectException
     {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-
+        java.util.Objects.requireNonNull( implementation, "implementation" );
         final Specifications implemented = this.getSpecifications( implementation );
         java.util.List<org.jomc.jls.JavaTypeName> javaTypeNames = null;
 
         if ( implemented != null )
         {
-            javaTypeNames =
-                new java.util.ArrayList<org.jomc.jls.JavaTypeName>( implemented.getSpecification().size() );
+            javaTypeNames = new java.util.ArrayList<>( implemented.getSpecification().size() );
 
-            for ( int i = 0, s0 = implemented.getSpecification().size(); i < s0; i++ )
+            for ( final Specification s : implemented.getSpecification() )
             {
-                final Specification s = implemented.getSpecification().get( i );
-                final org.jomc.jls.JavaTypeName javaTypeName = s.getJavaTypeName();
-
-                if ( javaTypeName != null && !javaTypeNames.contains( javaTypeName ) )
+                if ( s.getJavaTypeName() != null )
                 {
-                    javaTypeNames.add( javaTypeName );
+                    javaTypeNames.add( s.getJavaTypeName() );
                 }
             }
 
@@ -4242,27 +4118,17 @@
      */
     public Implementation getImplementation( final String implementation )
     {
-        if ( implementation == null )
+        java.util.Objects.requireNonNull( implementation, "implementation" );
+
+        try ( final java.util.stream.Stream<Module> st0 = this.getModule().parallelStream() )
         {
-            throw new NullPointerException( "implementation" );
+            final java.util.Optional<Implementation> candidate =
+                st0.filter( m  -> m.getImplementations() != null ).
+                    flatMap( m  -> m.getImplementations().getImplementation().parallelStream() ).
+                    filter( i  -> implementation.equals( i.getIdentifier() ) ).findFirst();
+
+            return candidate.orElse( null );
         }
-
-        for ( int i = 0, s0 = this.getModule().size(); i < s0; i++ )
-        {
-            final Module m = this.getModule().get( i );
-
-            if ( m.getImplementations() != null )
-            {
-                final Implementation current = m.getImplementations().getImplementation( implementation );
-
-                if ( current != null )
-                {
-                    return current;
-                }
-            }
-        }
-
-        return null;
     }
 
     /**
@@ -4282,27 +4148,56 @@
      */
     public Implementation getImplementation( final Class<?> implementation ) throws ModelObjectException
     {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
+        java.util.Objects.requireNonNull( implementation, "implementation" );
 
-        for ( int i = 0, s0 = this.getModule().size(); i < s0; i++ )
+        try ( final java.util.stream.Stream<Module> st0 = this.getModule().parallelStream() )
         {
-            final Module m = this.getModule().get( i );
-
-            if ( m.getImplementations() != null )
+            final class FindImplementationFailure extends RuntimeException
             {
-                final Implementation current = m.getImplementations().getImplementation( implementation );
 
-                if ( current != null )
+                public FindImplementationFailure( final Throwable cause )
                 {
-                    return current;
+                    super( cause );
                 }
+
+                void propagate() throws ModelObjectException
+                {
+                    if ( this.getCause() instanceof ModelObjectException )
+                    {
+                        throw new ModelObjectException( this.getCause().getMessage(), this.getCause() );
+                    }
+
+                    throw new AssertionError( this );
+                }
+
+            }
+
+            try
+            {
+                final java.util.Optional<Implementation> candidate =
+                    st0.filter( m  -> m.getImplementations() != null ).
+                        flatMap( m  -> m.getImplementations().getImplementation().parallelStream() ).
+                        filter( i  -> i.isClassDeclaration() && i.getClazz() != null ).
+                        filter( i  ->
+                        {
+                            try
+                            {
+                                return implementation.getName().equals( i.getJavaTypeName().getClassName() );
+                            }
+                            catch ( final ModelObjectException e )
+                            {
+                                throw new FindImplementationFailure( e );
+                            }
+                        } ).findFirst();
+
+                return candidate.orElse( null );
+            }
+            catch ( final FindImplementationFailure e )
+            {
+                e.propagate();
+                throw new AssertionError( e );
             }
         }
-
-        return null;
     }
 
     /**
@@ -4339,15 +4234,8 @@
      */
     public Implementation getImplementation( final String specification, final String name )
     {
-        if ( specification == null )
-        {
-            throw new NullPointerException( "specification" );
-        }
-        if ( name == null )
-        {
-            throw new NullPointerException( "name" );
-        }
-
+        java.util.Objects.requireNonNull( specification, "specification" );
+        java.util.Objects.requireNonNull( name, "name" );
         final Implementations implementations = this.getImplementations( specification );
         if ( implementations != null )
         {
@@ -4375,14 +4263,10 @@
      */
     public Dependencies getDependencies( final String implementation )
     {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-
+        java.util.Objects.requireNonNull( implementation, "implementation" );
         final Dependencies dependencies = new Dependencies();
         final Implementation impl = this.getImplementation( implementation );
-        this.collectModelObjects( impl, dependencies, null, null, null, null, new java.util.HashSet<String>(), true );
+        this.collectModelObjects( impl, dependencies, null, null, null, null, new java.util.HashSet<>(), true );
         this.collectClassDeclarationModelObjects( impl, dependencies, null, null, null, null );
         java.util.Collections.sort( dependencies.getDependency(), DEPENDENCY_NAME_COMPARATOR );
         return dependencies.getDependency().isEmpty() ? null : dependencies;
@@ -4411,15 +4295,8 @@
     public org.jomc.jls.JavaTypeName getDependencyJavaTypeName( final String implementation, final String dependency )
         throws ModelObjectException
     {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-        if ( dependency == null )
-        {
-            throw new NullPointerException( "dependency" );
-        }
-
+        java.util.Objects.requireNonNull( implementation, "implementation" );
+        java.util.Objects.requireNonNull( dependency, "dependency" );
         String typeName = null;
 
         try
@@ -4440,7 +4317,7 @@
                         typeName = specification.getClazz();
 
                         if ( specification.getMultiplicity() == Multiplicity.MANY
-                             && d.getImplementationName() == null )
+                                 && d.getImplementationName() == null )
                         {
                             typeName += "[]";
                         }
@@ -4478,15 +4355,8 @@
      */
     public String getDependencyJavaModifierName( final String implementation, final String dependency )
     {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-        if ( dependency == null )
-        {
-            throw new NullPointerException( "dependency" );
-        }
-
+        java.util.Objects.requireNonNull( implementation, "implementation" );
+        java.util.Objects.requireNonNull( dependency, "dependency" );
         final Dependencies dependencies = this.getDependencies( implementation );
 
         if ( dependencies != null )
@@ -4520,16 +4390,12 @@
      */
     public Properties getProperties( final String implementation )
     {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-
+        java.util.Objects.requireNonNull( implementation, "implementation" );
         final Properties properties = new Properties();
         final Specifications specifications = new Specifications();
         final Implementation impl = this.getImplementation( implementation );
         this.collectModelObjects(
-            impl, null, null, properties, specifications, null, new java.util.HashSet<String>(), true );
+            impl, null, null, properties, specifications, null, new java.util.HashSet<>(), true );
 
         this.collectClassDeclarationModelObjects( impl, null, null, properties, specifications, null );
         this.collectSpecifiedModelObjects( specifications, properties );
@@ -4553,24 +4419,27 @@
      */
     public Properties getSpecifiedProperties( final String implementation )
     {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-
+        java.util.Objects.requireNonNull( implementation, "implementation" );
         final Properties properties = new Properties();
         final Specifications specs = this.getSpecifications( implementation );
 
         if ( specs != null )
         {
-            for ( int i = 0, s0 = specs.getSpecification().size(); i < s0; i++ )
+            try ( final java.util.stream.Stream<Specification> st0 =
+                specs.getSpecification().parallelStream().unordered() )
             {
-                final Specification s = specs.getSpecification().get( i );
+                properties.getProperty().addAll(
+                    st0.filter( s  -> s.getProperties() != null ).
+                        flatMap( s  -> s.getProperties().getProperty().parallelStream().unordered() ).
+                        collect( java.util.stream.Collector.of(
+                            java.util.concurrent.CopyOnWriteArrayList::new,
+                            java.util.List::add, ( l1, l2 )  ->
+                        {
+                            l1.addAll( l2 );
+                            return l1;
+                        }, java.util.stream.Collector.Characteristics.CONCURRENT,
+                            java.util.stream.Collector.Characteristics.UNORDERED ) ) );
 
-                if ( s.getProperties() != null )
-                {
-                    properties.getProperty().addAll( s.getProperties().getProperty() );
-                }
             }
         }
 
@@ -4596,15 +4465,8 @@
      */
     public String getPropertyJavaModifierName( final String implementation, final String property )
     {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-        if ( property == null )
-        {
-            throw new NullPointerException( "property" );
-        }
-
+        java.util.Objects.requireNonNull( implementation, "implementation" );
+        java.util.Objects.requireNonNull( property, "property" );
         final Properties properties = this.getProperties( implementation );
 
         if ( properties != null )
@@ -4621,7 +4483,7 @@
 
         return null;
     }
-     
+
     /**
      * Gets all messages of an implementation from the list of modules.
      *
@@ -4640,14 +4502,10 @@
      */
     public Messages getMessages( final String implementation )
     {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-
+        java.util.Objects.requireNonNull( implementation, "implementation" );
         final Messages msgs = new Messages();
         final Implementation impl = this.getImplementation( implementation );
-        this.collectModelObjects( impl, null, msgs, null, null, null, new java.util.HashSet<String>(), true );
+        this.collectModelObjects( impl, null, msgs, null, null, null, new java.util.HashSet<>(), true );
         this.collectClassDeclarationModelObjects( impl, null, msgs, null, null, null );
         java.util.Collections.sort( msgs.getMessage(), MESSAGE_NAME_COMPARATOR );
         return msgs.getMessage().isEmpty() ? null : msgs;
@@ -4671,15 +4529,8 @@
      */
     public String getMessageJavaModifierName( final String implementation, final String message )
     {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-        if ( message == null )
-        {
-            throw new NullPointerException( "message" );
-        }
-
+        java.util.Objects.requireNonNull( implementation, "implementation" );
+        java.util.Objects.requireNonNull( message, "message" );
         final Messages messages = this.getMessages( implementation );
 
         if ( messages != null )
@@ -4714,14 +4565,10 @@
      */
     public List<Object> getAnyObjects( final String implementation )
     {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-
+        java.util.Objects.requireNonNull( implementation, "implementation" );
         final Implementation impl = this.getImplementation( implementation );
-        final java.util.List<Object> any = new java.util.LinkedList<Object>();
-        this.collectModelObjects( impl, null, null, null, null, any, new java.util.HashSet<String>(), true );
+        final java.util.List<Object> any = new java.util.LinkedList<>();
+        this.collectModelObjects( impl, null, null, null, null, any, new java.util.HashSet<>(), true );
         this.collectClassDeclarationModelObjects( impl, null, null, null, null, any );
         return any;
     }
@@ -4741,30 +4588,42 @@
      */
     public Implementations getImplementations( final String specification )
     {
-        if ( specification == null )
-        {
-            throw new NullPointerException( "specification" );
-        }
-
+        java.util.Objects.requireNonNull( specification, "specification" );
         final Implementations implementations = new Implementations();
 
-        for ( int i = 0, s0 = this.getModule().size(); i < s0; i++ )
+        try ( final java.util.stream.Stream<Module> st0 = this.getModule().parallelStream().unordered() )
         {
-            final Module m = this.getModule().get( i );
-
-            if ( m.getImplementations() != null )
+            final class FindImplementationResult
             {
-                for ( int j = 0, s1 = m.getImplementations().getImplementation().size(); j < s1; j++ )
-                {
-                    final Implementation impl = m.getImplementations().getImplementation().get( j );
-                    final Specifications specs = this.getSpecifications( impl.getIdentifier() );
 
-                    if ( specs != null && specs.getSpecification( specification ) != null )
-                    {
-                        implementations.getImplementation().add( impl );
-                    }
-                }
+                Implementation implementation;
+
+                Specifications specifications;
+
             }
+
+            implementations.getImplementation().addAll(
+                st0.filter( m  -> m.getImplementations() != null ).
+                    flatMap( m  -> m.getImplementations().getImplementation().parallelStream().unordered() ).
+                    map( i  ->
+                    {
+                        final FindImplementationResult r = new FindImplementationResult();
+                        r.implementation = i;
+                        r.specifications = getSpecifications( i.getIdentifier() );
+                        return r;
+                    } ).
+                    filter( r  -> r.specifications != null
+                                       && r.specifications.getSpecification( specification ) != null ).
+                    map( r  -> r.implementation ).
+                    collect( java.util.stream.Collector.of(
+                        java.util.concurrent.CopyOnWriteArrayList::new,
+                        java.util.List::add, ( l1, l2 )  ->
+                    {
+                        l1.addAll( l2 );
+                        return l1;
+                    }, java.util.stream.Collector.Characteristics.CONCURRENT,
+                        java.util.stream.Collector.Characteristics.UNORDERED ) ) );
+
         }
 
         return implementations.getImplementation().size() > 0 ? implementations : null;
@@ -4781,132 +4640,167 @@
      */
     public Module getMergedModule( final String name )
     {
-        if ( name == null )
-        {
-            throw new NullPointerException( "name" );
-        }
-
+        java.util.Objects.requireNonNull( name, "name" );
         final Modules copy = this.clone();
         final Module mergedModule = new Module();
         mergedModule.setName( name );
 
-        for ( int i = 0, s0 = copy.getModule().size(); i < s0; i++ )
+        try ( final java.util.stream.Stream<Module> st0 = copy.getModule().parallelStream() )
         {
-            final Module m = copy.getModule().get( i );
-            final java.util.Set<String> referencedMessages = new java.util.HashSet<String>();
-            final java.util.Set<String> referencedProperties = new java.util.HashSet<String>();
+            return st0.reduce( mergedModule, ( m1, m2 )  ->
+                           {
+                               final java.util.Set<String> referencedMessages =
+                                   new java.util.concurrent.CopyOnWriteArraySet<>();
 
-            if ( m.getImplementations() != null )
-            {
-                for ( int j = 0, s1 = m.getImplementations().getImplementation().size(); j < s1; j++ )
-                {
-                    final Implementation impl = m.getImplementations().getImplementation().get( j );
-                    if ( mergedModule.getImplementations() == null )
-                    {
-                        mergedModule.setImplementations( new Implementations() );
-                    }
+                               final java.util.Set<String> referencedProperties =
+                                   new java.util.concurrent.CopyOnWriteArraySet<>();
 
-                    if ( impl.getMessages() != null && !impl.getMessages().getReference().isEmpty() )
-                    {
-                        for ( java.util.Iterator<MessageReference> it = impl.getMessages().getReference().iterator();
-                              it.hasNext(); )
-                        {
-                            final String messageName = it.next().getName();
-                            impl.getMessages().getMessage().add( m.getMessages().getMessage( messageName ) );
-                            referencedMessages.add( messageName );
-                            it.remove();
-                        }
-                    }
+                               if ( m2.getImplementations() != null )
+                               {
+                                   try ( final java.util.stream.Stream<Implementation> st1 =
+                                       m2.getImplementations().getImplementation().parallelStream() )
+                                   {
+                                       st1.forEach( i  ->
+                                       {
+                                           synchronized ( m1 )
+                                           {
+                                               if ( m1.getImplementations() == null )
+                                               {
+                                                   m1.setImplementations( new Implementations() );
+                                               }
+                                           }
 
-                    if ( impl.getProperties() != null && !impl.getProperties().getReference().isEmpty() )
-                    {
-                        for ( java.util.Iterator<PropertyReference> it = impl.getProperties().getReference().iterator();
-                              it.hasNext(); )
-                        {
-                            final String propertyName = it.next().getName();
-                            impl.getProperties().getProperty().add( m.getProperties().getProperty( propertyName ) );
-                            referencedProperties.add( propertyName );
-                            it.remove();
-                        }
-                    }
+                                           if ( i.getMessages() != null && !i.getMessages().getReference().isEmpty() )
+                                           {
+                                               for ( java.util.Iterator<MessageReference> it =
+                                                   i.getMessages().getReference().iterator(); it.hasNext(); )
+                                               {
+                                                   final String messageName = it.next().getName();
+                                                   i.getMessages().getMessage().
+                                                       add( m2.getMessages().getMessage( messageName ) );
 
-                    mergedModule.getImplementations().getImplementation().add( impl );
-                }
-            }
+                                                   referencedMessages.add( messageName );
+                                                   it.remove();
+                                               }
+                                           }
 
-            if ( m.getSpecifications() != null )
-            {
-                if ( mergedModule.getSpecifications() == null )
-                {
-                    mergedModule.setSpecifications( new Specifications() );
-                }
+                                           if ( i.getProperties() != null
+                                                    && !i.getProperties().getReference().isEmpty() )
+                                           {
+                                               for ( java.util.Iterator<PropertyReference> it =
+                                                   i.getProperties().getReference().iterator(); it.hasNext(); )
+                                               {
+                                                   final String propertyName = it.next().getName();
+                                                   i.getProperties().getProperty().
+                                                       add( m2.getProperties().getProperty( propertyName ) );
 
-                for ( int j = 0, s1 = m.getSpecifications().getSpecification().size(); j < s1; j++ )
-                {
-                    final Specification s = m.getSpecifications().getSpecification().get( j );
+                                                   referencedProperties.add( propertyName );
+                                                   it.remove();
+                                               }
+                                           }
 
-                    if ( s.getProperties() != null && !s.getProperties().getReference().isEmpty() )
-                    {
-                        for ( java.util.Iterator<PropertyReference> it = s.getProperties().getReference().iterator();
-                              it.hasNext(); )
-                        {
-                            final String propertyName = it.next().getName();
-                            s.getProperties().getProperty().add( m.getProperties().getProperty( propertyName ) );
-                            referencedProperties.add( propertyName );
-                            it.remove();
-                        }
-                    }
+                                           synchronized ( m1 )
+                                           {
+                                               m1.getImplementations().getImplementation().add( i );
+                                           }
+                                       } );
+                                   }
 
-                    mergedModule.getSpecifications().getSpecification().add( s );
-                }
-            }
+                                   if ( m2.getSpecifications() != null )
+                                   {
+                                       synchronized ( m1 )
+                                       {
+                                           if ( m1.getSpecifications() == null )
+                                           {
+                                               m1.setSpecifications( new Specifications() );
+                                           }
+                                       }
 
-            for ( String messageName : referencedMessages )
-            {
-                for ( java.util.Iterator<Message> it = m.getMessages().getMessage().iterator(); it.hasNext(); )
-                {
-                    if ( messageName.equals( it.next().getName() ) )
-                    {
-                        it.remove();
-                        break;
-                    }
-                }
-            }
+                                       try ( final java.util.stream.Stream<Specification> st1 =
+                                           m2.getSpecifications().getSpecification().parallelStream() )
+                                       {
+                                           st1.forEach( s  ->
+                                           {
+                                               if ( s.getProperties() != null
+                                                        && !s.getProperties().getReference().isEmpty() )
+                                               {
+                                                   for ( java.util.Iterator<PropertyReference> it =
+                                                       s.getProperties().getReference().iterator(); it.hasNext(); )
+                                                   {
+                                                       final String propertyName = it.next().getName();
+                                                       s.getProperties().getProperty().
+                                                           add( m2.getProperties().getProperty( propertyName ) );
 
-            for ( String propertyName : referencedProperties )
-            {
-                for ( java.util.Iterator<Property> it = m.getProperties().getProperty().iterator(); it.hasNext(); )
-                {
-                    if ( propertyName.equals( it.next().getName() ) )
-                    {
-                        it.remove();
-                        break;
-                    }
-                }
-            }
+                                                       referencedProperties.add( propertyName );
+                                                       it.remove();
+                                                   }
+                                               }
 
-            if ( m.getProperties() != null && !m.getProperties().getProperty().isEmpty() )
-            {
-                if ( mergedModule.getProperties() == null )
-                {
-                    mergedModule.setProperties( new Properties() );
-                }
+                                               synchronized ( m1 )
+                                               {
+                                                   m1.getSpecifications().getSpecification().add( s );
+                                               }
+                                           } );
+                                       }
+                                   }
 
-                mergedModule.getProperties().getProperty().addAll( m.getProperties().getProperty() );
-            }
+                                   for ( final String messageName : referencedMessages )
+                                   {
+                                       for ( java.util.Iterator<Message> it = m2.getMessages().getMessage().iterator();
+                                             it.hasNext(); )
+                                       {
+                                           if ( messageName.equals( it.next().getName() ) )
+                                           {
+                                               it.remove();
+                                               break;
+                                           }
+                                       }
+                                   }
 
-            if ( m.getMessages() != null && !m.getMessages().getMessage().isEmpty() )
-            {
-                if ( mergedModule.getMessages() == null )
-                {
-                    mergedModule.setMessages( new Messages() );
-                }
+                                   for ( final String propertyName : referencedProperties )
+                                   {
+                                       for ( java.util.Iterator<Property> it =
+                                           m2.getProperties().getProperty().iterator(); it.hasNext(); )
+                                       {
+                                           if ( propertyName.equals( it.next().getName() ) )
+                                           {
+                                               it.remove();
+                                               break;
+                                           }
+                                       }
+                                   }
 
-                mergedModule.getMessages().getMessage().addAll( m.getMessages().getMessage() );
-            }
+                                   if ( m2.getProperties() != null && !m2.getProperties().getProperty().isEmpty() )
+                                   {
+                                       synchronized ( m1 )
+                                       {
+                                           if ( m1.getProperties() == null )
+                                           {
+                                               m1.setProperties( new Properties() );
+                                           }
+
+                                           m1.getProperties().getProperty().addAll( m2.getProperties().getProperty() );
+                                       }
+                                   }
+
+                                   if ( m2.getMessages() != null && !m2.getMessages().getMessage().isEmpty() )
+                                   {
+                                       synchronized ( m1 )
+                                       {
+                                           if ( m1.getMessages() == null )
+                                           {
+                                               m1.setMessages( new Messages() );
+                                           }
+
+                                           m1.getMessages().getMessage().addAll( m2.getMessages().getMessage() );
+                                       }
+                                   }
+                               }
+
+                               return m1;
+                           } );
+
         }
-
-        return mergedModule;
     }
 
     /**
@@ -4926,11 +4820,7 @@
      */
     public Instance getInstance( final Object object ) throws ModelObjectException
     {
-        if ( object == null )
-        {
-            throw new NullPointerException( "object" );
-        }
-
+        java.util.Objects.requireNonNull( object, "object" );
         synchronized ( this.objects )
         {
             Instance instance = this.objects.get( object );
@@ -4972,11 +4862,7 @@
      */
     public Instance getInstance( final String implementation )
     {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-
+        java.util.Objects.requireNonNull( implementation, "implementation" );
         final Implementation i = this.getImplementation( implementation );
 
         if ( i != null && i.getClazz() != null )
@@ -5013,15 +4899,8 @@
      */
     public Instance getInstance( final String implementation, final Dependency dependency )
     {
-        if ( implementation == null )
-        {
-            throw new NullPointerException( "implementation" );
-        }
-        if ( dependency == null )
-        {
-            throw new NullPointerException( "dependency" );
-        }
-
+        java.util.Objects.requireNonNull( implementation, "implementation" );
+        java.util.Objects.requireNonNull( dependency, "dependency" );
         Instance instance = this.getInstance( implementation );
 
         if ( instance != null )
@@ -5112,7 +4991,7 @@
      *
      * @return A new object of {@code instance}.
      *
-     * @throws NullPointerException if {@code instance}  is {@code null}.
+     * @throws NullPointerException if {@code instance} is {@code null}.
      * @throws ModelObjectException if compiling the name of a referenced type to a {@code JavaTypeName} fails.
      * @throws InstantiationException if creating an object fails.
      *
@@ -5126,11 +5005,7 @@
     public Object createObject( final Instance instance, final ClassLoader classLoader )
         throws ModelObjectException, InstantiationException
     {
-        if ( instance == null )
-        {
-            throw new NullPointerException( "instance" );
-        }
-
+        java.util.Objects.requireNonNull( instance, "instance" );
         Object object = null;
 
         try
@@ -5197,7 +5072,7 @@
             {
                 throw new InstantiationException( getMessage(
                     instance.getJavaFactoryMethodName() != null
-                    ? "failedCreatingObjectWithMethod" : "failedCreatingObject",
+                        ? "failedCreatingObjectWithMethod" : "failedCreatingObject",
                     instance.getIdentifier(), instance.getJavaTypeName(), instance.getJavaFactoryMethodName() ) );
 
             }
@@ -5225,7 +5100,9 @@
         }
     }
 
-    /** @since 1.2 */
+    /**
+     * @since 1.2
+     */
     private void collectModelObjects( final Implementation implementation, final Dependencies dependencies,
                                       final Messages messages, final Properties properties,
                                       final Specifications specifications, final List<Object> any,
@@ -5396,7 +5273,9 @@
         }
     }
 
-    /** @since 1.2 */
+    /**
+     * @since 1.2
+     */
     private void collectClassDeclarationModelObjects( final Implementation implementation,
                                                       final Dependencies dependencies, final Messages messages,
                                                       final Properties properties, final Specifications specifications,
@@ -5417,7 +5296,7 @@
                         final Implementation current = m.getImplementations().getImplementation().get( j );
 
                         if ( current.getClazz() != null && current.getClazz().equals( implementation.getClazz() )
-                             && current.isClassDeclaration() )
+                                 && current.isClassDeclaration() )
                         {
                             declaration = current;
                             break;
@@ -5430,12 +5309,14 @@
         if ( declaration != null )
         {
             this.collectModelObjects( declaration, dependencies, messages, properties, specifications, any,
-                                      new java.util.HashSet<String>(), true );
+                                      new java.util.HashSet<>(), true );
 
         }
     }
 
-    /** @since 1.2 */
+    /**
+     * @since 1.2
+     */
     private void collectSpecifiedModelObjects( final Specifications specifications, final Properties properties )
     {
         for ( int i = 0, s0 = specifications.getSpecification().size(); i < s0; i++ )
@@ -5543,9 +5424,9 @@
                 if ( ( e.getNamespaceURI() == null
                        ? current.getNamespaceURI() == null
                        : e.getNamespaceURI().equals( current.getNamespaceURI() ) )
-                     && ( e.getLocalName() == null
-                          ? current.getLocalName() == null
-                          : e.getLocalName().equals( current.getLocalName() ) ) )
+                         && ( e.getLocalName() == null
+                              ? current.getLocalName() == null
+                              : e.getLocalName().equals( current.getLocalName() ) ) )
                 {
                     return current;
                 }
@@ -5658,7 +5539,7 @@
     {
         boolean classpathSpecification = false;
         Specification specification = cpModule.getSpecifications() == null
-                                      ? null : cpModule.getSpecifications().getSpecification( identifier );
+                                          ? null : cpModule.getSpecifications().getSpecification( identifier );
 
         if ( specification == null )
         {
@@ -5696,11 +5577,7 @@
                     this.resolveClasspath( specification, cpModule, classLoader );
                 }
             }
-            catch ( final ClassNotFoundException e )
-            {
-                classpathSpecification = false;
-            }
-            catch ( final java.text.ParseException e )
+            catch ( final ClassNotFoundException | java.text.ParseException e )
             {
                 classpathSpecification = false;
             }
@@ -5715,7 +5592,7 @@
         boolean classpathImplementation = false;
         Implementation implementation =
             cpModule.getImplementations() == null ? null
-            : cpModule.getImplementations().getImplementation( specification.getIdentifier() );
+                : cpModule.getImplementations().getImplementation( specification.getIdentifier() );
 
         if ( implementation == null )
         {
@@ -5775,7 +5652,7 @@
                     }
 
                     if ( classpathImplementation
-                         && this.getImplementation( specification.getIdentifier(), name ) == null )
+                             && this.getImplementation( specification.getIdentifier(), name ) == null )
                     {
                         String vendor = null;
                         String version = null;
@@ -5809,11 +5686,7 @@
                     }
                 }
             }
-            catch ( final ClassNotFoundException e )
-            {
-                classpathImplementation = false;
-            }
-            catch ( final java.text.ParseException e )
+            catch ( final ClassNotFoundException | java.text.ParseException e )
             {
                 classpathImplementation = false;
             }
@@ -5824,13 +5697,13 @@
 
     private boolean checkFactoryMethod( final Class<?> clazz, final Class<?> type, final String methodName )
     {
-        boolean factoryMethod = false;
+        boolean factoryMethod;
 
         try
         {
             final java.lang.reflect.Method m = clazz.getMethod( methodName, (Class[]) null );
             factoryMethod = java.lang.reflect.Modifier.isStatic( m.getModifiers() )
-                            && type.isAssignableFrom( m.getReturnType() );
+                                && type.isAssignableFrom( m.getReturnType() );
 
         }
         catch ( final NoSuchMethodException e )
@@ -5844,10 +5717,10 @@
     private static String getMessage( final Throwable t )
     {
         return t != null
-               ? t.getMessage() != null && t.getMessage().trim().length() > 0
-                 ? t.getMessage()
-                 : getMessage( t.getCause() )
-               : null;
+                   ? t.getMessage() != null && t.getMessage().trim().length() > 0
+                         ? t.getMessage()
+                         : getMessage( t.getCause() )
+                   : null;
 
     }
 
