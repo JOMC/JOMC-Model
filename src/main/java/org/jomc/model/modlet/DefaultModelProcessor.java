@@ -670,8 +670,7 @@ public class DefaultModelProcessor implements ModelProcessor
     private static String getMessage( final String key, final Object... args )
     {
         return MessageFormat.format( ResourceBundle.getBundle(
-            DefaultModelProcessor.class
-            .getName().replace( '.', '/' ), Locale.getDefault() ).getString( key ), args );
+            DefaultModelProcessor.class.getName().replace( '.', '/' ), Locale.getDefault() ).getString( key ), args );
 
     }
 

@@ -4627,6 +4627,9 @@ public class DefaultModelValidator implements ModelValidator
 
                     this.modulesOfImplementations.put(
                         i.getIdentifier(), modules.getModuleOfImplementation( i.getIdentifier() ) );
+
+                    // Prepares the inheritance model for concurrent access.
+                    this.inheritanceModel.getSourceNodes( i.getIdentifier() );
                 }
             }
         }

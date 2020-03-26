@@ -114,23 +114,7 @@
             throw new NullPointerException( "locale" );
         }
 
-        Text defaultText = null;
-
-        for ( int i = 0, s0 = this.getText().size(); i < s0; i++ )
-        {
-            final Text t = this.getText().get( i );
-
-            if ( t.getLanguage().equalsIgnoreCase( this.getDefaultLanguage() ) )
-            {
-                defaultText = t;
-            }
-            if ( t.getLanguage().equalsIgnoreCase( locale.getLanguage() ) )
-            {
-                return t;
-            }
-        }
-
-        return defaultText;
+        return this.getText( locale.getLanguage() );
     }]]>
       </ci:code>
     </jaxb:bindings>
@@ -258,10 +242,10 @@
     private static String getMessage( final Throwable t )
     {
         return t != null
-               ? t.getMessage() != null && t.getMessage().trim().length() > 0
-                 ? t.getMessage()
-                 : getMessage( t.getCause() )
-               : null;
+                   ? t.getMessage() != null && t.getMessage().trim().length() > 0
+                         ? t.getMessage()
+                         : getMessage( t.getCause() )
+                   : null;
 
     }
 
@@ -2277,7 +2261,7 @@
                 }
 
                 final Object anyObject = this.getAny() instanceof JAXBElement
-                                         ? ( (JAXBElement) this.getAny() ).getValue() : this.getAny();
+                                             ? ( (JAXBElement) this.getAny() ).getValue() : this.getAny();
 
                 return this.getJavaValue( classLoader, anyObject,
                                           this.getJavaTypeName().getClass( classLoader, false ) );
@@ -2293,8 +2277,8 @@
                 }
 
                 return this.getJavaValue( this.getJavaTypeName().isPrimitive()
-                                          ? this.getJavaTypeName().getBoxedName().getClass( classLoader, false )
-                                          : this.getJavaTypeName().getClass( classLoader, false ),
+                                              ? this.getJavaTypeName().getBoxedName().getClass( classLoader, false )
+                                              : this.getJavaTypeName().getClass( classLoader, false ),
                                           this.getValue() );
 
             }
@@ -2319,10 +2303,10 @@
     public JavaTypeName getJavaTypeName() throws ModelObjectException
     {
         final String typeName = this.getType() == null
-                                ? this.getAny() == null
-                                  ? String.class.getName()
-                                  : Object.class.getName()
-                                : this.getType();
+                                    ? this.getAny() == null
+                                          ? String.class.getName()
+                                          : Object.class.getName()
+                                    : this.getType();
 
         try
         {
@@ -2570,10 +2554,10 @@
     private static String getMessage( final Throwable t )
     {
         return t != null
-               ? t.getMessage() != null && t.getMessage().trim().length() > 0
-                 ? t.getMessage()
-                 : getMessage( t.getCause() )
-               : null;
+                   ? t.getMessage() != null && t.getMessage().trim().length() > 0
+                         ? t.getMessage()
+                         : getMessage( t.getCause() )
+                   : null;
 
     }
 
@@ -3022,10 +3006,10 @@
     private static String getMessage( final Throwable t )
     {
         return t != null
-               ? t.getMessage() != null && t.getMessage().trim().length() > 0
-                 ? t.getMessage()
-                 : getMessage( t.getCause() )
-               : null;
+                   ? t.getMessage() != null && t.getMessage().trim().length() > 0
+                         ? t.getMessage()
+                         : getMessage( t.getCause() )
+                   : null;
 
     }
 
@@ -3615,7 +3599,7 @@
             final Class<?> javaClass = javaTypeName.getClass( classLoader, false );
 
             if ( java.lang.reflect.Modifier.isPublic( javaClass.getModifiers() )
-                 && !java.lang.reflect.Modifier.isAbstract( javaClass.getModifiers() ) )
+                     && !java.lang.reflect.Modifier.isAbstract( javaClass.getModifiers() ) )
             {
                 try
                 {
@@ -3977,10 +3961,10 @@
     private static String getMessage( final Throwable t )
     {
         return t != null
-               ? t.getMessage() != null && t.getMessage().trim().length() > 0
-                 ? t.getMessage()
-                 : getMessage( t.getCause() )
-               : null;
+                   ? t.getMessage() != null && t.getMessage().trim().length() > 0
+                         ? t.getMessage()
+                         : getMessage( t.getCause() )
+                   : null;
 
     }
 
@@ -4190,11 +4174,15 @@
     @javax.xml.bind.annotation.XmlTransient
     private static final String DEFAULT_CLASSPATH_MODULE_NAME = "Java Classpath";
 
-    /** Default classpath module name. */
+    /**
+     * Default classpath module name.
+     */
     @javax.xml.bind.annotation.XmlTransient
     private static volatile String defaultClasspathModuleName;
 
-    /** Empty {@code Class} array. */
+    /**
+     * Empty {@code Class} array.
+     */
     @javax.xml.bind.annotation.XmlTransient
     private static final Class<?>[] NO_CLASSES =
     {
@@ -5601,7 +5589,7 @@
      *
      * @return A new object of {@code instance}.
      *
-     * @throws NullPointerException if {@code instance}  is {@code null}.
+     * @throws NullPointerException if {@code instance} is {@code null}.
      * @throws ModelObjectException if compiling the name of a referenced type to a {@code JavaTypeName} fails.
      * @throws InstantiationException if creating an object fails.
      *
@@ -5686,7 +5674,7 @@
             {
                 throw new InstantiationException( getMessage(
                     instance.getJavaFactoryMethodName() != null
-                    ? "failedCreatingObjectWithMethod" : "failedCreatingObject",
+                        ? "failedCreatingObjectWithMethod" : "failedCreatingObject",
                     instance.getIdentifier(), instance.getJavaTypeName(), instance.getJavaFactoryMethodName() ) );
 
             }
@@ -5714,7 +5702,9 @@
         }
     }
 
-    /** @since 1.2 */
+    /**
+     * @since 1.2
+     */
     private void collectModelObjects( final Implementation implementation, final Dependencies dependencies,
                                       final Messages messages, final Properties properties,
                                       final Specifications specifications, final List<Object> any,
@@ -5885,7 +5875,9 @@
         }
     }
 
-    /** @since 1.2 */
+    /**
+     * @since 1.2
+     */
     private void collectClassDeclarationModelObjects( final Implementation implementation,
                                                       final Dependencies dependencies, final Messages messages,
                                                       final Properties properties, final Specifications specifications,
@@ -5906,7 +5898,7 @@
                         final Implementation current = m.getImplementations().getImplementation().get( j );
 
                         if ( current.getClazz() != null && current.getClazz().equals( implementation.getClazz() )
-                             && current.isClassDeclaration() )
+                                 && current.isClassDeclaration() )
                         {
                             declaration = current;
                             break;
@@ -5924,7 +5916,9 @@
         }
     }
 
-    /** @since 1.2 */
+    /**
+     * @since 1.2
+     */
     private void collectSpecifiedModelObjects( final Specifications specifications, final Properties properties )
     {
         for ( int i = 0, s0 = specifications.getSpecification().size(); i < s0; i++ )
@@ -6032,9 +6026,9 @@
                 if ( ( e.getNamespaceURI() == null
                        ? current.getNamespaceURI() == null
                        : e.getNamespaceURI().equals( current.getNamespaceURI() ) )
-                     && ( e.getLocalName() == null
-                          ? current.getLocalName() == null
-                          : e.getLocalName().equals( current.getLocalName() ) ) )
+                         && ( e.getLocalName() == null
+                              ? current.getLocalName() == null
+                              : e.getLocalName().equals( current.getLocalName() ) ) )
                 {
                     return current;
                 }
@@ -6147,7 +6141,7 @@
     {
         boolean classpathSpecification = false;
         Specification specification = cpModule.getSpecifications() == null
-                                      ? null : cpModule.getSpecifications().getSpecification( identifier );
+                                          ? null : cpModule.getSpecifications().getSpecification( identifier );
 
         if ( specification == null )
         {
@@ -6204,7 +6198,7 @@
         boolean classpathImplementation = false;
         Implementation implementation =
             cpModule.getImplementations() == null ? null
-            : cpModule.getImplementations().getImplementation( specification.getIdentifier() );
+                : cpModule.getImplementations().getImplementation( specification.getIdentifier() );
 
         if ( implementation == null )
         {
@@ -6262,7 +6256,7 @@
                     }
 
                     if ( classpathImplementation
-                         && this.getImplementation( specification.getIdentifier(), name ) == null )
+                             && this.getImplementation( specification.getIdentifier(), name ) == null )
                     {
                         String vendor = null;
                         String version = null;
@@ -6311,13 +6305,13 @@
 
     private boolean checkFactoryMethod( final Class<?> clazz, final Class<?> type, final String methodName )
     {
-        boolean factoryMethod = false;
+        boolean factoryMethod;
 
         try
         {
             final java.lang.reflect.Method m = clazz.getMethod( methodName, (Class[]) null );
             factoryMethod = java.lang.reflect.Modifier.isStatic( m.getModifiers() )
-                            && type.isAssignableFrom( m.getReturnType() );
+                                && type.isAssignableFrom( m.getReturnType() );
 
         }
         catch ( final NoSuchMethodException e )
@@ -6331,10 +6325,10 @@
     private static String getMessage( final Throwable t )
     {
         return t != null
-               ? t.getMessage() != null && t.getMessage().trim().length() > 0
-                 ? t.getMessage()
-                 : getMessage( t.getCause() )
-               : null;
+                   ? t.getMessage() != null && t.getMessage().trim().length() > 0
+                         ? t.getMessage()
+                         : getMessage( t.getCause() )
+                   : null;
 
     }
 

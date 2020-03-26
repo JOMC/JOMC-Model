@@ -72,7 +72,9 @@ public class DefaultModelProviderTest
      * The {@code ExecutorService} backing the tests.
      *
      * @since 1.10
+     * @deprecated As of 2.0, replaced by parallel Java streams. This field will be removed in 2.0.
      */
+    @Deprecated
     private volatile ExecutorService executorService;
 
     /**
@@ -136,6 +138,7 @@ public class DefaultModelProviderTest
      *
      * @see #newExecutorService()
      * @since 1.10
+     * @deprecated As of 2.0, replaced by parallel Java streams. This method will be removed in 2.0.
      */
     public final ExecutorService getExecutorService()
     {
@@ -154,6 +157,7 @@ public class DefaultModelProviderTest
      *
      * @see #getExecutorService()
      * @since 1.10
+     * @deprecated As of 2.0, replaced by parallel Java streams. This method will be removed in 2.0.
      */
     protected ExecutorService newExecutorService()
     {
