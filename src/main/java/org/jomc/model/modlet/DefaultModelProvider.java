@@ -452,43 +452,6 @@ public class DefaultModelProvider implements ModelProvider
                     this.resource = resource;
                 }
 
-                void propagate() throws ModelException
-                {
-                    if ( this.getCause() instanceof ModelException )
-                    {
-                        throw new ModelException( DefaultModelProvider.getMessage( this.getCause() ), this.getCause() );
-                    }
-                    else if ( this.getCause() instanceof UnmarshalException )
-                    {
-                        String message = DefaultModelProvider.getMessage( this.getCause() );
-                        if ( message == null && ( (UnmarshalException) this.getCause() ).getLinkedException() != null )
-                        {
-                            message = DefaultModelProvider.getMessage(
-                                ( (UnmarshalException) this.getCause() ).getLinkedException() );
-
-                        }
-
-                        message = DefaultModelProvider.getMessage( "unmarshalException", this.resource.toExternalForm(),
-                                                                   message != null ? " " + message : "" );
-
-                        throw new ModelException( message, this.getCause() );
-                    }
-                    else if ( this.getCause() instanceof JAXBException )
-                    {
-                        String message = DefaultModelProvider.getMessage( this.getCause() );
-                        if ( message == null && ( (JAXBException) this.getCause() ).getLinkedException() != null )
-                        {
-                            message = DefaultModelProvider.getMessage(
-                                ( (JAXBException) this.getCause() ).getLinkedException() );
-
-                        }
-
-                        throw new ModelException( message, this.getCause() );
-                    }
-
-                    throw new AssertionError( this );
-                }
-
             }
 
             try
@@ -556,7 +519,35 @@ public class DefaultModelProvider implements ModelProvider
             }
             catch ( final UnmarshalFailure e )
             {
-                e.propagate();
+                if ( e.getCause() instanceof ModelException )
+                {
+                    throw new ModelException( e.getCause().getMessage(), e.getCause() );
+                }
+                else if ( e.getCause() instanceof UnmarshalException )
+                {
+                    String message = getMessage( e.getCause() );
+                    if ( message == null && ( (UnmarshalException) e.getCause() ).getLinkedException() != null )
+                    {
+                        message = getMessage( ( (UnmarshalException) e.getCause() ).getLinkedException() );
+                    }
+
+                    message = getMessage( "unmarshalException", e.resource.toExternalForm(),
+                                          message != null ? " " + message : "" );
+
+                    throw new ModelException( message, e.getCause() );
+                }
+                else if ( e.getCause() instanceof JAXBException )
+                {
+                    String message = getMessage( e.getCause() );
+                    if ( message == null && ( (JAXBException) e.getCause() ).getLinkedException() != null )
+                    {
+                        message = getMessage( ( (JAXBException) e.getCause() ).getLinkedException() );
+                    }
+
+                    throw new ModelException( message, e.getCause() );
+                }
+
+                throw new AssertionError( e );
             }
         }
 

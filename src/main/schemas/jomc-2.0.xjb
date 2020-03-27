@@ -680,16 +680,6 @@
                     super( cause );
                 }
 
-                void propagate() throws ModelObjectException
-                {
-                    if ( this.getCause() instanceof ModelObjectException )
-                    {
-                        throw new ModelObjectException( this.getCause().getMessage(), this.getCause() );
-                    }
-
-                    throw new AssertionError( this );
-                }
-
             }
 
             try
@@ -712,7 +702,11 @@
             }
             catch ( final FindSpecificationFailure e )
             {
-                e.propagate();
+                if ( e.getCause() instanceof ModelObjectException )
+                {
+                    throw new ModelObjectException( e.getCause().getMessage(), e.getCause() );
+                }
+
                 throw new AssertionError( e );
             }
         }
@@ -1038,16 +1032,6 @@
                     super( cause );
                 }
 
-                void propagate() throws ModelObjectException
-                {
-                    if ( this.getCause() instanceof ModelObjectException )
-                    {
-                        throw new ModelObjectException( this.getCause().getMessage(), this.getCause() );
-                    }
-
-                    throw new AssertionError( this );
-                }
-
             }
 
             try
@@ -1070,7 +1054,11 @@
             }
             catch ( final FindImplementationFailure e )
             {
-                e.propagate();
+                if ( e.getCause() instanceof ModelObjectException )
+                {
+                    throw new ModelObjectException( e.getCause().getMessage(), e.getCause() );
+                }
+
                 throw new AssertionError( e );
             }
         }
@@ -3072,20 +3060,6 @@
                         super( cause );
                     }
 
-                    void propagate() throws ClassNotFoundException, ModelObjectException
-                    {
-                        if ( this.getCause() instanceof ClassNotFoundException )
-                        {
-                            throw (ClassNotFoundException) this.getCause();
-                        }
-                        else if ( this.getCause() instanceof ModelObjectException )
-                        {
-                            throw (ModelObjectException) this.getCause();
-                        }
-
-                        throw new AssertionError( this );
-                    }
-
                 }
 
                 try
@@ -3120,7 +3094,15 @@
                 }
                 catch ( final FindClassesFailure e )
                 {
-                    e.propagate();
+                    if ( e.getCause() instanceof ClassNotFoundException )
+                    {
+                        throw new ClassNotFoundException( e.getCause().getMessage(), e.getCause() );
+                    }
+                    else if ( e.getCause() instanceof ModelObjectException )
+                    {
+                        throw new ModelObjectException( e.getCause().getMessage(), e.getCause() );
+                    }
+
                     throw new AssertionError( e );
                 }
             }
@@ -3993,16 +3975,6 @@
                     super( cause );
                 }
 
-                void propagate() throws ModelObjectException
-                {
-                    if ( this.getCause() instanceof ModelObjectException )
-                    {
-                        throw new ModelObjectException( this.getCause().getMessage(), this.getCause() );
-                    }
-
-                    throw new AssertionError( this );
-                }
-
             }
 
             try
@@ -4027,8 +3999,12 @@
             }
             catch ( final FindSpecificationFailure e )
             {
-                e.propagate();
-                throw new AssertionError( this );
+                if ( e.getCause() instanceof ModelObjectException )
+                {
+                    throw new ModelObjectException( e.getCause().getMessage(), e.getCause() );
+                }
+
+                throw new AssertionError( e );
             }
         }
     }
@@ -4160,16 +4136,6 @@
                     super( cause );
                 }
 
-                void propagate() throws ModelObjectException
-                {
-                    if ( this.getCause() instanceof ModelObjectException )
-                    {
-                        throw new ModelObjectException( this.getCause().getMessage(), this.getCause() );
-                    }
-
-                    throw new AssertionError( this );
-                }
-
             }
 
             try
@@ -4194,7 +4160,11 @@
             }
             catch ( final FindImplementationFailure e )
             {
-                e.propagate();
+                if ( e.getCause() instanceof ModelObjectException )
+                {
+                    throw new ModelObjectException( e.getCause().getMessage(), e.getCause() );
+                }
+
                 throw new AssertionError( e );
             }
         }

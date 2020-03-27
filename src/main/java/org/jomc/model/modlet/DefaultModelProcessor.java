@@ -355,31 +355,6 @@ public class DefaultModelProcessor implements ModelProcessor
                     super( cause );
                 }
 
-                void propagate() throws ModelException
-                {
-                    if ( this.getCause() instanceof TransformerConfigurationException )
-                    {
-                        String message = DefaultModelProcessor.getMessage( this.getCause() );
-                        if ( message == null
-                                 && ( (TransformerConfigurationException) this.getCause() ).getException() != null )
-                        {
-                            message = DefaultModelProcessor.getMessage(
-                                ( (TransformerConfigurationException) this.getCause() ).getException() );
-
-                        }
-
-                        throw new ModelException( message, this.getCause() );
-                    }
-                    else if ( this.getCause() instanceof URISyntaxException )
-                    {
-                        throw new ModelException( DefaultModelProcessor.getMessage( this.getCause() ),
-                                                  this.getCause() );
-
-                    }
-
-                    throw new AssertionError( this );
-                }
-
             }
 
             try
@@ -427,7 +402,22 @@ public class DefaultModelProcessor implements ModelProcessor
             }
             catch ( final CreateTransformerFailure e )
             {
-                e.propagate();
+                if ( e.getCause() instanceof TransformerConfigurationException )
+                {
+                    String message = getMessage( e.getCause() );
+                    if ( message == null && ( (TransformerException) e.getCause() ).getException() != null )
+                    {
+                        message = getMessage( ( (TransformerException) e.getCause() ).getException() );
+                    }
+
+                    throw new ModelException( message, e.getCause() );
+                }
+                else if ( e.getCause() instanceof URISyntaxException )
+                {
+                    throw new ModelException( getMessage( e.getCause() ), e.getCause() );
+                }
+
+                throw new AssertionError( e );
             }
         }
 
