@@ -695,7 +695,7 @@
             {
                 if ( e.getCause() instanceof ModelObjectException )
                 {
-                    throw new ModelObjectException( e.getCause().getMessage(), e.getCause() );
+                    throw (ModelObjectException) e.getCause();
                 }
 
                 throw new AssertionError( e );
@@ -1037,7 +1037,7 @@
             {
                 if ( e.getCause() instanceof ModelObjectException )
                 {
-                    throw new ModelObjectException( e.getCause().getMessage(), e.getCause() );
+                    throw (ModelObjectException) e.getCause();
                 }
 
                 throw new AssertionError( e );
@@ -3049,11 +3049,11 @@
                 {
                     if ( e.getCause() instanceof ClassNotFoundException )
                     {
-                        throw new ClassNotFoundException( e.getCause().getMessage(), e.getCause() );
+                        throw (ClassNotFoundException) e.getCause();
                     }
                     else if ( e.getCause() instanceof ModelObjectException )
                     {
-                        throw new ModelObjectException( e.getCause().getMessage(), e.getCause() );
+                        throw (ModelObjectException) e.getCause();
                     }
 
                     throw new AssertionError( e );
@@ -3942,7 +3942,7 @@
             {
                 if ( e.getCause() instanceof ModelObjectException )
                 {
-                    throw new ModelObjectException( e.getCause().getMessage(), e.getCause() );
+                    throw (ModelObjectException) e.getCause();
                 }
 
                 throw new AssertionError( e );
@@ -4057,7 +4057,7 @@
                 {
                     if ( e.getCause() instanceof ModelObjectException )
                     {
-                        throw new ModelObjectException( e.getCause().getMessage(), e.getCause() );
+                        throw (ModelObjectException) e.getCause();
                     }
 
                     throw new AssertionError( e );
@@ -4156,7 +4156,7 @@
             {
                 if ( e.getCause() instanceof ModelObjectException )
                 {
-                    throw new ModelObjectException( e.getCause().getMessage(), e.getCause() );
+                    throw (ModelObjectException) e.getCause();
                 }
 
                 throw new AssertionError( e );
