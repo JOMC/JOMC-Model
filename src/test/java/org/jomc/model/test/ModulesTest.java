@@ -30,6 +30,7 @@
  */
 package org.jomc.model.test;
 
+import java.util.Optional;
 import java.util.logging.Level;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -124,11 +125,7 @@ public class ModulesTest
                     ABSOLUTE_RESOURCE_NAME_PREFIX + "ModulesTestSuite.xml" ) ) ).getValue();
 
         }
-        catch ( final JAXBException e )
-        {
-            throw new AssertionError( e );
-        }
-        catch ( final ModelException e )
+        catch ( final JAXBException | ModelException e )
         {
             throw new AssertionError( e );
         }
@@ -235,22 +232,39 @@ public class ModulesTest
         Assert.assertTrue( "[" + test.getIdentifier() + "] Unexpected invalid implementation.",
                            implementationReport.isModelValid() );
 
-        final Implementation i = modules.getValue().getImplementation( expected.getValue().getIdentifier() );
+        final Optional<Implementation> i = modules.getValue().getImplementation( expected.getValue().getIdentifier() );
 
         Assert.assertNotNull( i );
-        assertEquals( expected.getValue(), i );
-        assertEquals( expected.getValue().getDependencies(),
-                      modules.getValue().getDependencies( expected.getValue().getIdentifier() ) );
+        Assert.assertTrue( i.isPresent() );
+        assertEquals( expected.getValue(), i.get() );
 
-        assertEquals( expected.getValue().getMessages(),
-                      modules.getValue().getMessages( expected.getValue().getIdentifier() ) );
+        final Optional<Dependencies> computedDependencies =
+            modules.getValue().getDependencies( expected.getValue().getIdentifier() );
 
-        assertEquals( expected.getValue().getProperties(),
-                      modules.getValue().getProperties( expected.getValue().getIdentifier() ) );
+        Assert.assertNotNull( computedDependencies );
+        Assert.assertTrue( computedDependencies.isPresent() );
+        assertEquals( expected.getValue().getDependencies(), computedDependencies.get() );
 
-        assertEquals( expected.getValue().getSpecifications(),
-                      modules.getValue().getSpecifications( expected.getValue().getIdentifier() ) );
+        final Optional<Messages> computedMessages =
+            modules.getValue().getMessages( expected.getValue().getIdentifier() );
 
+        Assert.assertNotNull( computedMessages );
+        Assert.assertTrue( computedMessages.isPresent() );
+        assertEquals( expected.getValue().getMessages(), computedMessages.get() );
+
+        final Optional<Properties> computedProperties =
+            modules.getValue().getProperties( expected.getValue().getIdentifier() );
+
+        Assert.assertNotNull( computedProperties );
+        Assert.assertTrue( computedProperties.isPresent() );
+        assertEquals( expected.getValue().getProperties(), computedProperties.get() );
+
+        final Optional<Specifications> computedSpecifications =
+            modules.getValue().getSpecifications( expected.getValue().getIdentifier() );
+
+        Assert.assertNotNull( computedSpecifications );
+        Assert.assertTrue( computedSpecifications.isPresent() );
+        assertEquals( expected.getValue().getSpecifications(), computedSpecifications.get() );
     }
 
     /**
@@ -307,32 +321,49 @@ public class ModulesTest
         Assert.assertTrue( "[" + test.getIdentifier() + "] Unexpected invalid instance.",
                            validationReport.isModelValid() );
 
-        Instance instance = null;
+        Optional<Instance> instance = null;
 
         if ( test.getDependencyName() != null )
         {
-            final Dependencies dependencies =
+            final Optional<Dependencies> dependencies =
                 modules.getValue().getDependencies( test.getImplementationIdentifier() );
 
             Assert.assertNotNull( "[" + test.getIdentifier() + "] No dependencies for implementation '"
                                       + test.getImplementationIdentifier() + "' not found.", dependencies );
 
-            final Dependency d = dependencies.getDependency( test.getDependencyName() );
+            Assert.assertTrue( "[" + test.getIdentifier() + "] No dependencies for implementation '"
+                                   + test.getImplementationIdentifier() + "' not found.", dependencies.isPresent() );
+
+            final Optional<Dependency> d = dependencies.get().getDependency( test.getDependencyName() );
+
             Assert.assertNotNull( "[" + test.getIdentifier() + "] Dependency '" + test.getDependencyName()
                                       + "' not found.", d );
 
-            Assert.assertNotNull( "[" + test.getIdentifier() + "] Expected implementation name of dependency '"
-                                      + test.getDependencyName() + "' not set.", d.getImplementationName() );
+            Assert.assertTrue( "[" + test.getIdentifier() + "] Dependency '" + test.getDependencyName()
+                                   + "' not found.", d.isPresent() );
 
-            final Implementations implementations = modules.getValue().getImplementations( d.getIdentifier() );
+            Assert.assertNotNull( "[" + test.getIdentifier() + "] Expected implementation name of dependency '"
+                                      + test.getDependencyName() + "' not set.", d.get().getImplementationName() );
+
+            final Optional<Implementations> implementations =
+                modules.getValue().getImplementations( d.get().getIdentifier() );
+
             Assert.assertNotNull( "[" + test.getIdentifier() + "] Expected implementations of dependency '"
                                       + test.getDependencyName() + "' not found.", implementations );
 
-            final Implementation i = implementations.getImplementationByName( d.getImplementationName() );
-            Assert.assertNotNull( "[" + test.getIdentifier() + "] Expected '" + d.getImplementationName()
+            Assert.assertTrue( "[" + test.getIdentifier() + "] Expected implementations of dependency '"
+                                   + test.getDependencyName() + "' not found.", implementations.isPresent() );
+
+            final Optional<Implementation> i =
+                implementations.get().getImplementationByName( d.get().getImplementationName() );
+
+            Assert.assertNotNull( "[" + test.getIdentifier() + "] Expected '" + d.get().getImplementationName()
                                       + "' implementation not found.", i );
 
-            instance = modules.getValue().getInstance( i.getIdentifier(), d );
+            Assert.assertTrue( "[" + test.getIdentifier() + "] Expected '" + d.get().getImplementationName()
+                                   + "' implementation not found.", i.isPresent() );
+
+            instance = modules.getValue().getInstance( i.get().getIdentifier(), d.get() );
         }
         else
         {
@@ -340,7 +371,8 @@ public class ModulesTest
         }
 
         Assert.assertNotNull( "[" + test.getIdentifier() + "] Expected instance not found.", instance );
-        assertEquals( expected.getValue(), instance );
+        Assert.assertTrue( "[" + test.getIdentifier() + "] Expected instance not found.", instance.isPresent() );
+        assertEquals( expected.getValue(), instance.get() );
     }
 
     public static void assertEquals( final ModelObject expected, final ModelObject computed ) throws Exception
@@ -387,7 +419,9 @@ public class ModulesTest
 
             for ( final Implementation i : expected.getImplementation() )
             {
-                assertEquals( i, computed.getImplementation( i.getIdentifier() ) );
+                final Optional<Implementation> computedImpl = computed.getImplementation( i.getIdentifier() );
+                Assert.assertTrue( computedImpl.isPresent() );
+                assertEquals( i, computedImpl.get() );
             }
         }
         else
@@ -427,12 +461,16 @@ public class ModulesTest
 
             for ( final Specification s : expected.getSpecification() )
             {
-                assertEquals( s, computed.getSpecification( s.getIdentifier() ) );
+                final Optional<Specification> computedSpec = computed.getSpecification( s.getIdentifier() );
+                Assert.assertTrue( computedSpec.isPresent() );
+                assertEquals( s, computedSpec.get() );
             }
 
             for ( final SpecificationReference r : expected.getReference() )
             {
-                assertEquals( r, computed.getReference( r.getIdentifier() ) );
+                final Optional<SpecificationReference> computedRef = computed.getReference( r.getIdentifier() );
+                Assert.assertTrue( computedRef.isPresent() );
+                assertEquals( r, computedRef.get() );
             }
         }
         else
@@ -490,7 +528,9 @@ public class ModulesTest
 
             for ( final Dependency d : expected.getDependency() )
             {
-                assertEquals( d, computed.getDependency( d.getName() ) );
+                final Optional<Dependency> computedDep = computed.getDependency( d.getName() );
+                Assert.assertTrue( computedDep.isPresent() );
+                assertEquals( d, computedDep.get() );
             }
         }
         else
@@ -531,7 +571,9 @@ public class ModulesTest
 
             for ( final Message m : expected.getMessage() )
             {
-                assertEquals( m, computed.getMessage( m.getName() ) );
+                final Optional<Message> computedMsg = computed.getMessage( m.getName() );
+                Assert.assertTrue( computedMsg.isPresent() );
+                assertEquals( m, computedMsg.get() );
             }
         }
         else
@@ -589,7 +631,9 @@ public class ModulesTest
 
             for ( final Property p : expected.getProperty() )
             {
-                assertEquals( p, computed.getProperty( p.getName() ) );
+                final Optional<Property> computedProperty = computed.getProperty( p.getName() );
+                Assert.assertTrue( computedProperty.isPresent() );
+                assertEquals( p, computedProperty.get() );
             }
         }
         else

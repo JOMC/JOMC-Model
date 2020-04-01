@@ -32,9 +32,13 @@ package org.jomc.model.test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.Callable;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import org.jomc.model.ModelObject;
+import org.jomc.model.ModelObjectException;
+import org.jomc.model.PropertyException;
 import org.junit.Test;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
@@ -63,14 +67,14 @@ public class ModelObjectTest
     {
 
         @Override
-        public <T> JAXBElement<T> getAnyElement( final List<Object> any, final String namespaceURI,
-                                                 final String localPart, final Class<T> type )
+        public <T> Optional<JAXBElement<T>> getAnyElement( final List<Object> any, final String namespaceURI,
+                                                           final String localPart, final Class<T> type )
         {
             return super.getAnyElement( any, namespaceURI, localPart, type );
         }
 
         @Override
-        public <T> T getAnyObject( final List<Object> any, final Class<T> clazz )
+        public <T> Optional<T> getAnyObject( final List<Object> any, final Class<T> clazz )
         {
             return super.getAnyObject( any, clazz );
         }
@@ -87,16 +91,9 @@ public class ModelObjectTest
         any.add( element );
         any.add( element );
 
-        try
-        {
-            modelObject.getAnyElement( any, "http://jomc.org/model", "test", Object.class );
-            fail( "Expected 'IllegalStateException' not thrown." );
-        }
-        catch ( final IllegalStateException e )
-        {
-            assertNotNull( e.getMessage() );
-            System.out.println( e );
-        }
+        assertIllegalStateException( ()  -> modelObject.getAnyElement( any, "http://jomc.org/model", "test",
+                                                                        Object.class ) );
+
     }
 
     @Test
@@ -107,12 +104,59 @@ public class ModelObjectTest
         any.add( "TEST" );
         any.add( "TEST" );
 
+        assertIllegalStateException( ()  -> modelObject.getAnyObject( any, String.class ) );
+    }
+
+    static void assertIllegalStateException( final Callable<?> test ) throws Exception
+    {
         try
         {
-            modelObject.getAnyObject( any, String.class );
+            test.call();
             fail( "Expected 'IllegalStateException' not thrown." );
         }
         catch ( final IllegalStateException e )
+        {
+            assertNotNull( e.getMessage() );
+            System.out.println( e );
+        }
+    }
+
+    static void assertNullPointerException( final Callable<?> test ) throws Exception
+    {
+        try
+        {
+            test.call();
+            fail( "Expected 'NullPointerException' not thrown." );
+        }
+        catch ( final NullPointerException e )
+        {
+            assertNotNull( e.getMessage() );
+            System.out.println( e );
+        }
+    }
+
+    static void assertModelObjectException( final Callable<?> test ) throws Exception
+    {
+        try
+        {
+            test.call();
+            fail( "Expected 'ModelObjectException' not thrown." );
+        }
+        catch ( final ModelObjectException e )
+        {
+            assertNotNull( e.getMessage() );
+            System.out.println( e );
+        }
+    }
+
+    static void assertPropertyException( final Callable<?> test ) throws Exception
+    {
+        try
+        {
+            test.call();
+            fail( "Expected 'PropertyException' not thrown." );
+        }
+        catch ( final PropertyException e )
         {
             assertNotNull( e.getMessage() );
             System.out.println( e );

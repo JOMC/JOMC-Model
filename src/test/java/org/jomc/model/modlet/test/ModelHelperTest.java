@@ -30,6 +30,7 @@
  */
 package org.jomc.model.modlet.test;
 
+import java.util.concurrent.Callable;
 import org.jomc.model.ModelObject;
 import org.jomc.model.Module;
 import org.jomc.model.Modules;
@@ -37,8 +38,8 @@ import org.jomc.model.modlet.ModelHelper;
 import org.jomc.modlet.Model;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -62,71 +63,32 @@ public class ModelHelperTest
     @Test
     public final void testModelHelper() throws Exception
     {
-        try
-        {
-            ModelHelper.getModules( null );
-            fail( "Expected NullPointerException not thrown." );
-        }
-        catch ( final NullPointerException e )
-        {
-            assertNotNull( e.getMessage() );
-            System.out.println( e.toString() );
-        }
-
-        try
+        assertNullPointerException( ()  -> ModelHelper.getModules( null ) );
+        assertNullPointerException( ()  ->
         {
             ModelHelper.setModules( new Model(), null );
-            fail( "Expected NullPointerException not thrown." );
-        }
-        catch ( final NullPointerException e )
-        {
-            assertNotNull( e.getMessage() );
-            System.out.println( e.toString() );
-        }
-
-        try
+            return null;
+        } );
+        assertNullPointerException( ()  ->
         {
             ModelHelper.setModules( null, new Modules() );
-            fail( "Expected NullPointerException not thrown." );
-        }
-        catch ( final NullPointerException e )
-        {
-            assertNotNull( e.getMessage() );
-            System.out.println( e.toString() );
-        }
-
-        try
+            return null;
+        } );
+        assertNullPointerException( ()  ->
         {
             ModelHelper.addModules( new Model(), null );
-            fail( "Expected NullPointerException not thrown." );
-        }
-        catch ( final NullPointerException e )
-        {
-            assertNotNull( e.getMessage() );
-            System.out.println( e.toString() );
-        }
-
-        try
+            return null;
+        } );
+        assertNullPointerException( ()  ->
         {
             ModelHelper.addModules( null, new Modules() );
-            fail( "Expected NullPointerException not thrown." );
-        }
-        catch ( final NullPointerException e )
-        {
-            assertNotNull( e.getMessage() );
-            System.out.println( e.toString() );
-        }
-
-        try
+            return null;
+        } );
+        assertNullPointerException( ()  ->
         {
             ModelHelper.removeModules( null );
-            fail( "Expected NullPointerException not thrown." );
-        }
-        catch ( final NullPointerException e )
-        {
-            assertNotNull( e.getMessage() );
-            System.out.println( e.toString() );
-        }
+            return null;
+        } );
 
         final Model model = new Model();
         model.setIdentifier( ModelObject.MODEL_PUBLIC_ID );
@@ -134,18 +96,14 @@ public class ModelHelperTest
         ModelHelper.setModules( model, new Modules() );
 
         assertNotNull( ModelHelper.getModules( model ) );
-        assertTrue( ModelHelper.getModules( model ).getModule().isEmpty() );
+        assertTrue( ModelHelper.getModules( model ).isPresent() );
+        assertTrue( ModelHelper.getModules( model ).get().getModule().isEmpty() );
 
-        try
+        assertIllegalStateException( ()  ->
         {
             ModelHelper.setModules( model, new Modules() );
-            fail( "Expected IllegalStateException not thrown." );
-        }
-        catch ( final IllegalStateException e )
-        {
-            assertNotNull( e.getMessage() );
-            System.out.println( e.toString() );
-        }
+            return null;
+        } );
 
         final Module m = new Module();
         m.setName( "TEST" );
@@ -155,10 +113,40 @@ public class ModelHelperTest
 
         ModelHelper.addModules( model, add );
         assertNotNull( ModelHelper.getModules( model ) );
-        assertEquals( 1, ModelHelper.getModules( model ).getModule().size() );
+        assertTrue( ModelHelper.getModules( model ).isPresent() );
+        assertEquals( 1, ModelHelper.getModules( model ).get().getModule().size() );
 
         ModelHelper.removeModules( model );
-        assertNull( ModelHelper.getModules( model ) );
+        assertNotNull( ModelHelper.getModules( model ) );
+        assertFalse( ModelHelper.getModules( model ).isPresent() );
+    }
+
+    static void assertNullPointerException( final Callable<?> test ) throws Exception
+    {
+        try
+        {
+            test.call();
+            fail( "Expected 'NullPointerException' not thrown." );
+        }
+        catch ( final NullPointerException e )
+        {
+            assertNotNull( e.getMessage() );
+            System.out.println( e );
+        }
+    }
+
+    static void assertIllegalStateException( final Callable<?> test ) throws Exception
+    {
+        try
+        {
+            test.call();
+            fail( "Expected 'IllegalStateException' not thrown." );
+        }
+        catch ( final IllegalStateException e )
+        {
+            assertNotNull( e.getMessage() );
+            System.out.println( e );
+        }
     }
 
 }

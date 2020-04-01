@@ -60,20 +60,12 @@ public class PropertyExceptionTest
     @Test
     public final void Deserializable() throws Exception
     {
-        ObjectInputStream in = null;
-
-        try
+        try ( final ObjectInputStream in = new ObjectInputStream( this.getClass().getResourceAsStream(
+            ABSOLUTE_RESOURCE_NAME_PREFIX + "PropertyException.ser" ) ) )
         {
-            in = new ObjectInputStream( this.getClass().getResourceAsStream(
-                ABSOLUTE_RESOURCE_NAME_PREFIX + "PropertyException.ser" ) );
-
             final PropertyException e = (PropertyException) in.readObject();
             assertEquals( "PropertyException", e.getMessage() );
             System.out.println( e );
-        }
-        finally
-        {
-            in.close();
         }
     }
 

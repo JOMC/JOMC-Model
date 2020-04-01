@@ -42,6 +42,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -292,7 +293,7 @@ public class DefaultModelProcessor implements ModelProcessor
      * @param context The context to search for transformers.
      * @param location The location to search at.
      *
-     * @return The transformers found at {@code location} in {@code context} or {@code null}, if no transformers are
+     * @return The transformers found at {@code location} in {@code context} or an empty list, if no transformers are
      * found.
      *
      * @throws NullPointerException if {@code context} or {@code location} is {@code null}.
@@ -428,7 +429,7 @@ public class DefaultModelProcessor implements ModelProcessor
 
         }
 
-        return transformers.isEmpty() ? null : transformers;
+        return transformers;
     }
 
     /**
@@ -441,7 +442,7 @@ public class DefaultModelProcessor implements ModelProcessor
      * @see #TRANSFORMER_LOCATION_ATTRIBUTE_NAME
      */
     @Override
-    public Model processModel( final ModelContext context, final Model model ) throws ModelException
+    public Optional<Model> processModel( final ModelContext context, final Model model ) throws ModelException
     {
         Objects.requireNonNull( context, "context" );
         Objects.requireNonNull( model, "model" );
@@ -451,17 +452,27 @@ public class DefaultModelProcessor implements ModelProcessor
             Model processed = model;
 
             boolean contextEnabled = this.isEnabled();
-            if ( DEFAULT_ENABLED == contextEnabled
-                     && context.getAttribute( ENABLED_ATTRIBUTE_NAME ) instanceof Boolean )
+            if ( DEFAULT_ENABLED == contextEnabled )
             {
-                contextEnabled = (Boolean) context.getAttribute( ENABLED_ATTRIBUTE_NAME );
+                final Optional<Object> enabledAttribute = context.getAttribute( ENABLED_ATTRIBUTE_NAME );
+
+                if ( enabledAttribute.isPresent() && enabledAttribute.get() instanceof Boolean )
+                {
+                    contextEnabled = (Boolean) enabledAttribute.get();
+                }
             }
 
             String contextTransformerLocation = this.getTransformerLocation();
-            if ( DEFAULT_TRANSFORMER_LOCATION.equals( contextTransformerLocation )
-                     && context.getAttribute( TRANSFORMER_LOCATION_ATTRIBUTE_NAME ) instanceof String )
+            if ( DEFAULT_TRANSFORMER_LOCATION.equals( contextTransformerLocation ) )
             {
-                contextTransformerLocation = (String) context.getAttribute( TRANSFORMER_LOCATION_ATTRIBUTE_NAME );
+                final Optional<Object> transformerLocationAttribute =
+                    context.getAttribute( TRANSFORMER_LOCATION_ATTRIBUTE_NAME );
+
+                if ( transformerLocationAttribute.isPresent()
+                         && transformerLocationAttribute.get() instanceof String )
+                {
+                    contextTransformerLocation = (String) transformerLocationAttribute.get();
+                }
             }
 
             if ( contextEnabled )
@@ -501,7 +512,7 @@ public class DefaultModelProcessor implements ModelProcessor
 
             }
 
-            return processed;
+            return Optional.ofNullable( processed );
         }
         catch ( final TransformerException e )
         {

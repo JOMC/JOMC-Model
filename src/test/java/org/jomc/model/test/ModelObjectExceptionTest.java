@@ -61,20 +61,12 @@ public class ModelObjectExceptionTest
     @Test
     public final void Deserializable() throws Exception
     {
-        ObjectInputStream in = null;
-
-        try
+        try ( final ObjectInputStream in = new ObjectInputStream( this.getClass().getResourceAsStream(
+            ABSOLUTE_RESOURCE_NAME_PREFIX + "ModelObjectException.ser" ) ) )
         {
-            in = new ObjectInputStream( this.getClass().getResourceAsStream(
-                ABSOLUTE_RESOURCE_NAME_PREFIX + "ModelObjectException.ser" ) );
-
             final ModelObjectException e = (ModelObjectException) in.readObject();
             assertEquals( "ModelObjectException", e.getMessage() );
             System.out.println( e );
-        }
-        finally
-        {
-            in.close();
         }
     }
 

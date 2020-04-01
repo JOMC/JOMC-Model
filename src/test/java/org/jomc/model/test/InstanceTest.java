@@ -31,12 +31,10 @@
 package org.jomc.model.test;
 
 import org.jomc.model.Instance;
-import org.jomc.model.ModelObjectException;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
 
 /**
  * Test cases for class {@code org.jomc.model.Instance}.
@@ -60,46 +58,28 @@ public class InstanceTest
     public final void JavaTypeName() throws Exception
     {
         final Instance i = new Instance();
-        assertNull( i.getJavaTypeName() );
+        assertNotNull( i.getJavaTypeName() );
+        assertFalse( i.getJavaTypeName().isPresent() );
 
         i.setClazz( "@" );
-
-        try
-        {
-            i.getJavaTypeName();
-            fail( "Expected 'ModelObjectException' not thrown." );
-        }
-        catch ( final ModelObjectException e )
-        {
-            assertNotNull( e.getMessage() );
-            System.out.println( e.toString() );
-        }
+        ModelObjectTest.assertModelObjectException( ()  -> i.getJavaTypeName() );
 
         i.setClazz( "java.lang.Object<java.lang.Object<java.lang.Object<?>>>" );
-        assertEquals( "java.lang.Object", i.getJavaTypeName().getClassName() );
+        assertEquals( "java.lang.Object", i.getJavaTypeName().get().getClassName() );
     }
 
     @Test
     public final void JavaFactoryMethodName() throws Exception
     {
         final Instance i = new Instance();
-        assertNull( i.getJavaFactoryMethodName() );
+        assertNotNull( i.getJavaFactoryMethodName() );
+        assertFalse( i.getJavaFactoryMethodName().isPresent() );
 
         i.setName( "" );
-
-        try
-        {
-            i.getJavaFactoryMethodName();
-            fail( "Expected 'ModelObjectException' not thrown." );
-        }
-        catch ( final ModelObjectException e )
-        {
-            assertNotNull( e.getMessage() );
-            System.out.println( e.toString() );
-        }
+        ModelObjectTest.assertModelObjectException( ()  -> i.getJavaFactoryMethodName() );
 
         i.setName( "TEST TEST" );
-        assertEquals( "getTestTest", i.getJavaFactoryMethodName() );
+        assertEquals( "getTestTest", i.getJavaFactoryMethodName().get() );
     }
 
 }

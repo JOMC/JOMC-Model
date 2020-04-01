@@ -33,8 +33,7 @@ package org.jomc.model.test;
 import org.jomc.model.Text;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test cases for class {@code org.jomc.model.Text}.
@@ -61,29 +60,12 @@ public class TextTest
         text.setLanguage( "en" );
         text.setValue( "<>\"*&" );
 
-        assertEquals( "&lt;&gt;&quot;&lowast;&amp;", text.getJavadocComment( "\n", "" ) );
+        assertTrue( text.getJavadocComment( "\n", "" ).isPresent() );
+        assertEquals( "&lt;&gt;&quot;&lowast;&amp;", text.getJavadocComment( "\n", "" ).get() );
 
-        try
-        {
-            text.getJavadocComment( null, "" );
-            fail( "Expected 'NullPointerException' not thrown." );
-        }
-        catch ( final NullPointerException e )
-        {
-            assertNotNull( e.getMessage() );
-            System.out.println( e );
-        }
+        ModelObjectTest.assertNullPointerException( ()  -> text.getJavadocComment( null, "" ) );
+        ModelObjectTest.assertNullPointerException( ()  -> text.getJavadocComment( "", null ) );
 
-        try
-        {
-            text.getJavadocComment( "", null );
-            fail( "Expected 'NullPointerException' not thrown." );
-        }
-        catch ( final NullPointerException e )
-        {
-            assertNotNull( e.getMessage() );
-            System.out.println( e );
-        }
     }
 
 }

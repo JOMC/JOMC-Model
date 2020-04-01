@@ -31,6 +31,7 @@
 package org.jomc.model.modlet.test;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -195,11 +196,7 @@ public class DefaultModelValidatorTest
                     ABSOLUTE_RESOURCE_NAME_PREFIX + "DefaultModelValidatorTestSuite.xml" ) ) ).getValue();
 
         }
-        catch ( final JAXBException e )
-        {
-            throw new AssertionError( e );
-        }
-        catch ( final ModelException e )
+        catch ( final JAXBException | ModelException e )
         {
             throw new AssertionError( e );
         }
@@ -208,27 +205,12 @@ public class DefaultModelValidatorTest
     @Test
     public final void testIllegalArguments() throws Exception
     {
-        try
-        {
-            this.getModelValidator().validateModel( this.getModelContext(), null );
-            fail( "Expected NullPointerException not thrown." );
-        }
-        catch ( final NullPointerException e )
-        {
-            assertNotNull( e.getMessage() );
-            System.out.println( e.toString() );
-        }
+        ModelHelperTest.assertNullPointerException( ()  -> this.getModelValidator().
+            validateModel( this.getModelContext(), null ) );
 
-        try
-        {
-            this.getModelValidator().validateModel( null, new Model() );
-            fail( "Expected NullPointerException not thrown." );
-        }
-        catch ( final NullPointerException e )
-        {
-            assertNotNull( e.getMessage() );
-            System.out.println( e.toString() );
-        }
+        ModelHelperTest.assertNullPointerException( ()  -> this.getModelValidator().
+            validateModel( null, new Model() ) );
+
     }
 
     @Test
@@ -307,28 +289,30 @@ public class DefaultModelValidatorTest
         model.setIdentifier( ModelObject.MODEL_PUBLIC_ID );
         ModelHelper.setModules( model, modules.getValue() );
 
-        final ModelValidationReport report = this.getModelValidator().validateModel( context, model );
+        final Optional<ModelValidationReport> report = this.getModelValidator().validateModel( context, model );
+        assertNotNull( report );
+        assertTrue( report.isPresent() );
 
-        log( report );
+        log( report.get() );
 
         assertEquals( "[" + test.getIdentifier() + "] Unexpected model validity.",
-                      test.getModules().isValid(), report.isModelValid() );
+                      test.getModules().isValid(), report.get().isModelValid() );
 
         for ( final ModelValidationReportDetail expectedDetail : test.getDetail() )
         {
             final List<ModelValidationReport.Detail> reportedDetails =
-                report.getDetails( expectedDetail.getIdentifier() );
+                report.get().getDetails( expectedDetail.getIdentifier() );
 
             assertTrue( "[" + test.getIdentifier() + "] Expected " + expectedDetail.getCount() + " "
                             + expectedDetail.getIdentifier() + " details but got " + reportedDetails.size()
                             + ".", expectedDetail.getCount() == reportedDetails.size() );
 
-            report.getDetails().removeAll( reportedDetails );
+            report.get().getDetails().removeAll( reportedDetails );
         }
 
-        if ( !report.getDetails().isEmpty() )
+        if ( !report.get().getDetails().isEmpty() )
         {
-            for ( final ModelValidationReport.Detail d : report.getDetails() )
+            for ( final ModelValidationReport.Detail d : report.get().getDetails() )
             {
                 fail( "[" + test.getIdentifier() + "] Unexpected " + d.getIdentifier() + " detail." );
             }
@@ -372,10 +356,7 @@ public class DefaultModelValidatorTest
 
     private static void log( final ModelValidationReport report )
     {
-        for ( final ModelValidationReport.Detail d : report.getDetails() )
-        {
-            System.out.println( "\t" + d.toString() );
-        }
+        report.getDetails().forEach( d  -> System.out.println( "\t" + d.toString() ) );
     }
 
 }

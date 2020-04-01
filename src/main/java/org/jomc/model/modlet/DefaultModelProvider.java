@@ -37,6 +37,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
@@ -403,7 +404,7 @@ public class DefaultModelProvider implements ModelProvider
      * @param model The identifier of the model to search for modules.
      * @param location The location to search at.
      *
-     * @return The modules found at {@code location} in {@code context} or {@code null}, if no modules are found.
+     * @return The modules found at {@code location} in {@code context} or no value, if no modules are found.
      *
      * @throws NullPointerException if {@code context}, {@code model} or {@code location} is {@code null}.
      * @throws ModelException if searching the context fails.
@@ -411,7 +412,7 @@ public class DefaultModelProvider implements ModelProvider
      * @see #isValidating()
      * @see #VALIDATING_ATTRIBUTE_NAME
      */
-    public Modules findModules( final ModelContext context, final String model, final String location )
+    public Optional<Modules> findModules( final ModelContext context, final String model, final String location )
         throws ModelException
     {
         Objects.requireNonNull( context, "context" );
@@ -419,10 +420,14 @@ public class DefaultModelProvider implements ModelProvider
         Objects.requireNonNull( location, "location" );
 
         boolean contextValidating = this.isValidating();
-        if ( DEFAULT_VALIDATING == contextValidating
-                 && context.getAttribute( VALIDATING_ATTRIBUTE_NAME ) instanceof Boolean )
+        if ( DEFAULT_VALIDATING == contextValidating )
         {
-            contextValidating = (Boolean) context.getAttribute( VALIDATING_ATTRIBUTE_NAME );
+            final Optional<Object> validatingAttribute = context.getAttribute( VALIDATING_ATTRIBUTE_NAME );
+
+            if ( validatingAttribute.isPresent() && validatingAttribute.get() instanceof Boolean )
+            {
+                contextValidating = (Boolean) validatingAttribute.get();
+            }
         }
 
         final long t0 = System.nanoTime();
@@ -558,13 +563,13 @@ public class DefaultModelProvider implements ModelProvider
 
         }
 
-        return modules.getModule().isEmpty() ? null : modules;
+        return Optional.ofNullable( modules.getModule().isEmpty() ? null : modules );
     }
 
     /**
      * {@inheritDoc}
      *
-     * @return The {@code Model} found in the context or {@code null}, if no {@code Model} is found or the provider is
+     * @return The {@code Model} found in the context or no value, if no {@code Model} is found or the provider is
      * disabled.
      *
      * @see #isEnabled()
@@ -574,7 +579,7 @@ public class DefaultModelProvider implements ModelProvider
      * @see #MODULE_LOCATION_ATTRIBUTE_NAME
      */
     @Override
-    public Model findModel( final ModelContext context, final Model model ) throws ModelException
+    public Optional<Model> findModel( final ModelContext context, final Model model ) throws ModelException
     {
         Objects.requireNonNull( context, "context" );
         Objects.requireNonNull( model, "model" );
@@ -582,26 +587,34 @@ public class DefaultModelProvider implements ModelProvider
         Model found = null;
 
         boolean contextEnabled = this.isEnabled();
-        if ( DEFAULT_ENABLED == contextEnabled && context.getAttribute( ENABLED_ATTRIBUTE_NAME ) instanceof Boolean )
+        if ( DEFAULT_ENABLED == contextEnabled )
         {
-            contextEnabled = (Boolean) context.getAttribute( ENABLED_ATTRIBUTE_NAME );
+            final Optional<Object> enabledAttribute = context.getAttribute( ENABLED_ATTRIBUTE_NAME );
+
+            if ( enabledAttribute.isPresent() && enabledAttribute.get() instanceof Boolean )
+            {
+                contextEnabled = (Boolean) enabledAttribute.get();
+            }
         }
 
         String contextModuleLocation = this.getModuleLocation();
-        if ( DEFAULT_MODULE_LOCATION.equals( contextModuleLocation )
-                 && context.getAttribute( MODULE_LOCATION_ATTRIBUTE_NAME ) instanceof String )
+        if ( DEFAULT_MODULE_LOCATION.equals( contextModuleLocation ) )
         {
-            contextModuleLocation = (String) context.getAttribute( MODULE_LOCATION_ATTRIBUTE_NAME );
+            final Optional<Object> moduleLocationAttribute = context.getAttribute( MODULE_LOCATION_ATTRIBUTE_NAME );
+            if ( moduleLocationAttribute.isPresent() && moduleLocationAttribute.get() instanceof String )
+            {
+                contextModuleLocation = (String) moduleLocationAttribute.get();
+            }
         }
 
         if ( contextEnabled )
         {
-            final Modules modules = this.findModules( context, model.getIdentifier(), contextModuleLocation );
+            final Optional<Modules> modules = this.findModules( context, model.getIdentifier(), contextModuleLocation );
 
-            if ( modules != null )
+            if ( modules.isPresent() )
             {
                 found = model.clone();
-                ModelHelper.addModules( found, modules );
+                ModelHelper.addModules( found, modules.get() );
             }
         }
         else if ( context.isLoggable( Level.FINER ) )
@@ -611,7 +624,7 @@ public class DefaultModelProvider implements ModelProvider
 
         }
 
-        return found;
+        return Optional.ofNullable( found );
     }
 
     private static String getMessage( final String key, final Object... args )

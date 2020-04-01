@@ -30,6 +30,7 @@
  */
 package org.jomc.model.modlet.test;
 
+import java.util.Optional;
 import java.util.logging.Level;
 import org.jomc.model.ModelObject;
 import org.jomc.model.Modules;
@@ -43,9 +44,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * Test cases for class {@code org.jomc.model.modlet.DefaultModelProcessor}.
@@ -153,27 +152,9 @@ public class DefaultModelProcessorTest
     @Test
     public final void testFindTransformers() throws Exception
     {
-        try
-        {
-            this.getModelProcessor().findTransformers( this.getModelContext(), null );
-            fail( "Expected NullPointerException not thrown." );
-        }
-        catch ( final NullPointerException e )
-        {
-            assertNotNull( e.getMessage() );
-            System.out.println( e );
-        }
-
-        try
-        {
-            this.getModelProcessor().findTransformers( null, "" );
-            fail( "Expected NullPointerException not thrown." );
-        }
-        catch ( final NullPointerException e )
-        {
-            assertNotNull( e.getMessage() );
-            System.out.println( e );
-        }
+        ModelHelperTest.assertNullPointerException( ()  -> this.getModelProcessor().findTransformers( null, "" ) );
+        ModelHelperTest.assertNullPointerException( ()  -> this.getModelProcessor().
+            findTransformers( this.getModelContext(), null ) );
 
         DefaultModelProcessor.setDefaultTransformerLocation( null );
         this.getModelProcessor().setTransformerLocation( null );
@@ -183,11 +164,11 @@ public class DefaultModelProcessorTest
         DefaultModelProcessor.setDefaultTransformerLocation( "DOES_NOT_EXIST" );
         this.getModelProcessor().setTransformerLocation( "DOES_NOT_EXIST" );
 
-        assertNull( this.getModelProcessor().findTransformers(
-            this.getModelContext(), DefaultModelProcessor.getDefaultTransformerLocation() ) );
+        assertTrue( this.getModelProcessor().findTransformers(
+            this.getModelContext(), DefaultModelProcessor.getDefaultTransformerLocation() ).isEmpty() );
 
-        assertNull( this.getModelProcessor().findTransformers(
-            this.getModelContext(), this.getModelProcessor().getTransformerLocation() ) );
+        assertTrue( this.getModelProcessor().findTransformers(
+            this.getModelContext(), this.getModelProcessor().getTransformerLocation() ).isEmpty() );
 
         DefaultModelProcessor.setDefaultTransformerLocation( null );
         this.getModelProcessor().setTransformerLocation( null );
@@ -199,49 +180,44 @@ public class DefaultModelProcessorTest
         final Model model = new Model();
         model.setIdentifier( ModelObject.MODEL_PUBLIC_ID );
 
-        try
-        {
-            this.getModelProcessor().processModel( null, model );
-            fail( "Expected NullPointerException not thrown." );
-        }
-        catch ( final NullPointerException e )
-        {
-            assertNotNull( e.getMessage() );
-            System.out.println( e.toString() );
-        }
-
-        try
-        {
-            this.getModelProcessor().processModel( this.getModelContext(), null );
-            fail( "Expected NullPointerException not thrown." );
-        }
-        catch ( final NullPointerException e )
-        {
-            assertNotNull( e.getMessage() );
-            System.out.println( e.toString() );
-        }
+        ModelHelperTest.assertNullPointerException( ()  -> this.getModelProcessor().processModel( null, model ) );
+        ModelHelperTest.assertNullPointerException( ()  -> this.getModelProcessor().
+            processModel( this.getModelContext(), null ) );
 
         assertNotNull( this.getModelProcessor().processModel( this.getModelContext(), model ) );
+        assertTrue( this.getModelProcessor().processModel( this.getModelContext(), model ).isPresent() );
 
         this.getModelProcessor().setTransformerLocation(
             this.getClass().getPackage().getName().replace( '.', '/' ) + "/system-property-test.xsl" );
 
-        final Model processedSystemProperty = this.getModelProcessor().processModel( this.getModelContext(), model );
-        assertNotNull( processedSystemProperty );
+        final Optional<Model> processedSystemProperty =
+            this.getModelProcessor().processModel( this.getModelContext(), model );
 
-        final Modules processedSystemPropertyModules = ModelHelper.getModules( processedSystemProperty );
+        assertNotNull( processedSystemProperty );
+        assertTrue( processedSystemProperty.isPresent() );
+
+        final Optional<Modules> processedSystemPropertyModules =
+            ModelHelper.getModules( processedSystemProperty.get() );
+
         assertNotNull( processedSystemPropertyModules );
-        assertNotNull( processedSystemPropertyModules.getModule( System.getProperty( "user.home" ) ) );
+        assertTrue( processedSystemPropertyModules.isPresent() );
+        assertNotNull( processedSystemPropertyModules.get().getModule( System.getProperty( "user.home" ) ) );
+        assertTrue( processedSystemPropertyModules.get().getModule( System.getProperty( "user.home" ) ).isPresent() );
 
         this.getModelProcessor().setTransformerLocation(
             this.getClass().getPackage().getName().replace( '.', '/' ) + "/relative-uri-test.xsl" );
 
-        final Model processedRelativeUri = this.getModelProcessor().processModel( this.getModelContext(), model );
-        assertNotNull( processedRelativeUri );
+        final Optional<Model> processedRelativeUri =
+            this.getModelProcessor().processModel( this.getModelContext(), model );
 
-        final Modules processedRelativeUriModules = ModelHelper.getModules( processedRelativeUri );
+        assertNotNull( processedRelativeUri );
+        assertTrue( processedRelativeUri.isPresent() );
+
+        final Optional<Modules> processedRelativeUriModules = ModelHelper.getModules( processedRelativeUri.get() );
         assertNotNull( processedRelativeUriModules );
-        assertNotNull( processedRelativeUriModules.getModule( System.getProperty( "os.name" ) ) );
+        assertTrue( processedRelativeUriModules.isPresent() );
+        assertNotNull( processedRelativeUriModules.get().getModule( System.getProperty( "os.name" ) ) );
+        assertTrue( processedRelativeUriModules.get().getModule( System.getProperty( "os.name" ) ).isPresent() );
 
         this.getModelProcessor().setTransformerLocation( null );
     }

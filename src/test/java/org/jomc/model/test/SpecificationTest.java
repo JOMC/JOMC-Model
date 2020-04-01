@@ -30,13 +30,11 @@
  */
 package org.jomc.model.test;
 
-import org.jomc.model.ModelObjectException;
 import org.jomc.model.Specification;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
 
 /**
  * Test cases for class {@code org.jomc.model.Specification}.
@@ -60,23 +58,14 @@ public class SpecificationTest
     public final void JavaTypeName() throws Exception
     {
         final Specification s = new Specification();
-        assertNull( s.getJavaTypeName() );
+        assertNotNull( s.getJavaTypeName() );
+        assertFalse( s.getJavaTypeName().isPresent() );
 
         s.setClazz( "@" );
-
-        try
-        {
-            s.getJavaTypeName();
-            fail( "Expected 'ModelObjectException' not thrown." );
-        }
-        catch ( final ModelObjectException e )
-        {
-            assertNotNull( e.getMessage() );
-            System.out.println( e.toString() );
-        }
+        ModelObjectTest.assertModelObjectException( ()  -> s.getJavaTypeName() );
 
         s.setClazz( "java.lang.Object<java.lang.Object<java.lang.Object<?>>>" );
-        assertEquals( "java.lang.Object", s.getJavaTypeName().getClassName() );
+        assertEquals( "java.lang.Object", s.getJavaTypeName().get().getClassName() );
     }
 
 }

@@ -30,13 +30,10 @@
  */
 package org.jomc.model.test;
 
-import org.jomc.model.Argument;
-import org.jomc.model.ModelObjectException;
 import org.jomc.jls.JavaIdentifier;
+import org.jomc.model.Argument;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 
 /**
  * Test cases for class {@code org.jomc.model.Argument}.
@@ -60,17 +57,7 @@ public class ArgumentTest
     public final void JavaVariableName() throws Exception
     {
         final Argument argument = new Argument();
-
-        try
-        {
-            argument.getJavaVariableName();
-            fail( "Expected 'ModelObjectException' not thrown." );
-        }
-        catch ( final ModelObjectException e )
-        {
-            assertNotNull( e.getMessage() );
-            System.out.println( e.toString() );
-        }
+        ModelObjectTest.assertModelObjectException( ()  -> argument.getJavaVariableName() );
 
         argument.setName( "TEST TEST" );
         assertEquals( JavaIdentifier.valueOf( "testTest" ), argument.getJavaVariableName() );

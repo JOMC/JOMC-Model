@@ -33,6 +33,7 @@ package org.jomc.model.modlet;
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import javax.xml.bind.JAXBElement;
 import org.jomc.model.ModelObject;
@@ -62,19 +63,23 @@ public abstract class ModelHelper
      *
      * @param model The {@code Model} to get {@code Modules} of.
      *
-     * @return The {@code Modules} of {@code Model} or {@code null}.
+     * @return The {@code Modules} of {@code Model} or no value, if no {@code Modules} are found.
      *
      * @throws NullPointerException if {@code model} is {@code null}.
      *
      * @see #addModules(org.jomc.modlet.Model, org.jomc.model.Modules)
      * @see #setModules(org.jomc.modlet.Model, org.jomc.model.Modules)
      */
-    public static Modules getModules( final Model model )
+    public static Optional<Modules> getModules( final Model model )
     {
-        final JAXBElement<Modules> e = Objects.requireNonNull( model, "model" ).getAnyElement(
-            ModelObject.MODEL_PUBLIC_ID, "modules", Modules.class );
+        final Optional<JAXBElement<Modules>> e =
+            Objects.requireNonNull( model, "model" ).getAnyElement( ModelObject.MODEL_PUBLIC_ID, "modules",
+                                                                    Modules.class );
 
-        return e != null ? e.getValue() : null;
+        return e.isPresent()
+                   ? Optional.of( e.get().getValue() )
+                   : Optional.empty();
+
     }
 
     /**
@@ -91,7 +96,7 @@ public abstract class ModelHelper
      */
     public static void setModules( final Model model, final Modules modules )
     {
-        if ( getModules( Objects.requireNonNull( model, "model" ) ) != null )
+        if ( getModules( Objects.requireNonNull( model, "model" ) ).isPresent() )
         {
             throw new IllegalStateException( getMessage( "illegalState", model.getIdentifier() ) );
         }
@@ -115,11 +120,11 @@ public abstract class ModelHelper
         Objects.requireNonNull( model, "model" );
         Objects.requireNonNull( modules, "modules" );
 
-        final Modules current = getModules( model );
+        final Optional<Modules> current = getModules( model );
 
-        if ( current != null )
+        if ( current.isPresent() )
         {
-            current.getModule().addAll( modules.getModule() );
+            current.get().getModule().addAll( modules.getModule() );
         }
         else
         {
@@ -140,11 +145,12 @@ public abstract class ModelHelper
     public static void removeModules( final Model model )
     {
         Objects.requireNonNull( model, "model" );
-        final JAXBElement<Modules> e = model.getAnyElement( ModelObject.MODEL_PUBLIC_ID, "modules", Modules.class );
+        final Optional<JAXBElement<Modules>> e =
+            model.getAnyElement( ModelObject.MODEL_PUBLIC_ID, "modules", Modules.class );
 
-        if ( e != null )
+        if ( e.isPresent() )
         {
-            model.getAny().remove( e );
+            model.getAny().remove( e.get() );
         }
     }
 

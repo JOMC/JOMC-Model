@@ -41,9 +41,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * Test cases for class {@code org.jomc.model.modlet.DefaultModelProcessor}.
@@ -151,57 +149,39 @@ public class DefaultModelProviderTest
     @Test
     public final void testFindModules() throws Exception
     {
-        try
-        {
-            this.getModelProvider().findModules( null, null, null );
-            fail( "Expected NullPointerException not thrown." );
-        }
-        catch ( final NullPointerException e )
-        {
-            assertNotNull( e.getMessage() );
-            System.out.println( e );
-        }
+        ModelHelperTest.assertNullPointerException( ()  -> this.getModelProvider().findModules( null, null, null ) );
+        ModelHelperTest.assertNullPointerException( ()  -> this.getModelProvider().
+            findModules( this.getModelContext(), null, null ) );
 
-        try
-        {
-            this.getModelProvider().findModules( this.getModelContext(), null, null );
-            fail( "Expected NullPointerException not thrown." );
-        }
-        catch ( final NullPointerException e )
-        {
-            assertNotNull( e.getMessage() );
-            System.out.println( e );
-        }
-
-        try
-        {
-            this.getModelProvider().findModules( this.getModelContext(), "TEST", null );
-            fail( "Expected NullPointerException not thrown." );
-        }
-        catch ( final NullPointerException e )
-        {
-            assertNotNull( e.getMessage() );
-            System.out.println( e );
-        }
+        ModelHelperTest.assertNullPointerException( ()  -> this.getModelProvider().
+            findModules( this.getModelContext(), "TEST", null ) );
 
         DefaultModelProvider.setDefaultModuleLocation( null );
         this.getModelProvider().setModuleLocation( null );
         assertEquals( 1, this.getModelProvider().findModules(
                       this.getModelContext(), ModelObject.MODEL_PUBLIC_ID,
-                      DefaultModelProvider.getDefaultModuleLocation() ).getModule().size() );
+                      DefaultModelProvider.getDefaultModuleLocation() ).get().getModule().size() );
 
         assertEquals( 1, this.getModelProvider().findModules(
                       this.getModelContext(), ModelObject.MODEL_PUBLIC_ID, this.getModelProvider().
-                      getModuleLocation() ).getModule().size() );
+                      getModuleLocation() ).get().getModule().size() );
 
         DefaultModelProvider.setDefaultModuleLocation( "DOES_NOT_EXIST" );
         this.getModelProvider().setModuleLocation( "DOES_NOT_EXIST" );
 
-        assertNull( this.getModelProvider().findModules(
+        assertNotNull( this.getModelProvider().findModules(
             this.getModelContext(), ModelObject.MODEL_PUBLIC_ID, DefaultModelProvider.getDefaultModuleLocation() ) );
 
-        assertNull( this.getModelProvider().findModules(
+        assertFalse( this.getModelProvider().findModules(
+            this.getModelContext(), ModelObject.MODEL_PUBLIC_ID, DefaultModelProvider.getDefaultModuleLocation() ).
+            isPresent() );
+
+        assertNotNull( this.getModelProvider().findModules(
             this.getModelContext(), ModelObject.MODEL_PUBLIC_ID, this.getModelProvider().getModuleLocation() ) );
+
+        assertFalse( this.getModelProvider().findModules(
+            this.getModelContext(), ModelObject.MODEL_PUBLIC_ID, this.getModelProvider().getModuleLocation() ).
+            isPresent() );
 
         DefaultModelProvider.setDefaultModuleLocation( null );
         this.getModelProvider().setModuleLocation( null );
@@ -213,29 +193,12 @@ public class DefaultModelProviderTest
         final Model model = new Model();
         model.setIdentifier( ModelObject.MODEL_PUBLIC_ID );
 
-        try
-        {
-            this.getModelProvider().findModel( null, model );
-            fail( "Expected NullPointerException not thrown." );
-        }
-        catch ( final NullPointerException e )
-        {
-            assertNotNull( e.getMessage() );
-            System.out.println( e.toString() );
-        }
-
-        try
-        {
-            this.getModelProvider().findModel( this.getModelContext(), null );
-            fail( "Expected NullPointerException not thrown." );
-        }
-        catch ( final NullPointerException e )
-        {
-            assertNotNull( e.getMessage() );
-            System.out.println( e.toString() );
-        }
+        ModelHelperTest.assertNullPointerException( ()  -> this.getModelProvider().findModel( null, model ) );
+        ModelHelperTest.assertNullPointerException( ()  -> this.getModelProvider().
+            findModel( this.getModelContext(), null ) );
 
         assertNotNull( this.getModelProvider().findModel( this.getModelContext(), model ) );
+        assertTrue( this.getModelProvider().findModel( this.getModelContext(), model ).isPresent() );
     }
 
     @Test

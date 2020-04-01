@@ -36,6 +36,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -752,11 +753,11 @@ public class InheritanceModel
             state = ContextState.PREPARING;
             this.contextStates.put( context, state );
 
-            final Implementation i = this.modules.getImplementation( context );
+            final Optional<Implementation> i = this.modules.getImplementation( context );
 
-            if ( i != null )
+            if ( i.isPresent() )
             {
-                this.collectNodes( context, i, null, null );
+                this.collectNodes( context, i.get(), null, null );
                 map( this.sourceNodes, context ).values().forEach( n  -> this.collectEffectiveNodes( context, n ) );
             }
 
@@ -777,7 +778,8 @@ public class InheritanceModel
 
         if ( declaration != null && !contextImplementations.containsKey( declaration.getIdentifier() ) )
         {
-            final Module moduleOfDeclaration = this.modules.getModuleOfImplementation( declaration.getIdentifier() );
+            final Optional<Module> moduleOfDeclaration =
+                this.modules.getModuleOfImplementation( declaration.getIdentifier() );
 
             final Node<Implementation> declarationNode =
                 new Node<>( declaration, null, null, descendant, declaration, declaration.isFinal(), false );
@@ -800,12 +802,12 @@ public class InheritanceModel
                 collectNodes( map( this.messages, context ), declaration.getMessages().getMessage(),
                               currentPath, null, declaration, descendant, m  -> m.getName() );
 
-                if ( !declaration.getMessages().getReference().isEmpty() && moduleOfDeclaration != null
-                         && moduleOfDeclaration.getMessages() != null )
+                if ( !declaration.getMessages().getReference().isEmpty() && moduleOfDeclaration.isPresent()
+                         && moduleOfDeclaration.get().getMessages() != null )
                 {
                     collectNodes( map( this.messages, context ), declaration.getMessages().getReference(), currentPath,
                                   declaration, descendant,
-                                  r  -> moduleOfDeclaration.getMessages().getMessage( r.getName() ),
+                                  r  -> moduleOfDeclaration.get().getMessages().getMessage( r.getName() ),
                                   ( o, r )  ->
                               {
                                   final Message msg = o.clone();
@@ -822,12 +824,12 @@ public class InheritanceModel
                 collectNodes( map( this.properties, context ), declaration.getProperties().getProperty(),
                               currentPath, null, declaration, descendant, p  -> p.getName() );
 
-                if ( !declaration.getProperties().getReference().isEmpty() && moduleOfDeclaration != null
-                         && moduleOfDeclaration.getProperties() != null )
+                if ( !declaration.getProperties().getReference().isEmpty() && moduleOfDeclaration.isPresent()
+                         && moduleOfDeclaration.get().getProperties() != null )
                 {
                     collectNodes( map( this.properties, context ), declaration.getProperties().getReference(),
                                   currentPath, declaration, descendant,
-                                  r  -> moduleOfDeclaration.getProperties().getProperty( r.getName() ),
+                                  r  -> moduleOfDeclaration.get().getProperties().getProperty( r.getName() ),
                                   ( o, r )  ->
                               {
                                   final Property p = o.clone();
@@ -846,12 +848,12 @@ public class InheritanceModel
 
                 declaration.getSpecifications().getReference().forEach( ref  ->
                 {
-                    final Specification s = this.modules.getSpecification( ref.getIdentifier() );
+                    final Optional<Specification> s = this.modules.getSpecification( ref.getIdentifier() );
 
-                    if ( s != null && s.getProperties() != null )
+                    if ( s.isPresent() && s.get().getProperties() != null )
                     {
-                        collectNodes( map( this.properties, context ), s.getProperties().getProperty(),
-                                      currentPath, s, declaration, descendant, p  -> p.getName() );
+                        collectNodes( map( this.properties, context ), s.get().getProperties().getProperty(),
+                                      currentPath, s.get(), declaration, descendant, p  -> p.getName() );
 
                     }
                 } );
@@ -912,16 +914,16 @@ public class InheritanceModel
 
                     node.getModifiablePath().addAll( currentPath );
 
-                    final Implementation ancestor = this.modules.getImplementation( r.getIdentifier() );
+                    final Optional<Implementation> ancestor = this.modules.getImplementation( r.getIdentifier() );
 
                     boolean cycle = false;
-                    if ( ancestor != null && contextImplementations.containsKey( ancestor.getIdentifier() ) )
+                    if ( ancestor.isPresent() && contextImplementations.containsKey( ancestor.get().getIdentifier() ) )
                     {
                         for ( int j = 0, s1 = currentPath.size(); j < s1; j++ )
                         {
                             final Node<Implementation> n = currentPath.get( j );
 
-                            if ( n.getModelObject().getIdentifier().equals( ancestor.getIdentifier() ) )
+                            if ( n.getModelObject().getIdentifier().equals( ancestor.get().getIdentifier() ) )
                             {
                                 cycle = true;
                                 node.getModifiablePath().add( n );
@@ -941,7 +943,11 @@ public class InheritanceModel
                             map( this.implReferences, context );
 
                         addNode( implementationReferenceNodes, node, node.getModelObject().getIdentifier() );
-                        this.collectNodes( context, ancestor, declarationNode, currentPath );
+
+                        if ( ancestor.isPresent() )
+                        {
+                            this.collectNodes( context, ancestor.get(), declarationNode, currentPath );
+                        }
                     }
                 }
 
@@ -989,7 +995,7 @@ public class InheritanceModel
     private static <R extends Inheritable, T, K> void collectNodes(
         final Map<K, Set<Node<T>>> collectedNodes, final Collection<R> declaredReferenceModelObjects,
         final Collection<Node<Implementation>> path, final Implementation declaration,
-        final Node<Implementation> descendant, final Function<R, T> findModelObjectFunction,
+        final Node<Implementation> descendant, final Function<R, Optional<T>> findModelObjectFunction,
         final BiFunction<T, R, T> inheritanceAttributesFunction, final Function<T, K> modelObjectKeyFunction )
     {
         try ( final Stream<R> st0 = declaredReferenceModelObjects.parallelStream().unordered() )
@@ -997,12 +1003,12 @@ public class InheritanceModel
             st0.map( r  ->
             {
                 Node<T> node = null;
-                final T modelObject = findModelObjectFunction.apply( r );
+                final Optional<T> modelObject = findModelObjectFunction.apply( r );
 
-                if ( modelObject != null )
+                if ( modelObject.isPresent() )
                 {
                     node = new Node<>( declaration, null, null, descendant,
-                                       inheritanceAttributesFunction.apply( modelObject, r ),
+                                       inheritanceAttributesFunction.apply( modelObject.get(), r ),
                                        r.isFinal(), r.isOverride() );
 
                     node.getModifiablePath().addAll( path );

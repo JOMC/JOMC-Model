@@ -85,7 +85,7 @@
                 return t.getLanguage().equalsIgnoreCase( language );
             } ).findFirst();
 
-            return candidate.orElse( null );
+            return candidate.orElse( defaultText.get() );
         }
     }
 
@@ -149,14 +149,13 @@
      * @param lineSeparator String to use for separating lines.
      * @param indentation String to prepend any lines with.
      *
-     * @return The Javadoc comment of the text or {@code null}.
+     * @return The Javadoc comment of the text or no value, if {@link #getValue()} returns {@code null}.
      *
      * @throws NullPointerException if {@code lineSeparator} or {@code indentation} is {@code null}.
      * @throws ModelObjectException if compiling the referenced type to a {@code MimeType} fails.
-     *
-     * @since 1.4
      */
-    public String getJavadocComment( final String lineSeparator, final String indentation ) throws ModelObjectException
+    public java.util.Optional<String> getJavadocComment( final String lineSeparator, final String indentation )
+        throws ModelObjectException
     {
         java.util.Objects.requireNonNull( lineSeparator, "lineSeparator" );
         java.util.Objects.requireNonNull( indentation, "indentation" );
@@ -202,7 +201,7 @@
             }
         }
 
-        return javadocComment;
+        return java.util.Optional.ofNullable( javadocComment );
     }
 
     private static String getMessage( final Throwable t )
@@ -267,18 +266,17 @@
      * @param <T> The type the element is bound to.
      *
      * @return The {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any} list or
-     * {@code null} if no such element is found.
+     * no value, if no such element is found.
      *
      * @throws NullPointerException if {@code any}, {@code namespaceURI}, {@code localPart} or {@code type} is
      * {@code null}.
      * @throws IllegalStateException if {@code any} contains more than one matching element.
-     *
-     * @since 1.1
      */
-    protected <T> javax.xml.bind.JAXBElement<T> getAnyElement( final java.util.List<Object> any,
-                                                               final String namespaceURI,
-                                                               final String localPart,
-                                                               final Class<T> type )
+    @SuppressWarnings( "unchecked" )
+    protected <T> java.util.Optional<javax.xml.bind.JAXBElement<T>> getAnyElement( final java.util.List<Object> any,
+                                                                                   final String namespaceURI,
+                                                                                   final String localPart,
+                                                                                   final Class<T> type )
     {
         java.util.Objects.requireNonNull( any, "any" );
         java.util.Objects.requireNonNull( namespaceURI, "namespaceURI" );
@@ -316,15 +314,11 @@
             }
         }
 
-        if ( anyElement != null && anyElement.getValue() != null && anyElement.getValue().getClass().equals( type ) )
-        {
-            @SuppressWarnings( "unchecked" ) final javax.xml.bind.JAXBElement<T> e =
-                (javax.xml.bind.JAXBElement<T>) anyElement;
+        return java.util.Optional.ofNullable( anyElement != null && anyElement.getValue() != null
+                                                  && anyElement.getValue().getClass().equals( type )
+                                                  ? (javax.xml.bind.JAXBElement<T>) anyElement
+                                                  : null );
 
-            return e;
-        }
-
-        return null;
     }
 
     /**
@@ -389,12 +383,12 @@
      * @param clazz The class to return an instance of.
      * @param <T> The type of the object to return.
      *
-     * @return The instance of {@code clazz} from the {@code any} list or {@code null}, if no such instance is found.
+     * @return The instance of {@code clazz} from the {@code any} list or no value, if no such instance is found.
      *
      * @throws NullPointerException if {@code any} or {@code clazz} is {@code null}.
      * @throws IllegalStateException if {@code any} contains more than one matching object.
      */
-    protected <T> T getAnyObject( final java.util.List<Object> any, final Class<T> clazz )
+    protected <T> java.util.Optional<T> getAnyObject( final java.util.List<Object> any, final Class<T> clazz )
     {
         java.util.Objects.requireNonNull( any, "any" );
         java.util.Objects.requireNonNull( clazz, "clazz" );
@@ -435,7 +429,7 @@
             }
         }
 
-        return anyObject;
+        return java.util.Optional.ofNullable( anyObject );
     }
 
     /**
@@ -545,17 +539,16 @@
      * @param <T> The type the element is bound to.
      *
      * @return The {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any} property
-     * of the instance or {@code null}, if no such element is found.
+     * of the instance or no value, if no such element is found.
      *
      * @throws NullPointerException if {@code namespaceURI}, {@code localPart} or {@code type} is {@code null}.
      * @throws IllegalStateException if the {@code any} property contains more than one matching element.
      *
      * @see #getAnyElement(java.util.List, java.lang.String, java.lang.String, java.lang.Class)
-     *
-     * @since 1.1
      */
-    public <T> javax.xml.bind.JAXBElement<T> getAnyElement( final String namespaceURI, final String localPart,
-                                                            final Class<T> type )
+    public <T> java.util.Optional<javax.xml.bind.JAXBElement<T>> getAnyElement( final String namespaceURI,
+                                                                                final String localPart,
+                                                                                final Class<T> type )
     {
         return this.getAnyElement( this.getAny(), namespaceURI, localPart, type );
     }
@@ -591,7 +584,7 @@
      * @param clazz The class to return an instance of.
      * @param <T> The type of the object to return.
      *
-     * @return The instance of {@code clazz} from the {@code any} property of the instance or {@code null}, if no such
+     * @return The instance of {@code clazz} from the {@code any} property of the instance or no value, if no such
      * instance is found.
      *
      * @throws NullPointerException if {@code clazz} is {@code null}.
@@ -599,7 +592,7 @@
      *
      * @see #getAnyObject(java.util.List, java.lang.Class)
      */
-    public <T> T getAnyObject( final Class<T> clazz )
+    public <T> java.util.Optional<T> getAnyObject( final Class<T> clazz )
     {
         return this.getAnyObject( this.getAny(), clazz );
     }
@@ -631,23 +624,20 @@
      *
      * @param specification The identifier of the specification to return.
      *
-     * @return The first matching specification or {@code null}, if no such specification is found.
+     * @return The first matching specification or no value, if no such specification is found.
      *
      * @throws NullPointerException if {@code specification} is {@code null}.
      *
      * @see #getSpecification()
      * @see Specification#getIdentifier()
      */
-    public Specification getSpecification( final String specification )
+    public java.util.Optional<Specification> getSpecification( final String specification )
     {
         java.util.Objects.requireNonNull( specification, "specification" );
 
         try ( final java.util.stream.Stream<Specification> st0 = this.getSpecification().parallelStream() )
         {
-            final java.util.Optional<Specification> candidate =
-                st0.filter( s  -> specification.equals( s.getIdentifier() ) ).findFirst();
-
-            return candidate.orElse( null );
+            return st0.filter( s  -> specification.equals( s.getIdentifier() ) ).findFirst();
         }
     }
 
@@ -656,7 +646,7 @@
      *
      * @param specification The class of the specification to return.
      *
-     * @return The first matching specification declaring {@code specification} or {@code null}, if no such
+     * @return The first matching specification declaring {@code specification} or no value, if no such
      * specification is found.
      *
      * @throws NullPointerException if {@code specification} is {@code null}.
@@ -666,7 +656,8 @@
      * @see Specification#isClassDeclaration()
      * @see Specification#getClazz()
      */
-    public Specification getSpecification( final Class<?> specification ) throws ModelObjectException
+    public java.util.Optional<Specification> getSpecification( final Class<?> specification )
+        throws ModelObjectException
     {
         java.util.Objects.requireNonNull( specification, "specification" );
 
@@ -684,21 +675,21 @@
 
             try
             {
-                final java.util.Optional<Specification> candidate =
-                    st0.filter( s  -> s.isClassDeclaration() && s.getClazz() != null ).
-                        filter( s  ->
+                return st0.filter( s  -> s.isClassDeclaration() && s.getClazz() != null ).
+                    filter( s  ->
+                    {
+                        try
                         {
-                            try
-                            {
-                                return specification.getName().equals( s.getJavaTypeName().getClassName() );
-                            }
-                            catch ( final ModelObjectException e )
-                            {
-                                throw new FindSpecificationFailure( e );
-                            }
-                        } ).findFirst();
+                            return s.getJavaTypeName().isPresent()
+                                       ? specification.getName().equals( s.getJavaTypeName().get().getClassName() )
+                                       : false;
 
-                return candidate.orElse( null );
+                        }
+                        catch ( final ModelObjectException e )
+                        {
+                            throw new FindSpecificationFailure( e );
+                        }
+                    } ).findFirst();
             }
             catch ( final FindSpecificationFailure e )
             {
@@ -717,23 +708,20 @@
      *
      * @param specification The identifier of the reference to return.
      *
-     * @return The first matching specification reference or {@code null}, if no such specification reference is found.
+     * @return The first matching specification reference or no value, if no such specification reference is found.
      *
      * @throws NullPointerException if {@code specification} is {@code null}.
      *
      * @see #getReference()
      * @see SpecificationReference#getIdentifier()
      */
-    public SpecificationReference getReference( final String specification )
+    public java.util.Optional<SpecificationReference> getReference( final String specification )
     {
         java.util.Objects.requireNonNull( specification, "specification" );
 
         try ( final java.util.stream.Stream<SpecificationReference> st0 = this.getReference().parallelStream() )
         {
-            final java.util.Optional<SpecificationReference> candidate =
-                st0.filter( s  -> specification.equals( s.getIdentifier() ) ).findFirst();
-
-            return candidate.orElse( null );
+            return st0.filter( s  -> specification.equals( s.getIdentifier() ) ).findFirst();
         }
     }]]>
       </ci:code>
@@ -787,7 +775,7 @@
      * @param classLoader The class loader to get the Java class from or {@code null}, to get the Java class from the
      * platform's bootstrap class loader.
      *
-     * @return The Java class of the type referenced by the specification or {@code null}, if the specification does not
+     * @return The Java class of the type referenced by the specification or no value, if the specification does not
      * reference a type.
      *
      * @throws ClassNotFoundException if the Java class is not found.
@@ -795,36 +783,32 @@
      *
      * @see #getClazz()
      * @see #getJavaTypeName()
-     *
-     * @since 1.2
      */
-    public Class<?> getJavaClass( final ClassLoader classLoader )
+    public java.util.Optional<Class<?>> getJavaClass( final ClassLoader classLoader )
         throws ClassNotFoundException, ModelObjectException
     {
         Class<?> javaClass = null;
-        final org.jomc.jls.JavaTypeName javaTypeName = this.getJavaTypeName();
+        final java.util.Optional<org.jomc.jls.JavaTypeName> javaTypeName = this.getJavaTypeName();
 
-        if ( javaTypeName != null )
+        if ( javaTypeName.isPresent() )
         {
-            javaClass = javaTypeName.getClass( classLoader, false );
+            javaClass = javaTypeName.get().getClass( classLoader, false );
         }
 
-        return javaClass;
+        return java.util.Optional.ofNullable( javaClass );
     }
 
     /**
      * Gets the Java type name of the type referenced by the specification.
      *
-     * @return The Java type name of the type referenced by the specification or {@code null}, if the specification does
+     * @return The Java type name of the type referenced by the specification or no value, if the specification does
      * not reference a type.
      *
      * @throws ModelObjectException if compiling the name of the referenced type to a {@code JavaTypeName} fails.
      *
      * @see #getClazz()
-     *
-     * @since 1.4
      */
-    public org.jomc.jls.JavaTypeName getJavaTypeName() throws ModelObjectException
+    public java.util.Optional<org.jomc.jls.JavaTypeName> getJavaTypeName() throws ModelObjectException
     {
         try
         {
@@ -835,7 +819,7 @@
                 javaTypeName = org.jomc.jls.JavaTypeName.parse( this.getClazz() );
             }
 
-            return javaTypeName;
+            return java.util.Optional.ofNullable( javaTypeName );
         }
         catch ( final java.text.ParseException e )
         {
@@ -855,17 +839,16 @@
      * @param <T> The type the element is bound to.
      *
      * @return The {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any} property
-     * of the instance or {@code null} if no such element is found.
+     * of the instance or no value, if no such element is found.
      *
      * @throws NullPointerException if {@code namespaceURI}, {@code localPart} or {@code type} is {@code null}.
      * @throws IllegalStateException if the {@code any} property contains more than one matching element.
      *
      * @see #getAnyElement(java.util.List, java.lang.String, java.lang.String, java.lang.Class)
-     *
-     * @since 1.1
      */
-    public <T> javax.xml.bind.JAXBElement<T> getAnyElement( final String namespaceURI, final String localPart,
-                                                            final Class<T> type )
+    public <T> java.util.Optional<javax.xml.bind.JAXBElement<T>> getAnyElement( final String namespaceURI,
+                                                                                final String localPart,
+                                                                                final Class<T> type )
     {
         return this.getAnyElement( this.getAny(), namespaceURI, localPart, type );
     }
@@ -901,7 +884,7 @@
      * @param clazz The class to return an instance of.
      * @param <T> The type of the object to return.
      *
-     * @return The instance of {@code clazz} from the {@code any} property of the instance or {@code null}, if no such
+     * @return The instance of {@code clazz} from the {@code any} property of the instance or no value, if no such
      * instance is found.
      *
      * @throws NullPointerException if {@code clazz} is {@code null}.
@@ -909,7 +892,7 @@
      *
      * @see #getAnyObject(java.util.List, java.lang.Class)
      */
-    public <T> T getAnyObject( final Class<T> clazz )
+    public <T> java.util.Optional<T> getAnyObject( final Class<T> clazz )
     {
         return this.getAnyObject( this.getAny(), clazz );
     }
@@ -935,10 +918,10 @@
     private static String getMessage( final Throwable t )
     {
         return t != null
-               ? t.getMessage() != null && t.getMessage().trim().length() > 0
-                 ? t.getMessage()
-                 : getMessage( t.getCause() )
-               : null;
+                   ? t.getMessage() != null && t.getMessage().trim().length() > 0
+                         ? t.getMessage()
+                         : getMessage( t.getCause() )
+                   : null;
 
     }
 
@@ -983,23 +966,20 @@
      *
      * @param implementation The identifier of the implementation to return.
      *
-     * @return The first matching implementation or {@code null}, if no such implementation is found.
+     * @return The first matching implementation or no value, if no such implementation is found.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
      *
      * @see #getImplementation()
      * @see Implementation#getIdentifier()
      */
-    public Implementation getImplementation( final String implementation )
+    public java.util.Optional<Implementation> getImplementation( final String implementation )
     {
         java.util.Objects.requireNonNull( implementation, "implementation" );
 
         try ( final java.util.stream.Stream<Implementation> st0 = this.getImplementation().parallelStream() )
         {
-            final java.util.Optional<Implementation> candidate =
-                st0.filter( i  -> implementation.equals( i.getIdentifier() ) ).findFirst();
-
-            return candidate.orElse( null );
+            return st0.filter( i  -> implementation.equals( i.getIdentifier() ) ).findFirst();
         }
     }
 
@@ -1008,7 +988,7 @@
      *
      * @param implementation The class of the implementation to return.
      *
-     * @return The first matching implementation declaring {@code implementation} or {@code null}, if no such
+     * @return The first matching implementation declaring {@code implementation} or no value, if no such
      * implementation is found.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
@@ -1018,7 +998,8 @@
      * @see Implementation#isClassDeclaration()
      * @see Implementation#getClazz()
      */
-    public Implementation getImplementation( final Class<?> implementation ) throws ModelObjectException
+    public java.util.Optional<Implementation> getImplementation( final Class<?> implementation )
+        throws ModelObjectException
     {
         java.util.Objects.requireNonNull( implementation, "implementation" );
 
@@ -1036,21 +1017,21 @@
 
             try
             {
-                final java.util.Optional<Implementation> candidate =
-                    st0.filter( i  -> i.isClassDeclaration() && i.getClazz() != null ).
-                        filter( i  ->
+                return st0.filter( i  -> i.isClassDeclaration() && i.getClazz() != null ).
+                    filter( i  ->
+                    {
+                        try
                         {
-                            try
-                            {
-                                return implementation.getName().equals( i.getJavaTypeName().getClassName() );
-                            }
-                            catch ( final ModelObjectException e )
-                            {
-                                throw new FindImplementationFailure( e );
-                            }
-                        } ).findFirst();
+                            return i.getJavaTypeName().isPresent()
+                                       ? implementation.getName().equals( i.getJavaTypeName().get().getClassName() )
+                                       : false;
 
-                return candidate.orElse( null );
+                        }
+                        catch ( final ModelObjectException e )
+                        {
+                            throw new FindImplementationFailure( e );
+                        }
+                    } ).findFirst();
             }
             catch ( final FindImplementationFailure e )
             {
@@ -1069,23 +1050,20 @@
      *
      * @param name The name of the implementation to return.
      *
-     * @return The first matching implementation or {@code null}, if no such implementation is found.
+     * @return The first matching implementation or no value, if no such implementation is found.
      *
      * @throws NullPointerException if {@code name} is {@code null}.
      *
      * @see #getImplementation()
      * @see Implementation#getName()
      */
-    public Implementation getImplementationByName( final String name )
+    public java.util.Optional<Implementation> getImplementationByName( final String name )
     {
         java.util.Objects.requireNonNull( name, "name" );
 
         try ( final java.util.stream.Stream<Implementation> st0 = this.getImplementation().parallelStream() )
         {
-            final java.util.Optional<Implementation> candidate =
-                st0.filter( i  -> name.equals( i.getName() ) ).findFirst();
-
-            return candidate.orElse( null );
+            return st0.filter( i  -> name.equals( i.getName() ) ).findFirst();
         }
     }
 
@@ -1094,23 +1072,20 @@
      *
      * @param implementation The identifier of the reference to return.
      *
-     * @return The first matching implementation reference or {@code null}, if no such reference is found.
+     * @return The first matching implementation reference or no value, if no such reference is found.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
      *
      * @see #getReference()
      * @see ImplementationReference#getIdentifier()
      */
-    public ImplementationReference getReference( final String implementation )
+    public java.util.Optional<ImplementationReference> getReference( final String implementation )
     {
         java.util.Objects.requireNonNull( implementation, "implementation" );
 
-        try ( final java.util.stream.Stream<ImplementationReference> s1 = this.getReference().parallelStream() )
+        try ( final java.util.stream.Stream<ImplementationReference> st0 = this.getReference().parallelStream() )
         {
-            final java.util.Optional<ImplementationReference> candidate =
-                s1.filter( r  -> implementation.equals( r.getIdentifier() ) ).findFirst();
-
-            return candidate.orElse( null );
+            return st0.filter( r  -> implementation.equals( r.getIdentifier() ) ).findFirst();
         }
     }]]>
       </ci:code>
@@ -1199,7 +1174,7 @@
      * @param classLoader The class loader to get the Java class from or {@code null}, to get the Java class from the
      * platform's bootstrap class loader.
      *
-     * @return The Java class of the type referenced by the implementation or {@code null}, if the implementation does
+     * @return The Java class of the type referenced by the implementation or no value, if the implementation does
      * not reference a type.
      *
      * @throws ClassNotFoundException if the Java class is not found.
@@ -1207,27 +1182,25 @@
      *
      * @see #getClazz()
      * @see #getJavaTypeName()
-     *
-     * @since 1.2
      */
-    public Class<?> getJavaClass( final ClassLoader classLoader )
+    public java.util.Optional<Class<?>> getJavaClass( final ClassLoader classLoader )
         throws ClassNotFoundException, ModelObjectException
     {
         Class<?> javaClass = null;
-        final org.jomc.jls.JavaTypeName javaTypeName = this.getJavaTypeName();
+        final java.util.Optional<org.jomc.jls.JavaTypeName> javaTypeName = this.getJavaTypeName();
 
-        if ( javaTypeName != null )
+        if ( javaTypeName.isPresent() )
         {
-            javaClass = javaTypeName.getClass( classLoader, false );
+            javaClass = javaTypeName.get().getClass( classLoader, false );
         }
 
-        return javaClass;
+        return java.util.Optional.ofNullable( javaClass );
     }
 
     /**
      * Gets the Java type name of the type referenced by the implementation.
      *
-     * @return The Java type name of the type referenced by the implementation or {@code null}, if the implementation
+     * @return The Java type name of the type referenced by the implementation or no value, if the implementation
      * does not reference a type.
      *
      * @throws ModelObjectException if compiling the name of the referenced type to a {@code JavaTypeName} fails.
@@ -1236,7 +1209,7 @@
      *
      * @since 1.4
      */
-    public org.jomc.jls.JavaTypeName getJavaTypeName() throws ModelObjectException
+    public java.util.Optional<org.jomc.jls.JavaTypeName> getJavaTypeName() throws ModelObjectException
     {
         try
         {
@@ -1247,7 +1220,7 @@
                 javaTypeName = org.jomc.jls.JavaTypeName.parse( this.getClazz() );
             }
 
-            return javaTypeName;
+            return java.util.Optional.ofNullable( javaTypeName );
         }
         catch ( final java.text.ParseException e )
         {
@@ -1260,14 +1233,14 @@
     /**
      * Gets the location URI used for locating instances of this implementation.
      *
-     * @return The location URI used for locating instances of this implementation or {@code null}, if instances of this
+     * @return The location URI used for locating instances of this implementation or no value, if instances of this
      * implementation do not need to be located.
      *
      * @throws ModelObjectException if compiling the location to an {@code URI} object fails.
      *
      * @see #getLocation()
      */
-    public java.net.URI getLocationUri() throws ModelObjectException
+    public java.util.Optional<java.net.URI> getLocationUri() throws ModelObjectException
     {
         try
         {
@@ -1278,7 +1251,7 @@
                 javaLocation = new java.net.URI( this.getLocation() );
             }
 
-            return javaLocation;
+            return java.util.Optional.ofNullable( javaLocation );
         }
         catch ( final java.net.URISyntaxException e )
         {
@@ -1298,17 +1271,16 @@
      * @param <T> The type the element is bound to.
      *
      * @return The {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any} property
-     * of the instance or {@code null}, if no such element is found.
+     * of the instance or no value, if no such element is found.
      *
      * @throws NullPointerException if {@code namespaceURI}, {@code localPart} or {@code type} is {@code null}.
      * @throws IllegalStateException if the {@code any} property contains more than one matching element.
      *
      * @see #getAnyElement(java.util.List, java.lang.String, java.lang.String, java.lang.Class)
-     *
-     * @since 1.1
      */
-    public <T> javax.xml.bind.JAXBElement<T> getAnyElement( final String namespaceURI, final String localPart,
-                                                            final Class<T> type )
+    public <T> java.util.Optional<javax.xml.bind.JAXBElement<T>> getAnyElement( final String namespaceURI,
+                                                                                final String localPart,
+                                                                                final Class<T> type )
     {
         return this.getAnyElement( this.getAny(), namespaceURI, localPart, type );
     }
@@ -1344,7 +1316,7 @@
      * @param clazz The class to return an instance of.
      * @param <T> The type of the object to return.
      *
-     * @return The instance of {@code clazz} from the {@code any} property of the instance or {@code null}, if no such
+     * @return The instance of {@code clazz} from the {@code any} property of the instance or no value, if no such
      * instance is found.
      *
      * @throws NullPointerException if {@code clazz} is {@code null}.
@@ -1352,7 +1324,7 @@
      *
      * @see #getAnyObject(java.util.List, java.lang.Class)
      */
-    public <T> T getAnyObject( final Class<T> clazz )
+    public <T> java.util.Optional<T> getAnyObject( final Class<T> clazz )
     {
         return this.getAnyObject( this.getAny(), clazz );
     }
@@ -1378,10 +1350,10 @@
     private static String getMessage( final Throwable t )
     {
         return t != null
-               ? t.getMessage() != null && t.getMessage().trim().length() > 0
-                 ? t.getMessage()
-                 : getMessage( t.getCause() )
-               : null;
+                   ? t.getMessage() != null && t.getMessage().trim().length() > 0
+                         ? t.getMessage()
+                         : getMessage( t.getCause() )
+                   : null;
 
     }
 
@@ -1426,23 +1398,20 @@
      *
      * @param name The name of the dependency to return.
      *
-     * @return The first matching dependency or {@code null}, if no such dependency is found.
+     * @return The first matching dependency or no value, if no such dependency is found.
      *
      * @throws NullPointerException if {@code name} is {@code null}.
      *
      * @see #getDependency()
      * @see Dependency#getName()
      */
-    public Dependency getDependency( final String name )
+    public java.util.Optional<Dependency> getDependency( final String name )
     {
         java.util.Objects.requireNonNull( name, "name" );
 
-        try ( final java.util.stream.Stream<Dependency> s1 = this.getDependency().parallelStream() )
+        try ( final java.util.stream.Stream<Dependency> st0 = this.getDependency().parallelStream() )
         {
-            final java.util.Optional<Dependency> candidate =
-                s1.filter( d  -> name.equals( d.getName() ) ).findFirst();
-
-            return candidate.isPresent() ? candidate.get() : null;
+            return st0.filter( d  -> name.equals( d.getName() ) ).findFirst();
         }
     }
 
@@ -1473,8 +1442,7 @@
                                                         {
                                                             l1.addAll( l2 );
                                                             return l1;
-                                                        },
-                                                            java.util.stream.Collector.Characteristics.CONCURRENT,
+                                                        }, java.util.stream.Collector.Characteristics.CONCURRENT,
                                                             java.util.stream.Collector.Characteristics.UNORDERED ) ) );
 
         }
@@ -1641,7 +1609,7 @@
      * @param <T> The type the element is bound to.
      *
      * @return The {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any} property
-     * of the instance or {@code null}, if no such element is found.
+     * of the instance or no value, if no such element is found.
      *
      * @throws NullPointerException if {@code namespaceURI}, {@code localPart} or {@code type} is {@code null}.
      * @throws IllegalStateException if the {@code any} property contains more than one matching element.
@@ -1650,8 +1618,9 @@
      *
      * @since 1.1
      */
-    public <T> javax.xml.bind.JAXBElement<T> getAnyElement( final String namespaceURI, final String localPart,
-                                                            final Class<T> type )
+    public <T> java.util.Optional<javax.xml.bind.JAXBElement<T>> getAnyElement( final String namespaceURI,
+                                                                                final String localPart,
+                                                                                final Class<T> type )
     {
         return this.getAnyElement( this.getAny(), namespaceURI, localPart, type );
     }
@@ -1687,7 +1656,7 @@
      * @param clazz The class to return an instance of.
      * @param <T> The type of the object to return.
      *
-     * @return The instance of {@code clazz} from the {@code any} property of the instance or {@code null}, if no such
+     * @return The instance of {@code clazz} from the {@code any} property of the instance or no value, if no such
      * instance is found.
      *
      * @throws NullPointerException if {@code clazz} is {@code null}.
@@ -1695,7 +1664,7 @@
      *
      * @see #getAnyObject(java.util.List, java.lang.Class)
      */
-    public <T> T getAnyObject( final Class<T> clazz )
+    public <T> java.util.Optional<T> getAnyObject( final Class<T> clazz )
     {
         return this.getAnyObject( this.getAny(), clazz );
     }
@@ -1721,10 +1690,10 @@
     private static String getMessage( final Throwable t )
     {
         return t != null
-               ? t.getMessage() != null && t.getMessage().trim().length() > 0
-                 ? t.getMessage()
-                 : getMessage( t.getCause() )
-               : null;
+                   ? t.getMessage() != null && t.getMessage().trim().length() > 0
+                         ? t.getMessage()
+                         : getMessage( t.getCause() )
+                   : null;
 
     }
 
@@ -1745,23 +1714,20 @@
      *
      * @param name The name of the property to return.
      *
-     * @return The first matching property or {@code null}, if no such property is found.
+     * @return The first matching property or no value, if no such property is found.
      *
      * @throws NullPointerException if {@code name} is {@code null}.
      *
      * @see #getProperty()
      * @see Property#getName()
      */
-    public Property getProperty( final String name )
+    public java.util.Optional<Property> getProperty( final String name )
     {
         java.util.Objects.requireNonNull( name, "name" );
 
-        try ( final java.util.stream.Stream<Property> s1 = this.getProperty().parallelStream() )
+        try ( final java.util.stream.Stream<Property> st0 = this.getProperty().parallelStream() )
         {
-            final java.util.Optional<Property> candidate =
-                s1.filter( p  -> name.equals( p.getName() ) ).findFirst();
-
-            return candidate.orElse( null );
+            return st0.filter( p  -> name.equals( p.getName() ) ).findFirst();
         }
     }
 
@@ -1770,23 +1736,20 @@
      *
      * @param name The name of the property reference to return.
      *
-     * @return The first matching property reference or {@code null}, if no such reference is found.
+     * @return The first matching property reference or no value, if no such reference is found.
      *
      * @throws NullPointerException if {@code name} is {@code null}.
      *
      * @see #getReference()
      * @see PropertyReference#getName()
      */
-    public PropertyReference getReference( final String name )
+    public java.util.Optional<PropertyReference> getReference( final String name )
     {
         java.util.Objects.requireNonNull( name, "name" );
 
         try ( final java.util.stream.Stream<PropertyReference> st0 = this.getReference().parallelStream() )
         {
-            final java.util.Optional<PropertyReference> candidate =
-                st0.filter( r  -> name.equals( r.getName() ) ).findFirst();
-
-            return candidate.orElse( null );
+            return st0.filter( r  -> name.equals( r.getName() ) ).findFirst();
         }
     }
 
@@ -1879,7 +1842,7 @@
      * value of property {@code value} to the public constructor of that class taking a single {@code java.lang.String}
      * argument, or, failing that, by passing the value of property {@code value} to the static {@code valueOf} method
      * of that class taking a single {@code java.lang.String} argument.</li>
-     * <li>If properties {@code any} and {@code value} are both {@code null}, this method returns {@code null}.</li>
+     * <li>If properties {@code any} and {@code value} are both {@code null}, this method returns no value.</li>
      * </ol></p>
      *
      * @param classLoader The class loader to use for getting the Java value; {@code null} to use the platform's
@@ -1892,7 +1855,8 @@
      *
      * @see #getJavaTypeName()
      */
-    public Object getJavaValue( final ClassLoader classLoader ) throws ModelObjectException, PropertyException
+    public java.util.Optional<Object> getJavaValue( final ClassLoader classLoader )
+        throws ModelObjectException, PropertyException
     {
         try
         {
@@ -1906,8 +1870,8 @@
                 final Object anyObject = this.getAny() instanceof JAXBElement
                                              ? ( (JAXBElement) this.getAny() ).getValue() : this.getAny();
 
-                return this.getJavaValue( classLoader, anyObject,
-                                          this.getJavaTypeName().getClass( classLoader, false ) );
+                return java.util.Optional.ofNullable( this.getJavaValue(
+                    classLoader, anyObject, this.getJavaTypeName().getClass( classLoader, false ) ) );
 
             }
             else
@@ -1919,10 +1883,11 @@
 
                 }
 
-                return this.getJavaValue( this.getJavaTypeName().isPrimitive()
-                                              ? this.getJavaTypeName().getBoxedName().getClass( classLoader, false )
-                                              : this.getJavaTypeName().getClass( classLoader, false ),
-                                          this.getValue() );
+                return java.util.Optional.ofNullable( this.getJavaValue(
+                    this.getJavaTypeName().isPrimitive()
+                        ? this.getJavaTypeName().getBoxedName().getClass( classLoader, false )
+                        : this.getJavaTypeName().getClass( classLoader, false ),
+                    this.getValue() ) );
 
             }
         }
@@ -1979,7 +1944,9 @@
         {
             final org.jomc.jls.JavaTypeName javaType = this.getJavaTypeName();
             final String prefix = javaType.runtimeEquals( org.jomc.jls.JavaTypeName.BOOLEAN )
-                                      || javaType.runtimeEquals( org.jomc.jls.JavaTypeName.BOOLEAN_TYPE ) ? "is" : "get";
+                                      || javaType.runtimeEquals( org.jomc.jls.JavaTypeName.BOOLEAN_TYPE )
+                                      ? "is"
+                                      : "get";
 
             return org.jomc.jls.JavaIdentifier.parse( prefix + org.jomc.jls.JavaIdentifier.normalize(
                 this.getName() != null ? this.getName() : "",
@@ -2237,21 +2204,20 @@
      *
      * @param name The name of the message to return.
      *
-     * @return The first matching message or {@code null}, if no such message is found.
+     * @return The first matching message or no value, if no such message is found.
      *
      * @throws NullPointerException if {@code name} is {@code null}.
      *
      * @see #getMessage()
      * @see Message#getName()
      */
-    public Message getMessage( final String name )
+    public java.util.Optional<Message> getMessage( final String name )
     {
         java.util.Objects.requireNonNull( name, "name" );
 
         try ( final java.util.stream.Stream<Message> st0 = this.getMessage().parallelStream() )
         {
-            final java.util.Optional<Message> candidate = st0.filter( m  -> name.equals( m.getName() ) ).findFirst();
-            return candidate.orElse( null );
+            return st0.filter( m  -> name.equals( m.getName() ) ).findFirst();
         }
     }
 
@@ -2260,23 +2226,20 @@
      *
      * @param name The name of the message reference to return.
      *
-     * @return The first matching message reference or {@code null}, if no such reference is found.
+     * @return The first matching message reference or no value, if no such reference is found.
      *
      * @throws NullPointerException if {@code name} is {@code null}.
      *
      * @see #getReference()
      * @see MessageReference#getName()
      */
-    public MessageReference getReference( final String name )
+    public java.util.Optional<MessageReference> getReference( final String name )
     {
         java.util.Objects.requireNonNull( name, "name" );
 
         try ( final java.util.stream.Stream<MessageReference> st0 = this.getReference().parallelStream() )
         {
-            final java.util.Optional<MessageReference> candidate =
-                st0.filter( r  -> name.equals( r.getName() ) ).findFirst();
-
-            return candidate.orElse( null );
+            return st0.filter( r  -> name.equals( r.getName() ) ).findFirst();
         }
     }]]>
       </ci:code>
@@ -2329,17 +2292,16 @@
      * @param <T> The type the element is bound to.
      *
      * @return The {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any} property
-     * of the instance or {@code null}, if no such element is found.
+     * of the instance or no value, if no such element is found.
      *
      * @throws NullPointerException if {@code namespaceURI}, {@code localPart} or {@code type} is {@code null}.
      * @throws IllegalStateException if the {@code any} property contains more than one matching element.
      *
      * @see #getAnyElement(java.util.List, java.lang.String, java.lang.String, java.lang.Class)
-     *
-     * @since 1.1
      */
-    public <T> javax.xml.bind.JAXBElement<T> getAnyElement( final String namespaceURI, final String localPart,
-                                                            final Class<T> type )
+    public <T> java.util.Optional<javax.xml.bind.JAXBElement<T>> getAnyElement( final String namespaceURI,
+                                                                                final String localPart,
+                                                                                final Class<T> type )
     {
         return this.getAnyElement( this.getAny(), namespaceURI, localPart, type );
     }
@@ -2375,7 +2337,7 @@
      * @param clazz The class to return an instance of.
      * @param <T> The type of the object to return.
      *
-     * @return The instance of {@code clazz} from the {@code any} property of the instance or {@code null}, if no such
+     * @return The instance of {@code clazz} from the {@code any} property of the instance or no value, if no such
      * instance is found.
      *
      * @throws NullPointerException if {@code clazz} is {@code null}.
@@ -2383,7 +2345,7 @@
      *
      * @see #getAnyObject(java.util.List, java.lang.Class)
      */
-    public <T> T getAnyObject( final Class<T> clazz )
+    public <T> java.util.Optional<T> getAnyObject( final Class<T> clazz )
     {
         return this.getAnyObject( this.getAny(), clazz );
     }
@@ -2606,21 +2568,20 @@
      *
      * @param name The name of the argument to return.
      *
-     * @return The first matching argument or {@code null}, if no such argument is found.
+     * @return The first matching argument or no value, if no such argument is found.
      *
      * @throws NullPointerException if {@code name} is {@code null}.
      *
      * @see #getArgument()
      * @see Argument#getName()
      */
-    public Argument getArgument( final String name )
+    public java.util.Optional<Argument> getArgument( final String name )
     {
         java.util.Objects.requireNonNull( name, "name" );
 
         try ( final java.util.stream.Stream<Argument> st0 = this.getArgument().parallelStream() )
         {
-            final java.util.Optional<Argument> candidate = st0.filter( a  -> name.equals( a.getName() ) ).findFirst();
-            return candidate.orElse( null );
+            return st0.filter( a  -> name.equals( a.getName() ) ).findFirst();
         }
     }
 
@@ -2629,7 +2590,7 @@
      *
      * @param index The index of the argument to return.
      *
-     * @return The first matching argument or {@code null}, if no such argument is found.
+     * @return The first matching argument or no value, if no such argument is found.
      *
      * @throws IndexOutOfBoundsException if {@code index} is negative, greater or equal to the size of the list of
      * arguments.
@@ -2637,7 +2598,7 @@
      * @see #getArgument()
      * @see Argument#getIndex()
      */
-    public Argument getArgument( final int index )
+    public java.util.Optional<Argument> getArgument( final int index )
     {
         if ( index < 0 || index >= this.getArgument().size() )
         {
@@ -2646,8 +2607,7 @@
 
         try ( final java.util.stream.Stream<Argument> st0 = this.getArgument().parallelStream() )
         {
-            final java.util.Optional<Argument> candidate = st0.filter( a  -> index == a.getIndex() ).findFirst();
-            return candidate.orElse( null );
+            return st0.filter( a  -> index == a.getIndex() ).findFirst();
         }
     }]]>
       </ci:code>
@@ -2673,8 +2633,7 @@
     /**
      * Gets the Java type name of the type referenced by the argument.
      *
-     * @return The Java type name of the type referenced by the argument or {@code null}, if the argument does not
-     * reference a type.
+     * @return The Java type name of the type referenced by the argument.
      *
      * @throws ModelObjectException if compiling the name of the referenced type to a {@code JavaTypeName} fails.
      *
@@ -2745,17 +2704,16 @@
      * @param <T> The type the element is bound to.
      *
      * @return The {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any} property
-     * of the instance or {@code null}, if no such element is found.
+     * of the instance or no value, if no such element is found.
      *
      * @throws NullPointerException if {@code namespaceURI}, {@code localPart} or {@code type} is {@code null}.
      * @throws IllegalStateException if the {@code any} property contains more than one matching element.
      *
      * @see #getAnyElement(java.util.List, java.lang.String, java.lang.String, java.lang.Class)
-     *
-     * @since 1.1
      */
-    public <T> javax.xml.bind.JAXBElement<T> getAnyElement( final String namespaceURI, final String localPart,
-                                                            final Class<T> type )
+    public <T> java.util.Optional<javax.xml.bind.JAXBElement<T>> getAnyElement( final String namespaceURI,
+                                                                                final String localPart,
+                                                                                final Class<T> type )
     {
         return this.getAnyElement( this.getAny(), namespaceURI, localPart, type );
     }
@@ -2791,7 +2749,7 @@
      * @param clazz The class to return an instance of.
      * @param <T> The type of the object to return.
      *
-     * @return The instance of {@code clazz} from the {@code any} property of the instance or {@code null}, if no such
+     * @return The instance of {@code clazz} from the {@code any} property of the instance or no value, if no such
      * instance is found.
      *
      * @throws NullPointerException if {@code clazz} is {@code null}.
@@ -2799,7 +2757,7 @@
      *
      * @see #getAnyObject(java.util.List, java.lang.Class)
      */
-    public <T> T getAnyObject( final Class<T> clazz )
+    public <T> java.util.Optional<T> getAnyObject( final Class<T> clazz )
     {
         return this.getAnyObject( this.getAny(), clazz );
     }
@@ -2825,10 +2783,10 @@
     private static String getMessage( final Throwable t )
     {
         return t != null
-               ? t.getMessage() != null && t.getMessage().trim().length() > 0
-                 ? t.getMessage()
-                 : getMessage( t.getCause() )
-               : null;
+                   ? t.getMessage() != null && t.getMessage().trim().length() > 0
+                         ? t.getMessage()
+                         : getMessage( t.getCause() )
+                   : null;
 
     }
 
@@ -2849,23 +2807,20 @@
      *
      * @param identifier The identifier of the instance to return.
      *
-     * @return The first matching instance or {@code null}, if no such instance is found.
+     * @return The first matching instance or no value, if no such instance is found.
      *
      * @throws NullPointerException if {@code identifier} is {@code null}.
      *
      * @see #getInstance()
      * @see Instance#getIdentifier()
      */
-    public Instance getInstance( final String identifier )
+    public java.util.Optional<Instance> getInstance( final String identifier )
     {
         java.util.Objects.requireNonNull( identifier, "identifier" );
 
         try ( final java.util.stream.Stream<Instance> st0 = this.getInstance().parallelStream() )
         {
-            final java.util.Optional<Instance> candidate =
-                st0.filter( i  -> identifier.equals( i.getIdentifier() ) ).findFirst();
-
-            return candidate.orElse( null );
+            return st0.filter( i  -> identifier.equals( i.getIdentifier() ) ).findFirst();
         }
     }]]>
       </ci:code>
@@ -3000,7 +2955,7 @@
      * @param classLoader The class loader to get the Java class from or {@code null}, to get the Java class from the
      * platform's bootstrap class loader.
      *
-     * @return The Java class of the type referenced by the instance or {@code null}, if the instance does not reference
+     * @return The Java class of the type referenced by the instance or no value, if the instance does not reference
      * a type.
      *
      * @throws ClassNotFoundException if the Java class is not found.
@@ -3008,21 +2963,19 @@
      *
      * @see #getClazz()
      * @see #getJavaTypeName()
-     *
-     * @since 1.2
      */
-    public Class<?> getJavaClass( final ClassLoader classLoader )
+    public java.util.Optional<Class<?>> getJavaClass( final ClassLoader classLoader )
         throws ClassNotFoundException, ModelObjectException
     {
         Class<?> javaClass = null;
-        final org.jomc.jls.JavaTypeName javaTypeName = this.getJavaTypeName();
+        final java.util.Optional<org.jomc.jls.JavaTypeName> javaTypeName = this.getJavaTypeName();
 
-        if ( javaTypeName != null )
+        if ( javaTypeName.isPresent() )
         {
-            javaClass = javaTypeName.getClass( classLoader, false );
+            javaClass = javaTypeName.get().getClass( classLoader, false );
         }
 
-        return javaClass;
+        return java.util.Optional.ofNullable( javaClass );
     }
 
     /**
@@ -3068,7 +3021,7 @@
                     {
                         try
                         {
-                            return s.getJavaTypeName() != null;
+                            return s.getJavaTypeName().isPresent();
                         }
                         catch ( final ModelObjectException e )
                         {
@@ -3078,7 +3031,7 @@
                     {
                         try
                         {
-                            return s.getJavaTypeName().getClass( classLoader, false );
+                            return s.getJavaTypeName().get().getClass( classLoader, false );
                         }
                         catch ( final ClassNotFoundException | ModelObjectException e )
                         {
@@ -3117,7 +3070,7 @@
      * @param classLoader The class loader to get the Java class from or {@code null}, to get the Java class from the
      * platform's bootstrap class loader.
      *
-     * @return The public default Java constructor of the Java class of the instance or {@code null}, if the instance
+     * @return The public default Java constructor of the Java class of the instance or no value, if the instance
      * does not reference a type, or if the class is not accessible or abstract or does not declare such a constructor.
      *
      * @throws ClassNotFoundException if the Java class is not found.
@@ -3125,18 +3078,16 @@
      * {@code JavaTypeName} fails.
      *
      * @see #getJavaClass(java.lang.ClassLoader)
-     *
-     * @since 1.2
      */
-    public java.lang.reflect.Constructor<?> getJavaConstructor( final ClassLoader classLoader )
+    public java.util.Optional<java.lang.reflect.Constructor<?>> getJavaConstructor( final ClassLoader classLoader )
         throws ClassNotFoundException, ModelObjectException
     {
         java.lang.reflect.Constructor<?> javaConstructor = null;
-        final org.jomc.jls.JavaTypeName javaTypeName = this.getJavaTypeName();
+        final java.util.Optional<org.jomc.jls.JavaTypeName> javaTypeName = this.getJavaTypeName();
 
-        if ( javaTypeName != null )
+        if ( javaTypeName.isPresent() )
         {
-            final Class<?> javaClass = javaTypeName.getClass( classLoader, false );
+            final Class<?> javaClass = javaTypeName.get().getClass( classLoader, false );
 
             if ( java.lang.reflect.Modifier.isPublic( javaClass.getModifiers() )
                      && !java.lang.reflect.Modifier.isAbstract( javaClass.getModifiers() ) )
@@ -3152,22 +3103,20 @@
             }
         }
 
-        return javaConstructor;
+        return java.util.Optional.ofNullable( javaConstructor );
     }
 
     /**
      * Gets the name of the Java method to use for creating objects of the instance.
      *
-     * @return The name of the Java method to use for creating objects of the instance or {@code null}, if no such
+     * @return The name of the Java method to use for creating objects of the instance or no value, if no such
      * method name is supported.
      *
      * @throws ModelObjectException if compiling the name of the instance to a {@code JavaIdentifier} fails.
      *
      * @see #getName()
-     *
-     * @since 1.2
      */
-    public String getJavaFactoryMethodName() throws ModelObjectException
+    public java.util.Optional<String> getJavaFactoryMethodName() throws ModelObjectException
     {
         try
         {
@@ -3181,7 +3130,7 @@
 
             }
 
-            return javaFactoryMethodName;
+            return java.util.Optional.ofNullable( javaFactoryMethodName );
         }
         catch ( final java.text.ParseException e )
         {
@@ -3198,7 +3147,7 @@
      * platform's bootstrap class loader.
      *
      * @return The public Java method of the Java class of the instance to use for creating objects of the instance or
-     * {@code null}, if the instance does not reference a type or no such method is supported.
+     * no value, if the instance does not reference a type or no such method is supported.
      *
      * @throws ClassNotFoundException if the Java class is not found.
      * @throws ModelObjectException if compiling the name of the type referenced by the instance to a
@@ -3206,25 +3155,23 @@
      *
      * @see #getJavaClass(java.lang.ClassLoader)
      * @see #getJavaFactoryMethodName()
-     *
-     * @since 1.2
      */
-    public java.lang.reflect.Method getJavaFactoryMethod( final ClassLoader classLoader )
+    public java.util.Optional<java.lang.reflect.Method> getJavaFactoryMethod( final ClassLoader classLoader )
         throws ClassNotFoundException, ModelObjectException
     {
-        final org.jomc.jls.JavaTypeName javaTypeName = this.getJavaTypeName();
+        final java.util.Optional<org.jomc.jls.JavaTypeName> javaTypeName = this.getJavaTypeName();
         java.lang.reflect.Method factoryMethod = null;
 
-        if ( javaTypeName != null )
+        if ( javaTypeName.isPresent() )
         {
-            final Class<?> javaClass = javaTypeName.getClass( classLoader, false );
-            final String methodName = this.getJavaFactoryMethodName();
+            final Class<?> javaClass = javaTypeName.get().getClass( classLoader, false );
+            final java.util.Optional<String> methodName = this.getJavaFactoryMethodName();
 
-            if ( methodName != null )
+            if ( methodName.isPresent() )
             {
                 try
                 {
-                    factoryMethod = javaClass.getMethod( methodName, (Class[]) null );
+                    factoryMethod = javaClass.getMethod( methodName.get(), (Class[]) null );
                 }
                 catch ( final NoSuchMethodException e )
                 {
@@ -3245,7 +3192,7 @@
             }
         }
 
-        return factoryMethod;
+        return java.util.Optional.ofNullable( factoryMethod );
     }
 
     /**
@@ -3271,12 +3218,12 @@
     public boolean isJavaClassAssignable( final ClassLoader classLoader )
         throws ClassNotFoundException, ModelObjectException
     {
-        final org.jomc.jls.JavaTypeName javaTypeName = this.getJavaTypeName();
-        boolean assignable = javaTypeName != null;
+        final java.util.Optional<org.jomc.jls.JavaTypeName> javaTypeName = this.getJavaTypeName();
+        boolean assignable = javaTypeName.isPresent();
 
         if ( assignable )
         {
-            final Class<?> javaClass = javaTypeName.getClass( classLoader, false );
+            final Class<?> javaClass = javaTypeName.get().getClass( classLoader, false );
             final Class<?>[] javaClasses = this.getJavaClasses( classLoader );
 
             for ( int i = javaClasses.length - 1; i >= 0; i-- )
@@ -3298,7 +3245,7 @@
      * @param classLoader The class loader to get the Java proxy class from or {@code null}, to get the Java proxy class
      * from the platform's bootstrap class loader.
      *
-     * @return The Java proxy class for {@code classLoader} or {@code null}, if the instance does not support a Java
+     * @return The Java proxy class for {@code classLoader} or no value, if the instance does not support a Java
      * proxy class.
      *
      * @throws ClassNotFoundException if a Java class is not found.
@@ -3306,10 +3253,8 @@
      *
      * @see #getJavaClasses(java.lang.ClassLoader)
      * @see Class#isInterface()
-     *
-     * @since 1.2
      */
-    public Class<?> getJavaProxyClass( final ClassLoader classLoader )
+    public java.util.Optional<Class<?>> getJavaProxyClass( final ClassLoader classLoader )
         throws ClassNotFoundException, ModelObjectException
     {
         final Class<?>[] javaClasses = this.getJavaClasses( classLoader );
@@ -3324,22 +3269,23 @@
             }
         }
 
-        return canProxy ? java.lang.reflect.Proxy.getProxyClass( classLoader, javaClasses ) : null;
+        return java.util.Optional.ofNullable( canProxy
+                                                  ? java.lang.reflect.Proxy.getProxyClass( classLoader, javaClasses )
+                                                  : null );
+
     }
 
     /**
      * Gets the Java type name of the type referenced by the instance.
      *
-     * @return The Java type name of the type referenced by the instance or {@code null}, if the instance does not
+     * @return The Java type name of the type referenced by the instance or no value, if the instance does not
      * reference a type.
      *
      * @throws ModelObjectException if compiling the name of the referenced type to a {@code JavaTypeName} fails.
      *
      * @see #getClazz()
-     *
-     * @since 1.4
      */
-    public org.jomc.jls.JavaTypeName getJavaTypeName() throws ModelObjectException
+    public java.util.Optional<org.jomc.jls.JavaTypeName> getJavaTypeName() throws ModelObjectException
     {
         try
         {
@@ -3350,7 +3296,7 @@
                 javaTypeName = org.jomc.jls.JavaTypeName.parse( this.getClazz() );
             }
 
-            return javaTypeName;
+            return java.util.Optional.ofNullable( javaTypeName );
         }
         catch ( final java.text.ParseException e )
         {
@@ -3370,17 +3316,16 @@
      * @param <T> The type the element is bound to.
      *
      * @return The {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any} property
-     * of the instance or {@code null}, if no such element is found.
+     * of the instance or no value, if no such element is found.
      *
      * @throws NullPointerException if {@code namespaceURI}, {@code localPart} or {@code type} is {@code null}.
      * @throws IllegalStateException if the {@code any} property contains more than one matching element.
      *
      * @see #getAnyElement(java.util.List, java.lang.String, java.lang.String, java.lang.Class)
-     *
-     * @since 1.1
      */
-    public <T> javax.xml.bind.JAXBElement<T> getAnyElement( final String namespaceURI, final String localPart,
-                                                            final Class<T> type )
+    public <T> java.util.Optional<javax.xml.bind.JAXBElement<T>> getAnyElement( final String namespaceURI,
+                                                                                final String localPart,
+                                                                                final Class<T> type )
     {
         return this.getAnyElement( this.getAny(), namespaceURI, localPart, type );
     }
@@ -3416,7 +3361,7 @@
      * @param clazz The class to return an instance of.
      * @param <T> The type of the object to return.
      *
-     * @return The instance of {@code clazz} from the {@code any} property of the instance or {@code null} if no such
+     * @return The instance of {@code clazz} from the {@code any} property of the instance or no value if no such
      * instance is found.
      *
      * @throws NullPointerException if {@code clazz} is {@code null}.
@@ -3424,7 +3369,7 @@
      *
      * @see #getAnyObject(java.util.List, java.lang.Class)
      */
-    public <T> T getAnyObject( final Class<T> clazz )
+    public <T> java.util.Optional<T> getAnyObject( final Class<T> clazz )
     {
         return this.getAnyObject( this.getAny(), clazz );
     }
@@ -3489,17 +3434,16 @@
      * @param <T> The type the element is bound to.
      *
      * @return The {@code JAXBElement} matching {@code namespaceURI} and {@code localPart} from the {@code any} property
-     * of the instance or {@code null}, if no such element is found.
+     * of the instance or no value, if no such element is found.
      *
      * @throws NullPointerException if {@code namespaceURI}, {@code localPart} or {@code type} is {@code null}.
      * @throws IllegalStateException if the {@code any} property contains more than one matching element.
      *
      * @see #getAnyElement(java.util.List, java.lang.String, java.lang.String, java.lang.Class)
-     *
-     * @since 1.1
      */
-    public <T> javax.xml.bind.JAXBElement<T> getAnyElement( final String namespaceURI, final String localPart,
-                                                            final Class<T> type )
+    public <T> java.util.Optional<javax.xml.bind.JAXBElement<T>> getAnyElement( final String namespaceURI,
+                                                                                final String localPart,
+                                                                                final Class<T> type )
     {
         return this.getAnyElement( this.getAny(), namespaceURI, localPart, type );
     }
@@ -3535,7 +3479,7 @@
      * @param clazz The class to return an instance of.
      * @param <T> The type of the object to return.
      *
-     * @return The instance of {@code clazz} from the {@code any} property of the instance or {@code null}, if no such
+     * @return The instance of {@code clazz} from the {@code any} property of the instance or no value, if no such
      * instance is found.
      *
      * @throws NullPointerException if {@code clazz} is {@code null}.
@@ -3543,7 +3487,7 @@
      *
      * @see #getAnyObject(java.util.List, java.lang.Class)
      */
-    public <T> T getAnyObject( final Class<T> clazz )
+    public <T> java.util.Optional<T> getAnyObject( final Class<T> clazz )
     {
         return this.getAnyObject( this.getAny(), clazz );
     }
@@ -3753,7 +3697,7 @@
      * @param classLoader The class loader to use for resolving entities or {@code null}, to resolve entities using the
      * bootstrap class loader.
      *
-     * @return A module holding model objects resolved by inspecting the given class loader or {@code null}, if nothing
+     * @return A module holding model objects resolved by inspecting the given class loader or no value, if nothing
      * is resolved.
      *
      * @throws NullPointerException if {@code moduleName} is {@code null}.
@@ -3761,7 +3705,7 @@
      * @see #getDefaultClasspathModuleName()
      * @see #getModule()
      */
-    public Module getClasspathModule( final String moduleName, final ClassLoader classLoader )
+    public java.util.Optional<Module> getClasspathModule( final String moduleName, final ClassLoader classLoader )
     {
         final Module classpathModule = new Module();
         classpathModule.setName( java.util.Objects.requireNonNull( moduleName, "moduleName" ) );
@@ -3774,7 +3718,7 @@
                                      || ( classpathModule.getImplementations() != null
                                           && !classpathModule.getImplementations().getImplementation().isEmpty() );
 
-        return resolved ? classpathModule : null;
+        return java.util.Optional.ofNullable( resolved ? classpathModule : null );
     }
 
     /**
@@ -3782,30 +3726,27 @@
      *
      * @param name The name of the module to return.
      *
-     * @return The first matching module or {@code null}, if no such module is found.
+     * @return The first matching module or no value, if no such module is found.
      *
      * @throws NullPointerException if {@code name} is {@code null}.
      *
      * @see #getModule()
      * @see Module#getName()
      */
-    public Module getModule( final String name )
+    public java.util.Optional<Module> getModule( final String name )
     {
         java.util.Objects.requireNonNull( name, "name" );
 
         try ( final java.util.stream.Stream<Module> s0 = this.getModule().parallelStream() )
         {
-            final java.util.Optional<Module> candidate =
-                s0.filter( m  -> name.equals( m.getName() ) ).findFirst();
-
-            return candidate.isPresent() ? candidate.get() : null;
+            return s0.filter( m  -> name.equals( m.getName() ) ).findFirst();
         }
     }
 
     /**
      * Gets all specifications of the list of modules.
      *
-     * @return All specifications or {@code null}, if no specifications are found.
+     * @return All specifications.
      *
      * @see #getModule()
      */
@@ -3816,9 +3757,9 @@
         try ( final java.util.stream.Stream<Module> st0 = this.getModule().parallelStream().unordered() )
         {
             specifications.getSpecification().addAll(
-                st0.flatMap( m  -> m.getSpecifications() != null
-                                        ? m.getSpecifications().getSpecification().parallelStream().unordered()
-                                        : java.util.stream.Stream.empty() ).
+                st0.filter( m  -> m.getSpecifications() != null
+                                       && !m.getSpecifications().getSpecification().isEmpty() ).
+                    flatMap( m  -> m.getSpecifications().getSpecification().parallelStream().unordered() ).
                     collect( java.util.stream.Collector.of( java.util.concurrent.CopyOnWriteArrayList::new,
                                                             java.util.List::add, ( l1, l2 )  ->
                                                         {
@@ -3829,13 +3770,13 @@
 
         }
 
-        return specifications.getSpecification().isEmpty() ? null : specifications;
+        return specifications;
     }
 
     /**
      * Gets all implementations of the list of modules.
      *
-     * @return All implementations or {@code null}, if no implementations are found.
+     * @return All implementations.
      *
      * @see #getModule()
      */
@@ -3846,20 +3787,20 @@
         try ( final java.util.stream.Stream<Module> st0 = this.getModule().parallelStream().unordered() )
         {
             implementations.getImplementation().addAll(
-                st0.flatMap( m  -> m.getImplementations() != null
-                                        ? m.getImplementations().getImplementation().parallelStream().unordered()
-                                        : java.util.stream.Stream.empty() ).
+                st0.filter( m  -> m.getImplementations() != null
+                                       && !m.getImplementations().getImplementation().isEmpty() ).
+                    flatMap( m  -> m.getImplementations().getImplementation().parallelStream().unordered() ).
                     collect( java.util.stream.Collector.of( java.util.concurrent.CopyOnWriteArrayList::new,
                                                             java.util.List::add, ( l1, l2 )  ->
                                                         {
                                                             l1.addAll( l2 );
                                                             return l1;
                                                         }, java.util.stream.Collector.Characteristics.CONCURRENT,
-                                                            java.util.stream.Collector.Characteristics.UNORDERED ) ) );
-
+                                                            java.util.stream.Collector.Characteristics.UNORDERED ) )
+            );
         }
 
-        return implementations.getImplementation().isEmpty() ? null : implementations;
+        return implementations;
     }
 
     /**
@@ -3867,7 +3808,7 @@
      *
      * @param specification The identifier of the specification whose declaring module to return.
      *
-     * @return The first matching module or {@code null}, if no such module is found.
+     * @return The first matching module or no value, if no such module is found.
      *
      * @throws NullPointerException if {@code specification} is {@code null}.
      *
@@ -3875,17 +3816,16 @@
      * @see Module#getSpecifications()
      * @see Specifications#getSpecification( java.lang.String )
      */
-    public Module getModuleOfSpecification( final String specification )
+    public java.util.Optional<Module> getModuleOfSpecification( final String specification )
     {
         java.util.Objects.requireNonNull( specification, "specification" );
 
         try ( final java.util.stream.Stream<Module> st0 = this.getModule().parallelStream() )
         {
-            final java.util.Optional<Module> candidate =
-                st0.filter( m  -> m.getSpecifications() != null
-                                       && m.getSpecifications().getSpecification( specification ) != null ).findFirst();
+            return st0.filter( m  -> m.getSpecifications() != null
+                                          && m.getSpecifications().getSpecification( specification ) != null ).
+                findFirst();
 
-            return candidate.orElse( null );
         }
     }
 
@@ -3894,7 +3834,7 @@
      *
      * @param implementation The identifier of the implementation whose declaring module to return.
      *
-     * @return The first matching module or {@code null}, if no such module is found.
+     * @return The first matching module or no value, if no such module is found.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
      *
@@ -3902,18 +3842,16 @@
      * @see Module#getImplementations()
      * @see Implementations#getImplementation( java.lang.String )
      */
-    public Module getModuleOfImplementation( final String implementation )
+    public java.util.Optional<Module> getModuleOfImplementation( final String implementation )
     {
         java.util.Objects.requireNonNull( implementation, "implementation" );
 
         try ( final java.util.stream.Stream<Module> st0 = this.getModule().parallelStream() )
         {
-            final java.util.Optional<Module> candidate =
-                st0.filter( m  -> m.getImplementations() != null
-                                       && m.getImplementations().getImplementation( implementation ) != null ).
-                    findFirst();
+            return st0.filter( m  -> m.getImplementations() != null
+                                          && m.getImplementations().getImplementation( implementation ) != null ).
+                findFirst();
 
-            return candidate.orElse( null );
         }
     }
 
@@ -3922,7 +3860,7 @@
      *
      * @param specification The identifier of the specification to return.
      *
-     * @return The first matching specification or {@code null}, if no such specification is found.
+     * @return The first matching specification or no value, if no such specification is found.
      *
      * @throws NullPointerException if {@code specification} is {@code null}.
      *
@@ -3930,19 +3868,18 @@
      * @see Module#getSpecifications()
      * @see Specifications#getSpecification( java.lang.String )
      */
-    public Specification getSpecification( final String specification )
+    public java.util.Optional<Specification> getSpecification( final String specification )
     {
         java.util.Objects.requireNonNull( specification, "specification" );
 
         try ( final java.util.stream.Stream<Module> st0 = this.getModule().parallelStream() )
         {
-            final java.util.Optional<Specification> candidate =
-                st0.filter( m  -> m.getSpecifications() != null ).
-                    flatMap( m  -> m.getSpecifications().getSpecification().parallelStream() ).
-                    filter( s  -> specification.equals( s.getIdentifier() ) ).
-                    findFirst();
+            return st0.filter( m  -> m.getSpecifications() != null
+                                          && !m.getSpecifications().getSpecification().isEmpty() ).
+                flatMap( m  -> m.getSpecifications().getSpecification().parallelStream() ).
+                filter( s  -> specification.equals( s.getIdentifier() ) ).
+                findFirst();
 
-            return candidate.orElse( null );
         }
     }
 
@@ -3951,7 +3888,7 @@
      *
      * @param specification The class of the specification to return.
      *
-     * @return The first matching specification declaring the given class or {@code null}, if no such specification is
+     * @return The first matching specification declaring the given class or no value, if no such specification is
      * found.
      *
      * @throws NullPointerException if {@code specification} is {@code null}.
@@ -3961,7 +3898,8 @@
      * @see Module#getSpecifications()
      * @see Specifications#getSpecification( java.lang.Class )
      */
-    public Specification getSpecification( final Class<?> specification ) throws ModelObjectException
+    public java.util.Optional<Specification> getSpecification( final Class<?> specification )
+        throws ModelObjectException
     {
         java.util.Objects.requireNonNull( specification, "specification" );
 
@@ -3979,23 +3917,26 @@
 
             try
             {
-                final java.util.Optional<Specification> candidate =
-                    st0.filter( m  -> m.getSpecifications() != null ).
-                        flatMap( m  -> m.getSpecifications().getSpecification().parallelStream() ).
-                        filter( s  -> s.isClassDeclaration() && s.getClazz() != null ).
-                        filter( s  ->
+                return st0.filter( m  -> m.getSpecifications() != null
+                                              && !m.getSpecifications().getSpecification().isEmpty() ).
+                    flatMap( m  -> m.getSpecifications().getSpecification().parallelStream() ).
+                    filter( s  -> s.isClassDeclaration() && s.getClazz() != null ).
+                    filter( s  ->
+                    {
+                        try
                         {
-                            try
-                            {
-                                return specification.getName().equals( s.getJavaTypeName().getClassName() );
-                            }
-                            catch ( final ModelObjectException e )
-                            {
-                                throw new FindSpecificationFailure( e );
-                            }
-                        } ).findFirst();
+                            final java.util.Optional<org.jomc.jls.JavaTypeName> javaTypeName = s.getJavaTypeName();
+                            return javaTypeName.isPresent()
+                                       ? specification.getName().equals( javaTypeName.get().getClassName() )
+                                       : false;
 
-                return candidate.orElse( null );
+                        }
+                        catch ( final ModelObjectException e )
+                        {
+                            throw new FindSpecificationFailure( e );
+                        }
+                    } ).findFirst();
+
             }
             catch ( final FindSpecificationFailure e )
             {
@@ -4014,8 +3955,8 @@
      *
      * @param implementation The identifier of the implementation to get all implemented specifications of.
      *
-     * @return All specifications implemented by the first matching implementation or {@code null}, if no such
-     * implementation is found or if the first matching implementation does not implement any specification.
+     * @return All specifications implemented by the first matching implementation or no value, if no such
+     * implementation is found.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
      *
@@ -4025,16 +3966,21 @@
      * @see Implementations#getReference()
      * @see Implementation#getSpecifications()
      */
-    public Specifications getSpecifications( final String implementation )
+    public java.util.Optional<Specifications> getSpecifications( final String implementation )
     {
         java.util.Objects.requireNonNull( implementation, "implementation" );
         final Specifications specs = new Specifications();
-        final Implementation impl = this.getImplementation( implementation );
-        this.collectModelObjects( impl, null, null, null, specs, null, new java.util.HashSet<>(), true );
-        this.collectClassDeclarationModelObjects( impl, null, null, null, specs, null );
-        java.util.Collections.sort( specs.getSpecification(), SPECIFICATION_IDENTIFIER_COMPARATOR );
-        java.util.Collections.sort( specs.getReference(), SPECIFICATION_REFERENCE_IDENTIFIER_COMPARATOR );
-        return specs.getSpecification().isEmpty() && specs.getReference().isEmpty() ? null : specs;
+        final java.util.Optional<Implementation> impl = this.getImplementation( implementation );
+
+        if ( impl.isPresent() )
+        {
+            this.collectModelObjects( impl.get(), null, null, null, specs, null, new java.util.HashSet<>(), true );
+            this.collectClassDeclarationModelObjects( impl.get(), null, null, null, specs, null );
+            java.util.Collections.sort( specs.getSpecification(), SPECIFICATION_IDENTIFIER_COMPARATOR );
+            java.util.Collections.sort( specs.getReference(), SPECIFICATION_REFERENCE_IDENTIFIER_COMPARATOR );
+        }
+
+        return impl.isPresent() ? java.util.Optional.of( specs ) : java.util.Optional.empty();
     }
 
     /**
@@ -4043,32 +3989,78 @@
      * @param implementation The identifier of the implementation to get all implemented specifications of.
      *
      * @return An unmodifiable list holding all {@code JavaTypeName}s implemented by the first matching implementation
-     * or {@code null}, if no such implementation is found or if that implementation does not implement any
-     * {@code JavaTypeName}.
+     * or no value, if no such implementation is found.
      *
      * @throws ModelObjectException if compiling the name of a referenced type to a {@code JavaTypeName} fails.
      *
      * @see #getSpecifications(java.lang.String)
      * @see Specification#getJavaTypeName()
-     *
-     * @since 1.4
      */
-    public List<org.jomc.jls.JavaTypeName> getImplementedJavaTypeNames( final String implementation )
-        throws ModelObjectException
+    public java.util.Optional<List<org.jomc.jls.JavaTypeName>>
+        getImplementedJavaTypeNames( final String implementation ) throws ModelObjectException
     {
         java.util.Objects.requireNonNull( implementation, "implementation" );
-        final Specifications implemented = this.getSpecifications( implementation );
+        final java.util.Optional<Specifications> implementedSpecifications = this.getSpecifications( implementation );
         java.util.List<org.jomc.jls.JavaTypeName> javaTypeNames = null;
 
-        if ( implemented != null )
+        if ( implementedSpecifications.isPresent() )
         {
-            javaTypeNames = new java.util.ArrayList<>( implemented.getSpecification().size() );
+            javaTypeNames = new java.util.ArrayList<>( implementedSpecifications.get().getSpecification().size() );
 
-            for ( final Specification s : implemented.getSpecification() )
+            try ( final java.util.stream.Stream<Specification> st0 = implementedSpecifications.get().
+                getSpecification().parallelStream().unordered() )
             {
-                if ( s.getJavaTypeName() != null )
+                final class MapJavaTypeNameFailure extends RuntimeException
                 {
-                    javaTypeNames.add( s.getJavaTypeName() );
+
+                    public MapJavaTypeNameFailure( final Throwable cause )
+                    {
+                        super( cause );
+                    }
+
+                }
+
+                try
+                {
+                    javaTypeNames.addAll(
+                        st0.filter( s  ->
+                        {
+                            try
+                            {
+                                return s.getJavaTypeName().isPresent();
+                            }
+                            catch ( final ModelObjectException e )
+                            {
+                                throw new MapJavaTypeNameFailure( e );
+                            }
+                        } ).map( s  ->
+                        {
+                            try
+                            {
+                                return s.getJavaTypeName().get();
+                            }
+                            catch ( final ModelObjectException e )
+                            {
+                                throw new MapJavaTypeNameFailure( e );
+                            }
+                        } ).collect(
+                            java.util.stream.Collector.of( java.util.concurrent.CopyOnWriteArrayList::new,
+                                                           java.util.List::add, ( l1, l2 )  ->
+                                                       {
+                                                           l1.addAll( l2 );
+                                                           return l1;
+                                                       }, java.util.stream.Collector.Characteristics.CONCURRENT,
+                                                           java.util.stream.Collector.Characteristics.UNORDERED ) )
+                    );
+                }
+                catch ( final MapJavaTypeNameFailure e )
+                {
+                    if ( e.getCause() instanceof ModelObjectException )
+                    {
+                        throw new ModelObjectException( e.getCause().getMessage(), e.getCause() );
+                    }
+
+                    throw new AssertionError( e );
                 }
             }
 
@@ -4076,7 +4068,7 @@
             javaTypeNames = java.util.Collections.unmodifiableList( javaTypeNames );
         }
 
-        return javaTypeNames;
+        return java.util.Optional.ofNullable( javaTypeNames );
     }
 
     /**
@@ -4084,7 +4076,7 @@
      *
      * @param implementation The identifier of the implementation to return.
      *
-     * @return The first matching implementation or {@code null}, if no such implementation is found.
+     * @return The first matching implementation or no value, if no such implementation is found.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
      *
@@ -4092,18 +4084,18 @@
      * @see Module#getImplementations()
      * @see Implementations#getImplementation( java.lang.String )
      */
-    public Implementation getImplementation( final String implementation )
+    public java.util.Optional<Implementation> getImplementation( final String implementation )
     {
         java.util.Objects.requireNonNull( implementation, "implementation" );
 
         try ( final java.util.stream.Stream<Module> st0 = this.getModule().parallelStream() )
         {
-            final java.util.Optional<Implementation> candidate =
-                st0.filter( m  -> m.getImplementations() != null ).
-                    flatMap( m  -> m.getImplementations().getImplementation().parallelStream() ).
-                    filter( i  -> implementation.equals( i.getIdentifier() ) ).findFirst();
+            return st0.filter( m  -> m.getImplementations() != null
+                                          && !m.getImplementations().getImplementation().isEmpty() ).
+                flatMap( m  -> m.getImplementations().getImplementation().parallelStream() ).
+                filter( i  -> implementation.equals( i.getIdentifier() ) ).
+                findFirst();
 
-            return candidate.orElse( null );
         }
     }
 
@@ -4112,7 +4104,7 @@
      *
      * @param implementation The class of the implementation to return.
      *
-     * @return The first matching implementation declaring the given class or {@code null}, if no such implementation is
+     * @return The first matching implementation declaring the given class or no value, if no such implementation is
      * found.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
@@ -4122,7 +4114,8 @@
      * @see Module#getImplementations()
      * @see Implementations#getImplementation( java.lang.Class )
      */
-    public Implementation getImplementation( final Class<?> implementation ) throws ModelObjectException
+    public java.util.Optional<Implementation> getImplementation( final Class<?> implementation )
+        throws ModelObjectException
     {
         java.util.Objects.requireNonNull( implementation, "implementation" );
 
@@ -4140,23 +4133,24 @@
 
             try
             {
-                final java.util.Optional<Implementation> candidate =
-                    st0.filter( m  -> m.getImplementations() != null ).
-                        flatMap( m  -> m.getImplementations().getImplementation().parallelStream() ).
-                        filter( i  -> i.isClassDeclaration() && i.getClazz() != null ).
-                        filter( i  ->
+                return st0.filter( m  -> m.getImplementations() != null
+                                              && !m.getImplementations().getImplementation().isEmpty() ).
+                    flatMap( m  -> m.getImplementations().getImplementation().parallelStream().unordered() ).
+                    filter( i  -> i.isClassDeclaration() && i.getClazz() != null ).
+                    filter( i  ->
+                    {
+                        try
                         {
-                            try
-                            {
-                                return implementation.getName().equals( i.getJavaTypeName().getClassName() );
-                            }
-                            catch ( final ModelObjectException e )
-                            {
-                                throw new FindImplementationFailure( e );
-                            }
-                        } ).findFirst();
+                            return i.getJavaTypeName().isPresent()
+                                       ? implementation.getName().equals( i.getJavaTypeName().get().getClassName() )
+                                       : false;
 
-                return candidate.orElse( null );
+                        }
+                        catch ( final ModelObjectException e )
+                        {
+                            throw new FindImplementationFailure( e );
+                        }
+                    } ).findFirst();
             }
             catch ( final FindImplementationFailure e )
             {
@@ -4175,7 +4169,7 @@
      *
      * @param object The object of the implementation to return.
      *
-     * @return The first matching implementation or {@code null}, if no such implementation is found.
+     * @return The first matching implementation or no value, if no such implementation is found.
      *
      * @throws NullPointerException if {@code object} is {@code null}.
      * @throws ModelObjectException if compiling a name of a referenced type to a {@code JavaTypeName} fails.
@@ -4183,7 +4177,7 @@
      * @see #getModule()
      * @see #getImplementation( java.lang.Class )
      */
-    public Implementation getImplementation( final Object object ) throws ModelObjectException
+    public java.util.Optional<Implementation> getImplementation( final Object object ) throws ModelObjectException
     {
         return this.collectImplementation( object.getClass() );
     }
@@ -4194,7 +4188,7 @@
      * @param specification The identifier of the specification to return an implementation of.
      * @param name The name of the implementation to return.
      *
-     * @return The first matching implementation or {@code null}, if no such implementation is found.
+     * @return The first matching implementation or no value, if no such implementation is found.
      *
      * @throws NullPointerException if {@code specification} or {@code name} is {@code null}.
      *
@@ -4202,17 +4196,21 @@
      * @see #getImplementations( java.lang.String )
      * @see Implementations#getImplementationByName( java.lang.String )
      */
-    public Implementation getImplementation( final String specification, final String name )
+    public java.util.Optional<Implementation> getImplementation( final String specification, final String name )
     {
         java.util.Objects.requireNonNull( specification, "specification" );
         java.util.Objects.requireNonNull( name, "name" );
-        final Implementations implementations = this.getImplementations( specification );
-        if ( implementations != null )
+
+        java.util.Optional<Implementation> implementation = java.util.Optional.empty();
+
+        final java.util.Optional<Implementations> implementations = this.getImplementations( specification );
+
+        if ( implementations.isPresent() )
         {
-            return implementations.getImplementationByName( name );
+            implementation = implementations.get().getImplementationByName( name );
         }
 
-        return null;
+        return implementation;
     }
 
     /**
@@ -4220,8 +4218,7 @@
      *
      * @param implementation The identifier of the implementation to get all dependencies of.
      *
-     * @return All dependencies of the first matching implementation or {@code null}, if no such implementation is
-     * found or if the first matching implementation does not have any dependencies.
+     * @return All dependencies of the first matching implementation or no value, if no such implementation is found.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
      *
@@ -4231,15 +4228,25 @@
      * @see Implementations#getReference()
      * @see Implementation#getDependencies()
      */
-    public Dependencies getDependencies( final String implementation )
+    public java.util.Optional<Dependencies> getDependencies( final String implementation )
     {
         java.util.Objects.requireNonNull( implementation, "implementation" );
         final Dependencies dependencies = new Dependencies();
-        final Implementation impl = this.getImplementation( implementation );
-        this.collectModelObjects( impl, dependencies, null, null, null, null, new java.util.HashSet<>(), true );
-        this.collectClassDeclarationModelObjects( impl, dependencies, null, null, null, null );
-        java.util.Collections.sort( dependencies.getDependency(), DEPENDENCY_NAME_COMPARATOR );
-        return dependencies.getDependency().isEmpty() ? null : dependencies;
+        final java.util.Optional<Implementation> impl = this.getImplementation( implementation );
+
+        if ( impl.isPresent() )
+        {
+            this.collectModelObjects( impl.get(), dependencies, null, null, null, null, new java.util.HashSet<>(),
+                                      true );
+
+            this.collectClassDeclarationModelObjects( impl.get(), dependencies, null, null, null, null );
+            java.util.Collections.sort( dependencies.getDependency(), DEPENDENCY_NAME_COMPARATOR );
+        }
+
+        return impl.isPresent()
+                   ? java.util.Optional.of( dependencies )
+                   : java.util.Optional.empty();
+
     }
 
     /**
@@ -4249,20 +4256,19 @@
      * @param dependency The name of the dependency to get the Java type name of.
      *
      * @return The Java type name of the dependency named {@code dependency } of the first matching implementation
-     * identified by {@code implementation} or {@code null}, if the implementation, the dependency or the referenced
+     * identified by {@code implementation} or no value, if the implementation, the dependency or the referenced
      * specification is not found or does not reference a Java type.
      *
      * @throws NullPointerException if {@code implementation} or {@code dependency} is {@code null}.
      * @throws ModelObjectException if compiling the name of the referenced type to a {@code JavaTypeName} fails.
-     *
-     * @since 1.4
      *
      * @see #getDependencies(java.lang.String)
      * @see Dependencies#getDependency(java.lang.String)
      * @see #getSpecification(java.lang.String)
      * @see Specification#getJavaTypeName()
      */
-    public org.jomc.jls.JavaTypeName getDependencyJavaTypeName( final String implementation, final String dependency )
+    public java.util.Optional<org.jomc.jls.JavaTypeName> getDependencyJavaTypeName( final String implementation,
+                                                                                    final String dependency )
         throws ModelObjectException
     {
         java.util.Objects.requireNonNull( implementation, "implementation" );
@@ -4272,22 +4278,23 @@
         try
         {
             org.jomc.jls.JavaTypeName javaTypeName = null;
-            final Dependencies dependencies = this.getDependencies( implementation );
+            final java.util.Optional<Dependencies> dependencies = this.getDependencies( implementation );
 
-            if ( dependencies != null )
+            if ( dependencies.isPresent() )
             {
-                final Dependency d = dependencies.getDependency( dependency );
+                final java.util.Optional<Dependency> d = dependencies.get().getDependency( dependency );
 
-                if ( d != null )
+                if ( d.isPresent() )
                 {
-                    final Specification specification = this.getSpecification( d.getIdentifier() );
+                    final java.util.Optional<Specification> specification =
+                        this.getSpecification( d.get().getIdentifier() );
 
-                    if ( specification != null && specification.getClazz() != null )
+                    if ( specification.isPresent() && specification.get().getClazz() != null )
                     {
-                        typeName = specification.getClazz();
+                        typeName = specification.get().getClazz();
 
-                        if ( specification.getMultiplicity() == Multiplicity.MANY
-                                 && d.getImplementationName() == null )
+                        if ( specification.get().getMultiplicity() == Multiplicity.MANY
+                                 && d.get().getImplementationName() == null )
                         {
                             typeName += "[]";
                         }
@@ -4297,7 +4304,7 @@
                 }
             }
 
-            return javaTypeName;
+            return java.util.Optional.ofNullable( javaTypeName );
         }
         catch ( final java.text.ParseException e )
         {
@@ -4314,32 +4321,33 @@
      * @param dependency The name of the dependency to get the Java modifier name of.
      *
      * @return The Java modifier name of the dependency named {@code dependency} of the first matching implementation
-     * identified by {@code implementation} or {@code null}, if the implementation or the dependency is not found.
+     * identified by {@code implementation} or no value, if the implementation or the dependency is not found.
      *
      * @throws NullPointerException if {@code implementation} or {@code dependency} is {@code null}.
-     *
-     * @since 1.4
      *
      * @see #getDependencies(java.lang.String)
      * @see Dependencies#getDependency(java.lang.String)
      */
-    public String getDependencyJavaModifierName( final String implementation, final String dependency )
+    public java.util.Optional<String> getDependencyJavaModifierName( final String implementation,
+                                                                     final String dependency )
     {
         java.util.Objects.requireNonNull( implementation, "implementation" );
         java.util.Objects.requireNonNull( dependency, "dependency" );
-        final Dependencies dependencies = this.getDependencies( implementation );
+        final java.util.Optional<Dependencies> dependencies = this.getDependencies( implementation );
 
-        if ( dependencies != null )
+        String modifierName = null;
+
+        if ( dependencies.isPresent() )
         {
-            final Dependency d = dependencies.getDependency( dependency );
+            final java.util.Optional<Dependency> d = dependencies.get().getDependency( dependency );
 
-            if ( d != null )
+            if ( d.isPresent() )
             {
-                return "private";
+                modifierName = "private";
             }
         }
 
-        return null;
+        return java.util.Optional.ofNullable( modifierName );
     }
 
     /**
@@ -4347,8 +4355,7 @@
      *
      * @param implementation The identifier of the implementation to get all properties of.
      *
-     * @return All properties of the first matching implementation or {@code null}, if no such implementation is found
-     * or if the first matching implementation does not have any properties.
+     * @return All properties of the first matching implementation or no value, if no such implementation is found.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
      *
@@ -4358,19 +4365,27 @@
      * @see Implementations#getReference()
      * @see Implementation#getProperties()
      */
-    public Properties getProperties( final String implementation )
+    public java.util.Optional<Properties> getProperties( final String implementation )
     {
         java.util.Objects.requireNonNull( implementation, "implementation" );
         final Properties properties = new Properties();
         final Specifications specifications = new Specifications();
-        final Implementation impl = this.getImplementation( implementation );
-        this.collectModelObjects(
-            impl, null, null, properties, specifications, null, new java.util.HashSet<>(), true );
+        final java.util.Optional<Implementation> impl = this.getImplementation( implementation );
 
-        this.collectClassDeclarationModelObjects( impl, null, null, properties, specifications, null );
-        this.collectSpecifiedModelObjects( specifications, properties );
-        java.util.Collections.sort( properties.getProperty(), PROPERTY_NAME_COMPARATOR );
-        return properties.getProperty().isEmpty() ? null : properties;
+        if ( impl.isPresent() )
+        {
+            this.collectModelObjects( impl.get(), null, null, properties, specifications, null,
+                                      new java.util.HashSet<>(), true );
+
+            this.collectClassDeclarationModelObjects( impl.get(), null, null, properties, specifications, null );
+            this.collectSpecifiedModelObjects( specifications, properties );
+            java.util.Collections.sort( properties.getProperty(), PROPERTY_NAME_COMPARATOR );
+        }
+
+        return impl.isPresent()
+                   ? java.util.Optional.of( properties )
+                   : java.util.Optional.empty();
+
     }
 
     /**
@@ -4378,8 +4393,8 @@
      *
      * @param implementation The identifier of the implementation to return specified properties of.
      *
-     * @return All properties specified for the first matching implementation or {@code null}, if no such implementation
-     * is found or if the first matching implementation does not have any specified properties.
+     * @return All properties specified for the first matching implementation or no value, if no such implementation
+     * is found.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
      *
@@ -4387,20 +4402,226 @@
      * @see #getSpecifications( java.lang.String )
      * @see Specification#getProperties()
      */
-    public Properties getSpecifiedProperties( final String implementation )
+    public java.util.Optional<Properties> getSpecifiedProperties( final String implementation )
     {
         java.util.Objects.requireNonNull( implementation, "implementation" );
         final Properties properties = new Properties();
-        final Specifications specs = this.getSpecifications( implementation );
+        final java.util.Optional<Specifications> specs = this.getSpecifications( implementation );
 
-        if ( specs != null )
+        if ( specs.isPresent() )
         {
             try ( final java.util.stream.Stream<Specification> st0 =
-                specs.getSpecification().parallelStream().unordered() )
+                specs.get().getSpecification().parallelStream().unordered() )
             {
                 properties.getProperty().addAll(
-                    st0.filter( s  -> s.getProperties() != null ).
+                    st0.filter( s  -> s.getProperties() != null
+                                           && !s.getProperties().getProperty().isEmpty() ).
                         flatMap( s  -> s.getProperties().getProperty().parallelStream().unordered() ).
+                        collect( java.util.stream.Collector.of(
+                            java.util.concurrent.CopyOnWriteArrayList::new,
+                            java.util.List::add, ( l1, l2 )  ->
+                        {
+                            l1.addAll( l2 );
+                            return l1;
+                        }, java.util.stream.Collector.Characteristics.CONCURRENT,
+                            java.util.stream.Collector.Characteristics.UNORDERED ) ) );
+
+            }
+
+            java.util.Collections.sort( properties.getProperty(), PROPERTY_NAME_COMPARATOR );
+        }
+
+        return specs.isPresent()
+                   ? java.util.Optional.of( properties )
+                   : java.util.Optional.empty();
+
+    }
+
+    /**
+     * Gets the Java modifier name of a property.
+     *
+     * @param implementation The identifier of the implementation of the property.
+     * @param property The name of the property to get the Java modifier name of.
+     *
+     * @return The Java modifier name of the property named {@code property} of the first matching implementation
+     * identified by {@code implementation} or no value, if the implementation or the property is not found.
+     *
+     * @throws NullPointerException if {@code implementation} or {@code dependency} is {@code null}.
+     *
+     * @see #getProperties(java.lang.String)
+     * @see Properties#getProperty(java.lang.String)
+     */
+    public java.util.Optional<String> getPropertyJavaModifierName( final String implementation, final String property )
+    {
+        java.util.Objects.requireNonNull( implementation, "implementation" );
+        java.util.Objects.requireNonNull( property, "property" );
+        final java.util.Optional<Properties> properties = this.getProperties( implementation );
+
+        String modifierName = null;
+
+        if ( properties.isPresent() )
+        {
+            final java.util.Optional<Property> p = properties.get().getProperty( property );
+
+            if ( p.isPresent() )
+            {
+                final java.util.Optional<Properties> specified = this.getSpecifiedProperties( implementation );
+
+                modifierName = specified.isPresent() && specified.get().getProperty( property ).isPresent()
+                                   ? "public"
+                                   : "private";
+
+            }
+        }
+
+        return java.util.Optional.ofNullable( modifierName );
+    }
+
+    /**
+     * Gets all messages of an implementation from the list of modules.
+     *
+     * @param implementation The identifier of the implementation to get all messages of.
+     *
+     * @return All messages of the first matching implementation or no value, if no such implementation is found.
+     *
+     * @throws NullPointerException if {@code implementation} is {@code null}.
+     *
+     * @see #getModule()
+     * @see #getImplementation( java.lang.String )
+     * @see Implementation#getImplementations()
+     * @see Implementations#getReference()
+     * @see Implementation#getMessages()
+     */
+    public java.util.Optional<Messages> getMessages( final String implementation )
+    {
+        java.util.Objects.requireNonNull( implementation, "implementation" );
+        final Messages msgs = new Messages();
+        final java.util.Optional<Implementation> impl = this.getImplementation( implementation );
+
+        if ( impl.isPresent() )
+        {
+            this.collectModelObjects( impl.get(), null, msgs, null, null, null, new java.util.HashSet<>(), true );
+            this.collectClassDeclarationModelObjects( impl.get(), null, msgs, null, null, null );
+            java.util.Collections.sort( msgs.getMessage(), MESSAGE_NAME_COMPARATOR );
+        }
+
+        return impl.isPresent()
+                   ? java.util.Optional.of( msgs )
+                   : java.util.Optional.empty();
+
+    }
+
+    /**
+     * Gets the Java modifier name of a message.
+     *
+     * @param implementation The identifier of the implementation of the message.
+     * @param message The name of the message to get the Java modifier name of.
+     *
+     * @return The Java modifier name of the message named {@code message} of the first matching implementation
+     * identified by {@code implementation} or no value, if the implementation or the message is not found.
+     *
+     * @throws NullPointerException if {@code implementation} or {@code message} is {@code null}.
+     *
+     * @see #getMessages(java.lang.String)
+     * @see Messages#getMessage(java.lang.String)
+     */
+    public java.util.Optional<String> getMessageJavaModifierName( final String implementation, final String message )
+    {
+        java.util.Objects.requireNonNull( implementation, "implementation" );
+        java.util.Objects.requireNonNull( message, "message" );
+        final java.util.Optional<Messages> messages = this.getMessages( implementation );
+
+        String modifierName = null;
+
+        if ( messages.isPresent() )
+        {
+            final java.util.Optional<Message> m = messages.get().getMessage( message );
+
+            if ( m.isPresent() )
+            {
+                modifierName = "private";
+            }
+        }
+
+        return java.util.Optional.ofNullable( modifierName );
+    }
+
+    /**
+     * Gets any objects of an implementation from the list of modules.
+     *
+     * @param implementation The identifier of the implementation to get any objects of.
+     *
+     * @return Any objects of the first matching implementation or no value, if no such implementation is found.
+     *
+     * @throws NullPointerException if {@code implementation} is {@code null}.
+     *
+     * @see #getModule()
+     * @see #getImplementation( java.lang.String )
+     * @see Implementation#getImplementations()
+     * @see Implementations#getReference()
+     * @see Implementation#getAny()
+     */
+    public java.util.Optional<List<Object>> getAnyObjects( final String implementation )
+    {
+        java.util.Objects.requireNonNull( implementation, "implementation" );
+        java.util.List<Object> any = null;
+        final java.util.Optional<Implementation> impl = this.getImplementation( implementation );
+        if ( impl.isPresent() )
+        {
+            any = new java.util.LinkedList<>();
+            this.collectModelObjects( impl.get(), null, null, null, null, any, new java.util.HashSet<>(), true );
+            this.collectClassDeclarationModelObjects( impl.get(), null, null, null, null, any );
+        }
+        return java.util.Optional.ofNullable( any );
+    }
+
+    /**
+     * Gets all implementations implementing a given specification from the list of modules.
+     *
+     * @param specification The identifier of the specification to return all implementations of.
+     *
+     * @return All implementations implementing the first matching specification or no value, if no such
+     * specification is found.
+     *
+     * @throws NullPointerException if {@code specification} is {@code null}.
+     *
+     * @see #getModule()
+     * @see #getSpecifications( java.lang.String )
+     */
+    public java.util.Optional<Implementations> getImplementations( final String specification )
+    {
+        java.util.Objects.requireNonNull( specification, "specification" );
+        Implementations implementations = null;
+
+        if ( this.getSpecification( specification ).isPresent() )
+        {
+            implementations = new Implementations();
+
+            try ( final java.util.stream.Stream<Module> st0 = this.getModule().parallelStream().unordered() )
+            {
+                final class FindImplementationResult
+                {
+
+                    Implementation implementation;
+
+                    java.util.Optional<Specifications> specifications;
+
+                }
+
+                implementations.getImplementation().addAll(
+                    st0.filter( m  -> m.getImplementations() != null
+                                           && !m.getImplementations().getImplementation().isEmpty() ).
+                        flatMap( m  -> m.getImplementations().getImplementation().parallelStream().unordered() ).
+                        map( i  ->
+                        {
+                            final FindImplementationResult r = new FindImplementationResult();
+                            r.implementation = i;
+                            r.specifications = getSpecifications( i.getIdentifier() );
+                            return r;
+                        } ).
+                        filter( r  -> r.specifications.isPresent()
+                                           && r.specifications.get().getSpecification( specification ).isPresent() ).
+                        map( r  -> r.implementation ).
                         collect( java.util.stream.Collector.of(
                             java.util.concurrent.CopyOnWriteArrayList::new,
                             java.util.List::add, ( l1, l2 )  ->
@@ -4413,190 +4634,7 @@
             }
         }
 
-        java.util.Collections.sort( properties.getProperty(), PROPERTY_NAME_COMPARATOR );
-        return properties.getProperty().isEmpty() ? null : properties;
-    }
-
-    /**
-     * Gets the Java modifier name of a property.
-     *
-     * @param implementation The identifier of the implementation of the property.
-     * @param property The name of the property to get the Java modifier name of.
-     *
-     * @return The Java modifier name of the property named {@code property} of the first matching implementation
-     * identified by {@code implementation} or {@code null}, if the implementation or the property is not found.
-     *
-     * @throws NullPointerException if {@code implementation} or {@code dependency} is {@code null}.
-     *
-     * @since 1.4
-     *
-     * @see #getProperties(java.lang.String)
-     * @see Properties#getProperty(java.lang.String)
-     */
-    public String getPropertyJavaModifierName( final String implementation, final String property )
-    {
-        java.util.Objects.requireNonNull( implementation, "implementation" );
-        java.util.Objects.requireNonNull( property, "property" );
-        final Properties properties = this.getProperties( implementation );
-
-        if ( properties != null )
-        {
-            final Property p = properties.getProperty( property );
-
-            if ( p != null )
-            {
-                final Properties specified = this.getSpecifiedProperties( implementation );
-
-                return specified != null && specified.getProperty( property ) != null ? "public" : "private";
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Gets all messages of an implementation from the list of modules.
-     *
-     * @param implementation The identifier of the implementation to get all messages of.
-     *
-     * @return All messages of the first matching implementation or {@code null}, if no such implementation is found
-     * or if the first matching implementation does not have any messages.
-     *
-     * @throws NullPointerException if {@code implementation} is {@code null}.
-     *
-     * @see #getModule()
-     * @see #getImplementation( java.lang.String )
-     * @see Implementation#getImplementations()
-     * @see Implementations#getReference()
-     * @see Implementation#getMessages()
-     */
-    public Messages getMessages( final String implementation )
-    {
-        java.util.Objects.requireNonNull( implementation, "implementation" );
-        final Messages msgs = new Messages();
-        final Implementation impl = this.getImplementation( implementation );
-        this.collectModelObjects( impl, null, msgs, null, null, null, new java.util.HashSet<>(), true );
-        this.collectClassDeclarationModelObjects( impl, null, msgs, null, null, null );
-        java.util.Collections.sort( msgs.getMessage(), MESSAGE_NAME_COMPARATOR );
-        return msgs.getMessage().isEmpty() ? null : msgs;
-    }
-
-    /**
-     * Gets the Java modifier name of a message.
-     *
-     * @param implementation The identifier of the implementation of the message.
-     * @param message The name of the message to get the Java modifier name of.
-     *
-     * @return The Java modifier name of the message named {@code message} of the first matching implementation
-     * identified by {@code implementation} or {@code null}, if the implementation or the message is not found.
-     *
-     * @throws NullPointerException if {@code implementation} or {@code message} is {@code null}.
-     *
-     * @since 1.4
-     *
-     * @see #getMessages(java.lang.String)
-     * @see Messages#getMessage(java.lang.String)
-     */
-    public String getMessageJavaModifierName( final String implementation, final String message )
-    {
-        java.util.Objects.requireNonNull( implementation, "implementation" );
-        java.util.Objects.requireNonNull( message, "message" );
-        final Messages messages = this.getMessages( implementation );
-
-        if ( messages != null )
-        {
-            final Message m = messages.getMessage( message );
-
-            if ( m != null )
-            {
-                return "private";
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Gets any objects of an implementation from the list of modules.
-     *
-     * @param implementation The identifier of the implementation to get any objects of.
-     *
-     * @return Any objects of the first matching implementation or {@code null}, if no such implementation is found.
-     *
-     * @throws NullPointerException if {@code implementation} is {@code null}.
-     *
-     * @see #getModule()
-     * @see #getImplementation( java.lang.String )
-     * @see Implementation#getImplementations()
-     * @see Implementations#getReference()
-     * @see Implementation#getAny()
-     *
-     * @since 1.2
-     */
-    public List<Object> getAnyObjects( final String implementation )
-    {
-        java.util.Objects.requireNonNull( implementation, "implementation" );
-        final Implementation impl = this.getImplementation( implementation );
-        final java.util.List<Object> any = new java.util.LinkedList<>();
-        this.collectModelObjects( impl, null, null, null, null, any, new java.util.HashSet<>(), true );
-        this.collectClassDeclarationModelObjects( impl, null, null, null, null, any );
-        return any;
-    }
-
-    /**
-     * Gets all implementations implementing a given specification from the list of modules.
-     *
-     * @param specification The identifier of the specification to return all implementations of.
-     *
-     * @return All implementations implementing the first matching specification or {@code null}, if no such
-     * specification is found or if the first matching specification does not have any implementations.
-     *
-     * @throws NullPointerException if {@code specification} is {@code null}.
-     *
-     * @see #getModule()
-     * @see #getSpecifications( java.lang.String )
-     */
-    public Implementations getImplementations( final String specification )
-    {
-        java.util.Objects.requireNonNull( specification, "specification" );
-        final Implementations implementations = new Implementations();
-
-        try ( final java.util.stream.Stream<Module> st0 = this.getModule().parallelStream().unordered() )
-        {
-            final class FindImplementationResult
-            {
-
-                Implementation implementation;
-
-                Specifications specifications;
-
-            }
-
-            implementations.getImplementation().addAll(
-                st0.filter( m  -> m.getImplementations() != null ).
-                    flatMap( m  -> m.getImplementations().getImplementation().parallelStream().unordered() ).
-                    map( i  ->
-                    {
-                        final FindImplementationResult r = new FindImplementationResult();
-                        r.implementation = i;
-                        r.specifications = getSpecifications( i.getIdentifier() );
-                        return r;
-                    } ).
-                    filter( r  -> r.specifications != null
-                                       && r.specifications.getSpecification( specification ) != null ).
-                    map( r  -> r.implementation ).
-                    collect( java.util.stream.Collector.of(
-                        java.util.concurrent.CopyOnWriteArrayList::new,
-                        java.util.List::add, ( l1, l2 )  ->
-                    {
-                        l1.addAll( l2 );
-                        return l1;
-                    }, java.util.stream.Collector.Characteristics.CONCURRENT,
-                        java.util.stream.Collector.Characteristics.UNORDERED ) ) );
-
-        }
-
-        return implementations.getImplementation().size() > 0 ? implementations : null;
+        return java.util.Optional.ofNullable( implementations );
     }
 
     /**
@@ -4646,11 +4684,15 @@
                                                    i.getMessages().getReference().iterator(); it.hasNext(); )
                                                {
                                                    final String messageName = it.next().getName();
-                                                   i.getMessages().getMessage().
-                                                       add( m2.getMessages().getMessage( messageName ) );
+                                                   final java.util.Optional<Message> moduleMessage =
+                                                       m2.getMessages().getMessage( messageName );
 
-                                                   referencedMessages.add( messageName );
-                                                   it.remove();
+                                                   if ( moduleMessage.isPresent() )
+                                                   {
+                                                       i.getMessages().getMessage().add( moduleMessage.get() );
+                                                       referencedMessages.add( messageName );
+                                                       it.remove();
+                                                   }
                                                }
                                            }
 
@@ -4661,11 +4703,15 @@
                                                    i.getProperties().getReference().iterator(); it.hasNext(); )
                                                {
                                                    final String propertyName = it.next().getName();
-                                                   i.getProperties().getProperty().
-                                                       add( m2.getProperties().getProperty( propertyName ) );
+                                                   final java.util.Optional<Property> moduleProperty =
+                                                       m2.getProperties().getProperty( propertyName );
 
-                                                   referencedProperties.add( propertyName );
-                                                   it.remove();
+                                                   if ( moduleProperty.isPresent() )
+                                                   {
+                                                       i.getProperties().getProperty().add( moduleProperty.get() );
+                                                       referencedProperties.add( propertyName );
+                                                       it.remove();
+                                                   }
                                                }
                                            }
 
@@ -4698,11 +4744,15 @@
                                                        s.getProperties().getReference().iterator(); it.hasNext(); )
                                                    {
                                                        final String propertyName = it.next().getName();
-                                                       s.getProperties().getProperty().
-                                                           add( m2.getProperties().getProperty( propertyName ) );
+                                                       final java.util.Optional<Property> moduleProperty =
+                                                           m2.getProperties().getProperty( propertyName );
 
-                                                       referencedProperties.add( propertyName );
-                                                       it.remove();
+                                                       if ( moduleProperty.isPresent() )
+                                                       {
+                                                           s.getProperties().getProperty().add( moduleProperty.get() );
+                                                           referencedProperties.add( propertyName );
+                                                           it.remove();
+                                                       }
                                                    }
                                                }
 
@@ -4778,7 +4828,7 @@
      *
      * @param object The object to get the instance of.
      *
-     * @return The instance of {@code object} or {@code null}, if no such instance is found.
+     * @return The instance of {@code object} or no value, if no such instance is found.
      *
      * @throws NullPointerException if {@code object} is {@code null}.
      * @throws ModelObjectException if compiling a name of a referenced type to a {@code JavaTypeName} fails.
@@ -4788,28 +4838,31 @@
      * @see #getInstance( java.lang.String )
      * @see #createObject(org.jomc.model.Instance instance, java.lang.ClassLoader classLoader)
      */
-    public Instance getInstance( final Object object ) throws ModelObjectException
+    public java.util.Optional<Instance> getInstance( final Object object ) throws ModelObjectException
     {
         java.util.Objects.requireNonNull( object, "object" );
+
         synchronized ( this.objects )
         {
             Instance instance = this.objects.get( object );
 
             if ( instance == null )
             {
-                final Implementation i = this.getImplementation( object );
+                final java.util.Optional<Implementation> impl = this.getImplementation( object );
 
-                if ( i != null )
+                if ( impl.isPresent() )
                 {
-                    instance = this.getInstance( i.getIdentifier() );
-                    if ( instance != null )
+                    final java.util.Optional<Instance> i = this.getInstance( impl.get().getIdentifier() );
+
+                    if ( i.isPresent() )
                     {
+                        instance = i.get();
                         this.objects.put( object, instance );
                     }
                 }
             }
 
-            return instance;
+            return java.util.Optional.ofNullable( instance );
         }
     }
 
@@ -4818,7 +4871,7 @@
      *
      * @param implementation The identifier of the implementation to get an instance for.
      *
-     * @return A new instance for the first matching implementation or {@code null}, if no such implementation is found.
+     * @return A new instance for the first matching implementation or no value, if no such implementation is found.
      *
      * @throws NullPointerException if {@code implementation} is {@code null}.
      *
@@ -4830,27 +4883,29 @@
      * @see #getSpecifications(java.lang.String)
      * @see #getAnyObjects(java.lang.String)
      */
-    public Instance getInstance( final String implementation )
+    public java.util.Optional<Instance> getInstance( final String implementation )
     {
         java.util.Objects.requireNonNull( implementation, "implementation" );
-        final Implementation i = this.getImplementation( implementation );
 
-        if ( i != null && i.getClazz() != null )
+        final java.util.Optional<Implementation> i = this.getImplementation( implementation );
+
+        Instance instance = null;
+
+        if ( i.isPresent() && i.get().getClazz() != null )
         {
-            final Instance instance = new Instance();
-            instance.setIdentifier( i.getIdentifier() );
-            instance.setName( i.getName() );
-            instance.setClazz( i.getClazz() );
-            instance.setStateless( i.isStateless() );
-            instance.setDependencies( this.getDependencies( implementation ) );
-            instance.setProperties( this.getProperties( implementation ) );
-            instance.setMessages( this.getMessages( implementation ) );
-            instance.setSpecifications( this.getSpecifications( implementation ) );
-            instance.getAny().addAll( this.getAnyObjects( implementation ) );
-            return instance;
+            instance = new Instance();
+            instance.setIdentifier( i.get().getIdentifier() );
+            instance.setName( i.get().getName() );
+            instance.setClazz( i.get().getClazz() );
+            instance.setStateless( i.get().isStateless() );
+            instance.setDependencies( this.getDependencies( implementation ).get() );
+            instance.setProperties( this.getProperties( implementation ).get() );
+            instance.setMessages( this.getMessages( implementation ).get() );
+            instance.setSpecifications( this.getSpecifications( implementation ).get() );
+            instance.getAny().addAll( this.getAnyObjects( implementation ).get() );
         }
 
-        return null;
+        return java.util.Optional.ofNullable( instance );
     }
 
     /**
@@ -4860,49 +4915,50 @@
      * @param dependency The dependency to use for overriding model objects of the instance.
      *
      * @return An instance for the first matching implementation with any model objects overridden using
-     * {@code dependency} or {@code null}, if no such implementation is found.
+     * {@code dependency} or no value, if no such implementation is found.
      *
      * @throws NullPointerException if {@code implementation} or {@code dependency} is {@code null}.
      *
      * @see #getModule()
      * @see #getInstance( java.lang.String )
      */
-    public Instance getInstance( final String implementation, final Dependency dependency )
+    public java.util.Optional<Instance> getInstance( final String implementation, final Dependency dependency )
     {
         java.util.Objects.requireNonNull( implementation, "implementation" );
         java.util.Objects.requireNonNull( dependency, "dependency" );
-        Instance instance = this.getInstance( implementation );
+        final java.util.Optional<Instance> instance = this.getInstance( implementation );
 
-        if ( instance != null )
+        if ( instance.isPresent() )
         {
-            final Specification dependencySpecification = this.getSpecification( dependency.getIdentifier() );
+            final java.util.Optional<Specification> dependencySpecification =
+                this.getSpecification( dependency.getIdentifier() );
 
-            if ( dependencySpecification != null && dependencySpecification.getScope() == null )
+            if ( dependencySpecification.isPresent() && dependencySpecification.get().getScope() == null )
             {
                 if ( dependency.getDependencies() != null && !dependency.getDependencies().getDependency().isEmpty() )
                 {
                     final Dependencies dependencies = new Dependencies();
                     dependencies.getDependency().addAll( dependency.getDependencies().getDependency() );
 
-                    if ( instance.getDependencies() != null )
+                    if ( instance.get().getDependencies() != null )
                     {
-                        for ( int i = 0, s0 = instance.getDependencies().getDependency().size(); i < s0; i++ )
+                        for ( int i = 0, s0 = instance.get().getDependencies().getDependency().size(); i < s0; i++ )
                         {
-                            final Dependency d = instance.getDependencies().getDependency().get( i );
-                            final Dependency td = dependencies.getDependency( d.getName() );
+                            final Dependency d = instance.get().getDependencies().getDependency().get( i );
+                            final java.util.Optional<Dependency> td = dependencies.getDependency( d.getName() );
 
-                            if ( td == null )
+                            if ( !td.isPresent() )
                             {
                                 dependencies.getDependency().add( d );
                             }
                             else
                             {
-                                this.collectDependencies( d, td );
+                                this.collectDependencies( d, td.get() );
                             }
                         }
                     }
 
-                    instance.setDependencies( dependencies );
+                    instance.get().setDependencies( dependencies );
                 }
 
                 if ( dependency.getMessages() != null && !dependency.getMessages().getMessage().isEmpty() )
@@ -4910,20 +4966,20 @@
                     final Messages messages = new Messages();
                     messages.getMessage().addAll( dependency.getMessages().getMessage() );
 
-                    if ( instance.getMessages() != null )
+                    if ( instance.get().getMessages() != null )
                     {
-                        for ( int i = 0, s0 = instance.getMessages().getMessage().size(); i < s0; i++ )
+                        for ( int i = 0, s0 = instance.get().getMessages().getMessage().size(); i < s0; i++ )
                         {
-                            final Message m = instance.getMessages().getMessage().get( i );
+                            final Message m = instance.get().getMessages().getMessage().get( i );
 
-                            if ( messages.getMessage( m.getName() ) == null )
+                            if ( !messages.getMessage( m.getName() ).isPresent() )
                             {
                                 messages.getMessage().add( m );
                             }
                         }
                     }
 
-                    instance.setMessages( messages );
+                    instance.get().setMessages( messages );
                 }
 
                 if ( dependency.getProperties() != null && !dependency.getProperties().getProperty().isEmpty() )
@@ -4931,20 +4987,20 @@
                     final Properties properties = new Properties();
                     properties.getProperty().addAll( dependency.getProperties().getProperty() );
 
-                    if ( instance.getProperties() != null )
+                    if ( instance.get().getProperties() != null )
                     {
-                        for ( int i = 0, s0 = instance.getProperties().getProperty().size(); i < s0; i++ )
+                        for ( int i = 0, s0 = instance.get().getProperties().getProperty().size(); i < s0; i++ )
                         {
-                            final Property p = instance.getProperties().getProperty().get( i );
+                            final Property p = instance.get().getProperties().getProperty().get( i );
 
-                            if ( properties.getProperty( p.getName() ) == null )
+                            if ( !properties.getProperty( p.getName() ).isPresent() )
                             {
                                 properties.getProperty().add( p );
                             }
                         }
                     }
 
-                    instance.setProperties( properties );
+                    instance.get().setProperties( properties );
                 }
             }
         }
@@ -4980,11 +5036,11 @@
 
         try
         {
-            final java.lang.reflect.Constructor<?> ctor = instance.getJavaConstructor( classLoader );
+            final java.util.Optional<java.lang.reflect.Constructor<?>> ctor = instance.getJavaConstructor( classLoader );
 
-            if ( ctor != null && instance.isJavaClassAssignable( classLoader ) )
+            if ( ctor.isPresent() && instance.isJavaClassAssignable( classLoader ) )
             {
-                object = instance.getJavaTypeName().getClass( classLoader, true ).newInstance();
+                object = instance.getJavaTypeName().get().getClass( classLoader, true ).newInstance();
 
                 synchronized ( this.objects )
                 {
@@ -4993,13 +5049,14 @@
             }
             else
             {
-                java.lang.reflect.Method factoryMethod = instance.getJavaFactoryMethod( classLoader );
+                java.util.Optional<java.lang.reflect.Method> factoryMethod =
+                    instance.getJavaFactoryMethod( classLoader );
 
-                if ( factoryMethod != null )
+                if ( factoryMethod.isPresent() )
                 {
-                    if ( java.lang.reflect.Modifier.isStatic( factoryMethod.getModifiers() ) )
+                    if ( java.lang.reflect.Modifier.isStatic( factoryMethod.get().getModifiers() ) )
                     {
-                        object = factoryMethod.invoke( null, (Object[]) null );
+                        object = factoryMethod.get().invoke( null, (Object[]) null );
 
                         if ( object != null )
                         {
@@ -5009,9 +5066,9 @@
                             }
                         }
                     }
-                    else if ( ctor != null )
+                    else if ( ctor.isPresent() )
                     {
-                        final Object o = ctor.newInstance();
+                        final Object o = ctor.get().newInstance();
 
                         synchronized ( this.objects )
                         {
@@ -5020,7 +5077,7 @@
 
                         try
                         {
-                            object = factoryMethod.invoke( o, (Object[]) null );
+                            object = factoryMethod.get().invoke( o, (Object[]) null );
                         }
                         finally
                         {
@@ -5089,15 +5146,16 @@
                     for ( int i = 0, s0 = implementation.getDependencies().getDependency().size(); i < s0; i++ )
                     {
                         final Dependency d = implementation.getDependencies().getDependency().get( i );
-                        final Dependency dependency = dependencies.getDependency( d.getName() );
+                        final java.util.Optional<Dependency> dependency =
+                            dependencies.getDependency( d.getName() );
 
-                        if ( dependency == null )
+                        if ( !dependency.isPresent() )
                         {
                             dependencies.getDependency().add( d );
                         }
                         else
                         {
-                            this.collectDependencies( d, dependency );
+                            this.collectDependencies( d, dependency.get() );
                         }
                     }
                 }
@@ -5108,7 +5166,7 @@
                     {
                         final Message msg = implementation.getMessages().getMessage().get( i );
 
-                        if ( messages.getMessage( msg.getName() ) == null )
+                        if ( !messages.getMessage( msg.getName() ).isPresent() )
                         {
                             messages.getMessage().add( msg );
                         }
@@ -5116,24 +5174,27 @@
 
                     if ( !implementation.getMessages().getReference().isEmpty() )
                     {
-                        final Module m = this.getModuleOfImplementation( implementation.getIdentifier() );
+                        final java.util.Optional<Module> m =
+                            this.getModuleOfImplementation( implementation.getIdentifier() );
 
-                        if ( m != null )
+                        if ( m.isPresent() )
                         {
                             for ( int i = 0, s0 = implementation.getMessages().getReference().size(); i < s0; i++ )
                             {
                                 final MessageReference ref = implementation.getMessages().getReference().get( i );
 
-                                if ( messages.getMessage( ref.getName() ) == null )
+                                if ( !messages.getMessage( ref.getName() ).isPresent() )
                                 {
-                                    Message referenced = m.getMessages().getMessage( ref.getName() );
-                                    if ( referenced != null )
+                                    java.util.Optional<Message> referenced =
+                                        m.get().getMessages().getMessage( ref.getName() );
+
+                                    if ( referenced.isPresent() )
                                     {
-                                        referenced = referenced.clone();
-                                        referenced.setDeprecated( ref.isDeprecated() );
-                                        referenced.setFinal( ref.isFinal() );
-                                        referenced.setOverride( ref.isOverride() );
-                                        messages.getMessage().add( referenced );
+                                        final Message refMsg = referenced.get().clone();
+                                        refMsg.setDeprecated( ref.isDeprecated() );
+                                        refMsg.setFinal( ref.isFinal() );
+                                        refMsg.setOverride( ref.isOverride() );
+                                        messages.getMessage().add( refMsg );
                                     }
                                 }
                             }
@@ -5147,7 +5208,7 @@
                     {
                         final Property p = implementation.getProperties().getProperty().get( i );
 
-                        if ( properties.getProperty( p.getName() ) == null )
+                        if ( !properties.getProperty( p.getName() ).isPresent() )
                         {
                             properties.getProperty().add( p );
                         }
@@ -5155,24 +5216,27 @@
 
                     if ( !implementation.getProperties().getReference().isEmpty() )
                     {
-                        final Module m = this.getModuleOfImplementation( implementation.getIdentifier() );
+                        final java.util.Optional<Module> m =
+                            this.getModuleOfImplementation( implementation.getIdentifier() );
 
-                        if ( m != null )
+                        if ( m.isPresent() )
                         {
                             for ( int i = 0, s0 = implementation.getProperties().getReference().size(); i < s0; i++ )
                             {
                                 final PropertyReference ref = implementation.getProperties().getReference().get( i );
 
-                                if ( properties.getProperty( ref.getName() ) == null )
+                                if ( !properties.getProperty( ref.getName() ).isPresent() )
                                 {
-                                    Property referenced = m.getProperties().getProperty( ref.getName() );
-                                    if ( referenced != null )
+                                    java.util.Optional<Property> referenced =
+                                        m.get().getProperties().getProperty( ref.getName() );
+
+                                    if ( referenced.isPresent() )
                                     {
-                                        referenced = referenced.clone();
-                                        referenced.setDeprecated( ref.isDeprecated() );
-                                        referenced.setFinal( ref.isFinal() );
-                                        referenced.setOverride( ref.isOverride() );
-                                        properties.getProperty().add( referenced );
+                                        final Property refProperty = referenced.get().clone();
+                                        refProperty.setDeprecated( ref.isDeprecated() );
+                                        refProperty.setFinal( ref.isFinal() );
+                                        refProperty.setOverride( ref.isOverride() );
+                                        properties.getProperty().add( refProperty );
                                     }
                                 }
                             }
@@ -5186,14 +5250,16 @@
                     {
                         final SpecificationReference r = implementation.getSpecifications().getReference().get( i );
 
-                        if ( specifications.getReference( r.getIdentifier() ) == null )
+                        if ( !specifications.getReference( r.getIdentifier() ).isPresent() )
                         {
                             specifications.getReference().add( r );
 
-                            final Specification s = this.getSpecification( r.getIdentifier() );
-                            if ( s != null && specifications.getSpecification( s.getIdentifier() ) == null )
+                            final java.util.Optional<Specification> s = this.getSpecification( r.getIdentifier() );
+
+                            if ( s.isPresent()
+                                     && !specifications.getSpecification( s.get().getIdentifier() ).isPresent() )
                             {
-                                specifications.getSpecification().add( s );
+                                specifications.getSpecification().add( s.get() );
                             }
                         }
                     }
@@ -5235,9 +5301,14 @@
                 for ( int i = 0, s0 = implementation.getImplementations().getReference().size(); i < s0; i++ )
                 {
                     final ImplementationReference r = implementation.getImplementations().getReference().get( i );
-                    this.collectModelObjects( this.getImplementation( r.getIdentifier() ), dependencies, messages,
-                                              properties, specifications, any, seen, true );
+                    final java.util.Optional<Implementation> referenced = this.getImplementation( r.getIdentifier() );
 
+                    if ( referenced.isPresent() )
+                    {
+                        this.collectModelObjects( referenced.get(), dependencies, messages, properties, specifications,
+                                                  any, seen, true );
+
+                    }
                 }
             }
         }
@@ -5251,34 +5322,24 @@
                                                       final Properties properties, final Specifications specifications,
                                                       final List<Object> any )
     {
-        Implementation declaration = null;
+        java.util.Optional<Implementation> declaration = java.util.Optional.empty();
 
         if ( implementation != null && implementation.getClazz() != null && !implementation.isClassDeclaration() )
         {
-            for ( int i = 0, s0 = this.getModule().size(); i < s0; i++ )
+            try ( final java.util.stream.Stream<Module> st0 = this.getModule().parallelStream().unordered() )
             {
-                final Module m = this.getModule().get( i );
+                declaration = st0.filter( m  -> m.getImplementations() != null
+                                                     && !m.getImplementations().getImplementation().isEmpty() ).
+                    flatMap( m  -> m.getImplementations().getImplementation().parallelStream().unordered() ).
+                    filter( i  -> i.getClazz() != null && i.getClazz().equals( implementation.getClazz() )
+                                       && i.isClassDeclaration() ).findFirst();
 
-                if ( m.getImplementations() != null )
-                {
-                    for ( int j = 0, s1 = m.getImplementations().getImplementation().size(); j < s1; j++ )
-                    {
-                        final Implementation current = m.getImplementations().getImplementation().get( j );
-
-                        if ( current.getClazz() != null && current.getClazz().equals( implementation.getClazz() )
-                                 && current.isClassDeclaration() )
-                        {
-                            declaration = current;
-                            break;
-                        }
-                    }
-                }
             }
         }
 
-        if ( declaration != null )
+        if ( declaration.isPresent() )
         {
-            this.collectModelObjects( declaration, dependencies, messages, properties, specifications, any,
+            this.collectModelObjects( declaration.get(), dependencies, messages, properties, specifications, any,
                                       new java.util.HashSet<>(), true );
 
         }
@@ -5289,22 +5350,22 @@
      */
     private void collectSpecifiedModelObjects( final Specifications specifications, final Properties properties )
     {
-        for ( int i = 0, s0 = specifications.getSpecification().size(); i < s0; i++ )
+        try ( final java.util.stream.Stream<Specification> st0 =
+            specifications.getSpecification().parallelStream().unordered() )
         {
-            final Specification s = specifications.getSpecification().get( i );
-
-            if ( s.getProperties() != null )
-            {
-                for ( int j = 0, s1 = s.getProperties().getProperty().size(); j < s1; j++ )
-                {
-                    final Property p = s.getProperties().getProperty().get( j );
-
-                    if ( properties.getProperty( p.getName() ) == null )
-                    {
-                        properties.getProperty().add( p );
-                    }
-                }
-            }
+            properties.getProperty().addAll(
+                st0.filter( s  -> s.getProperties() != null
+                                       && !s.getProperties().getProperty().isEmpty() ).
+                    flatMap( s  -> s.getProperties().getProperty().parallelStream().unordered() ).
+                    filter( p  -> !properties.getProperty( p.getName() ).isPresent() ).
+                    collect( java.util.stream.Collector.of( java.util.concurrent.CopyOnWriteArrayList::new,
+                                                            java.util.List::add, ( l1, l2 )  ->
+                                                        {
+                                                            l1.addAll( l2 );
+                                                            return l1;
+                                                        }, java.util.stream.Collector.Characteristics.CONCURRENT,
+                                                            java.util.stream.Collector.Characteristics.UNORDERED ) )
+            );
         }
     }
 
@@ -5321,7 +5382,7 @@
             {
                 final Message m = source.getMessages().getMessage().get( i );
 
-                if ( target.getMessages().getMessage( m.getName() ) == null )
+                if ( !target.getMessages().getMessage( m.getName() ).isPresent() )
                 {
                     target.getMessages().getMessage().add( m );
                 }
@@ -5339,7 +5400,7 @@
             {
                 final Property p = source.getProperties().getProperty().get( i );
 
-                if ( target.getProperties().getProperty( p.getName() ) == null )
+                if ( !target.getProperties().getProperty( p.getName() ).isPresent() )
                 {
                     target.getProperties().getProperty().add( p );
                 }
@@ -5356,25 +5417,26 @@
             for ( int i = 0, s0 = source.getDependencies().getDependency().size(); i < s0; i++ )
             {
                 final Dependency sd = source.getDependencies().getDependency().get( i );
-                final Dependency td = target.getDependencies().getDependency( sd.getName() );
+                final java.util.Optional<Dependency> td = target.getDependencies().getDependency( sd.getName() );
 
-                if ( td == null )
+                if ( !td.isPresent() )
                 {
                     target.getDependencies().getDependency().add( sd );
                 }
                 else
                 {
-                    this.collectDependencies( sd, td );
+                    this.collectDependencies( sd, td.get() );
                 }
             }
         }
     }
 
-    private Implementation collectImplementation( final Class<?> clazz ) throws ModelObjectException
+    private java.util.Optional<Implementation> collectImplementation( final Class<?> clazz )
+        throws ModelObjectException
     {
-        Implementation i = this.getImplementation( clazz );
+        java.util.Optional<Implementation> i = this.getImplementation( clazz );
 
-        if ( i == null && clazz.getSuperclass() != null )
+        if ( !i.isPresent() && clazz.getSuperclass() != null )
         {
             i = this.collectImplementation( clazz.getSuperclass() );
         }
@@ -5508,10 +5570,12 @@
     private boolean resolveClasspath( final String identifier, final Module cpModule, final ClassLoader classLoader )
     {
         boolean classpathSpecification = false;
-        Specification specification = cpModule.getSpecifications() == null
-                                          ? null : cpModule.getSpecifications().getSpecification( identifier );
+        java.util.Optional<Specification> specification =
+            cpModule.getSpecifications() == null
+                ? java.util.Optional.empty()
+                : cpModule.getSpecifications().getSpecification( identifier );
 
-        if ( specification == null )
+        if ( !specification.isPresent() )
         {
             try
             {
@@ -5530,21 +5594,21 @@
                         version = classpathSpec.getPackage().getSpecificationVersion();
                     }
 
-                    specification = new Specification();
-                    specification.setIdentifier( identifier );
-                    specification.setClazz( javaTypeName.getName( true ) );
-                    specification.setMultiplicity( Multiplicity.MANY );
-                    specification.setVendor( vendor );
-                    specification.setVersion( version );
+                    final Specification s = new Specification();
+                    s.setIdentifier( identifier );
+                    s.setClazz( javaTypeName.getName( true ) );
+                    s.setMultiplicity( Multiplicity.MANY );
+                    s.setVendor( vendor );
+                    s.setVersion( version );
 
                     if ( cpModule.getSpecifications() == null )
                     {
                         cpModule.setSpecifications( new Specifications() );
                     }
 
-                    cpModule.getSpecifications().getSpecification().add( specification );
+                    cpModule.getSpecifications().getSpecification().add( s );
 
-                    this.resolveClasspath( specification, cpModule, classLoader );
+                    this.resolveClasspath( s, cpModule, classLoader );
                 }
             }
             catch ( final ClassNotFoundException | java.text.ParseException e )
@@ -5560,16 +5624,17 @@
                                       final ClassLoader classLoader )
     {
         boolean classpathImplementation = false;
-        Implementation implementation =
-            cpModule.getImplementations() == null ? null
+        java.util.Optional<Implementation> implementation =
+            cpModule.getImplementations() == null
+                ? java.util.Optional.empty()
                 : cpModule.getImplementations().getImplementation( specification.getIdentifier() );
 
-        if ( implementation == null )
+        if ( !implementation.isPresent() )
         {
             implementation = this.getImplementation( specification.getIdentifier() );
         }
 
-        if ( implementation == null )
+        if ( !implementation.isPresent() )
         {
             String name = null;
 
@@ -5622,7 +5687,7 @@
                     }
 
                     if ( classpathImplementation
-                             && this.getImplementation( specification.getIdentifier(), name ) == null )
+                             && !this.getImplementation( specification.getIdentifier(), name ).isPresent() )
                     {
                         String vendor = null;
                         String version = null;
@@ -5632,27 +5697,27 @@
                             version = classpathImpl.getPackage().getImplementationVersion();
                         }
 
-                        implementation = new Implementation();
-                        implementation.setVendor( vendor );
-                        implementation.setFinal( true );
-                        implementation.setName( name );
-                        implementation.setIdentifier( specification.getIdentifier() );
-                        implementation.setClazz( javaTypeName.getName( true ) );
-                        implementation.setVersion( version );
+                        final Implementation i = new Implementation();
+                        i.setVendor( vendor );
+                        i.setFinal( true );
+                        i.setName( name );
+                        i.setIdentifier( specification.getIdentifier() );
+                        i.setClazz( javaTypeName.getName( true ) );
+                        i.setVersion( version );
 
                         final Specifications implemented = new Specifications();
                         final SpecificationReference ref = new SpecificationReference();
                         ref.setIdentifier( specification.getIdentifier() );
                         ref.setVersion( specification.getVersion() );
                         implemented.getReference().add( ref );
-                        implementation.setSpecifications( implemented );
+                        i.setSpecifications( implemented );
 
                         if ( cpModule.getImplementations() == null )
                         {
                             cpModule.setImplementations( new Implementations() );
                         }
 
-                        cpModule.getImplementations().getImplementation().add( implementation );
+                        cpModule.getImplementations().getImplementation().add( i );
                     }
                 }
             }

@@ -37,6 +37,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -329,29 +331,32 @@ public class DefaultModelValidator implements ModelValidator
     }
 
     @Override
-    public ModelValidationReport validateModel( final ModelContext context, final Model model ) throws ModelException
+    public Optional<ModelValidationReport> validateModel( final ModelContext context, final Model model )
+        throws ModelException
     {
-        if ( context == null )
-        {
-            throw new NullPointerException( "context" );
-        }
-        if ( model == null )
-        {
-            throw new NullPointerException( "model" );
-        }
+        Objects.requireNonNull( context, "context" );
+        Objects.requireNonNull( model, "model" );
 
         boolean contextEnabled = this.isEnabled();
-        if ( DEFAULT_ENABLED == contextEnabled
-                 && context.getAttribute( ENABLED_ATTRIBUTE_NAME ) instanceof Boolean )
+        if ( DEFAULT_ENABLED == contextEnabled )
         {
-            contextEnabled = (Boolean) context.getAttribute( ENABLED_ATTRIBUTE_NAME );
+            final Optional<Object> enabledAttribute = context.getAttribute( ENABLED_ATTRIBUTE_NAME );
+
+            if ( enabledAttribute.isPresent() && enabledAttribute.get() instanceof Boolean )
+            {
+                contextEnabled = (Boolean) enabledAttribute.get();
+            }
         }
 
         boolean contextValidateJava = this.isValidateJava();
-        if ( DEFAULT_VALIDATE_JAVA == contextValidateJava
-                 && context.getAttribute( VALIDATE_JAVA_ATTRIBUTE_NAME ) instanceof Boolean )
+        if ( DEFAULT_VALIDATE_JAVA == contextValidateJava )
         {
-            contextValidateJava = (Boolean) context.getAttribute( VALIDATE_JAVA_ATTRIBUTE_NAME );
+            final Optional<Object> validateJavaAttribute = context.getAttribute( VALIDATE_JAVA_ATTRIBUTE_NAME );
+
+            if ( validateJavaAttribute.isPresent() && validateJavaAttribute.get() instanceof Boolean )
+            {
+                contextValidateJava = (Boolean) validateJavaAttribute.get();
+            }
         }
 
         try
@@ -365,12 +370,12 @@ public class DefaultModelValidator implements ModelValidator
 
                 report = context.validateModel( model.getIdentifier(), source );
 
-                final Modules modules = ModelHelper.getModules( model );
+                final Optional<Modules> modules = ModelHelper.getModules( model );
 
-                if ( modules != null )
+                if ( modules.isPresent() )
                 {
                     final ValidationContext validationContext =
-                        new ValidationContext( context, modules, report, contextValidateJava );
+                        new ValidationContext( context, modules.get(), report, contextValidateJava );
 
                     assertModulesValid( validationContext );
                     assertSpecificationsValid( validationContext );
@@ -384,7 +389,7 @@ public class DefaultModelValidator implements ModelValidator
 
             }
 
-            return report;
+            return Optional.of( report );
         }
         catch ( final JAXBException e )
         {
@@ -936,8 +941,8 @@ public class DefaultModelValidator implements ModelValidator
                         if ( impl.getClazz() == null )
                         {
                             addDetail( validationContext.getReport(), "IMPLEMENTATION_CLASS_CONSTRAINT", Level.SEVERE,
-                                       new ObjectFactory().createImplementation( impl ), "implementationClassConstraint",
-                                       impl.getIdentifier(), moduleOfImpl.getName() );
+                                       new ObjectFactory().createImplementation( impl ),
+                                       "implementationClassConstraint", impl.getIdentifier(), moduleOfImpl.getName() );
 
                         }
                         else
@@ -959,13 +964,13 @@ public class DefaultModelValidator implements ModelValidator
 
                             }
 
-                            if ( validationContext.isValidateJava() )
+                            try
                             {
-                                try
+                                if ( validationContext.isValidateJava() && impl.getJavaTypeName().isPresent() )
                                 {
                                     final Implementation java =
                                         implementationJavaClassDeclarations.putIfAbsent(
-                                            impl.getJavaTypeName().getClassName(), impl );
+                                            impl.getJavaTypeName().get().getClassName(), impl );
 
                                     if ( java != null && !java.getIdentifier().equals( impl.getIdentifier() ) )
                                     {
@@ -977,15 +982,15 @@ public class DefaultModelValidator implements ModelValidator
                                                    Level.SEVERE, new ObjectFactory().createImplementation( impl ),
                                                    "implementationJavaClassDeclarationConstraint",
                                                    impl.getIdentifier(), moduleOfImpl.getName(),
-                                                   impl.getJavaTypeName().getClassName(), java.getIdentifier(),
+                                                   impl.getJavaTypeName().get().getClassName(), java.getIdentifier(),
                                                    moduleOfJava.getName() );
 
                                     }
                                 }
-                                catch ( final ModelObjectException e )
-                                {
-                                    // Already validated above.
-                                }
+                            }
+                            catch ( final ModelObjectException e )
+                            {
+                                // Already validated above.
                             }
                         }
                     }
@@ -1556,7 +1561,7 @@ public class DefaultModelValidator implements ModelValidator
                                             final Implementation impl,
                                             final Message m )
     {
-        if ( impl.getMessages().getReference( m.getName() ) != null )
+        if ( impl.getMessages().getReference( m.getName() ).isPresent() )
         {
             addDetail( validationContext.getReport(), "IMPLEMENTATION_MESSAGES_UNIQUENESS_CONSTRAINT",
                        Level.SEVERE, new ObjectFactory().createImplementation( impl ),
@@ -1949,7 +1954,7 @@ public class DefaultModelValidator implements ModelValidator
                                              final Implementation impl,
                                              final Property p )
     {
-        if ( impl.getProperties().getReference( p.getName() ) != null )
+        if ( impl.getProperties().getReference( p.getName() ).isPresent() )
         {
             addDetail( validationContext.getReport(), "IMPLEMENTATION_PROPERTIES_UNIQUENESS_CONSTRAINT",
                        Level.SEVERE, new ObjectFactory().createImplementation( impl ),
@@ -2962,12 +2967,12 @@ public class DefaultModelValidator implements ModelValidator
 
                             }
 
-                            if ( validationContext.isValidateJava() )
+                            try
                             {
-                                try
+                                if ( validationContext.isValidateJava() && s.getJavaTypeName().isPresent() )
                                 {
                                     final Specification java = specificationJavaClassDeclarations.putIfAbsent(
-                                        s.getJavaTypeName().getClassName(), s );
+                                        s.getJavaTypeName().get().getClassName(), s );
 
                                     if ( java != null && !java.getIdentifier().equals( s.getIdentifier() ) )
                                     {
@@ -2978,15 +2983,15 @@ public class DefaultModelValidator implements ModelValidator
                                                    "SPECIFICATION_JAVA_CLASS_DECLARATION_CONSTRAINT",
                                                    Level.SEVERE, new ObjectFactory().createSpecification( s ),
                                                    "specificationJavaClassDeclarationConstraint", s.getIdentifier(),
-                                                   moduleOfS.getName(), s.getJavaTypeName().getClassName(),
+                                                   moduleOfS.getName(), s.getJavaTypeName().get().getClassName(),
                                                    java.getIdentifier(), moduleOfJava.getName() );
 
                                     }
                                 }
-                                catch ( final ModelObjectException e )
-                                {
-                                    // Already validated above.
-                                }
+                            }
+                            catch ( final ModelObjectException e )
+                            {
+                                // Already validated above.
                             }
                         }
                     }
@@ -3246,7 +3251,7 @@ public class DefaultModelValidator implements ModelValidator
         if ( !dependency.isOptional()
                  && ( available == null || available.getImplementation().isEmpty()
                       || ( dependency.getImplementationName() != null
-                           && available.getImplementationByName( dependency.getImplementationName() ) == null ) ) )
+                           && !available.getImplementationByName( dependency.getImplementationName() ).isPresent() ) ) )
         {
             addDetail( validationContext.getReport(), "IMPLEMENTATION_MANDATORY_DEPENDENCY_CONSTRAINT", Level.SEVERE,
                        new ObjectFactory().createImplementation( implementation ),
@@ -4266,20 +4271,20 @@ public class DefaultModelValidator implements ModelValidator
             {
                 st0.forEach( r  ->
                 {
-                    final Specification s = specs.getSpecification( r.getIdentifier() );
+                    final Optional<Specification> s = specs.getSpecification( r.getIdentifier() );
 
-                    if ( s != null && r.getVersion() != null )
+                    if ( s.isPresent() && r.getVersion() != null )
                     {
                         final Module moduleOfS =
-                            validationContext.getModuleOfSpecification( s.getIdentifier() );
+                            validationContext.getModuleOfSpecification( s.get().getIdentifier() );
 
-                        if ( s.getVersion() == null )
+                        if ( s.get().getVersion() == null )
                         {
                             addDetail( validationContext.getReport(),
                                        "IMPLEMENTATION_SPECIFICATION_VERSIONING_CONSTRAINT", Level.SEVERE,
                                        new ObjectFactory().createImplementation( implementation ),
                                        "implementationSpecificationVersioningConstraint",
-                                       implementation.getIdentifier(), moduleOfImpl.getName(), s.getIdentifier(),
+                                       implementation.getIdentifier(), moduleOfImpl.getName(), s.get().getIdentifier(),
                                        moduleOfS.getName() );
 
                         }
@@ -4287,14 +4292,15 @@ public class DefaultModelValidator implements ModelValidator
                         {
                             try
                             {
-                                if ( VersionParser.compare( r.getVersion(), s.getVersion() ) != 0 )
+                                if ( VersionParser.compare( r.getVersion(), s.get().getVersion() ) != 0 )
                                 {
                                     addDetail( validationContext.getReport(),
                                                "IMPLEMENTATION_SPECIFICATION_COMPATIBILITY_CONSTRAINT", Level.SEVERE,
                                                new ObjectFactory().createImplementation( implementation ),
                                                "implementationSpecificationCompatibilityConstraint",
                                                implementation.getIdentifier(), moduleOfImpl.getName(),
-                                               s.getIdentifier(), moduleOfS.getName(), r.getVersion(), s.getVersion() );
+                                               s.get().getIdentifier(), moduleOfS.getName(), r.getVersion(),
+                                               s.get().getVersion() );
 
                                 }
                             }
@@ -4311,8 +4317,8 @@ public class DefaultModelValidator implements ModelValidator
                                            "IMPLEMENTATION_SPECIFICATION_COMPATIBILITY_VERSIONING_PARSE_EXCEPTION",
                                            Level.SEVERE, new ObjectFactory().createImplementation( implementation ),
                                            "implementationSpecificationCompatibilityVersioningParseException",
-                                           implementation.getIdentifier(), moduleOfImpl.getName(), s.getIdentifier(),
-                                           moduleOfS.getName(), r.getVersion(),
+                                           implementation.getIdentifier(), moduleOfImpl.getName(),
+                                           s.get().getIdentifier(), moduleOfS.getName(), r.getVersion(),
                                            message != null && message.length() > 0 ? " " + message : "" );
 
                             }
@@ -4329,8 +4335,8 @@ public class DefaultModelValidator implements ModelValidator
                                            "IMPLEMENTATION_SPECIFICATION_COMPATIBILITY_VERSIONING_TOKEN_MANAGER_ERROR",
                                            Level.SEVERE, new ObjectFactory().createImplementation( implementation ),
                                            "implementationSpecificationCompatibilityVersioningTokenManagerError",
-                                           implementation.getIdentifier(), moduleOfImpl.getName(), s.getIdentifier(),
-                                           moduleOfS.getName(), r.getVersion(),
+                                           implementation.getIdentifier(), moduleOfImpl.getName(),
+                                           s.get().getIdentifier(), moduleOfS.getName(), r.getVersion(),
                                            message != null && message.length() > 0 ? " " + message : "" );
 
                             }
@@ -4426,7 +4432,7 @@ public class DefaultModelValidator implements ModelValidator
 
         if ( col != null )
         {
-            set = new HashSet<T>( col );
+            set = new HashSet<>( col );
         }
 
         return set;
@@ -4502,18 +4508,18 @@ public class DefaultModelValidator implements ModelValidator
                     {
                         specifications.put( s.getIdentifier(), s );
 
-                        final Implementations i = modules.getImplementations( s.getIdentifier() );
+                        final Optional<Implementations> i = modules.getImplementations( s.getIdentifier() );
 
-                        if ( i != null )
+                        if ( i.isPresent() )
                         {
-                            implementationsBySpecification.put( s.getIdentifier(), i );
+                            implementationsBySpecification.put( s.getIdentifier(), i.get() );
                         }
 
-                        final Module m = modules.getModuleOfSpecification( s.getIdentifier() );
+                        final Optional<Module> m = modules.getModuleOfSpecification( s.getIdentifier() );
 
-                        if ( m != null )
+                        if ( m.isPresent() )
                         {
-                            modulesOfSpecifications.put( s.getIdentifier(), m );
+                            modulesOfSpecifications.put( s.getIdentifier(), m.get() );
                         }
                     } );
                 }
@@ -4528,18 +4534,18 @@ public class DefaultModelValidator implements ModelValidator
                     {
                         implementations.put( i.getIdentifier(), i );
 
-                        final Specifications s = modules.getSpecifications( i.getIdentifier() );
+                        final Optional<Specifications> s = modules.getSpecifications( i.getIdentifier() );
 
-                        if ( s != null )
+                        if ( s.isPresent() )
                         {
-                            specificationsByImplementation.put( i.getIdentifier(), s );
+                            specificationsByImplementation.put( i.getIdentifier(), s.get() );
                         }
 
-                        final Module m = modules.getModuleOfImplementation( i.getIdentifier() );
+                        final Optional<Module> m = modules.getModuleOfImplementation( i.getIdentifier() );
 
-                        if ( m != null )
+                        if ( m.isPresent() )
                         {
-                            modulesOfImplementations.put( i.getIdentifier(), m );
+                            modulesOfImplementations.put( i.getIdentifier(), m.get() );
                         }
 
                         // Prepares the inheritance model for concurrent access.

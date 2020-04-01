@@ -30,13 +30,10 @@
  */
 package org.jomc.model.test;
 
-import org.jomc.model.Message;
-import org.jomc.model.ModelObjectException;
 import org.jomc.jls.JavaIdentifier;
+import org.jomc.model.Message;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 
 /**
  * Test cases for class {@code org.jomc.model.Message}.
@@ -60,17 +57,7 @@ public class MessageTest
     public final void JavaConstantName() throws Exception
     {
         final Message m = new Message();
-
-        try
-        {
-            m.getJavaConstantName();
-            fail( "Expected 'ModelObjectException' not thrown." );
-        }
-        catch ( final ModelObjectException e )
-        {
-            assertNotNull( e.getMessage() );
-            System.out.println( e.toString() );
-        }
+        ModelObjectTest.assertModelObjectException( ()  -> m.getJavaConstantName() );
 
         m.setName( "test test" );
         assertEquals( JavaIdentifier.valueOf( "TEST_TEST" ), m.getJavaConstantName() );
@@ -80,17 +67,7 @@ public class MessageTest
     public final void JavaGetterMethodName() throws Exception
     {
         final Message m = new Message();
-
-        try
-        {
-            m.getJavaGetterMethodName();
-            fail( "Expected 'ModelObjectException' not thrown." );
-        }
-        catch ( final ModelObjectException e )
-        {
-            assertNotNull( e.getMessage() );
-            System.out.println( e.toString() );
-        }
+        ModelObjectTest.assertModelObjectException( ()  -> m.getJavaGetterMethodName() );
 
         m.setName( "TEST TEST" );
         assertEquals( JavaIdentifier.valueOf( "getTestTest" ), m.getJavaGetterMethodName() );
@@ -100,17 +77,7 @@ public class MessageTest
     public final void JavaSetterMethodName() throws Exception
     {
         final Message m = new Message();
-
-        try
-        {
-            m.getJavaSetterMethodName();
-            fail( "Expected 'ModelObjectException' not thrown." );
-        }
-        catch ( final ModelObjectException e )
-        {
-            assertNotNull( e.getMessage() );
-            System.out.println( e.toString() );
-        }
+        ModelObjectTest.assertModelObjectException( ()  -> m.getJavaSetterMethodName() );
 
         m.setName( "TEST TEST" );
         assertEquals( JavaIdentifier.valueOf( "setTestTest" ), m.getJavaSetterMethodName() );
@@ -120,17 +87,7 @@ public class MessageTest
     public final void JavaVariableName() throws Exception
     {
         final Message m = new Message();
-
-        try
-        {
-            m.getJavaVariableName();
-            fail( "Expected 'ModelObjectException' not thrown." );
-        }
-        catch ( final ModelObjectException e )
-        {
-            assertNotNull( e.getMessage() );
-            System.out.println( e.toString() );
-        }
+        ModelObjectTest.assertModelObjectException( ()  -> m.getJavaVariableName() );
 
         m.setName( "TEST TEST" );
         assertEquals( JavaIdentifier.valueOf( "testTest" ), m.getJavaVariableName() );

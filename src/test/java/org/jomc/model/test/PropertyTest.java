@@ -30,17 +30,12 @@
  */
 package org.jomc.model.test;
 
-import java.lang.reflect.InvocationTargetException;
-import org.jomc.model.ModelObjectException;
-import org.jomc.model.Property;
-import org.jomc.model.PropertyException;
 import org.jomc.jls.JavaIdentifier;
+import org.jomc.model.Property;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * Test cases for class {@code org.jomc.model.Property}.
@@ -129,36 +124,15 @@ public class PropertyTest
     public final void testGetJavaValue() throws Exception
     {
         final Property p = new Property();
-        assertNull( p.getJavaValue( this.getClass().getClassLoader() ) );
+        assertNotNull( p.getJavaValue( this.getClass().getClassLoader() ) );
+        assertFalse( p.getJavaValue( this.getClass().getClassLoader() ).isPresent() );
 
         p.setAny( new Object() );
-
-        try
-        {
-            p.getJavaValue( this.getClass().getClassLoader() );
-            fail( "Expected PropertyException not thrown for missing mandatory type." );
-        }
-        catch ( final PropertyException e )
-        {
-            assertNotNull( e.getMessage() );
-            System.out.println( e );
-        }
+        ModelObjectTest.assertPropertyException( ()  -> p.getJavaValue( this.getClass().getClassLoader() ) );
 
         p.setType( UnsupportedJavaValue.class.getName() );
         p.setAny( new UnsupportedJavaValue() );
-
-        try
-        {
-            p.getJavaValue( this.getClass().getClassLoader() );
-            fail( "Expected PropertyException not thrown for unsupported getJavaValue operation." );
-        }
-        catch ( final PropertyException e )
-        {
-            assertNotNull( e.getMessage() );
-            assertTrue( e.getCause() instanceof InvocationTargetException );
-            System.out.println( e );
-            System.out.println( e.getCause() );
-        }
+        ModelObjectTest.assertPropertyException( ()  -> p.getJavaValue( this.getClass().getClassLoader() ) );
 
         p.setType( Object.class.getName() );
         p.setAny( new Object()
@@ -170,174 +144,63 @@ public class PropertyTest
             }
 
         } );
-
-        try
-        {
-            p.getJavaValue( this.getClass().getClassLoader() );
-            fail( "Expected PropertyException not thrown for inaccessible getJavaValue method." );
-        }
-        catch ( final PropertyException e )
-        {
-            assertNotNull( e.getMessage() );
-            System.out.println( e );
-            System.out.println( e.getCause() );
-        }
+        ModelObjectTest.assertPropertyException( ()  -> p.getJavaValue( this.getClass().getClassLoader() ) );
 
         p.setType( "java.lang.String" );
         p.setAny( new ObjectJavaValue() );
-
-        try
-        {
-            p.getJavaValue( this.getClass().getClassLoader() );
-            fail( "Expected PropertyException not thrown for incompatible getJavaValue method." );
-        }
-        catch ( final PropertyException e )
-        {
-            assertNotNull( e.getMessage() );
-            System.out.println( e );
-        }
+        ModelObjectTest.assertPropertyException( ()  -> p.getJavaValue( this.getClass().getClassLoader() ) );
 
         p.setType( "int" );
         p.setAny( null );
         p.setValue( null );
-
-        try
-        {
-            p.getJavaValue( this.getClass().getClassLoader() );
-            fail( "Expected PropertyException not thrown for mandatory primitive value." );
-        }
-        catch ( final PropertyException e )
-        {
-            assertNotNull( e.getMessage() );
-            System.out.println( e );
-        }
+        ModelObjectTest.assertPropertyException( ()  -> p.getJavaValue( this.getClass().getClassLoader() ) );
 
         p.setType( "DOES_NOT_EXIST" );
         p.setAny( null );
         p.setValue( "STRING VALUE" );
-
-        try
-        {
-            p.getJavaValue( this.getClass().getClassLoader() );
-            fail( "Expected PropertyException not thrown for missing class." );
-        }
-        catch ( final PropertyException e )
-        {
-            assertNotNull( e.getMessage() );
-            System.out.println( e );
-        }
+        ModelObjectTest.assertPropertyException( ()  -> p.getJavaValue( this.getClass().getClassLoader() ) );
 
         p.setType( "char" );
         p.setValue( "NO CHAR VALUE" );
-
-        try
-        {
-            p.getJavaValue( this.getClass().getClassLoader() );
-            fail( "Expected PropertyException not thrown for illegal char value." );
-        }
-        catch ( final PropertyException e )
-        {
-            assertNotNull( e.getMessage() );
-            System.out.println( e );
-        }
+        ModelObjectTest.assertPropertyException( ()  -> p.getJavaValue( this.getClass().getClassLoader() ) );
 
         p.setType( AbstractJavaValue.class.getName() );
         p.setAny( null );
         p.setValue( "STRING VALUE" );
-
-        try
-        {
-            p.getJavaValue( this.getClass().getClassLoader() );
-            fail( "Expected PropertyException not thrown for non-instantiable class." );
-        }
-        catch ( final PropertyException e )
-        {
-            assertNotNull( e.getMessage() );
-            System.out.println( e );
-        }
+        ModelObjectTest.assertPropertyException( ()  -> p.getJavaValue( this.getClass().getClassLoader() ) );
 
         p.setType( ObjectJavaValue.class.getName() );
         p.setAny( null );
         p.setValue( "STRING VALUE" );
-
-        try
-        {
-            p.getJavaValue( this.getClass().getClassLoader() );
-            fail( "Expected PropertyException not thrown for missing constructor." );
-        }
-        catch ( final PropertyException e )
-        {
-            assertNotNull( e.getMessage() );
-            System.out.println( e );
-        }
+        ModelObjectTest.assertPropertyException( ()  -> p.getJavaValue( this.getClass().getClassLoader() ) );
 
         p.setType( UnsupportedJavaValue.class.getName() );
         p.setAny( null );
         p.setValue( "STRING VALUE" );
-
-        try
-        {
-            p.getJavaValue( this.getClass().getClassLoader() );
-            fail( "Expected PropertyException not thrown for unsupported constructor." );
-        }
-        catch ( final PropertyException e )
-        {
-            assertNotNull( e.getMessage() );
-            System.out.println( e );
-        }
+        ModelObjectTest.assertPropertyException( ()  -> p.getJavaValue( this.getClass().getClassLoader() ) );
 
         p.setType( InaccessibleJavaValue.class.getName() );
         p.setAny( null );
         p.setValue( "STRING VALUE" );
-
-        try
-        {
-            p.getJavaValue( this.getClass().getClassLoader() );
-            fail( "Expected PropertyException not thrown for inaccessible constructor." );
-        }
-        catch ( final PropertyException e )
-        {
-            assertNotNull( e.getMessage() );
-            System.out.println( e );
-        }
+        ModelObjectTest.assertPropertyException( ()  -> p.getJavaValue( this.getClass().getClassLoader() ) );
 
         // Since 1.5
         p.setType( Thread.State.class.getName() );
         p.setAny( null );
         p.setValue( "RUNNABLE" );
-        assertEquals( Thread.State.RUNNABLE, p.getJavaValue( this.getClass().getClassLoader() ) );
+        assertEquals( Thread.State.RUNNABLE, p.getJavaValue( this.getClass().getClassLoader() ).get() );
 
         p.setType( FactoryMethodTestClass.class.getName() );
         p.setAny( null );
         p.setValue( "TEST" );
-
-        try
-        {
-            p.getJavaValue( this.getClass().getClassLoader() );
-            fail( "Expected PropertyException not thrown for illegal factory method." );
-        }
-        catch ( final PropertyException e )
-        {
-            assertNotNull( e.getMessage() );
-            System.out.println( e );
-        }
+        ModelObjectTest.assertPropertyException( ()  -> p.getJavaValue( this.getClass().getClassLoader() ) );
     }
 
     @Test
     public final void JavaConstantName() throws Exception
     {
         final Property p = new Property();
-
-        try
-        {
-            p.getJavaConstantName();
-            fail( "Expected 'ModelObjectException' not thrown." );
-        }
-        catch ( final ModelObjectException e )
-        {
-            assertNotNull( e.getMessage() );
-            System.out.println( e.toString() );
-        }
+        ModelObjectTest.assertModelObjectException( ()  -> p.getJavaConstantName() );
 
         p.setName( "test test" );
         assertEquals( JavaIdentifier.valueOf( "TEST_TEST" ), p.getJavaConstantName() );
@@ -347,17 +210,7 @@ public class PropertyTest
     public final void JavaGetterMethodName() throws Exception
     {
         final Property p = new Property();
-
-        try
-        {
-            p.getJavaGetterMethodName();
-            fail( "Expected 'ModelObjectException' not thrown." );
-        }
-        catch ( final ModelObjectException e )
-        {
-            assertNotNull( e.getMessage() );
-            System.out.println( e.toString() );
-        }
+        ModelObjectTest.assertModelObjectException( ()  -> p.getJavaGetterMethodName() );
 
         p.setName( "TEST TEST" );
         assertEquals( JavaIdentifier.valueOf( "getTestTest" ), p.getJavaGetterMethodName() );
@@ -367,17 +220,7 @@ public class PropertyTest
     public final void JavaSetterMethodName() throws Exception
     {
         final Property p = new Property();
-
-        try
-        {
-            p.getJavaSetterMethodName();
-            fail( "Expected 'ModelObjectException' not thrown." );
-        }
-        catch ( final ModelObjectException e )
-        {
-            assertNotNull( e.getMessage() );
-            System.out.println( e.toString() );
-        }
+        ModelObjectTest.assertModelObjectException( ()  -> p.getJavaSetterMethodName() );
 
         p.setName( "TEST TEST" );
         assertEquals( JavaIdentifier.valueOf( "setTestTest" ), p.getJavaSetterMethodName() );
@@ -387,17 +230,7 @@ public class PropertyTest
     public final void JavaVariableName() throws Exception
     {
         final Property p = new Property();
-
-        try
-        {
-            p.getJavaVariableName();
-            fail( "Expected 'ModelObjectException' not thrown." );
-        }
-        catch ( final ModelObjectException e )
-        {
-            assertNotNull( e.getMessage() );
-            System.out.println( e.toString() );
-        }
+        ModelObjectTest.assertModelObjectException( ()  -> p.getJavaVariableName() );
 
         p.setName( "TEST TEST" );
         assertEquals( JavaIdentifier.valueOf( "testTest" ), p.getJavaVariableName() );
