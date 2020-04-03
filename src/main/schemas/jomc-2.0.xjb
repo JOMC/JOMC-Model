@@ -666,9 +666,23 @@
             final class FindSpecificationFailure extends RuntimeException
             {
 
-                public FindSpecificationFailure( final Throwable cause )
+                FindSpecificationFailure( final Throwable cause )
                 {
-                    super( cause );
+                    super( java.util.Objects.requireNonNull( cause, "cause" ) );
+                }
+
+                <T extends Exception> void handleCause( final Class<T> cause ) throws T
+                {
+                    if ( this.getCause().getClass().isAssignableFrom(
+                        java.util.Objects.requireNonNull( cause, "cause" ) ) )
+                    {
+                        throw (T) this.getCause();
+                    }
+                }
+
+                Error unhandledCauseError()
+                {
+                    return new AssertionError( this.getCause() );
                 }
 
             }
@@ -691,14 +705,10 @@
                         }
                     } ).findFirst();
             }
-            catch ( final FindSpecificationFailure e )
+            catch ( final FindSpecificationFailure f )
             {
-                if ( e.getCause() instanceof ModelObjectException )
-                {
-                    throw (ModelObjectException) e.getCause();
-                }
-
-                throw new AssertionError( e );
+                f.handleCause( ModelObjectException.class );
+                throw f.unhandledCauseError();
             }
         }
     }
@@ -1008,9 +1018,23 @@
             final class FindImplementationFailure extends RuntimeException
             {
 
-                public FindImplementationFailure( final Throwable cause )
+                FindImplementationFailure( final Throwable cause )
                 {
-                    super( cause );
+                    super( java.util.Objects.requireNonNull( cause, "cause" ) );
+                }
+
+                <T extends Exception> void handleCause( final Class<T> cause ) throws T
+                {
+                    if ( this.getCause().getClass().isAssignableFrom(
+                        java.util.Objects.requireNonNull( cause, "cause" ) ) )
+                    {
+                        throw (T) this.getCause();
+                    }
+                }
+
+                Error unhandledCauseError()
+                {
+                    return new AssertionError( this.getCause() );
                 }
 
             }
@@ -1033,14 +1057,10 @@
                         }
                     } ).findFirst();
             }
-            catch ( final FindImplementationFailure e )
+            catch ( final FindImplementationFailure f )
             {
-                if ( e.getCause() instanceof ModelObjectException )
-                {
-                    throw (ModelObjectException) e.getCause();
-                }
-
-                throw new AssertionError( e );
+                f.handleCause( ModelObjectException.class );
+                throw f.unhandledCauseError();
             }
         }
     }
@@ -3008,9 +3028,23 @@
                 final class FindClassesFailure extends RuntimeException
                 {
 
-                    public FindClassesFailure( final Throwable cause )
+                    FindClassesFailure( final Throwable cause )
                     {
-                        super( cause );
+                        super( java.util.Objects.requireNonNull( cause, "cause" ) );
+                    }
+
+                    <T extends Exception> void handleCause( final Class<T> cause ) throws T
+                    {
+                        if ( this.getCause().getClass().isAssignableFrom(
+                            java.util.Objects.requireNonNull( cause, "cause" ) ) )
+                        {
+                            throw (T) this.getCause();
+                        }
+                    }
+
+                    Error unhandledCauseError()
+                    {
+                        return new AssertionError( this.getCause() );
                     }
 
                 }
@@ -3045,18 +3079,11 @@
                                                             }, java.util.stream.Collector.Characteristics.CONCURRENT,
                                                                 java.util.stream.Collector.Characteristics.UNORDERED ) );
                 }
-                catch ( final FindClassesFailure e )
+                catch ( final FindClassesFailure f )
                 {
-                    if ( e.getCause() instanceof ClassNotFoundException )
-                    {
-                        throw (ClassNotFoundException) e.getCause();
-                    }
-                    else if ( e.getCause() instanceof ModelObjectException )
-                    {
-                        throw (ModelObjectException) e.getCause();
-                    }
-
-                    throw new AssertionError( e );
+                    f.handleCause( ClassNotFoundException.class );
+                    f.handleCause( ModelObjectException.class );
+                    throw f.unhandledCauseError();
                 }
             }
         }
@@ -3908,9 +3935,23 @@
             final class FindSpecificationFailure extends RuntimeException
             {
 
-                public FindSpecificationFailure( final Throwable cause )
+                FindSpecificationFailure( final Throwable cause )
                 {
-                    super( cause );
+                    super( java.util.Objects.requireNonNull( cause, "cause" ) );
+                }
+
+                <T extends Exception> void handleCause( final Class<T> cause ) throws T
+                {
+                    if ( this.getCause().getClass().isAssignableFrom(
+                        java.util.Objects.requireNonNull( cause, "cause" ) ) )
+                    {
+                        throw (T) this.getCause();
+                    }
+                }
+
+                Error unhandledCauseError()
+                {
+                    return new AssertionError( this.getCause() );
                 }
 
             }
@@ -3938,14 +3979,10 @@
                     } ).findFirst();
 
             }
-            catch ( final FindSpecificationFailure e )
+            catch ( final FindSpecificationFailure f )
             {
-                if ( e.getCause() instanceof ModelObjectException )
-                {
-                    throw (ModelObjectException) e.getCause();
-                }
-
-                throw new AssertionError( e );
+                f.handleCause( ModelObjectException.class );
+                throw f.unhandledCauseError();
             }
         }
     }
@@ -4013,9 +4050,23 @@
                 final class MapJavaTypeNameFailure extends RuntimeException
                 {
 
-                    public MapJavaTypeNameFailure( final Throwable cause )
+                    MapJavaTypeNameFailure( final Throwable cause )
                     {
-                        super( cause );
+                        super( java.util.Objects.requireNonNull( cause, "cause" ) );
+                    }
+
+                    <T extends Exception> void handleCause( final Class<T> cause ) throws T
+                    {
+                        if ( this.getCause().getClass().isAssignableFrom(
+                            java.util.Objects.requireNonNull( cause, "cause" ) ) )
+                        {
+                            throw (T) this.getCause();
+                        }
+                    }
+
+                    Error unhandledCauseError()
+                    {
+                        return new AssertionError( this.getCause() );
                     }
 
                 }
@@ -4053,14 +4104,10 @@
                                                            java.util.stream.Collector.Characteristics.UNORDERED ) )
                     );
                 }
-                catch ( final MapJavaTypeNameFailure e )
+                catch ( final MapJavaTypeNameFailure f )
                 {
-                    if ( e.getCause() instanceof ModelObjectException )
-                    {
-                        throw (ModelObjectException) e.getCause();
-                    }
-
-                    throw new AssertionError( e );
+                    f.handleCause( ModelObjectException.class );
+                    throw f.unhandledCauseError();
                 }
             }
 
@@ -4124,9 +4171,23 @@
             final class FindImplementationFailure extends RuntimeException
             {
 
-                public FindImplementationFailure( final Throwable cause )
+                FindImplementationFailure( final Throwable cause )
                 {
-                    super( cause );
+                    super( java.util.Objects.requireNonNull( cause, "cause" ) );
+                }
+
+                <T extends Exception> void handleCause( final Class<T> cause ) throws T
+                {
+                    if ( this.getCause().getClass().isAssignableFrom(
+                        java.util.Objects.requireNonNull( cause, "cause" ) ) )
+                    {
+                        throw (T) this.getCause();
+                    }
+                }
+
+                Error unhandledCauseError()
+                {
+                    return new AssertionError( this.getCause() );
                 }
 
             }
@@ -4152,14 +4213,10 @@
                         }
                     } ).findFirst();
             }
-            catch ( final FindImplementationFailure e )
+            catch ( final FindImplementationFailure f )
             {
-                if ( e.getCause() instanceof ModelObjectException )
-                {
-                    throw (ModelObjectException) e.getCause();
-                }
-
-                throw new AssertionError( e );
+                f.handleCause( ModelObjectException.class );
+                throw f.unhandledCauseError();
             }
         }
     }

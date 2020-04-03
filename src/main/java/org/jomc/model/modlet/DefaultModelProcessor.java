@@ -46,6 +46,7 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
@@ -351,9 +352,27 @@ public class DefaultModelProcessor implements ModelProcessor
             final class CreateTransformerFailure extends RuntimeException
             {
 
-                public CreateTransformerFailure( final Throwable cause )
+                CreateTransformerFailure( final Throwable cause )
                 {
-                    super( cause );
+                    super( Objects.requireNonNull( cause, "cause" ) );
+                }
+
+                <T extends Exception, R extends Exception> void handleCause(
+                    final Class<T> cause, final Function<T, R> createExceptionFunction )
+                    throws R
+                {
+                    if ( this.getCause().getClass().isAssignableFrom( Objects.requireNonNull( cause, "cause" ) ) )
+                    {
+                        throw Objects.requireNonNull( Objects.requireNonNull( createExceptionFunction,
+                                                                              "createExceptionFunction" ).
+                            apply( (T) this.getCause() ), createExceptionFunction.toString() );
+
+                    }
+                }
+
+                Error unhandledCauseError()
+                {
+                    return new AssertionError( this.getCause() );
                 }
 
             }
@@ -401,24 +420,15 @@ public class DefaultModelProcessor implements ModelProcessor
                                            Collector.Characteristics.UNORDERED ) ) );
 
             }
-            catch ( final CreateTransformerFailure e )
+            catch ( final CreateTransformerFailure f )
             {
-                if ( e.getCause() instanceof TransformerConfigurationException )
-                {
-                    String message = getMessage( e.getCause() );
-                    if ( message == null && ( (TransformerException) e.getCause() ).getException() != null )
-                    {
-                        message = getMessage( ( (TransformerException) e.getCause() ).getException() );
-                    }
+                f.handleCause( TransformerConfigurationException.class,
+                               cause  -> new ModelException( getMessage( cause ), cause ) );
 
-                    throw new ModelException( message, e.getCause() );
-                }
-                else if ( e.getCause() instanceof URISyntaxException )
-                {
-                    throw new ModelException( getMessage( e.getCause() ), e.getCause() );
-                }
+                f.handleCause( URISyntaxException.class,
+                               cause  -> new ModelException( getMessage( cause ), cause ) );
 
-                throw new AssertionError( e );
+                throw f.unhandledCauseError();
             }
         }
 
