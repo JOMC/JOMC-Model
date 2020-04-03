@@ -377,48 +377,52 @@ public class DefaultModelProcessor implements ModelProcessor
 
             }
 
+            final Function<URL, Transformer> toTransformer = url  ->
+            {
+                try
+                {
+                    TransformerFactory transformerFactory = threadLocalTransformerFactory.get();
+                    if ( transformerFactory == null )
+                    {
+                        transformerFactory = TransformerFactory.newInstance();
+                        transformerFactory.setErrorListener( errorListener );
+                        threadLocalTransformerFactory.set( transformerFactory );
+                    }
+
+                    if ( context.isLoggable( Level.FINEST ) )
+                    {
+                        context.log( Level.FINEST, getMessage( "processing", url.toExternalForm() ), null );
+                    }
+
+                    final Transformer transformer =
+                        transformerFactory.newTransformer( new StreamSource( url.toURI().toASCIIString() ) );
+
+                    transformer.setErrorListener( errorListener );
+
+                    parameters.entrySet().forEach( e  ->
+                    {
+                        transformer.setParameter( e.getKey().toString(), e.getValue() );
+                    } );
+
+                    return transformer;
+                }
+                catch ( final TransformerConfigurationException | URISyntaxException e )
+                {
+                    throw new CreateTransformerFailure( e );
+                }
+            };
+
             try
             {
-                transformers.addAll( st0.map( url  ->
-                {
-                    try
-                    {
-                        TransformerFactory transformerFactory = threadLocalTransformerFactory.get();
-                        if ( transformerFactory == null )
-                        {
-                            transformerFactory = TransformerFactory.newInstance();
-                            transformerFactory.setErrorListener( errorListener );
-                            threadLocalTransformerFactory.set( transformerFactory );
-                        }
-
-                        if ( context.isLoggable( Level.FINEST ) )
-                        {
-                            context.log( Level.FINEST, getMessage( "processing", url.toExternalForm() ), null );
-                        }
-
-                        final Transformer transformer =
-                            transformerFactory.newTransformer( new StreamSource( url.toURI().toASCIIString() ) );
-
-                        transformer.setErrorListener( errorListener );
-
-                        parameters.entrySet().forEach( e  ->
-                        {
-                            transformer.setParameter( e.getKey().toString(), e.getValue() );
-                        } );
-
-                        return transformer;
-                    }
-                    catch ( final TransformerConfigurationException | URISyntaxException e )
-                    {
-                        throw new CreateTransformerFailure( e );
-                    }
-                } ).collect( Collector.of( CopyOnWriteArrayList::new, List::add, ( l1, l2 )  ->
-                                       {
-                                           l1.addAll( l2 );
-                                           return l1;
-                                       }, Collector.Characteristics.CONCURRENT,
-                                           Collector.Characteristics.UNORDERED ) ) );
-
+                transformers.addAll(
+                    st0.map( toTransformer ).
+                        collect( Collector.of( CopyOnWriteArrayList::new, List::add, ( l1, l2 )  ->
+                                           {
+                                               l1.addAll( l2 );
+                                               return l1;
+                                           }, Collector.Characteristics.CONCURRENT,
+                                               Collector.Characteristics.UNORDERED ) )
+                );
             }
             catch ( final CreateTransformerFailure f )
             {

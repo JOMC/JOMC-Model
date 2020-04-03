@@ -486,68 +486,73 @@ public class DefaultModelProvider implements ModelProvider
 
             }
 
-            try
+            final Function<URL, Module> toModule = url  ->
             {
-                modules.getModule().addAll( st0.map( url  ->
+                try
                 {
-                    try
+                    Module module = null;
+
+                    if ( context.isLoggable( Level.FINEST ) )
                     {
-                        Module module = null;
+                        context.log( Level.FINEST, getMessage( "processing", url.toExternalForm() ), null );
+                    }
+
+                    Unmarshaller u = threadLocalUnmarshaller.get();
+                    if ( u == null )
+                    {
+                        u = context.createUnmarshaller( model );
+                        u.setSchema( schema );
+                        threadLocalUnmarshaller.set( u );
+                    }
+
+                    Object content = u.unmarshal( url );
+                    if ( content instanceof JAXBElement<?> )
+                    {
+                        content = ( (JAXBElement<?>) content ).getValue();
+                    }
+
+                    if ( content instanceof Module )
+                    {
+                        module = (Module) content;
 
                         if ( context.isLoggable( Level.FINEST ) )
                         {
-                            context.log( Level.FINEST, getMessage( "processing", url.toExternalForm() ), null );
-                        }
-
-                        Unmarshaller u = threadLocalUnmarshaller.get();
-                        if ( u == null )
-                        {
-                            u = context.createUnmarshaller( model );
-                            u.setSchema( schema );
-                            threadLocalUnmarshaller.set( u );
-                        }
-
-                        Object content = u.unmarshal( url );
-                        if ( content instanceof JAXBElement<?> )
-                        {
-                            content = ( (JAXBElement<?>) content ).getValue();
-                        }
-
-                        if ( content instanceof Module )
-                        {
-                            module = (Module) content;
-
-                            if ( context.isLoggable( Level.FINEST ) )
-                            {
-                                context.log( Level.FINEST, getMessage( "foundModule", module.getName(),
-                                                                       module.getVersion() == null
-                                                                           ? ""
-                                                                           : module.getVersion() ),
-                                             null );
-
-                            }
-                        }
-                        else if ( context.isLoggable( Level.WARNING ) )
-                        {
-                            context.log( Level.WARNING, getMessage( "ignoringDocument",
-                                                                    content == null ? "<>" : content.toString(),
-                                                                    url.toExternalForm() ), null );
+                            context.log( Level.FINEST, getMessage( "foundModule", module.getName(),
+                                                                   module.getVersion() == null
+                                                                       ? ""
+                                                                       : module.getVersion() ),
+                                         null );
 
                         }
-
-                        return module;
                     }
-                    catch ( final ModelException | JAXBException e )
+                    else if ( context.isLoggable( Level.WARNING ) )
                     {
-                        throw new UnmarshalFailure( url, e );
+                        context.log( Level.WARNING, getMessage( "ignoringDocument",
+                                                                content == null ? "<>" : content.toString(),
+                                                                url.toExternalForm() ), null );
+
                     }
-                } ).filter( m  -> m != null ).
-                    collect( Collector.of( CopyOnWriteArrayList::new, List::add, ( l1, l2 )  ->
-                                       {
-                                           l1.addAll( l2 );
-                                           return l1;
-                                       }, Collector.Characteristics.CONCURRENT,
-                                           Collector.Characteristics.UNORDERED ) ) );
+
+                    return module;
+                }
+                catch ( final ModelException | JAXBException e )
+                {
+                    throw new UnmarshalFailure( url, e );
+                }
+            };
+
+            try
+            {
+                modules.getModule().addAll(
+                    st0.map( toModule ).
+                        filter( m  -> m != null ).
+                        collect( Collector.of( CopyOnWriteArrayList::new, List::add, ( l1, l2 )  ->
+                                           {
+                                               l1.addAll( l2 );
+                                               return l1;
+                                           }, Collector.Characteristics.CONCURRENT,
+                                               Collector.Characteristics.UNORDERED ) )
+                );
             }
             catch ( final UnmarshalFailure f )
             {
