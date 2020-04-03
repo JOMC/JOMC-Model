@@ -673,7 +673,7 @@
 
                 <T extends Exception> void handleCause( final Class<T> cause ) throws T
                 {
-                    if ( java.util.Objects.requireNonNull( cause, "cause" ).getClass().
+                    if ( java.util.Objects.requireNonNull( cause, "cause" ).
                         isAssignableFrom( this.getCause().getClass() ) )
                     {
                         throw (T) this.getCause();
@@ -1025,7 +1025,7 @@
 
                 <T extends Exception> void handleCause( final Class<T> cause ) throws T
                 {
-                    if ( java.util.Objects.requireNonNull( cause, "cause" ).getClass().
+                    if ( java.util.Objects.requireNonNull( cause, "cause" ).
                         isAssignableFrom( this.getCause().getClass() ) )
                     {
                         throw (T) this.getCause();
@@ -3035,7 +3035,7 @@
 
                     <T extends Exception> void handleCause( final Class<T> cause ) throws T
                     {
-                        if ( java.util.Objects.requireNonNull( cause, "cause" ).getClass().
+                        if ( java.util.Objects.requireNonNull( cause, "cause" ).
                             isAssignableFrom( this.getCause().getClass() ) )
                         {
                             throw (T) this.getCause();
@@ -3942,7 +3942,7 @@
 
                 <T extends Exception> void handleCause( final Class<T> cause ) throws T
                 {
-                    if ( java.util.Objects.requireNonNull( cause, "cause" ).getClass().
+                    if ( java.util.Objects.requireNonNull( cause, "cause" ).
                         isAssignableFrom( this.getCause().getClass() ) )
                     {
                         throw (T) this.getCause();
@@ -4057,7 +4057,7 @@
 
                     <T extends Exception> void handleCause( final Class<T> cause ) throws T
                     {
-                        if ( java.util.Objects.requireNonNull( cause, "cause" ).getClass().
+                        if ( java.util.Objects.requireNonNull( cause, "cause" ).
                             isAssignableFrom( this.getCause().getClass() ) )
                         {
                             throw (T) this.getCause();
@@ -4178,7 +4178,7 @@
 
                 <T extends Exception> void handleCause( final Class<T> cause ) throws T
                 {
-                    if ( java.util.Objects.requireNonNull( cause, "cause" ).getClass().
+                    if ( java.util.Objects.requireNonNull( cause, "cause" ).
                         isAssignableFrom( this.getCause().getClass() ) )
                     {
                         throw (T) this.getCause();

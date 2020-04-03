@@ -460,8 +460,7 @@ public class DefaultModelProvider implements ModelProvider
 
                 <T extends Exception> void handleCause( final Class<T> cause ) throws T
                 {
-                    if ( Objects.requireNonNull( cause, "cause" ).getClass().
-                        isAssignableFrom( this.getCause().getClass() ) )
+                    if ( Objects.requireNonNull( cause, "cause" ).isAssignableFrom( this.getCause().getClass() ) )
                     {
                         throw (T) this.getCause();
                     }
@@ -471,7 +470,7 @@ public class DefaultModelProvider implements ModelProvider
                     final Class<T> cause, final Function<T, R> createExceptionFunction )
                     throws R
                 {
-                    if ( this.getCause().getClass().isAssignableFrom( Objects.requireNonNull( cause, "cause" ) ) )
+                    if ( Objects.requireNonNull( cause, "cause" ).isAssignableFrom( this.getCause().getClass() ) )
                     {
                         throw Objects.requireNonNull( Objects.requireNonNull( createExceptionFunction,
                                                                               "createExceptionFunction" ).
